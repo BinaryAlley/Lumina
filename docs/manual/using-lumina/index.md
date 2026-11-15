@@ -153,7 +153,7 @@ Both book and music pages double as editors for the items that were scanned in. 
 
 ## The file system browser
 
-Wherever Lumina needs a folder or a file from the server, it opens the file system browser: a modal that lists the drives, a tree of folders, a pane of the items in the current folder, and an address bar you can walk with. It offers icon view modes, generates thumbnails for images, and can show or hide hidden files. You will meet it when you pick the content locations of a library, and anywhere else the interface asks you to point at a path on the server.
+Wherever Lumina needs a folder or a file from the server, it opens the file system browser: a modal that lists the drives, a tree of folders, a pane of the items in the current folder, and an address bar you can walk with. It offers icon view modes, generates thumbnails for images, and can show or hide hidden files. Hidden entries are dimmed by the bundled themes. You will meet it when you pick the content locations of a library, and anywhere else the interface asks you to point at a path on the server.
 
 ## Settings and language
 

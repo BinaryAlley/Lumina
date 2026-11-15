@@ -24,11 +24,13 @@ public class FileSystemTreeNodeDtoFixture
     /// <param name="path">Optional. The full path of the file or directory.</param>
     /// <param name="name">Optional. The name of the file or directory.</param>
     /// <param name="itemType">Optional. The type of the item, indicating whether it is a file, directory, or drive.</param>
+    /// <param name="isHidden">Optional. Whether the node is hidden. If not provided, a random value is generated.</param>
     /// <returns>A configured <see cref="FileSystemTreeNodeDto"/> instance.</returns>
     public FileSystemTreeNodeDto Create(
         string? path = null, 
         string? name = null, 
-        FileSystemItemType? itemType = null)
+        FileSystemItemType? itemType = null,
+        bool? isHidden = null)
     {
         string generatedPath = _faker.System.FilePath();
         return new FileSystemTreeNodeDto
@@ -36,6 +38,7 @@ public class FileSystemTreeNodeDtoFixture
             Path = path ?? generatedPath,
             Name = name ?? Path.GetFileName(generatedPath),
             ItemType = itemType ?? _faker.PickRandom<FileSystemItemType>(),
+            IsHidden = isHidden ?? _faker.Random.Bool(),
             IsExpanded = _faker.Random.Bool(),
             ChildrenLoaded = _faker.Random.Bool(),
             Children = []

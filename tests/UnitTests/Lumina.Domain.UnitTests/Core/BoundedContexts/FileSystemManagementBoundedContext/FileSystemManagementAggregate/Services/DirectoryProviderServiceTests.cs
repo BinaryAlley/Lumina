@@ -212,6 +212,82 @@ public class DirectoryProviderServiceTests
     }
 
     [Fact]
+    public void IsHidden_WhenDirectoryHasHiddenAttribute_ShouldReturnTrue()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(_pathHidden1);
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false).Returns(true);
+        _mockFileSystem.File.GetAttributes(path.Path).Returns(FileAttributes.Directory | FileAttributes.Hidden);
+
+        // Act
+        bool result = _sut.IsHidden(path);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void IsHidden_WhenDirectoryPathEndsWithSeparator_ShouldCheckAttributesWithoutSeparator()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(_pathHidden2);
+        _mockFileSystem.Path.DirectorySeparatorChar.Returns(_dirSeparator);
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false).Returns(true);
+        _mockFileSystem.File.GetAttributes(_pathHidden1).Returns(FileAttributes.Directory | FileAttributes.Hidden);
+
+        // Act
+        bool result = _sut.IsHidden(path);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void IsHidden_WhenDirectoryDoesNotHaveHiddenAttribute_ShouldReturnFalse()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(_pathVisible1);
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false).Returns(true);
+        _mockFileSystem.File.GetAttributes(path.Path).Returns(FileAttributes.Directory);
+
+        // Act
+        bool result = _sut.IsHidden(path);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void IsHidden_WhenGetAttributesThrowsException_ShouldReturnFalse()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(_pathInvalid1);
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false).Returns(true);
+        _mockFileSystem.File.GetAttributes(path.Path).Throws(new Exception("Access denied"));
+
+        // Act
+        bool result = _sut.IsHidden(path);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void IsHidden_WhenUserHasNoAccess_ShouldReturnFalseWithoutReadingAttributes()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(_pathHidden1);
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false).Returns(false);
+
+        // Act
+        bool result = _sut.IsHidden(path);
+
+        // Assert
+        Assert.False(result);
+        _mockFileSystem.File.DidNotReceive().GetAttributes(Arg.Any<string>());
+    }
+
+    [Fact]
     public void DirectoryExists_WhenDirectoryExists_ShouldReturnTrue()
     {
         // Arrange

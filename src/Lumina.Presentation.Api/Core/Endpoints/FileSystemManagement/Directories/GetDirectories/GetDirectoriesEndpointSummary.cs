@@ -37,8 +37,8 @@ public class GetDirectoriesEndpointSummary : Summary<GetDirectoriesEndpoint, Get
 
         Response(200, "The list of directories for the specified path is returned.",
             example: new DirectoryResponse[] {
-                new(Path: "/media/movies/The Matrix (1999)/", Name: "The Matrix", DateCreated: DateTime.UtcNow, DateModified: DateTime.UtcNow.AddMinutes(-10), Items: []),
-                new(Path: "/media/movies/The Lord of the Rings - The Fellowship of the Ring (2001)/", Name: "The Lord of the Rings - The Fellowship of the Ring (2001)", DateCreated: DateTime.UtcNow, DateModified: DateTime.UtcNow.AddMinutes(-10), Items: [])
+                new(Path: "/media/movies/The Matrix (1999)/", Name: "The Matrix", DateCreated: DateTime.UtcNow, DateModified: DateTime.UtcNow.AddMinutes(-10), Items: [], IsHidden: false),
+                new(Path: "/media/movies/The Lord of the Rings - The Fellowship of the Ring (2001)/", Name: "The Lord of the Rings - The Fellowship of the Ring (2001)", DateCreated: DateTime.UtcNow, DateModified: DateTime.UtcNow.AddMinutes(-10), Items: [], IsHidden: false)
             });
 
         Response(401, "Authentication required.", "application/problem+json",

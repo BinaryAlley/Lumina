@@ -51,7 +51,11 @@ public class GetDirectoriesQueryHandlerTests
         // Arrange
         GetDirectoriesQuery getDirectoriesQuery = _getDirectoriesQueryFixture.Create(shouldIncludeHiddenElements: false);
 
-        IEnumerable<Directory> directories = _directoryFixture.CreateMany();
+        IEnumerable<Directory> directories =
+        [
+            _directoryFixture.Create(isHidden: true),
+            _directoryFixture.Create(isHidden: false)
+        ];
 
         _mockDirectoryService.GetSubdirectories(getDirectoriesQuery.Path!, getDirectoriesQuery.ShouldIncludeHiddenElements)
             .Returns(Result.From(directories));
@@ -73,7 +77,8 @@ public class GetDirectoriesQueryHandlerTests
             Assert.Equal(directoriesList[i].Name, resultList[i].Name);
             Assert.Equal(directoriesList[i].DateCreated.Value, resultList[i].DateCreated);
             Assert.Equal(directoriesList[i].DateModified.Value, resultList[i].DateModified);
-            Assert.Empty(resultList[i].Items); // since files are not included
+            Assert.Equal(directoriesList[i].IsHidden, resultList[i].IsHidden);
+            Assert.Empty(resultList[i].Items); // Since files are not included.
         }
 
         _mockDirectoryService.Received(1).GetSubdirectories(getDirectoriesQuery.Path!, getDirectoriesQuery.ShouldIncludeHiddenElements);
@@ -85,7 +90,11 @@ public class GetDirectoriesQueryHandlerTests
         // Arrange
         GetDirectoriesQuery getDirectoriesQuery = _getDirectoriesQueryFixture.Create(shouldIncludeHiddenElements: true);
 
-        IEnumerable<Directory> directories = _directoryFixture.CreateMany();
+        IEnumerable<Directory> directories =
+        [
+            _directoryFixture.Create(isHidden: true),
+            _directoryFixture.Create(isHidden: false)
+        ];
 
         _mockDirectoryService.GetSubdirectories(getDirectoriesQuery.Path!, getDirectoriesQuery.ShouldIncludeHiddenElements)
             .Returns(Result.From(directories));
@@ -107,6 +116,7 @@ public class GetDirectoriesQueryHandlerTests
             Assert.Equal(directoriesList[i].Name, resultList[i].Name);
             Assert.Equal(directoriesList[i].DateCreated.Value, resultList[i].DateCreated);
             Assert.Equal(directoriesList[i].DateModified.Value, resultList[i].DateModified);
+            Assert.Equal(directoriesList[i].IsHidden, resultList[i].IsHidden);
             Assert.Equal(directoriesList[i].Items.Count, resultList[i].Items.Count);
         }
 

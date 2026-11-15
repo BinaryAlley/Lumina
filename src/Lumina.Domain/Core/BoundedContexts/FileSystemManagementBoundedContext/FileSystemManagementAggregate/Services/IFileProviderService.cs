@@ -22,6 +22,13 @@ public interface IFileProviderService
     Result<IEnumerable<FileSystemPathId>> GetFilePaths(FileSystemPathId path, bool shouldIncludeHiddenElements);
 
     /// <summary>
+    /// Checks if the file at the specified path is hidden.
+    /// </summary>
+    /// <param name="path">The path of the file to check.</param>
+    /// <returns><see langword="true"/> when the file is hidden, otherwise <see langword="false"/>, including when its attributes cannot be read.</returns>
+    bool IsHidden(FileSystemPathId path);
+
+    /// <summary>
     /// Retrieves the contents of a file at the specified path.
     /// </summary>
     /// <param name="path">The path for which to retrieve the file contents.</param>

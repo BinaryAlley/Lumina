@@ -12,10 +12,12 @@ namespace Lumina.Contracts.DTO.FileSystemManagement;
 /// <param name="Name">The name of the file system item.</param>
 /// <param name="DateCreated">The creation date of the file system item.</param>
 /// <param name="DateModified">The modification date of the file system item.</param>
+/// <param name="IsHidden">Whether the file system item is hidden.</param>
 [DebuggerDisplay("Name: {Name}")]
 public record FileSystemItemDto(
     string Path,
     string Name,
     DateTime DateCreated,
-    DateTime DateModified
+    DateTime DateModified,
+    bool IsHidden
 );

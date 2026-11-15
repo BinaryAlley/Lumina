@@ -54,6 +54,7 @@ public sealed class File : FileSystemItem
     /// <param name="dateModified">The date and time the file was last modified. Can be optional if unknown.</param>
     /// <param name="size">The size of the file in bytes.</param>
     /// <param name="status">The status of the file system item.</param>
+    /// <param name="isHidden">Whether the file is hidden.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="File"/>, or an error message.
     /// </returns>
@@ -63,7 +64,8 @@ public sealed class File : FileSystemItem
         Optional<DateTime> dateCreated,
         Optional<DateTime> dateModified,
         long size,
-        FileSystemItemStatus status = FileSystemItemStatus.Accessible)
+        FileSystemItemStatus status = FileSystemItemStatus.Accessible,
+        bool isHidden = false)
     {
         // TODO: enforce invariants
         Result<FileSystemPathId> createPathResult = FileSystemPathId.Create(path);
@@ -78,6 +80,9 @@ public sealed class File : FileSystemItem
         Result<Updated> setStatusResult = newFile.SetStatus(status);
         if (setStatusResult.IsFailure)
             return setStatusResult.Errors;
+        Result<Updated> setHiddenStateResult = newFile.SetHiddenState(isHidden);
+        if (setHiddenStateResult.IsFailure)
+            return setHiddenStateResult.Errors;
         return newFile;
     }
 
@@ -90,6 +95,7 @@ public sealed class File : FileSystemItem
     /// <param name="dateModified">The date and time the file was last modified. Can be optional if unknown.</param>
     /// <param name="size">The size of the file in bytes.</param>
     /// <param name="status">The status of the file system item.</param>
+    /// <param name="isHidden">Whether the file is hidden.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="File"/>, or an error message.
     /// </returns>
@@ -99,7 +105,8 @@ public sealed class File : FileSystemItem
         Optional<DateTime> dateCreated,
         Optional<DateTime> dateModified,
         long size,
-        FileSystemItemStatus status = FileSystemItemStatus.Accessible)
+        FileSystemItemStatus status = FileSystemItemStatus.Accessible,
+        bool isHidden = false)
     {
         // TODO: enforce invariants        
         File newFile = new(
@@ -111,6 +118,9 @@ public sealed class File : FileSystemItem
         Result<Updated> setStatusResult = newFile.SetStatus(status);
         if (setStatusResult.IsFailure)
             return setStatusResult.Errors;
+        Result<Updated> setHiddenStateResult = newFile.SetHiddenState(isHidden);
+        if (setHiddenStateResult.IsFailure)
+            return setHiddenStateResult.Errors;
         return newFile;
     }
 

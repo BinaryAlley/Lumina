@@ -80,7 +80,8 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
             FileResponse firstDirectory = files!.First();
             Assert.Equal("TestFile_2.txt", firstDirectory.Name);
             Assert.Equal(System.IO.Path.Combine(testPath, "TestFile_2.txt"), firstDirectory.Path);
-            Assert.Single(files); // only files
+            Assert.False(firstDirectory.IsHidden);
+            Assert.Single(files); // Only files.
         }
         finally
         {
@@ -94,7 +95,7 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         // Arrange
         string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
-        testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // two levels to get to the element that has a hidden element as child
+        testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // Two levels to get to the element that has a hidden element as child.
         bool shouldIncludeHiddenElements = false;
         try
         {
@@ -112,6 +113,7 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
             FileResponse firstDirectory = files!.First();
             Assert.Equal("TestFile_2.txt", firstDirectory.Name);
             Assert.Equal(System.IO.Path.Combine(testPath, "TestFile_2.txt"), firstDirectory.Path);
+            Assert.False(firstDirectory.IsHidden);
         }
         finally
         {
@@ -119,13 +121,13 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         }
     }
 
-    [Fact]
+    [SkipWhenHiddenAttributeNotSupportedFact]
     public async Task GetFiles_WhenCalledWithValidPathAndWithShouldIncludeHiddenElements_ShouldReturnFilesWithHiddenElements()
     {
         // Arrange
         string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
-        testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // two levels to get to the element that has a hidden element as child
+        testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // Two levels to get to the element that has a hidden element as child.
         bool shouldIncludeHiddenElements = true;
         try
         {
@@ -147,10 +149,12 @@ public class GetFilesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
             FileResponse firstDirectory = files!.First();
             Assert.Equal((s_isUnix ? "." : string.Empty) + "TestFile_1.txt", firstDirectory.Name);
             Assert.Equal(System.IO.Path.Combine(testPath, (s_isUnix ? "." : string.Empty) + "TestFile_1.txt"), firstDirectory.Path);
+            Assert.True(firstDirectory.IsHidden);
 
             FileResponse secondDirectory = files!.Last();
             Assert.Equal("TestFile_2.txt", secondDirectory.Name);
             Assert.Equal(System.IO.Path.Combine(testPath, "TestFile_2.txt"), secondDirectory.Path);
+            Assert.False(secondDirectory.IsHidden);
             Assert.Equal(2, files.Count);
         }
         finally

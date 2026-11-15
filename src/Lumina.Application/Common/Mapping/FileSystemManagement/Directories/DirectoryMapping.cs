@@ -26,10 +26,10 @@ public static class DirectoryMapping
             Name = domainEntity.Name,
             Path = domainEntity.Id.Path,
             ItemType = domainEntity.Type,
+            IsHidden = domainEntity.IsHidden,
             IsExpanded = false,
             ChildrenLoaded = false,
-            Children = domainEntity.Items.Select(item => item.ToTreeNodeResponse())
-                                         .ToList()
+            Children = [.. domainEntity.Items.Select(item => item.ToTreeNodeResponse())]
         };
     }
 
@@ -55,8 +55,8 @@ public static class DirectoryMapping
             domainEntity.Name,
             domainEntity.DateCreated.Value,
             domainEntity.DateModified.Value,
-            domainEntity.Items.Select(fileSystemItem => fileSystemItem.ToFileSystemItemDto())
-                              .ToList()
+            [.. domainEntity.Items.Select(fileSystemItem => fileSystemItem.ToFileSystemItemDto())],
+            domainEntity.IsHidden
         );
     }
 

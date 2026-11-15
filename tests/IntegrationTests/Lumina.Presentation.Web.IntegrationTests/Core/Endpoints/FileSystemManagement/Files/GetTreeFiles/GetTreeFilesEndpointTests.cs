@@ -39,7 +39,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<LuminaWebFactory>
         // Arrange
         _apiFactory.ApiClientStub.Reset();
         string path = @"C:\Users\test";
-        FileSystemTreeNodeDto[] expectedNodes = [_fileSystemTreeNodeDtoFixture.Create(path: path, name: "test")];
+        FileSystemTreeNodeDto[] expectedNodes = [_fileSystemTreeNodeDtoFixture.Create(path: path, name: "test", isHidden: true)];
         string expectedEndpoint = $"files/get-tree-files?path={Uri.EscapeDataString(path)}&shouldIncludeHiddenElements=True";
         _apiFactory.ApiClientStub.RegisterGetResponse(expectedEndpoint, expectedNodes);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
@@ -56,6 +56,7 @@ public class GetTreeFilesEndpointTests : IClassFixture<LuminaWebFactory>
         using JsonDocument json = JsonDocument.Parse(content);
         Assert.True(json.RootElement.GetProperty("success").GetBoolean());
         Assert.Equal(expectedNodes.Length, json.RootElement.GetProperty("data").GetArrayLength());
+        Assert.True(json.RootElement.GetProperty("data")[0].GetProperty("isHidden").GetBoolean());
         Assert.Contains(expectedEndpoint, _apiFactory.ApiClientStub.GetEndpointsCalled);
     }
 }

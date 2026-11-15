@@ -1,12 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
-
+using Lumina.Domain.Common.Primitives;
+using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System;
 using System.Collections.Generic;
 #endregion
@@ -76,13 +75,15 @@ public class DirectoryService : IDirectoryService
             Result<string> dirNameResult = _environmentContext.DirectoryProviderService.GetFileName(subPath);
             Result<Optional<DateTime>> dateModifiedResult = _environmentContext.DirectoryProviderService.GetLastWriteTime(subPath);
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.DirectoryProviderService.GetCreationTime(subPath);
+            // When hidden elements are excluded, the provider already filtered them out, so only an inclusive listing needs the attribute.
+            bool isHidden = shouldIncludeHiddenElements && _environmentContext.DirectoryProviderService.IsHidden(subPath);
 
             // If any error occurred, mark the directory as inaccessible.
             if (dirNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure)
             {
                 Result<Directory> errorDirResult = Directory.Create(subPath, !dirNameResult.IsFailure ? dirNameResult.Value : null!,
                     !dateCreatedResult.IsFailure ? dateCreatedResult.Value : Optional<DateTime>.None(),
-                    !dateModifiedResult.IsFailure ? dateModifiedResult.Value : Optional<DateTime>.None());
+                    !dateModifiedResult.IsFailure ? dateModifiedResult.Value : Optional<DateTime>.None(), isHidden: isHidden);
                 if (errorDirResult.IsFailure)
                     return errorDirResult.Errors;
                 Result<Updated> setStatusResult = errorDirResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
@@ -92,7 +93,7 @@ public class DirectoryService : IDirectoryService
             }
             else
             {
-                Result<Directory> subDirectoryResult = Directory.Create(subPath, dirNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value);
+                Result<Directory> subDirectoryResult = Directory.Create(subPath, dirNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, isHidden: isHidden);
                 if (subDirectoryResult.IsFailure)
                     return subDirectoryResult.Errors;
                 result.Add(subDirectoryResult.Value);
@@ -141,12 +142,13 @@ public class DirectoryService : IDirectoryService
             Result<string> dirNameResult = _environmentContext.DirectoryProviderService.GetFileName(newDirectoryPathResult.Value);
             Result<Optional<DateTime>> dateModifiedResult = _environmentContext.DirectoryProviderService.GetLastWriteTime(newDirectoryPathResult.Value);
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.DirectoryProviderService.GetCreationTime(newDirectoryPathResult.Value);
+            bool isHidden = _environmentContext.DirectoryProviderService.IsHidden(newDirectoryPathResult.Value);
             // If any error occurred, mark the directory as inaccessible.
             if (dirNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure)
             {
                 Result<Directory> errorDirResult = Directory.Create(newDirectoryPathResult.Value, !dirNameResult.IsFailure ? dirNameResult.Value : null!,
                     !dateCreatedResult.IsFailure ? dateCreatedResult.Value : Optional<DateTime>.None(),
-                    !dateModifiedResult.IsFailure ? dateModifiedResult.Value : Optional<DateTime>.None());
+                    !dateModifiedResult.IsFailure ? dateModifiedResult.Value : Optional<DateTime>.None(), isHidden: isHidden);
                 if (errorDirResult.IsFailure)
                     return errorDirResult.Errors;
                 Result<Updated> setStatusResult = errorDirResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
@@ -155,7 +157,7 @@ public class DirectoryService : IDirectoryService
                 return errorDirResult;
             }
             else
-                return Directory.Create(newDirectoryPathResult.Value, dirNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value);
+                return Directory.Create(newDirectoryPathResult.Value, dirNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, isHidden: isHidden);
         }
     }
 
@@ -291,12 +293,13 @@ public class DirectoryService : IDirectoryService
             Result<string> dirNameResult = _environmentContext.DirectoryProviderService.GetFileName(newDirectoryPathResult.Value);
             Result<Optional<DateTime>> dateModifiedResult = _environmentContext.DirectoryProviderService.GetLastWriteTime(newDirectoryPathResult.Value);
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.DirectoryProviderService.GetCreationTime(newDirectoryPathResult.Value);
+            bool isHidden = _environmentContext.DirectoryProviderService.IsHidden(newDirectoryPathResult.Value);
             // If any error occurred, mark the directory as inaccessible.
             if (dirNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure)
             {
                 Result<Directory> errorDirResult = Directory.Create(newDirectoryPathResult.Value, !dirNameResult.IsFailure ? dirNameResult.Value : null!,
                     !dateCreatedResult.IsFailure ? dateCreatedResult.Value : Optional<DateTime>.None(),
-                    !dateModifiedResult.IsFailure ? dateModifiedResult.Value : Optional<DateTime>.None());
+                    !dateModifiedResult.IsFailure ? dateModifiedResult.Value : Optional<DateTime>.None(), isHidden: isHidden);
                 if (errorDirResult.IsFailure)
                     return errorDirResult.Errors;
                 Result<Updated> setStatusResult = errorDirResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
@@ -305,7 +308,7 @@ public class DirectoryService : IDirectoryService
                 return errorDirResult;
             }
             else
-                return Directory.Create(newDirectoryPathResult.Value, dirNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value);
+                return Directory.Create(newDirectoryPathResult.Value, dirNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, isHidden: isHidden);
         }
     }
 

@@ -1,10 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Models.Core;
-
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Diagnostics;
 #endregion
 
@@ -37,6 +36,11 @@ public abstract class FileSystemItem : AggregateRoot<FileSystemPathId>
     public FileSystemItemType Type { get; protected set; }
 
     /// <summary>
+    /// Gets a value indicating whether the file system item is hidden.
+    /// </summary>
+    public bool IsHidden { get; private set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemItem"/> class.
     /// </summary>
     /// <param name="id">The unique identifier for the file system path.</param>
@@ -49,7 +53,7 @@ public abstract class FileSystemItem : AggregateRoot<FileSystemPathId>
     }
 
     /// <summary>
-    /// Sets the status of the filesystem item.
+    /// Sets the status of the file system item.
     /// </summary>
     /// <param name="status">The status to be set.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
@@ -60,7 +64,18 @@ public abstract class FileSystemItem : AggregateRoot<FileSystemPathId>
     }
 
     /// <summary>
-    /// Sets the parent of the filesystem item.
+    /// Sets the hidden state of the file system item.
+    /// </summary>
+    /// <param name="isHidden">Whether the file system item is hidden.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public Result<Updated> SetHiddenState(bool isHidden)
+    {
+        IsHidden = isHidden;
+        return Result.Updated;
+    }
+
+    /// <summary>
+    /// Sets the parent of the file system item.
     /// </summary>
     /// <param name="parent">The file system item to be set as parent.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>

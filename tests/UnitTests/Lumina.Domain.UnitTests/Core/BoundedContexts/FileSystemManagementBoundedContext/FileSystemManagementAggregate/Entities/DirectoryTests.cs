@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
@@ -42,6 +41,24 @@ public class DirectoryTests
         Assert.Equal(dateCreated, result.Value.DateCreated);
         Assert.Equal(dateModified, result.Value.DateModified);
         Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
+        Assert.False(result.Value.IsHidden);
+    }
+
+    [Fact]
+    public void Create_WhenCalledWithHiddenDirectory_ShouldSetHiddenState()
+    {
+        // Arrange
+        string path = "/valid/path";
+        string name = "TestDirectory";
+        Optional<DateTime> dateCreated = DateTime.Now;
+        Optional<DateTime> dateModified = DateTime.Now;
+
+        // Act
+        Result<Directory> result = Directory.Create(path, name, dateCreated, dateModified, isHidden: true);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.True(result.Value.IsHidden);
     }
 
     [Fact]

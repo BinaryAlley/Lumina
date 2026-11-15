@@ -94,6 +94,39 @@ public class FileServiceTests
         Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count());
         Assert.Equal(["File1.txt", "File2.txt"], result.Value.Select(f => f.Name));
+        _mockEnvironmentContext.FileProviderService.DidNotReceive().IsHidden(Arg.Any<FileSystemPathId>());
+    }
+
+    [Fact]
+    public void GetFiles_WhenFileIsHidden_ShouldReturnFileWithHiddenState()
+    {
+        // Arrange
+        string path = _pathTestDir;
+        bool shouldIncludeHiddenElements = true;
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
+        FileSystemPathId filePath = _fileSystemPathIdFixture.Create(_pathTestDirFile1);
+
+        _mockEnvironmentContext.FileProviderService.GetFilePaths(pathId, shouldIncludeHiddenElements)
+            .Returns(Result.From(new[] { filePath }.AsEnumerable()));
+        _mockEnvironmentContext.FileProviderService.GetFileName(filePath)
+            .Returns(Result.From(System.IO.Path.GetFileName(filePath.Path)));
+        _mockEnvironmentContext.FileProviderService.GetLastWriteTime(filePath)
+            .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+        _mockEnvironmentContext.FileProviderService.GetCreationTime(filePath)
+            .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
+        _mockEnvironmentContext.FileProviderService.GetSize(filePath)
+            .Returns(Result.From((long?)1024));
+        _mockEnvironmentContext.FileProviderService.IsHidden(filePath)
+            .Returns(true);
+
+        // Act
+        Result<IEnumerable<File>> result = _sut.GetFiles(path, shouldIncludeHiddenElements);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        File file = Assert.Single(result.Value);
+        Assert.True(file.IsHidden);
+        _mockEnvironmentContext.FileProviderService.Received(1).IsHidden(filePath);
     }
 
     [Fact]
@@ -135,7 +168,7 @@ public class FileServiceTests
     {
         // Arrange
         string path = _pathTestDir;
-        bool shouldIncludeHiddenElements = false;
+        bool shouldIncludeHiddenElements = true;
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
         FileSystemPathId filePath = _fileSystemPathIdFixture.Create(_pathTestDirInaccessible);
 
@@ -150,6 +183,7 @@ public class FileServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetSize(filePath)
             .Returns(Result.From((long?)null));
+        _mockEnvironmentContext.FileProviderService.IsHidden(filePath).Returns(true);
 
         // Act
         Result<IEnumerable<File>> result = _sut.GetFiles(path, shouldIncludeHiddenElements);
@@ -158,6 +192,7 @@ public class FileServiceTests
         Assert.False(result.IsFailure);
         Assert.Single(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.First().Status);
+        Assert.True(result.Value.First().IsHidden);
     }
 
     [Fact]
@@ -378,6 +413,7 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.GetCreationTime(copiedFilePathId)
             .Returns(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1)));
         _mockEnvironmentContext.FileProviderService.GetSize(copiedFilePathId).Returns((long?)1024);
+        _mockEnvironmentContext.FileProviderService.IsHidden(copiedFilePathId).Returns(true);
 
         // Act
         Result<File> result = _sut.CopyFile(sourcePath, destinationPath, overrideExisting);
@@ -387,6 +423,7 @@ public class FileServiceTests
         Assert.NotNull(result.Value);
         Assert.Equal("file.txt", result.Value.Name);
         Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
+        Assert.True(result.Value.IsHidden);
     }
 
     [Fact]
@@ -451,6 +488,7 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.GetLastWriteTime(copiedFilePathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetCreationTime(copiedFilePathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetSize(copiedFilePathId).Returns(Result.From((long?)null));
+        _mockEnvironmentContext.FileProviderService.IsHidden(copiedFilePathId).Returns(true);
 
         // Act
         Result<File> result = _sut.CopyFile(sourcePath, destinationPath, overrideExisting);
@@ -459,6 +497,7 @@ public class FileServiceTests
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.Status);
+        Assert.True(result.Value.IsHidden);
     }
 
     [Fact]
@@ -681,6 +720,7 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.GetCreationTime(movedFilePathId)
             .Returns(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1)));
         _mockEnvironmentContext.FileProviderService.GetSize(movedFilePathId).Returns((long?)1024);
+        _mockEnvironmentContext.FileProviderService.IsHidden(movedFilePathId).Returns(true);
 
         // Act
         Result<File> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
@@ -690,6 +730,7 @@ public class FileServiceTests
         Assert.NotNull(result.Value);
         Assert.Equal("file.txt", result.Value.Name);
         Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
+        Assert.True(result.Value.IsHidden);
     }
 
     [Fact]
@@ -757,6 +798,7 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.GetLastWriteTime(movedFilePathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetCreationTime(movedFilePathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetSize(movedFilePathId).Returns(Result.From((long?)null));
+        _mockEnvironmentContext.FileProviderService.IsHidden(movedFilePathId).Returns(true);
 
         // Act
         Result<File> result = _sut.MoveFile(sourcePath, destinationPath, overrideExisting);
@@ -765,6 +807,7 @@ public class FileServiceTests
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.Status);
+        Assert.True(result.Value.IsHidden);
     }
 
     [Fact]
@@ -971,6 +1014,7 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.GetCreationTime(newPathId)
             .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
         _mockEnvironmentContext.FileProviderService.GetSize(newPathId).Returns(Result.From((long?)1024));
+        _mockEnvironmentContext.FileProviderService.IsHidden(newPathId).Returns(true);
 
         // Act
         Result<File> result = _sut.RenameFile(path, newName);
@@ -980,6 +1024,7 @@ public class FileServiceTests
         Assert.NotNull(result.Value);
         Assert.Equal(newName, result.Value.Name);
         Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
+        Assert.True(result.Value.IsHidden);
     }
 
     [Fact]
@@ -1047,6 +1092,7 @@ public class FileServiceTests
         _mockEnvironmentContext.FileProviderService.GetLastWriteTime(newPathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetCreationTime(newPathId).Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.FileProviderService.GetSize(newPathId).Returns(Result.From((long?)null));
+        _mockEnvironmentContext.FileProviderService.IsHidden(newPathId).Returns(true);
 
         // Act
         Result<File> result = _sut.RenameFile(path, newName);
@@ -1055,6 +1101,7 @@ public class FileServiceTests
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.Status);
+        Assert.True(result.Value.IsHidden);
     }
 
     [Fact]

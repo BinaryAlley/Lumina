@@ -19,14 +19,16 @@ public class FileSystemItemDtoFixture
     /// <summary>
     /// Creates a random valid <see cref="FileSystemItemDto"/>.
     /// </summary>
+    /// <param name="isHidden">Optional. Whether the file system item is hidden. If not provided, a random value is generated.</param>
     /// <returns>The created <see cref="FileSystemItemDto"/>.</returns>
-    public FileSystemItemDto Create()
+    public FileSystemItemDto Create(bool? isHidden = null)
     {
         return new FileSystemItemDto(
             _faker.System.FilePath(),
             _faker.System.FileName(),
             _faker.Date.Past(),
-            _faker.Date.Recent()
+            _faker.Date.Recent(),
+            isHidden ?? _faker.Random.Bool()
         );
     }
 

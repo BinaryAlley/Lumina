@@ -22,15 +22,17 @@ public class DirectoryResponseFixture
     /// Creates a random valid <see cref="DirectoryResponse"/>.
     /// </summary>
     /// <param name="itemCount">Optional. The number of children elements to create.</param>
+    /// <param name="isHidden">Optional. Whether the directory is hidden. If not provided, a random value is generated.</param>
     /// <returns>The created <see cref="DirectoryResponse"/>.</returns>
-    public DirectoryResponse Create(int itemCount = 3)
+    public DirectoryResponse Create(int itemCount = 3, bool? isHidden = null)
     {
         return new DirectoryResponse(
             _faker.System.FilePath(),
             _faker.System.FileName(),
             _faker.Date.Past(),
             _faker.Date.Recent(),
-            _fileSystemItemDtoFixture.CreateMany(itemCount)
+            _fileSystemItemDtoFixture.CreateMany(itemCount),
+            isHidden ?? _faker.Random.Bool()
         );
     }
 

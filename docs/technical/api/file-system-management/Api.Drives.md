@@ -31,6 +31,7 @@ GET api/v1/drives/get-drives
     "path": "C:\\",
     "name": "C:\\",
     "itemType": "Root",
+    "isHidden": false,
     "isExpanded": false,
     "childrenLoaded": false,
     "children": []
@@ -39,6 +40,7 @@ GET api/v1/drives/get-drives
     "path": "D:\\",
     "name": "D:\\",
     "itemType": "Root",
+    "isHidden": false,
     "isExpanded": false,
     "childrenLoaded": false,
     "children": []

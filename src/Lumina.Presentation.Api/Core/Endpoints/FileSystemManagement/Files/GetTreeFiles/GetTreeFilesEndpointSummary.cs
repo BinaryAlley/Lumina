@@ -37,9 +37,9 @@ public class GetTreeFilesEndpointSummary : Summary<GetTreeFilesEndpoint, GetTree
 
         Response(200, "The tree structure of files is returned.",
             example: new FileSystemTreeNodeResponse[] {
-                new() { Path = "/media/movies/The Matrix (1999)/The Matrix.mkv", Name = "The Matrix.mkv", ItemType = FileSystemItemType.File, IsExpanded = false, ChildrenLoaded = false, Children = [] },
-                new() { Path = "/media/movies/The Matrix (1999)/The Matrix.en.srt", Name = "The Matrix.en.srt", ItemType = FileSystemItemType.File, IsExpanded = false, ChildrenLoaded = false, Children = [] },
-                new() { Path = "/media/movies/The Matrix (1999)/poster.jpg", Name = "poster.jpg", ItemType = FileSystemItemType.File, IsExpanded = false, ChildrenLoaded = false, Children = [] },
+                new() { Path = "/media/movies/The Matrix (1999)/The Matrix.mkv", Name = "The Matrix.mkv", ItemType = FileSystemItemType.File, IsHidden = false, IsExpanded = false, ChildrenLoaded = false, Children = [] },
+                new() { Path = "/media/movies/The Matrix (1999)/The Matrix.en.srt", Name = "The Matrix.en.srt", ItemType = FileSystemItemType.File, IsHidden = false, IsExpanded = false, ChildrenLoaded = false, Children = [] },
+                new() { Path = "/media/movies/The Matrix (1999)/poster.jpg", Name = "poster.jpg", ItemType = FileSystemItemType.File, IsHidden = false, IsExpanded = false, ChildrenLoaded = false, Children = [] },
             });
 
         Response(401, "Authentication required.", "application/problem+json",

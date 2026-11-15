@@ -19,15 +19,17 @@ public class FileResponseFixture
     /// <summary>
     /// Creates a random valid <see cref="FileResponse"/>.
     /// </summary>
+    /// <param name="isHidden">Optional. Whether the file is hidden. If not provided, a random value is generated.</param>
     /// <returns>The created <see cref="FileResponse"/>.</returns>
-    public FileResponse Create()
+    public FileResponse Create(bool? isHidden = null)
     {
         return new FileResponse(
             _faker.System.FilePath(),
             _faker.System.FileName(),
             _faker.Date.Past(),
             _faker.Date.Recent(),
-            _faker.Random.Long()
+            _faker.Random.Long(),
+            isHidden ?? _faker.Random.Bool()
         );
     }
 

@@ -191,6 +191,66 @@ public class FileProviderServiceTests
     }
 
     [Fact]
+    public void IsHidden_WhenFileHasHiddenAttribute_ShouldReturnTrue()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(_pathHidden1);
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(true);
+        _mockFileSystem.File.GetAttributes(path.Path).Returns(FileAttributes.Hidden);
+
+        // Act
+        bool result = _sut.IsHidden(path);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void IsHidden_WhenFileDoesNotHaveHiddenAttribute_ShouldReturnFalse()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(_pathVisible1);
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(true);
+        _mockFileSystem.File.GetAttributes(path.Path).Returns(FileAttributes.Normal);
+
+        // Act
+        bool result = _sut.IsHidden(path);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void IsHidden_WhenGetAttributesThrowsException_ShouldReturnFalse()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(_pathInvalid1);
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(true);
+        _mockFileSystem.File.GetAttributes(path.Path).Throws(new Exception("Access denied"));
+
+        // Act
+        bool result = _sut.IsHidden(path);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void IsHidden_WhenUserHasNoAccess_ShouldReturnFalseWithoutReadingAttributes()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(_pathHidden1);
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties).Returns(false);
+
+        // Act
+        bool result = _sut.IsHidden(path);
+
+        // Assert
+        Assert.False(result);
+        _mockFileSystem.File.DidNotReceive().GetAttributes(Arg.Any<string>());
+    }
+
+    [Fact]
     public void FileExists_WhenFileExists_ShouldReturnTrue()
     {
         // Arrange

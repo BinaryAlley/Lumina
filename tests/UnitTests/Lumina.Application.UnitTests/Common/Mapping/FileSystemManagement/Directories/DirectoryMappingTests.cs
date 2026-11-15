@@ -20,15 +20,17 @@ public class DirectoryMappingTests
 {
     private readonly DirectoryFixture _directoryFixture = new();
 
-    [Fact]
-    public void ToFileSystemTreeNodeResponse_WhenMappingDirectory_ShouldMapCorrectly()
+    [Theory]
+    [InlineData(true)] // hidden directory
+    [InlineData(false)] // visible directory
+    public void ToFileSystemTreeNodeResponse_WhenMappingDirectory_ShouldMapCorrectly(bool isHidden)
     {
         // Arrange
-        Directory directory = _directoryFixture.Create();
+        Directory directory = _directoryFixture.Create(isHidden: isHidden);
         List<FileSystemItem> childItems =
         [
-            _directoryFixture.Create(),
-            _directoryFixture.Create()
+            _directoryFixture.Create(isHidden: true),
+            _directoryFixture.Create(isHidden: false)
         ];
         foreach (FileSystemItem item in childItems)
             directory.AddItem(item);
@@ -41,6 +43,7 @@ public class DirectoryMappingTests
         Assert.Equal(directory.Name, result.Name);
         Assert.Equal(directory.Id.Path, result.Path);
         Assert.Equal(directory.Type, result.ItemType);
+        Assert.Equal(directory.IsHidden, result.IsHidden);
         Assert.False(result.IsExpanded);
         Assert.False(result.ChildrenLoaded);
         Assert.NotNull(result.Children);
@@ -51,6 +54,7 @@ public class DirectoryMappingTests
             Assert.Equal(childItems[i].Name, result.Children[i].Name);
             Assert.Equal(childItems[i].Id.Path, result.Children[i].Path);
             Assert.Equal(childItems[i].Type, result.Children[i].ItemType);
+            Assert.Equal(childItems[i].IsHidden, result.Children[i].IsHidden);
         }
     }
 
@@ -58,7 +62,11 @@ public class DirectoryMappingTests
     public void ToFileSystemTreeNodeResponses_WhenMappingMultipleDirectories_ShouldMapCorrectly()
     {
         // Arrange
-        List<Directory> directories = _directoryFixture.CreateMany(2);
+        List<Directory> directories =
+        [
+            _directoryFixture.Create(isHidden: true),
+            _directoryFixture.Create(isHidden: false)
+        ];
 
         // Act
         IEnumerable<FileSystemTreeNodeResponse> result = directories.ToFileSystemTreeNodeResponses();
@@ -73,18 +81,21 @@ public class DirectoryMappingTests
             Assert.Equal(directories[i].Name, resultList[i].Name);
             Assert.Equal(directories[i].Id.Path, resultList[i].Path);
             Assert.Equal(directories[i].Type, resultList[i].ItemType);
+            Assert.Equal(directories[i].IsHidden, resultList[i].IsHidden);
         }
     }
 
-    [Fact]
-    public void ToResponse_WhenMappingDirectory_ShouldMapCorrectly()
+    [Theory]
+    [InlineData(true)] // hidden directory
+    [InlineData(false)] // visible directory
+    public void ToResponse_WhenMappingDirectory_ShouldMapCorrectly(bool isHidden)
     {
         // Arrange
-        Directory directory = _directoryFixture.Create();
+        Directory directory = _directoryFixture.Create(isHidden: isHidden);
         List<FileSystemItem> childItems =
         [
-            _directoryFixture.Create(),
-            _directoryFixture.Create()
+            _directoryFixture.Create(isHidden: true),
+            _directoryFixture.Create(isHidden: false)
         ];
         foreach (FileSystemItem item in childItems)
             directory.AddItem(item);
@@ -98,6 +109,7 @@ public class DirectoryMappingTests
         Assert.Equal(directory.Name, result.Name);
         Assert.Equal(directory.DateCreated.Value, result.DateCreated);
         Assert.Equal(directory.DateModified.Value, result.DateModified);
+        Assert.Equal(directory.IsHidden, result.IsHidden);
         Assert.NotNull(result.Items);
         Assert.Equal(childItems.Count, result.Items.Count);
 
@@ -105,6 +117,7 @@ public class DirectoryMappingTests
         {
             Assert.Equal(childItems[i].Name, result.Items[i].Name);
             Assert.Equal(childItems[i].Id.Path, result.Items[i].Path);
+            Assert.Equal(childItems[i].IsHidden, result.Items[i].IsHidden);
         }
     }
 
@@ -112,7 +125,11 @@ public class DirectoryMappingTests
     public void ToResponses_WhenMappingMultipleDirectories_ShouldMapCorrectly()
     {
         // Arrange
-        List<Directory> directories = _directoryFixture.CreateMany(2);
+        List<Directory> directories =
+        [
+            _directoryFixture.Create(isHidden: true),
+            _directoryFixture.Create(isHidden: false)
+        ];
 
         // Act
         IEnumerable<DirectoryResponse> result = directories.ToResponses();
@@ -128,6 +145,7 @@ public class DirectoryMappingTests
             Assert.Equal(directories[i].Name, resultList[i].Name);
             Assert.Equal(directories[i].DateCreated.Value, resultList[i].DateCreated);
             Assert.Equal(directories[i].DateModified.Value, resultList[i].DateModified);
+            Assert.Equal(directories[i].IsHidden, resultList[i].IsHidden);
         }
     }
 }
