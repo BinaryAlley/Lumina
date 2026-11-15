@@ -23,11 +23,13 @@ public class FileDtoFixture
     /// <param name="path">Optional. The full path to the file.</param>
     /// <param name="name">Optional. The name of the file.</param>
     /// <param name="size">Optional. The size of the file, in bytes.</param>
+    /// <param name="isHidden">Optional. Whether the file is hidden. If not provided, a random value is generated.</param>
     /// <returns>A configured <see cref="FileDto"/> instance.</returns>
     public FileDto Create(
         string? path = null, 
         string? name = null, 
-        long? size = null)
+        long? size = null,
+        bool? isHidden = null)
     {
         string generatedPath = _faker.System.FilePath();
         return new FileDto
@@ -36,6 +38,7 @@ public class FileDtoFixture
             Name = name ?? Path.GetFileName(generatedPath),
             DateCreated = _faker.Date.Past(),
             DateModified = _faker.Date.Recent(),
+            IsHidden = isHidden ?? _faker.Random.Bool(),
             Size = size ?? _faker.Random.Long(0, 10_000_000)
         };
     }

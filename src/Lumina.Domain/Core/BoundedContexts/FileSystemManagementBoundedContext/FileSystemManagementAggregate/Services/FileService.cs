@@ -78,12 +78,14 @@ public class FileService : IFileService
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(filePath);
             Result<long?> sizeResult = _environmentContext.FileProviderService.GetSize(filePath);
             long size = !sizeResult.IsFailure ? sizeResult.Value ?? 0 : 0;
+            // When hidden elements are excluded, the provider already filtered them out, so only an inclusive listing needs the attribute.
+            bool isHidden = shouldIncludeHiddenElements && _environmentContext.FileProviderService.IsHidden(filePath);
             // If any of the details returned an error, set the inaccessible status.
             if (fileNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure || sizeResult.IsFailure)
             {
                 Result<File> errorFileResult = File.Create(filePath, !fileNameResult.IsFailure ? fileNameResult.Value : null!,
                     !dateCreatedResult.IsFailure ? dateCreatedResult.Value : Optional<DateTime>.None(),
-                    !dateModifiedResult.IsFailure ? dateModifiedResult.Value : Optional<DateTime>.None(), size);
+                    !dateModifiedResult.IsFailure ? dateModifiedResult.Value : Optional<DateTime>.None(), size, isHidden: isHidden);
                 if (errorFileResult.IsFailure)
                     return errorFileResult.Errors;
                 Result<Updated> setStatusResult = errorFileResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
@@ -93,7 +95,7 @@ public class FileService : IFileService
             }
             else
             {
-                Result<File> fileResult = File.Create(filePath, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
+                Result<File> fileResult = File.Create(filePath, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size, isHidden: isHidden);
                 if (fileResult.IsFailure)
                     return fileResult.Errors;
                 result.Add(fileResult.Value);
@@ -150,12 +152,13 @@ public class FileService : IFileService
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(copyFileResult.Value);
             Result<long?> sizeResult = _environmentContext.FileProviderService.GetSize(copyFileResult.Value);
             long size = !sizeResult.IsFailure ? sizeResult.Value ?? 0 : 0;
+            bool isHidden = _environmentContext.FileProviderService.IsHidden(copyFileResult.Value);
             // If any of the details returned an error, set the inaccessible status.
             if (fileNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure || sizeResult.IsFailure)
             {
                 Result<File> errorFileResult = File.Create(copyFileResult.Value, !fileNameResult.IsFailure ? fileNameResult.Value : null!,
                     !dateCreatedResult.IsFailure ? dateCreatedResult.Value : Optional<DateTime>.None(),
-                    !dateModifiedResult.IsFailure ? dateModifiedResult.Value : Optional<DateTime>.None(), size);
+                    !dateModifiedResult.IsFailure ? dateModifiedResult.Value : Optional<DateTime>.None(), size, isHidden: isHidden);
                 if (errorFileResult.IsFailure)
                     return errorFileResult.Errors;
                 Result<Updated> setStatusResult = errorFileResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
@@ -164,7 +167,7 @@ public class FileService : IFileService
                 return errorFileResult;
             }
             else
-                return File.Create(copyFileResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
+                return File.Create(copyFileResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size, isHidden: isHidden);
         }
     }
 
@@ -216,12 +219,13 @@ public class FileService : IFileService
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(moveFileResult.Value);
             Result<long?> sizeResult = _environmentContext.FileProviderService.GetSize(moveFileResult.Value);
             long size = !sizeResult.IsFailure ? sizeResult.Value ?? 0 : 0;
+            bool isHidden = _environmentContext.FileProviderService.IsHidden(moveFileResult.Value);
             // If any of the details returned an error, set the inaccessible status.
             if (fileNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure || sizeResult.IsFailure)
             {
                 Result<File> errorFileResult = File.Create(moveFileResult.Value, !fileNameResult.IsFailure ? fileNameResult.Value : null!,
                     !dateCreatedResult.IsFailure ? dateCreatedResult.Value : Optional<DateTime>.None(),
-                    !dateModifiedResult.IsFailure ? dateModifiedResult.Value : Optional<DateTime>.None(), size);
+                    !dateModifiedResult.IsFailure ? dateModifiedResult.Value : Optional<DateTime>.None(), size, isHidden: isHidden);
                 if (errorFileResult.IsFailure)
                     return errorFileResult.Errors;
                 Result<Updated> setStatusResult = errorFileResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
@@ -230,7 +234,7 @@ public class FileService : IFileService
                 return errorFileResult;
             }
             else
-                return File.Create(moveFileResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
+                return File.Create(moveFileResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size, isHidden: isHidden);
         }
     }
 
@@ -276,12 +280,13 @@ public class FileService : IFileService
             Result<Optional<DateTime>> dateCreatedResult = _environmentContext.FileProviderService.GetCreationTime(newFilePathResult.Value);
             Result<long?> sizeResult = _environmentContext.FileProviderService.GetSize(newFilePathResult.Value);
             long size = !sizeResult.IsFailure ? sizeResult.Value ?? 0 : 0;
+            bool isHidden = _environmentContext.FileProviderService.IsHidden(newFilePathResult.Value);
             // If any of the details returned an error, set the inaccessible status.
             if (fileNameResult.IsFailure || dateModifiedResult.IsFailure || dateCreatedResult.IsFailure || sizeResult.IsFailure)
             {
                 Result<File> errorFileResult = File.Create(newFilePathResult.Value, !fileNameResult.IsFailure ? fileNameResult.Value : null!,
                     !dateCreatedResult.IsFailure ? dateCreatedResult.Value : Optional<DateTime>.None(),
-                    !dateModifiedResult.IsFailure ? dateModifiedResult.Value : Optional<DateTime>.None(), size);
+                    !dateModifiedResult.IsFailure ? dateModifiedResult.Value : Optional<DateTime>.None(), size, isHidden: isHidden);
                 if (errorFileResult.IsFailure)
                     return errorFileResult.Errors;
                 Result<Updated> setStatusResult = errorFileResult.Value.SetStatus(FileSystemItemStatus.Inaccessible);
@@ -290,7 +295,7 @@ public class FileService : IFileService
                 return errorFileResult;
             }
             else
-                return File.Create(newFilePathResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size);
+                return File.Create(newFilePathResult.Value, fileNameResult.Value, dateCreatedResult.Value, dateModifiedResult.Value, size, isHidden: isHidden);
         }
     }
 

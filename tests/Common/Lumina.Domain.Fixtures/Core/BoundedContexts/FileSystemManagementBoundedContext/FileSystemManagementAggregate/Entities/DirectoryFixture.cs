@@ -28,6 +28,7 @@ public class DirectoryFixture
     /// <param name="dateCreated">Optional. The directory's creation date. If not provided, a random past date is generated.</param>
     /// <param name="dateModified">Optional. The directory's modification date. If not provided, a recent date is generated.</param>
     /// <param name="status">Optional. The directory's status. If not provided, a random status is assigned.</param>
+    /// <param name="isHidden">Optional. Whether the directory is hidden. If not provided, a random value is generated.</param>
     /// <param name="childItems">Optional. A list of child items to be added to the directory.</param>
     /// <returns>A newly created <see cref="Directory"/> instance.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the <see cref="Directory"/> creation fails.</exception>
@@ -37,6 +38,7 @@ public class DirectoryFixture
         Optional<DateTime>? dateCreated = null,
         Optional<DateTime>? dateModified = null,
         FileSystemItemStatus? status = null,
+        bool? isHidden = null,
         List<FileSystemItem>? childItems = null)
     {
         path ??= _faker.System.FilePath();
@@ -44,8 +46,9 @@ public class DirectoryFixture
         dateCreated ??= Optional<DateTime>.Some(_faker.Date.Past());
         dateModified ??= Optional<DateTime>.Some(_faker.Date.Recent());
         status ??= _faker.PickRandom<FileSystemItemStatus>();
+        isHidden ??= _faker.Random.Bool();
 
-        Result<Directory> directoryResult = Directory.Create(path, name, dateCreated.Value, dateModified.Value, status.Value);
+        Result<Directory> directoryResult = Directory.Create(path, name, dateCreated.Value, dateModified.Value, status.Value, isHidden.Value);
 
         if (directoryResult.IsFailure)
             throw new InvalidOperationException("Failed to create Directory: " + string.Join(", ", directoryResult.Errors));

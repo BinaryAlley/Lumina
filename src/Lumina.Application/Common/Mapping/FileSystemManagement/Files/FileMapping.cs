@@ -25,6 +25,7 @@ public static class FileMapping
             Name = domainEntity.Name,
             Path = domainEntity.Id.Path,
             ItemType = domainEntity.Type,
+            IsHidden = domainEntity.IsHidden,
             IsExpanded = false,
             ChildrenLoaded = false
         };
@@ -52,7 +53,8 @@ public static class FileMapping
             domainEntity.Name,
             domainEntity.DateCreated.HasValue ? domainEntity.DateCreated.Value : default,
             domainEntity.DateModified.HasValue ? domainEntity.DateModified.Value : default,
-            domainEntity.Size
+            domainEntity.Size,
+            domainEntity.IsHidden
         );
     }
 

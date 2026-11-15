@@ -28,6 +28,7 @@ public class FileFixture
     /// <param name="dateModified">Optional. The file's modification date. If not provided, a recent date is generated.</param>
     /// <param name="size">Optional. The file size. If not provided, a random size is generated.</param>
     /// <param name="status">Optional. The file's status. If not provided, a random status is assigned.</param>
+    /// <param name="isHidden">Optional. Whether the file is hidden. If not provided, a random value is generated.</param>
     /// <param name="includeDates">Whether the creation and modification dates should be included, or left unset.</param>
     /// <returns>The created <see cref="File"/>.</returns>
     public File Create(
@@ -37,6 +38,7 @@ public class FileFixture
         Optional<DateTime>? dateModified = null,
         long? size = null,
         FileSystemItemStatus? status = null,
+        bool? isHidden = null,
         bool includeDates = true)
     {
         path ??= _faker.System.FilePath();
@@ -45,8 +47,9 @@ public class FileFixture
         dateModified ??= includeDates ? Optional<DateTime>.Some(_faker.Date.Recent()) : Optional<DateTime>.None();
         size ??= _faker.Random.Long();
         status ??= _faker.PickRandom<FileSystemItemStatus>();
+        isHidden ??= _faker.Random.Bool();
 
-        Result<File> fileResult = File.Create(path, name, dateCreated.Value, dateModified.Value, size.Value, status.Value);
+        Result<File> fileResult = File.Create(path, name, dateCreated.Value, dateModified.Value, size.Value, status.Value, isHidden.Value);
 
         if (fileResult.IsFailure)
             throw new InvalidOperationException("Failed to create File: " + string.Join(", ", fileResult.Errors));

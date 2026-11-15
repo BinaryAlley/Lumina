@@ -24,8 +24,8 @@ public class GetDrivesEndpointSummary : Summary<GetDrivesEndpoint, EmptyRequest>
 
         Response(200, "The list of file system drives is returned.",
             example: new FileSystemTreeNodeResponse[] {
-                new() { Path = "C:\\", Name = "C:\\", ItemType = FileSystemItemType.Root, IsExpanded = false, ChildrenLoaded = false, Children = [] },
-                new() { Path = "D:\\", Name = "D:\\", ItemType = FileSystemItemType.Root, IsExpanded = false, ChildrenLoaded = false, Children = [] }
+                new() { Path = "C:\\", Name = "C:\\", ItemType = FileSystemItemType.Root, IsHidden = false, IsExpanded = false, ChildrenLoaded = false, Children = [] },
+                new() { Path = "D:\\", Name = "D:\\", ItemType = FileSystemItemType.Root, IsHidden = false, IsExpanded = false, ChildrenLoaded = false, Children = [] }
             });
 
         Response(401, "Authentication required.", "application/problem+json",

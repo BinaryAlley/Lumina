@@ -53,6 +53,7 @@ public sealed class Directory : FileSystemItem
     /// <param name="dateCreated">The date and time the directory was created. Can be optional if unknown.</param>
     /// <param name="dateModified">The date and time the directory was last modified. Can be optional if unknown.</param>
     /// <param name="status">The status of the file system item.</param>
+    /// <param name="isHidden">Whether the directory is hidden.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Directory"/>, or an error message.
     /// </returns>
@@ -61,9 +62,10 @@ public sealed class Directory : FileSystemItem
         string name,
         Optional<DateTime> dateCreated,
         Optional<DateTime> dateModified,
-        FileSystemItemStatus status = FileSystemItemStatus.Accessible)
+        FileSystemItemStatus status = FileSystemItemStatus.Accessible,
+        bool isHidden = false)
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         Result<FileSystemPathId> createPathResult = FileSystemPathId.Create(path);
         if (createPathResult.IsFailure)
             return createPathResult.Errors;
@@ -75,6 +77,9 @@ public sealed class Directory : FileSystemItem
         Result<Updated> setStatusResult = newDirectory.SetStatus(status);
         if (setStatusResult.IsFailure)
             return setStatusResult.Errors;
+        Result<Updated> setHiddenStateResult = newDirectory.SetHiddenState(isHidden);
+        if (setHiddenStateResult.IsFailure)
+            return setHiddenStateResult.Errors;
         return newDirectory;
     }
 
@@ -85,6 +90,7 @@ public sealed class Directory : FileSystemItem
     /// <param name="dateCreated">The date and time the directory was created. Can be optional if unknown.</param>
     /// <param name="dateModified">The date and time the directory was last modified. Can be optional if unknown.</param>
     /// <param name="status">The status of the file system item.</param>
+    /// <param name="isHidden">Whether the directory is hidden.</param>
     /// <returns>
     /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="Directory"/>, or an error message.
     /// </returns>
@@ -93,9 +99,10 @@ public sealed class Directory : FileSystemItem
         string name,
         Optional<DateTime> dateCreated,
         Optional<DateTime> dateModified,
-        FileSystemItemStatus status = FileSystemItemStatus.Accessible)
+        FileSystemItemStatus status = FileSystemItemStatus.Accessible,
+        bool isHidden = false)
     {
-        // TODO: enforce invariants        
+        // TODO: enforce invariants.
         Directory newDirectory = new(
             id,
             name,
@@ -104,6 +111,9 @@ public sealed class Directory : FileSystemItem
         Result<Updated> setStatusResult = newDirectory.SetStatus(status);
         if (setStatusResult.IsFailure)
             return setStatusResult.Errors;
+        Result<Updated> setHiddenStateResult = newDirectory.SetHiddenState(isHidden);
+        if (setHiddenStateResult.IsFailure)
+            return setHiddenStateResult.Errors;
         return newDirectory;
     }
 

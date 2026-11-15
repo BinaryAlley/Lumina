@@ -46,6 +46,7 @@ public class FileSystemItemTests
         Assert.Equal(name, item.Name);
         Assert.Equal(type, item.Type);
         Assert.Equal(FileSystemItemStatus.Accessible, item.Status);
+        Assert.False(item.IsHidden);
         Assert.Equal(Optional<FileSystemItem>.None(), item.Parent);
     }
 
@@ -63,6 +64,21 @@ public class FileSystemItemTests
         Assert.False(result.IsFailure);
         Assert.Equal(Result.Updated, result.Value);
         Assert.Equal(newStatus, item.Status);
+    }
+
+    [Fact]
+    public void SetHiddenState_WhenCalled_ShouldUpdateHiddenStateAndReturnUpdated()
+    {
+        // Arrange
+        FileSystemItemFixture item = CreateFileSystemItemFixture();
+
+        // Act
+        Result<Updated> result = item.SetHiddenState(true);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Updated, result.Value);
+        Assert.True(item.IsHidden);
     }
 
     [Fact]

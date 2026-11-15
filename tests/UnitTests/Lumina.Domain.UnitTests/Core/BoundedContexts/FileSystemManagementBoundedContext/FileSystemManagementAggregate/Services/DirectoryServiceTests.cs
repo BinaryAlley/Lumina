@@ -83,6 +83,37 @@ public class DirectoryServiceTests
         Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value.Count());
         Assert.Equal(["Sub1", "Sub2"], result.Value.Select(d => d.Name));
+        _mockEnvironmentContext.DirectoryProviderService.DidNotReceive().IsHidden(Arg.Any<FileSystemPathId>());
+    }
+
+    [Fact]
+    public void GetSubdirectories_WhenDirectoryIsHidden_ShouldReturnDirectoryWithHiddenState()
+    {
+        // Arrange
+        string path = _pathDirTest;
+        bool shouldIncludeHiddenElements = true;
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
+        FileSystemPathId subPath = _fileSystemPathIdFixture.Create(_pathDirTestSubDir1);
+
+        _mockEnvironmentContext.DirectoryProviderService.GetSubdirectoryPaths(pathId, shouldIncludeHiddenElements)
+            .Returns(Result.From(new[] { subPath }.AsEnumerable()));
+        _mockEnvironmentContext.DirectoryProviderService.GetFileName(subPath)
+            .Returns(Result.From(System.IO.Path.GetFileName(subPath.Path)));
+        _mockEnvironmentContext.DirectoryProviderService.GetLastWriteTime(subPath)
+            .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+        _mockEnvironmentContext.DirectoryProviderService.GetCreationTime(subPath)
+            .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now.AddDays(-1))));
+        _mockEnvironmentContext.DirectoryProviderService.IsHidden(subPath)
+            .Returns(true);
+
+        // Act
+        Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(path, shouldIncludeHiddenElements);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Directory directory = Assert.Single(result.Value);
+        Assert.True(directory.IsHidden);
+        _mockEnvironmentContext.DirectoryProviderService.Received(1).IsHidden(subPath);
     }
 
     [Fact]
@@ -124,7 +155,7 @@ public class DirectoryServiceTests
     {
         // Arrange
         string path = _pathDirTest;
-        bool shouldIncludeHiddenElements = false;
+        bool shouldIncludeHiddenElements = true;
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
         FileSystemPathId subPath = _fileSystemPathIdFixture.Create(
             s_isUnix ? "/TestDir/InaccessibleSub" : @"C:\TestDir\InaccessibleSub"
@@ -139,6 +170,7 @@ public class DirectoryServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.DirectoryProviderService.GetCreationTime(subPath)
             .Returns(Errors.Permission.UnauthorizedAccess);
+        _mockEnvironmentContext.DirectoryProviderService.IsHidden(subPath).Returns(true);
 
         // Act
         Result<IEnumerable<Directory>> result = _sut.GetSubdirectories(path, shouldIncludeHiddenElements);
@@ -147,6 +179,7 @@ public class DirectoryServiceTests
         Assert.False(result.IsFailure);
         Assert.Single(result.Value);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.First().Status);
+        Assert.True(result.Value.First().IsHidden);
     }
 
     [Fact]
@@ -331,6 +364,7 @@ public class DirectoryServiceTests
             .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
         _mockEnvironmentContext.DirectoryProviderService.GetCreationTime(newDirPathId)
             .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+        _mockEnvironmentContext.DirectoryProviderService.IsHidden(newDirPathId).Returns(true);
 
         // Act
         Result<Directory> result = _sut.CreateDirectory(parentPath, newDirName);
@@ -338,6 +372,7 @@ public class DirectoryServiceTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(newDirPathId, result.Value.Id);
+        Assert.True(result.Value.IsHidden);
     }
 
     [Fact]
@@ -425,6 +460,7 @@ public class DirectoryServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.DirectoryProviderService.GetCreationTime(newDirPathId)
             .Returns(Errors.Permission.UnauthorizedAccess);
+        _mockEnvironmentContext.DirectoryProviderService.IsHidden(newDirPathId).Returns(true);
 
         // Act
         Result<Directory> result = _sut.CreateDirectory(parentPathId, newDirName);
@@ -435,6 +471,7 @@ public class DirectoryServiceTests
         Assert.Equal(newDirPathId, result.Value.Id);
         Assert.False(result.Value.DateCreated.HasValue);
         Assert.False(result.Value.DateModified.HasValue);
+        Assert.True(result.Value.IsHidden);
     }
 
     [Fact]
@@ -493,7 +530,7 @@ public class DirectoryServiceTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
 
-        // Verify that DirectoryExists was not called
+        // Verify that DirectoryExists was not called.
         _mockEnvironmentContext.DirectoryProviderService.DidNotReceive().DirectoryExists(Arg.Any<FileSystemPathId>());
         _mockEnvironmentContext.DirectoryProviderService.DidNotReceive().CreateDirectory(Arg.Any<FileSystemPathId>(), Arg.Any<string>());
     }
@@ -664,6 +701,7 @@ public class DirectoryServiceTests
             .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
         _mockEnvironmentContext.DirectoryProviderService.GetCreationTime(newPathId)
             .Returns(Result.From(Optional<DateTime>.FromNullable(DateTime.Now)));
+        _mockEnvironmentContext.DirectoryProviderService.IsHidden(newPathId).Returns(true);
 
         // Act
         Result<Directory> result = _sut.RenameDirectory(oldPath, newName);
@@ -672,6 +710,7 @@ public class DirectoryServiceTests
         Assert.False(result.IsFailure);
         Assert.Equal(newPathId, result.Value.Id);
         Assert.Equal(newName, result.Value.Name);
+        Assert.True(result.Value.IsHidden);
     }
 
     [Fact]
@@ -772,6 +811,7 @@ public class DirectoryServiceTests
             .Returns(Errors.Permission.UnauthorizedAccess);
         _mockEnvironmentContext.DirectoryProviderService.GetCreationTime(newPathId)
             .Returns(Errors.Permission.UnauthorizedAccess);
+        _mockEnvironmentContext.DirectoryProviderService.IsHidden(newPathId).Returns(true);
 
         // Act
         Result<Directory> result = _sut.RenameDirectory(oldPathId, newName);
@@ -780,6 +820,7 @@ public class DirectoryServiceTests
         Assert.False(result.IsFailure);
         Assert.Equal(FileSystemItemStatus.Inaccessible, result.Value.Status);
         Assert.Equal(newPathId, result.Value.Id);
+        Assert.True(result.Value.IsHidden);
         Assert.False(result.Value.DateCreated.HasValue);
         Assert.False(result.Value.DateModified.HasValue);
     }
@@ -828,7 +869,7 @@ public class DirectoryServiceTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
 
-        // Verify that DirectoryExists and RenameDirectory were not called
+        // Verify that DirectoryExists and RenameDirectory were not called.
         _mockEnvironmentContext.DirectoryProviderService.DidNotReceive().DirectoryExists(Arg.Any<FileSystemPathId>());
         _mockEnvironmentContext.DirectoryProviderService.DidNotReceive().RenameDirectory(Arg.Any<FileSystemPathId>(), Arg.Any<string>());
     }
@@ -857,7 +898,7 @@ public class DirectoryServiceTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
 
-        // Verify that RenameDirectory was not called
+        // Verify that RenameDirectory was not called.
         _mockEnvironmentContext.DirectoryProviderService.DidNotReceive().RenameDirectory(Arg.Any<FileSystemPathId>(), Arg.Any<string>());
     }
 

@@ -30,4 +30,9 @@ public abstract class FileSystemItemDto
     /// Gets or sets the modification date of the file system item.
     /// </summary>
     public DateTime DateModified { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the file system item is hidden.
+    /// </summary>
+    public bool IsHidden { get; set; }
 }

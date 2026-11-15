@@ -29,17 +29,18 @@ public class FileSystemItemMappingTests
     private readonly WindowsRootItemFixture _windowsRootItemFixture = new();
     private readonly UnixRootItemFixture _unixRootItemFixture = new();
 
-    [Fact]
-    public void ToFileSystemItemModel_WhenMappingFileSystemItem_ShouldMapCorrectly()
+    [Theory]
+    [InlineData(true)] // hidden file system item
+    [InlineData(false)] // visible file system item
+    public void ToFileSystemItemModel_WhenMappingFileSystemItem_ShouldMapCorrectly(bool isHidden)
     {
         // Arrange
         FileSystemPathId id = _fileSystemPathIdFixture.Create();
         string name = "TestItem";
         FileSystemItemType type = FileSystemItemType.File;
         FileSystemItemFixture domainModel = new(id, name, type);
+        domainModel.SetHiddenState(isHidden);
 
-        // Arrange
-       
         // Act
         FileSystemItemDto result = domainModel.ToFileSystemItemDto();
 
@@ -47,15 +48,18 @@ public class FileSystemItemMappingTests
         Assert.NotNull(result);
         Assert.Equal(domainModel.Id.Path, result.Path);
         Assert.Equal(domainModel.Name, result.Name);
+        Assert.Equal(domainModel.IsHidden, result.IsHidden);
         Assert.True((DateTime.Now - result.DateCreated) < TimeSpan.FromSeconds(1));
         Assert.True((DateTime.Now - result.DateModified) < TimeSpan.FromSeconds(1));
     }
 
-    [Fact]
-    public void ToTreeNodeResponse_WhenMappingDirectory_ShouldMapCorrectly()
+    [Theory]
+    [InlineData(true)] // hidden directory
+    [InlineData(false)] // visible directory
+    public void ToTreeNodeResponse_WhenMappingDirectory_ShouldMapCorrectly(bool isHidden)
     {
         // Arrange
-        Directory directory = _directoryFixture.Create();
+        Directory directory = _directoryFixture.Create(isHidden: isHidden);
 
         // Act
         FileSystemTreeNodeResponse result = directory.ToTreeNodeResponse();
@@ -65,13 +69,16 @@ public class FileSystemItemMappingTests
         Assert.Equal(directory.Name, result.Name);
         Assert.Equal(directory.Id.Path, result.Path);
         Assert.Equal(directory.Type, result.ItemType);
+        Assert.Equal(directory.IsHidden, result.IsHidden);
     }
 
-    [Fact]
-    public void ToTreeNodeResponse_WhenMappingFile_ShouldMapCorrectly()
+    [Theory]
+    [InlineData(true)] // hidden file
+    [InlineData(false)] // visible file
+    public void ToTreeNodeResponse_WhenMappingFile_ShouldMapCorrectly(bool isHidden)
     {
         // Arrange
-        File file = _fileFixture.Create();
+        File file = _fileFixture.Create(isHidden: isHidden);
 
         // Act
         FileSystemTreeNodeResponse result = file.ToTreeNodeResponse();
@@ -81,6 +88,7 @@ public class FileSystemItemMappingTests
         Assert.Equal(file.Name, result.Name);
         Assert.Equal(file.Id.Path, result.Path);
         Assert.Equal(file.Type, result.ItemType);
+        Assert.Equal(file.IsHidden, result.IsHidden);
     }
 
     [Fact]
@@ -97,6 +105,7 @@ public class FileSystemItemMappingTests
         Assert.Equal(windowsRootItem.Name, result.Name);
         Assert.Equal(windowsRootItem.Id.Path, result.Path);
         Assert.Equal(windowsRootItem.Type, result.ItemType);
+        Assert.False(result.IsHidden);
         Assert.False(result.IsExpanded);
         Assert.False(result.ChildrenLoaded);
         Assert.Empty(result.Children);
@@ -116,19 +125,21 @@ public class FileSystemItemMappingTests
         Assert.Equal(unixRootItem.Name, result.Name);
         Assert.Equal(unixRootItem.Id.Path, result.Path);
         Assert.Equal(unixRootItem.Type, result.ItemType);
+        Assert.False(result.IsHidden);
         Assert.False(result.IsExpanded);
         Assert.False(result.ChildrenLoaded);
         Assert.Empty(result.Children);
     }
 
     [Theory]
-    [InlineData("TestFile.txt", FileSystemItemType.File)]
-    [InlineData("TestFolder", FileSystemItemType.Directory)]
-    public void ToFileSystemItemModel_WhenMappingDifferentFileSystemItems_ShouldMapCorrectly(string name, FileSystemItemType type)
+    [InlineData("TestFile.txt", FileSystemItemType.File, true)] // hidden file
+    [InlineData("TestFolder", FileSystemItemType.Directory, false)] // visible directory
+    public void ToFileSystemItemModel_WhenMappingDifferentFileSystemItems_ShouldMapCorrectly(string name, FileSystemItemType type, bool isHidden)
     {
         // Arrange
         FileSystemPathId id = _fileSystemPathIdFixture.Create();
         FileSystemItemFixture domainModel = new(id, name, type);
+        domainModel.SetHiddenState(isHidden);
 
         // Act
         FileSystemItemDto result = domainModel.ToFileSystemItemDto();
@@ -137,6 +148,7 @@ public class FileSystemItemMappingTests
         Assert.NotNull(result);
         Assert.Equal(domainModel.Id.Path, result.Path);
         Assert.Equal(domainModel.Name, result.Name);
+        Assert.Equal(domainModel.IsHidden, result.IsHidden);
         Assert.True((DateTime.Now - result.DateCreated) < TimeSpan.FromSeconds(1));
         Assert.True((DateTime.Now - result.DateModified) < TimeSpan.FromSeconds(1));
     }
@@ -147,8 +159,8 @@ public class FileSystemItemMappingTests
         // Arrange
         List<FileSystemItem> domainModels =
         [
-            _directoryFixture.Create(),
-            _fileFixture.Create(),
+            _directoryFixture.Create(isHidden: true),
+            _fileFixture.Create(isHidden: false),
             _windowsRootItemFixture.Create(),
             _unixRootItemFixture.Create()
         ];
@@ -166,6 +178,7 @@ public class FileSystemItemMappingTests
             Assert.Equal(domainModels[i].Name, resultList[i].Name);
             Assert.Equal(domainModels[i].Id.Path, resultList[i].Path);
             Assert.Equal(domainModels[i].Type, resultList[i].ItemType);
+            Assert.Equal(domainModels[i].IsHidden, resultList[i].IsHidden);
             Assert.False(resultList[i].IsExpanded);
             Assert.False(resultList[i].ChildrenLoaded);
         }
@@ -189,7 +202,11 @@ public class FileSystemItemMappingTests
     public void ToTreeNodeResponses_WhenMappingMultipleFileSystemItems_ShouldMapCorrectly()
     {
         // Arrange
-        IEnumerable<FileSystemItem> domainModels = _directoryFixture.CreateMany();
+        IEnumerable<FileSystemItem> domainModels =
+        [
+            _directoryFixture.Create(isHidden: true),
+            _directoryFixture.Create(isHidden: false)
+        ];
 
         // Act
         IEnumerable<FileSystemTreeNodeResponse> result = domainModels.ToTreeNodeResponses();
@@ -205,6 +222,7 @@ public class FileSystemItemMappingTests
             Assert.Equal(domainModelsList[i].Name, resultList[i].Name);
             Assert.Equal(domainModelsList[i].Id.Path, resultList[i].Path);
             Assert.Equal(domainModelsList[i].Type, resultList[i].ItemType);
+            Assert.Equal(domainModelsList[i].IsHidden, resultList[i].IsHidden);
             Assert.False(resultList[i].IsExpanded);
             Assert.False(resultList[i].ChildrenLoaded);
             Assert.Empty(resultList[i].Children);

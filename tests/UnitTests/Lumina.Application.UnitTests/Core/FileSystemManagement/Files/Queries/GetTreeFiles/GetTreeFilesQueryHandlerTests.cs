@@ -1,6 +1,4 @@
 #region ========================================================================= USING =====================================================================================
-using AutoFixture;
-using AutoFixture.AutoNSubstitute;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
 using Lumina.Application.Fixtures.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
@@ -26,7 +24,6 @@ namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.G
 [ExcludeFromCodeCoverage]
 public class GetTreeFilesQueryHandlerTests
 {
-    private readonly IFixture _fixture;
     private readonly IFileService _mockFileService;
     private readonly GetTreeFilesQueryHandler _sut;
     private readonly FileFixture _fileFixture = new();
@@ -37,7 +34,6 @@ public class GetTreeFilesQueryHandlerTests
     /// </summary>
     public GetTreeFilesQueryHandlerTests()
     {
-        _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _mockFileService = Substitute.For<IFileService>();
         IValidator<GetTreeFilesQuery> mockValidator = Substitute.For<IValidator<GetTreeFilesQuery>>();
         mockValidator.Validate(Arg.Any<GetTreeFilesQuery>())
@@ -51,7 +47,11 @@ public class GetTreeFilesQueryHandlerTests
         // Arrange
         GetTreeFilesQuery getFilesQuery = _getTreeFilesQueryFixture.Create(shouldIncludeHiddenElements: false);
 
-        IEnumerable<File> files = _fileFixture.CreateMany();
+        IEnumerable<File> files =
+        [
+            _fileFixture.Create(isHidden: true),
+            _fileFixture.Create(isHidden: false)
+        ];
 
         _mockFileService.GetFiles(getFilesQuery.Path!, getFilesQuery.ShouldIncludeHiddenElements)
             .Returns(Result.From(files));
@@ -72,6 +72,7 @@ public class GetTreeFilesQueryHandlerTests
             Assert.Equal(filesList[i].Id.Path, resultList[i].Path);
             Assert.Equal(filesList[i].Name, resultList[i].Name);
             Assert.Equal(FileSystemItemType.File, resultList[i].ItemType);
+            Assert.Equal(filesList[i].IsHidden, resultList[i].IsHidden);
             Assert.False(resultList[i].IsExpanded);
             Assert.False(resultList[i].ChildrenLoaded);
             Assert.Empty(resultList[i].Children);
@@ -86,7 +87,11 @@ public class GetTreeFilesQueryHandlerTests
         // Arrange
         GetTreeFilesQuery getFilesQuery = _getTreeFilesQueryFixture.Create(shouldIncludeHiddenElements: true);
 
-        IEnumerable<File> files = _fileFixture.CreateMany();
+        IEnumerable<File> files =
+        [
+            _fileFixture.Create(isHidden: true),
+            _fileFixture.Create(isHidden: false)
+        ];
 
         _mockFileService.GetFiles(getFilesQuery.Path!, getFilesQuery.ShouldIncludeHiddenElements)
             .Returns(Result.From(files));
@@ -107,6 +112,7 @@ public class GetTreeFilesQueryHandlerTests
             Assert.Equal(filesList[i].Id.Path, resultList[i].Path);
             Assert.Equal(filesList[i].Name, resultList[i].Name);
             Assert.Equal(FileSystemItemType.File, resultList[i].ItemType);
+            Assert.Equal(filesList[i].IsHidden, resultList[i].IsHidden);
             Assert.False(resultList[i].IsExpanded);
             Assert.False(resultList[i].ChildrenLoaded);
             Assert.Empty(resultList[i].Children);

@@ -28,7 +28,8 @@ public static class FileSystemItemMapping
             domainEntity.Id.Path,
             domainEntity.Name,
             DateTime.Now,
-            DateTime.Now
+            DateTime.Now,
+            domainEntity.IsHidden
         );
     }
 

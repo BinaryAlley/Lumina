@@ -28,6 +28,11 @@ public class FileSystemTreeNodeDto
     public FileSystemItemType ItemType { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the file or directory is hidden.
+    /// </summary>
+    public bool IsHidden { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether the node is expanded. 
     /// </summary>
     public bool IsExpanded { get; set; }

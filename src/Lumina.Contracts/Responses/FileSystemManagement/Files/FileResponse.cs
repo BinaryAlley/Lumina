@@ -14,11 +14,13 @@ namespace Lumina.Contracts.Responses.FileSystemManagement.Files;
 /// <param name="DateCreated">The creation date of the file.</param>
 /// <param name="DateModified">The modification date of the file.</param>
 /// <param name="Size">The size of the file, in bytes.</param>
+/// <param name="IsHidden">Whether the file is hidden.</param>
 [DebuggerDisplay("Name: {Name} (File, Size: {Size} bytes)")]
 public record FileResponse(
     string Path,
     string Name,
     DateTime DateCreated,
     DateTime DateModified,
-    long Size
-) : FileSystemItemDto(Path, Name, DateCreated, DateModified);
+    long Size,
+    bool IsHidden
+) : FileSystemItemDto(Path, Name, DateCreated, DateModified, IsHidden);

@@ -42,6 +42,25 @@ public class FileTests
         Assert.Equal(dateModified, result.Value.DateModified);
         Assert.Equal(size, result.Value.Size);
         Assert.Equal(FileSystemItemStatus.Accessible, result.Value.Status);
+        Assert.False(result.Value.IsHidden);
+    }
+
+    [Fact]
+    public void Create_WhenCalledWithHiddenFile_ShouldSetHiddenState()
+    {
+        // Arrange
+        string path = "/valid/path/file.txt";
+        string name = "file.txt";
+        Optional<DateTime> dateCreated = DateTime.Now;
+        Optional<DateTime> dateModified = DateTime.Now;
+        long size = 1024;
+
+        // Act
+        Result<File> result = File.Create(path, name, dateCreated, dateModified, size, isHidden: true);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.True(result.Value.IsHidden);
     }
 
     [Fact]

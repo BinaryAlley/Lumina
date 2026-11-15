@@ -86,7 +86,7 @@ The manifest is a JSON object describing the theme. The example below is the man
   "name": "Editorial Paper",
   "description": "A clean, readable proof of concept theme.",
   "author": "Lumina",
-  "version": "1.4.0",
+  "version": "1.5.61",
   "preview": "assets/preview.svg",
   "templates": {
     "default": "templates/index.html"
@@ -511,8 +511,8 @@ The sub templates are rendered client side by the application script for each dy
 
 | Template | Fields |
 | --- | --- |
-| `tree-node` | `path`, `name`, `itemType` (`Root`, `Directory` or `File`), `isRoot`, `isDirectory`, `isFile`, `isExpanded` and `icon`. The node must keep the `.tree-node` root with its `data-path`, the `.node-content`, `.expand-button` (or `.spacer` for files), `.node-icon` and `.node-name` elements, and the `.child-nodes` container. |
-| `explorer-item` | `path`, `name`, `itemType` (`Directory` or `File`), `isDirectory`, `isFile`, `cssClass` (the active view mode, such as `large-icons`) and `iconUrl`. The item must keep the `.e` root with its `data-path` and `data-type`, and an `<img>` element, which the script replaces with thumbnails for image files. |
+| `tree-node` | `path`, `name`, `itemType` (`Root`, `Directory` or `File`), `isRoot`, `isDirectory`, `isFile`, `isHidden`, `isExpanded` and `icon`. The node must keep the `.tree-node` root with its `data-path`, the `.node-content`, `.expand-button` (or `.spacer` for files), `.node-icon` and `.node-name` elements, and the `.child-nodes` container. When `isHidden` is true the application also adds the `is-hidden` class to the root, so a theme can dim hidden nodes. |
+| `explorer-item` | `path`, `name`, `itemType` (`Directory` or `File`), `isDirectory`, `isFile`, `isHidden`, `cssClass` (the active view mode, such as `large-icons`) and `iconUrl`. The item must keep the `.e` root with its `data-path` and `data-type`, and an `<img>` element, which the script replaces with thumbnails for image files. When `isHidden` is true the application also adds the `is-hidden` class to the root, so a theme can dim hidden items. |
 | `path-segment` | `id`, `path` (the segment name), `dataPath` (the full path up to and including the segment), `toggleId` and `dropdownId`. The segment must keep the combobox structure with its `.navigator-combobox` (`data-path`), `.navigator-toggle-checkbox`, `.navigator-selected-text`, `.navigator-arrow` and `.navigator-dropdown` elements. |
 
 #### The file icons mapping (assets/file-icons.json)

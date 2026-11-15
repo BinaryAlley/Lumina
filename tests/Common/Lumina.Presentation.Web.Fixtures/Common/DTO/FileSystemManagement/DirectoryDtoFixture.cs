@@ -22,12 +22,14 @@ public class DirectoryDtoFixture
     /// </summary>
     /// <param name="path">Optional. The full path to the directory.</param>
     /// <param name="name">Optional. The name of the directory.</param>
+    /// <param name="isHidden">Optional. Whether the directory is hidden. If not provided, a random value is generated.</param>
     /// <param name="items">Optional. The children items of the directory.</param>
     /// <param name="includeItems">Whether the children items should be included, or forced to an empty collection.</param>
     /// <returns>The created <see cref="DirectoryDto"/>.</returns>
     public DirectoryDto Create(
         string? path = null,
         string? name = null,
+        bool? isHidden = null,
         List<FileSystemItemDto>? items = null,
         bool includeItems = false)
     {
@@ -38,6 +40,7 @@ public class DirectoryDtoFixture
             Name = name ?? Path.GetFileName(generatedPath),
             DateCreated = _faker.Date.Past(),
             DateModified = _faker.Date.Recent(),
+            IsHidden = isHidden ?? _faker.Random.Bool(),
             Items = includeItems ? (items ?? []) : []
         };
     }

@@ -1,10 +1,10 @@
-﻿// because this script can be reused many times and only when needed, we need not polute the global space with the declarations - 
-// wrap everything in an IIFE (Immediately Invoked Function Expression), which creates a scope each time
+﻿// Because this script can be reused many times and only when needed, we need not polute the global space with the declarations - 
+// wrap everything in an IIFE (Immediately Invoked Function Expression), which creates a scope each time.
 (function () {
     console.log('Loaded File System Explorer script');
 
     //+======================================================================================+
-    //|                                  DOM Elements                                        |
+    //|                                  DOM Elements.                                       |
     //+======================================================================================+ 
 
     const modalBackgroundMenu = document.getElementById('modal-background-menu');
@@ -61,16 +61,16 @@
     const visibleSelectionRectangle = document.getElementById('visible-selection-rectangle');
 
     //+======================================================================================+
-    //|                                   Variables                                          |
+    //|                                   Variables.                                         |
     //+======================================================================================+ 
 
-    // base URL of the file type icons of the active theme, empty when no theme is applied, in which case no icons are rendered
+    // Base URL of the file type icons of the active theme, empty when no theme is applied, in which case no icons are rendered.
     let iconBaseUrl = '';
-    // URL of the theme file icons mapping, mapping file extensions to icon paths, empty when no theme is applied
+    // URL of the theme file icons mapping, mapping file extensions to icon paths, empty when no theme is applied.
     let fileIconsUrl = '';
-    // the file extension to icon path mapping of the active theme, null until the mapping is loaded
+    // The file extension to icon path mapping of the active theme, null until the mapping is loaded.
     let fileIcons = null;
-    // the raw theme sub templates for the dynamic content, null when the theme does not provide a template and the built-in markup is used instead
+    // The raw theme sub templates for the dynamic content, null when the theme does not provide a template and the built-in markup is used instead.
     let treeNodeTemplate = null;
     let explorerItemTemplate = null;
     let pathSegmentTemplate = null;
@@ -79,10 +79,12 @@
     let _path;
     let pathSeparator = '/';
     let platformType = 'Unix';
-    let showFileSystemTreeView = true; // TODO: take from config
-    let showHiddenElements = true; // TODO: take from config
-    let includeFiles = true; // TODO: take from config
-    let viewMode = 'list-icons'; // TODO: take from config
+    let showFileSystemTreeView = true; // TODO: take from config.
+    let showHiddenElements = true; // TODO: take from config.
+    let includeFiles = true; // TODO: take from config.
+    let viewMode = 'list-icons'; // TODO: take from config.
+    // The classes that identify the active view mode on the explorer entries, swappable without touching the other entry classes.
+    const viewModeClasses = ['list-icons', 'details-icons', 'small-icons', 'medium-icons', 'large-icons', 'extra-large-icons'];
     let undoStack = [];
     let redoStack = [];
 
@@ -91,20 +93,20 @@
     let isSelecting = false;
     let isSelectionMode = false;
 
-    let scrollTimeout; // timeout to delay thumbnail loading after scrolling
-    let resizeTimeout; // timeout to delay thumbnail loading after resizing
-    let abortController; // allows the cancellation of thumbnail retrieval jobs
-    let hasScrolledAfterModeChange = false; // flag to track if scrolling occurred after a mode change
-    let showThumbnails = true; // whether to show thumbnails or not
-    let scrollThumbnailRetrievalTimeout = 1000; // the time span to wait after the last scroll, before getting thumbnails
-    let inspectFileForThumbnails = false; // whether to check the actual header bytes in order to determine if a file is an image, rather than its extension
-    let thumbnailsRetrievalBatchSize = 20; // the number of thumbnails to ask from the server, concurrently
-    let imagePreviewsQuality = 70; // the quality used for image thumbnails
-    let fullImageQuality = 90; // the quality used for full images
+    let scrollTimeout; // Timeout to delay thumbnail loading after scrolling.
+    let resizeTimeout; // Timeout to delay thumbnail loading after resizing.
+    let abortController; // Allows the cancellation of thumbnail retrieval jobs.
+    let hasScrolledAfterModeChange = false; // Flag to track if scrolling occurred after a mode change.
+    let showThumbnails = true; // Whether to show thumbnails or not.
+    let scrollThumbnailRetrievalTimeout = 1000; // The time span to wait after the last scroll, before getting thumbnails.
+    let inspectFileForThumbnails = false; // Whether to check the actual header bytes in order to determine if a file is an image, rather than its extension.
+    let thumbnailsRetrievalBatchSize = 20; // The number of thumbnails to ask from the server, concurrently.
+    let imagePreviewsQuality = 70; // The quality used for image thumbnails.
+    let fullImageQuality = 90; // The quality used for full images.
 
 
     //+======================================================================================+
-    //|                                 Initialization                                       |
+    //|                                 Initialization.                                      |
     //+======================================================================================+ 
 
     /**
@@ -125,7 +127,7 @@
 
         _path = initialPath;
         addressBarInput.value = initialPath;
-        showFileSystemTreeView = true; // TODO: take from config
+        showFileSystemTreeView = true; // TODO: take from config.
 
         addHorizontalScrolling(addressBar);
         switchViewMode(config.viewMode, config.viewMode === 'list' ? null : config.iconSize, true);
@@ -151,10 +153,10 @@
         const templateElement = document.getElementById(id);
         if (!templateElement)
             return null;
-        // the theme template engine may be absent on a partially loaded page, in which case the built-in markup is used
+        // The theme template engine may be absent on a partially loaded page, in which case the built-in markup is used.
         if (typeof renderThemeTemplate !== 'function')
             return null;
-        // an empty template element means the theme does not provide the template, in which case the built-in markup is used
+        // An empty template element means the theme does not provide the template, in which case the built-in markup is used.
         return templateElement.textContent || null;
     }
 
@@ -206,17 +208,17 @@
             await toggleFileSystemTreeViewAsync(false);
             await toggleShowFileSystemElementsThumbnailsAsync(false);
             await navigateToPathAsync(path, false, false);
-            // add click handler for confirm button
+            // Add click handler for confirm button.
             btnFileSystemBrowserConfirm.onclick = function () {
                 const selectedPaths = selectedFileSystemElementsInput.value;
                 if (onConfirmCallback && typeof onConfirmCallback === 'function') 
                     onConfirmCallback(selectedPaths);
-                // hide dialog
+                // Hide dialog.
                 hideFileSystemBrowserDialog();
             };
             btnFileSystemBrowserCancel.onclick = hideFileSystemBrowserDialog;
         } else
-            notificationService.Show("Path cannot be null!", NotificationType.ERROR); // TODO: should ask error message from server when translation is implemented
+            notificationService.Show("Path cannot be null!", NotificationType.ERROR); // TODO: should ask error message from server when translation is implemented.
     }
 
     /**
@@ -233,11 +235,11 @@
      * @returns {Promise<boolean>} A promise that resolves once the properties have been fetched.
      */
     async function getFileSystemPropertiesAsync() {
-        // call the API to get the file system type (platform type)
+        // Call the API to get the file system type (platform type).
         const fileSystemTypeResponse = await callApiGetAsync(`${clientBasePath}file-system/api-get-type`);
         if (fileSystemTypeResponse !== undefined)
             platformType = fileSystemTypeResponse.platformType;
-        // call the API to get the path separator for the file system
+        // Call the API to get the path separator for the file system.
         const pathSeparatorResponse = await callApiGetAsync(`${clientBasePath}path/api-get-path-separator`);
         if (pathSeparatorResponse !== undefined)
             pathSeparator = pathSeparatorResponse.pathSeparator;
@@ -251,21 +253,21 @@
     async function checkPathAsync(path) {
         const pathValidResponse = await callApiGetAsync(`${clientBasePath}path/api-validate?path=${encodeURIComponent(path)}`);
         if (pathValidResponse === undefined) {
-            // the API rejected the path with a validation error (e.g. it is empty), treat it as invalid and restore the address bar
+            // The API rejected the path with a validation error (e.g. it is empty), treat it as invalid and restore the address bar.
             addressBarInput.value = _path;
             if (addressBarInput.value !== null && !addressBarInput.value.endsWith(pathSeparator))
                 addressBarInput.value += pathSeparator;
             return false;
         }
         if (!pathValidResponse.isValid) {
-            notificationService.show("Specified path is not valid!", NotificationType.ERROR); // TODO: should ask error message from server when translation is implemented
+            notificationService.show("Specified path is not valid!", NotificationType.ERROR); // TODO: should ask error message from server when translation is implemented.
             addressBarInput.value = _path;
             if (addressBarInput.value !== null && !addressBarInput.value.endsWith(pathSeparator))
                 addressBarInput.value += pathSeparator;
         } else {
             const pathExistsResponse = await callApiGetAsync(`${clientBasePath}path/api-check-path-exists?path=${encodeURIComponent(path)}&shouldIncludeHiddenElements=${showHiddenElements}`);
             if (pathExistsResponse !== undefined && !pathExistsResponse.exists) {
-                notificationService.show("Specified path does not exist!", NotificationType.ERROR); // TODO: should ask error message from server when translation is implemented
+                notificationService.show("Specified path does not exist!", NotificationType.ERROR); // TODO: should ask error message from server when translation is implemented.
                 return false;
             }
         }
@@ -273,24 +275,24 @@
     }
 
     /**
-     * Navigates to the specified path,
+     * Navigates to the specified path.
      * @param {any} path The path o navigate to.
      * @param {any} isForwardNavigation Whether the Forward button was clicked, and navigation is done to a history location or not.
      * @param {any} isBackwardNavigation Whether the Back button was clicked, and navigation is done to a history location or not.
      */
     async function navigateToPathAsync(path, isForwardNavigation, isBackwardNavigation) {
         if (await checkPathAsync(path)) {
-            // if there was a job for thumbnails retrieval, cancel it first
+            // If there was a job for thumbnails retrieval, cancel it first.
             if (abortController) {
                 abortController.abort();
                 abortController = null;
             }
-            // check if backward navigation is possible
+            // Check if backward navigation is possible.
             if (isBackwardNavigation) {
                 if (undoStack.length > 0) {
-                    // get the first path in the backward navigation list
+                    // Get the first path in the backward navigation list.
                     const backwardPath = undoStack.pop();
-                    // put the current path in the forward navigationlist, before navigating to the backward path
+                    // Put the current path in the forward navigationlist, before navigating to the backward path.
                     if (addressBarInput.value !== null) {
                         if (!addressBarInput.value.endsWith(pathSeparator))
                             addressBarInput.value += pathSeparator;
@@ -299,11 +301,11 @@
                     path = backwardPath;
                 } else
                     return;
-            } else if (isForwardNavigation) { // check if forward navigation is possible
+            } else if (isForwardNavigation) { // Check if forward navigation is possible.
                 if (redoStack.length > 0) {
-                    // get the first path in the forward navigation list
+                    // Get the first path in the forward navigation list.
                     const forwardPath = redoStack.pop();
-                    // put the current path in the backward navigation list, before navigating to the forward path
+                    // Put the current path in the backward navigation list, before navigating to the forward path.
                     if (addressBarInput.value !== null) {
                         if (!addressBarInput.value.endsWith(pathSeparator))
                             addressBarInput.value += pathSeparator;
@@ -313,19 +315,19 @@
                     path = forwardPath;
                 } else
                     return;
-            } else { // navigation to a brand new location (up, directory browse, manual path edit, etc)
+            } else { // Navigation to a brand new location (up, directory browse, manual path edit, etc).
                 redoStack = [];
-                if (addressBarInput.value !== null && addressBarInput.value !== path) { // when navigating up, addressBarInput.value will be set after navigation
+                if (addressBarInput.value !== null && addressBarInput.value !== path) { // When navigating up, addressBarInput.value will be set after navigation.
                     if (undoStack.length === 0 || (undoStack.length > 0 && undoStack[undoStack.length - 1] !== addressBarInput.value))
                         undoStack.push(addressBarInput.value);
-                } else if (_path !== null && _path !== path) { // when editing the address, addressBarInput.value already comes set, check against control value
+                } else if (_path !== null && _path !== path) { // When editing the address, addressBarInput.value already comes set, check against control value.
                     if (undoStack.length === 0 || (undoStack.length > 0 && undoStack[undoStack.length - 1] !== _path))
                         undoStack.push(_path);
                 }
             }
-            _path = path; // we are about to navigate to the new path, store its value in the control variable
-            addressBarInput.style.display = 'none'; // hide #address-bar-input
-            addressBar.style.display = 'block'; // show #address-bar
+            _path = path; // We are about to navigate to the new path, store its value in the control variable.
+            addressBarInput.style.display = 'none'; // Hide #address-bar-input.
+            addressBar.style.display = 'block'; // Show #address-bar.
             await getNavigatorPathAsync(path);
             await getFileSystemItemsAsync(path);
             if (showFileSystemTreeView)
@@ -339,14 +341,14 @@
     }
 
     /**
-     * Navigates up one level from the current path
+     * Navigates up one level from the current path.
      */
     async function navigateUpAsync() {
         if (addressBarInput.value !== null) {
-            // ask the API for the parent path
+            // Ask the API for the parent path.
             const parentLocationResponse = await callApiGetAsync(`${clientBasePath}path/api-get-path-parent?path=${encodeURIComponent(addressBarInput.value)}`);
             if (parentLocationResponse !== undefined && parentLocationResponse.pathSegments !== null) {
-                // if the answer was valid, and we can navigate up, reconstruct the provided path from its segments, and navigate to it
+                // If the answer was valid, and we can navigate up, reconstruct the provided path from its segments, and navigate to it.
                 platformType = parentLocationResponse.pathSegments;
                 let parentConcatenatedPath = parentLocationResponse.pathSegments[0].path;
                 for (var i = 1; i < parentLocationResponse.pathSegments.length; i++)
@@ -360,7 +362,7 @@
 
 
     //+======================================================================================+
-    //|                                   Navigator                                          |
+    //|                                   Navigator.                                         |
     //+======================================================================================+ 
 
     /**
@@ -378,16 +380,16 @@
      * @param {Array<PathSegmentEntity>} pathSegments - An array of path segments.
      */
     function renderAddressBar(pathSegments) {
-        pathSegmentsContainer.removeEventListener('change', handlePathSegmentComboboxChangeAsync);  // remove previous listeners
-        pathSegmentsContainer.addEventListener('change', handlePathSegmentComboboxChangeAsync);  // add new listener
-        pathSegmentsContainer.innerHTML = ""; // clear existing segments
+        pathSegmentsContainer.removeEventListener('change', handlePathSegmentComboboxChangeAsync);  // Remove previous listeners.
+        pathSegmentsContainer.addEventListener('change', handlePathSegmentComboboxChangeAsync);  // Add new listener.
+        pathSegmentsContainer.innerHTML = ""; // Clear existing segments.
         if (pathSegments !== null) {
             pathSegments.forEach((segment, index) => {
                 const li = renderPathSegment(segment, index, pathSegments);
                 pathSegmentsContainer.appendChild(li);
             });
         } else
-            pathSegmentsContainer.querySelectorAll('li').forEach(li => li.remove()); // no address, clear path segments
+            pathSegmentsContainer.querySelectorAll('li').forEach(li => li.remove()); // No address, clear path segments.
     }
 
     /**
@@ -414,10 +416,10 @@
         }
         const li = document.createElement("li");
         li.id = `path-segment-${index}`;
-        // create the combobox
+        // Create the combobox.
         const combobox = document.createElement("div");
         combobox.className = "navigator-combobox inline-block";
-        // the shine effect 
+        // The shine effect.
         const shineEffect = document.createElement("div");
         shineEffect.className = "shine-effect";
         shineEffect.style.top = "1px";
@@ -434,7 +436,7 @@
         span.className = "navigator-selected-text";
         span.innerText = segment.path;
         toggleLabel.appendChild(span);
-        // add the arrow element
+        // Add the arrow element.
         const arrowSpan = document.createElement("span");
         arrowSpan.className = "navigator-arrow";
         toggleLabel.appendChild(arrowSpan);
@@ -452,10 +454,10 @@
     /**
      * Handle the change event for the comboboxes inside the path-segments.
      * This function is triggered when any of the comboboxes (checkboxes) in the navigation bar is toggled.
-     * @param {Event} e - The change event object. 
+     * @param {Event} e - The change event object.
      */
     async function handlePathSegmentComboboxChangeAsync(e) {
-        // ensure the event was triggered by an element with the 'navigator-toggle-checkbox' class
+        // Ensure the event was triggered by an element with the 'navigator-toggle-checkbox' class.
         if (e.target.classList.contains('navigator-toggle-checkbox')) {
             const comboboxId = e.target.id;
             const dropdownId = comboboxId.replace('segment-toggle-', 'navigator-dropdown-');
@@ -463,26 +465,26 @@
             reattachDropdown();
             if (!e.target.checked)
                 return;
-            const comboboxElement = e.target.closest('.navigator-combobox'); // get the closest parent (or self) with the specified class
-            const pathValue = comboboxElement.getAttribute('data-path');  // retrieve the data-path attribute value
-            // clear any existing dropdown elements
+            const comboboxElement = e.target.closest('.navigator-combobox'); // Get the closest parent (or self) with the specified class.
+            const pathValue = comboboxElement.getAttribute('data-path');  // Retrieve the data-path attribute value.
+            // Clear any existing dropdown elements.
             dropdown.innerHTML = "";
             showBusyIndicator();
             setupDropdown(dropdown, e.target);
 
-            // add combobox entry for current directory
+            // Add combobox entry for current directory.
             addDirectoryOption(dropdown, pathValue, ".", async () => {
                 addressBarInput.value = pathValue;
                 await navigateToPathAsync(pathValue, false, false);
             });
 
-            // add combobox entry for parent directory
+            // Add combobox entry for parent directory.
             addDirectoryOption(dropdown, pathValue, "..", async () => {
                 addressBarInput.value = pathValue;
                 await navigateUpAsync();
             });
 
-            // fetch directory data for the path
+            // Fetch directory data for the path.
             try {
                 await fetchFileSystemDirectoriesAsync(pathValue, (parsedItem) => {
                     addDirectoryOption(dropdown, pathValue, parsedItem.name, async () => {
@@ -506,19 +508,19 @@
      * @param {HTMLElement} toggleElement - The element that triggered the dropdown.
      */
     function setupDropdown(dropdown, toggleElement) {
-        // when drop down opens, need to show address bar overflow, otherwise clipping of drop down occurs
+        // When drop down opens, need to show address bar overflow, otherwise clipping of drop down occurs
         // store the id of the parent combobox of the dropdown - the dropdown will be reparented
-        // because of manadatory "overflow hidden" of scrollable area and clipping isues
+        // because of manadatory "overflow hidden" of scrollable area and clipping isues.
         dropdown.setAttribute('data-parent', toggleElement.id);
         dropdown.setAttribute('data-detached', true);
         const position = toggleElement.closest('.navigator-combobox').getBoundingClientRect();
-        // detach dropdown and reposition
+        // Detach dropdown and reposition.
         document.body.appendChild(dropdown);
         dropdown.style.position = 'absolute';
         dropdown.style.top = `${position.bottom}px`;
         dropdown.style.left = `${position.left}px`;
         dropdown.style.display = 'block';
-        // handle addressBar scroll to adjust dropdown position
+        // Handle addressBar scroll to adjust dropdown position.
         addressBar.addEventListener('scroll', adjustDropdownPosition);
     }
 
@@ -539,36 +541,36 @@
     }
 
     /**
-     * Re-attaches the detached visible drop down to the path segment or platform combobox it originally belonged to
+     * Re-attaches the detached visible drop down to the path segment or platform combobox it originally belonged to.
      */
     function reattachDropdown() {
-        // when the combobox closes, re-attach the detached dropdown
+        // When the combobox closes, re-attach the detached dropdown.
         const dropdown = document.querySelector('.navigator-dropdown[data-detached="true"], .enlightenment-dropdown[data-detached="true"]');
         if (dropdown) {
-            // reset its absolute positioning and stuff
+            // Reset its absolute positioning and stuff.
             dropdown.style.position = '';
             dropdown.style.top = '';
             dropdown.style.left = '';
             dropdown.style.display = '';
-            // re-attach it to original parent
+            // Re-attach it to original parent.
             const dataParent = dropdown.getAttribute('data-parent');
             dropdown.removeAttribute('data-detached');
             const originalParent = document.getElementById(dataParent).parentNode;
             if (originalParent)
                 originalParent.appendChild(dropdown);
-            // remove scroll event listener from the addressBar
+            // Remove scroll event listener from the addressBar.
             addressBar.removeEventListener('scroll', adjustDropdownPosition);
         }
     }
 
     /**
-     * Adjusts the position of a detached drop down, such that it is always just under its original 
-     * path segment combobox, even when this parent is moved through scrolling
+     * Adjusts the position of a detached drop down, such that it is always just under its original
+     * path segment combobox, even when this parent is moved through scrolling.
      */
     function adjustDropdownPosition() {
         const dropdown = document.querySelector('.navigator-dropdown[data-detached="true"]');
         if (dropdown) {
-            const comboboxElement = document.getElementById(dropdown.getAttribute('data-parent')); // get the related combobox
+            const comboboxElement = document.getElementById(dropdown.getAttribute('data-parent')); // Get the related combobox.
             const position = comboboxElement.parentNode.getBoundingClientRect();
             dropdown.style.top = position.bottom + 'px';
             dropdown.style.left = position.left + 'px';
@@ -589,26 +591,26 @@
     }
 
     //+======================================================================================+
-    //|                                   Tree View                                          |
+    //|                                   Tree View.                                         |
     //+======================================================================================+ 
 
     /**
-     * Gets the file system tree view
+     * Gets the file system tree view.
      * @param {string} initialPath - The initial path to expand in the tree view (optional).
      * @returns {Promise<void>}
      */
     async function getFileSystemTreeViewAsync(initialPath) {
-        // clear the existing tree view
+        // Clear the existing tree view.
         fileSystemBrowserTreeview.innerHTML = '';
-        // fetch available drives asynchronously
+        // Fetch available drives asynchronously.
         const drives = await getFileSystemDrivesAsync();
-        // iterate through each drive and add it to the tree view as root node
+        // Iterate through each drive and add it to the tree view as root node.
         for (const drive of drives) {
-            // create a tree node for the drive
+            // Create a tree node for the drive.
             const driveNode = createFileSystemTreeViewTreeNode(drive);
-            // append the drive node to the tree view
+            // Append the drive node to the tree view.
             fileSystemBrowserTreeview.appendChild(driveNode);
-            // if the initial path starts with this drive's path, expand the tree view to show the initial path
+            // If the initial path starts with this drive's path, expand the tree view to show the initial path.
             if (initialPath.toLowerCase().startsWith(drive.path.toLowerCase())) 
                 await expandInitialTreeViewPathAsync(driveNode, initialPath);
         }
@@ -638,13 +640,17 @@
                 isRoot: nodeData.itemType === 'Root',
                 isDirectory: nodeData.itemType !== 'File',
                 isFile: nodeData.itemType === 'File',
+                isHidden: !!nodeData.isHidden,
                 isExpanded: !!nodeData.isExpanded,
                 icon: getNodeIcon(nodeData)
             });
             const container = document.createElement("div");
             container.innerHTML = html;
             const treeNodeDiv = container.firstElementChild;
-            // the theme template must keep the DOM contract the script binds its events to
+            // Hidden entries keep a distinct class even when the theme template does not apply it itself.
+            if (nodeData.isHidden)
+                treeNodeDiv.classList.add('is-hidden');
+            // The theme template must keep the DOM contract the script binds its events to.
             const nodeContent = treeNodeDiv.querySelector('.node-content');
             if (nodeContent)
                 nodeContent.addEventListener('click', handleNodeClickAsync);
@@ -654,7 +660,7 @@
             return treeNodeDiv;
         }
         const treeNodeDiv = document.createElement("div");
-        treeNodeDiv.className = "tree-node";
+        treeNodeDiv.className = nodeData.isHidden ? "tree-node is-hidden" : "tree-node";
         treeNodeDiv.setAttribute('data-path', nodeData.path);
 
         const nodeContent = document.createElement("span");
@@ -673,7 +679,7 @@
         nodeName.className = "node-name";
         nodeName.textContent = nodeData.name;
 
-        // assemble the node structure
+        // Assemble the node structure.
         nodeContent.appendChild(expandButton);
         nodeContent.appendChild(nodeIcon);
         nodeContent.appendChild(nodeName);
@@ -691,15 +697,15 @@
      * @param {Event} e - The click event object.
      */
     async function handleNodeClickAsync(e) {
-        // get the node that was clicked
+        // Get the node that was clicked.
         const treeNode = e.target.closest('.tree-node');
-        // retrieve the path stored on the clicked node
+        // Retrieve the path stored on the clicked node.
         selectedPath = treeNode.getAttribute('data-path');
         if (selectedPath !== null) {
-            // ensure path ends with separator
+            // Ensure path ends with separator.
             if (!selectedPath.endsWith(pathSeparator))
                 selectedPath += pathSeparator;
-            // set the retrieved path as the navigator path, and navigate to it
+            // Set the retrieved path as the navigator path, and navigate to it.
             addressBarInput.value = selectedPath;
             await navigateToPathAsync(selectedPath, false, false);
         }
@@ -711,21 +717,21 @@
      */
     async function toggleFileSysemTreeViewNodeExpandAsync(e) {
         e.stopPropagation();
-        // get the node that was clicked
+        // Get the node that was clicked.
         const treeNode = e.target.closest('.tree-node');
         const treeNodeIcon = treeNode.querySelector('.node-icon');
         const nodeData = { itemType: 'Directory' };
 
         const expandButton = e.target;
-        // get the div that hosts child nodes in tthe clicked node
+        // Get the div that hosts child nodes in tthe clicked node.
         const childNodes = treeNode.querySelector('.child-nodes');
         const path = treeNode.getAttribute('data-path');
-        // get the current expanded state of the clicked node, and toggle it
+        // Get the current expanded state of the clicked node, and toggle it.
         const isExpanded = expandButton.classList.contains('expanded');
         nodeData.isExpanded = !isExpanded;
         if (treeNodeIcon)
             treeNodeIcon.textContent = getNodeIcon(nodeData);
-        // expand or collapse the node
+        // Expand or collapse the node.
         if (isExpanded) {
             expandButton.classList.remove('expanded');
             if (childNodes)
@@ -734,7 +740,7 @@
             expandButton.classList.add('expanded');
             if (childNodes) {
                 childNodes.style.display = 'block';
-                // if node is expanded and child nodes are not yet loaded, load them
+                // If node is expanded and child nodes are not yet loaded, load them.
                 if (childNodes.children.length === 0)
                     await loadFileSystemTreeViewChildNodesAsync(treeNode, path);
             }
@@ -747,15 +753,15 @@
      * @param {string} path - The file system path to load children from.
      */
     async function loadFileSystemTreeViewChildNodesAsync(parentNode, path) {
-        // get the div that hosts child nodes
+        // Get the div that hosts child nodes.
         const childNodes = parentNode.querySelector('.child-nodes');
         if (!childNodes)
             return;
-        // clear existing child nodes
+        // Clear existing child nodes.
         childNodes.innerHTML = '';
         try {
             showBusyIndicator();
-            // fetch directory information and create nodes for each
+            // Fetch directory information and create nodes for each.
             await fetchFileSystemDirectoriesAsync(path, (dir) => {
                 dir.itemType = 'Directory';
                 const dirNode = createFileSystemTreeViewTreeNode(dir);
@@ -791,7 +797,7 @@
      * Fetches and processes JSON data from a given URL.
      * This function handles the data by processing all items in the response.data array
      * and passing them through the callback function.
-     * 
+     *
      * @param {string} url - The URL to fetch JSON data from.
      * @param {Function} callback - Function to call for each processed item.
      * @param {string} itemType - Type of item being processed ('File' or 'Directory').
@@ -799,11 +805,11 @@
     async function fetchJsonDataAsync(url, callback, itemType) {
         const response = await callApiGetAsync(url);
         if (response !== undefined) {       
-            // process each item in the response.data array
+            // Process each item in the response.data array.
             for (let item of response) {
-                // manually specify the type to the parsed object
+                // Manually specify the type to the parsed object.
                 item.itemType = itemType;
-                // call the provided callback function with the processed item
+                // Call the provided callback function with the processed item.
                 callback(item);
             }
         }
@@ -816,40 +822,40 @@
      */
     async function expandInitialTreeViewPathAsync(node, targetPath) {
         const nodePath = node.getAttribute('data-path');
-        // exit if the target path doesn't start with the node path
+        // Exit if the target path doesn't start with the node path.
         if (!targetPath.toLowerCase().startsWith(nodePath.toLowerCase()))
             return;
-        // expand the current node if it's not already expanded
+        // Expand the current node if it's not already expanded.
         const expandButton = node.querySelector('.expand-button');
         if (expandButton && !expandButton.classList.contains('expanded'))
             await toggleFileSysemTreeViewNodeExpandAsync({ target: expandButton, stopPropagation: () => { } });
-        // split the remaining path into segments, using the separator of the file system the browser is showing
+        // Split the remaining path into segments, using the separator of the file system the browser is showing.
         const pathSegments = targetPath.slice(nodePath.length).split(pathSeparator).filter(Boolean);
         let currentNode = node;
-        // iterate through each path segment
+        // Iterate through each path segment.
         for (let i = 0; i < pathSegments.length; i++) {
             const segment = pathSegments[i];
             const childNodes = currentNode.querySelector('.child-nodes');
             let found = false;
-            // search for the child node matching the current path segment
+            // Search for the child node matching the current path segment.
             for (const childNode of childNodes.children) {
                 if (childNode.querySelector('.node-name').textContent.toLowerCase() === segment.toLowerCase()) {
                     currentNode = childNode;
                     found = true;
                     if (i === pathSegments.length - 1) {
-                        // if this is the last segment (target node)
-                        childNode.scrollIntoView(); // bring it into view, if its not already
-                        // mark it as selected
+                        // If this is the last segment (target node).
+                        childNode.scrollIntoView(); // Bring it into view, if its not already.
+                        // Mark it as selected.
                         childNode.querySelector('.node-content').classList.add('selected');
-                        // toggle this last node, because all its children will be loaded
+                        // Toggle this last node, because all its children will be loaded.
                         const expandChildButton = childNode.querySelector('.expand-button');
                         if (expandChildButton)
                             await toggleFileSysemTreeViewNodeExpandAsync({ target: expandChildButton, stopPropagation: () => { } });
-                        // load the node's children
+                        // Load the node's children.
                         await loadFileSystemTreeViewChildNodesAsync(childNode, childNode.getAttribute('data-path'));
                     }
                     else {
-                        // if this is an intermediate node, expand it if necessary
+                        // If this is an intermediate node, expand it if necessary.
                         const childExpandButton = childNode.querySelector('.expand-button');
                         if (childExpandButton && !childExpandButton.classList.contains('expanded'))
                             await toggleFileSysemTreeViewNodeExpandAsync({ target: childExpandButton, stopPropagation: () => { } });
@@ -857,14 +863,14 @@
                     break;
                 }
             }
-            // if the current segment wasn't found, stop expanding
+            // If the current segment wasn't found, stop expanding.
             if (!found)
                 break;
         }
     }
 
     //+======================================================================================+
-    //|                                  File System                                         |
+    //|                                  File System.                                        |
     //+======================================================================================+ 
 
     /**
@@ -872,12 +878,12 @@
      * @param {string} path - The path to fetch items from.
      */
     async function getFileSystemItemsAsync(path) {
-        // clear the current contents of the file system explorer
+        // Clear the current contents of the file system explorer.
         fileSystemExplorer.innerHTML = '';
 
         try {
             showBusyIndicator();
-            // fetch file system items and create explorer items for each
+            // Fetch file system items and create explorer items for each.
             await fetchFileSystemItemsAsync(path, (item) => {
                 const newItem = createFileSystemExplorerItem(item);
                 fileSystemExplorer.appendChild(newItem);
@@ -915,36 +921,40 @@
                 itemType: itemType,
                 isDirectory: itemType === 'Directory',
                 isFile: itemType === 'File',
+                isHidden: !!item.isHidden,
                 cssClass: viewMode,
                 iconUrl: resolveIconUrl(item.path, itemType)
             });
             const container = document.createElement('div');
             container.innerHTML = html;
             const itemDiv = container.firstElementChild;
-            // add event listeners for mouse interactions
+            // Hidden entries keep a distinct class even when the theme template does not apply it itself.
+            if (item.isHidden)
+                itemDiv.classList.add('is-hidden');
+            // Add event listeners for mouse interactions.
             itemDiv.onmouseup = handleFileSystemEntityMouseUpAsync;
             itemDiv.onmousedown = handleFileSystemEntityMouseDown;
             return itemDiv;
         }
         const itemDiv = document.createElement('div');
-        // set up the main item div with appropriate classes and data attributes
-        itemDiv.className = `e ${viewMode}`;
+        // Set up the main item div with appropriate classes and data attributes.
+        itemDiv.className = item.isHidden ? `e ${viewMode} is-hidden` : `e ${viewMode}`;
         itemDiv.setAttribute('data-path', item.path);
         itemDiv.setAttribute('data-type', itemType);
-        // create and set up the icon div
+        // Create and set up the icon div.
         const iconDiv = document.createElement('div');
         iconDiv.className = 'icon';
         const iconUrl = resolveIconUrl(item.path, itemType);
         iconDiv.innerHTML = iconUrl !== '' ? `<img src='${iconUrl}'>` : '';
-        // create and set up the text div
+        // Create and set up the text div.
         const textDiv = document.createElement('div');
         textDiv.className = 'text';
-        // use different class for directory ('d') and file ('f')
+        // Use different class for directory ('d') and file ('f').
         textDiv.innerHTML = `<span class='${itemType === 'Directory' ? 'd' : 'f'} t'>${item.name}</span>`;
-        // assemble the item structure
+        // Assemble the item structure.
         itemDiv.appendChild(iconDiv);
         itemDiv.appendChild(textDiv);
-        // add event listeners for mouse interactions
+        // Add event listeners for mouse interactions.
         itemDiv.onmouseup = handleFileSystemEntityMouseUpAsync;
         itemDiv.onmousedown = handleFileSystemEntityMouseDown;
         return itemDiv;
@@ -962,75 +972,75 @@
         const allEClassElements = Array.from(fileSystemExplorer.querySelectorAll('.e'));
         const currentIndex = allEClassElements.indexOf(e.currentTarget);
 
-        // if a previous click timestamp exists, check the time difference
+        // If a previous click timestamp exists, check the time difference.
         const previousTime = parseInt(e.currentTarget.dataset.selectionStartTime || 0);
         const currentTime = new Date().getTime();
         const timeDifference = currentTime - previousTime;
 
         // TODO: needs to account for when the element is already selected, and a double click occurs - on first click it would check the difference and go to rename -
-        // maybe just wait half second before performing action
+        // maybe just wait half second before performing action.
 
-        // if time difference is less than 300ms, treat it as a double-click
+        // If time difference is less than 300ms, treat it as a double-click.
         if (timeDifference < 300) {
-            if (e.currentTarget.dataset.type === 'Directory') { // directories
+            if (e.currentTarget.dataset.type === 'Directory') { // Directories.
                 addressBarInput.value = e.currentTarget.dataset.path;
-                await navigateToPathAsync(addressBarInput.value, false, false); // TODO: add to undo 
+                await navigateToPathAsync(addressBarInput.value, false, false); // TODO: add to undo.
                 return;
-            } else { // files
+            } else { // Files.
 
             }
-            // reset the timestamp used to track double clicks
+            // Reset the timestamp used to track double clicks.
             e.currentTarget.dataset.selectionStartTime = 0;
             return;
         }
         else
-            e.currentTarget.dataset.selectionStartTime = currentTime; // element was single clicked, update the selection start time to now 
-        if (e.ctrlKey || isSelectionMode) { // when CTRL key is pressed
-            // toggle selection for the current clicked item
+            e.currentTarget.dataset.selectionStartTime = currentTime; // Element was single clicked, update the selection start time to now.
+        if (e.ctrlKey || isSelectionMode) { // When CTRL key is pressed.
+            // Toggle selection for the current clicked item.
             e.currentTarget.classList.toggle('selected');
-            // set the selection start if it's not already set
+            // Set the selection start if it's not already set.
             if (fileSystemExplorer.dataset.selectionStart === undefined)
                 fileSystemExplorer.dataset.selectionStart = currentIndex;
         }
-        else if ((e.shiftKey && fileSystemExplorer.dataset.selectionStart !== undefined) || isSelectionMode) { // when SHIFT key is pressed
+        else if ((e.shiftKey && fileSystemExplorer.dataset.selectionStart !== undefined) || isSelectionMode) { // When SHIFT key is pressed.
             const start = parseInt(fileSystemExplorer.dataset.selectionStart);
-            // remove all selections
+            // Remove all selections.
             allEClassElements.forEach(elem => {
                 elem.classList.remove('selected');
             });
-            // define the range to select items from and to
+            // Define the range to select items from and to.
             const [from, to] = start < currentIndex ? [start, currentIndex] : [currentIndex, start];
-            // add the 'selected' class to items in the range
+            // Add the 'selected' class to items in the range.
             for (let i = from; i <= to; i++)
                 allEClassElements[i].classList.add('selected');
         }
-        else { // when neither CTRL nor SHIFT keys are pressed
+        else { // When neither CTRL nor SHIFT keys are pressed.
             if (!isSelectionMode) {
-                // get all elements that are selected
+                // Get all elements that are selected.
                 const selectedElements = allEClassElements.filter(element => element.classList.contains('selected'));
-                // add 'selected' class to the current clicked item
+                // Add 'selected' class to the current clicked item.
                 e.currentTarget.classList.add('selected');
-                // if there are no selected elements, or if there are more than one, deselect all of them, and select just the clicked one
+                // If there are no selected elements, or if there are more than one, deselect all of them, and select just the clicked one.
                 if ((selectedElements.length === 1 && e.currentTarget !== selectedElements[0]) || selectedElements.length !== 1) {
-                    // deselect all items
+                    // Deselect all items.
                     selectedElements.forEach(elem => {
                         if (elem !== e.currentTarget) {
                             elem.classList.remove('selected');
-                            // remove selectionStartTime from all items
+                            // Remove selectionStartTime from all items.
                             delete elem.dataset.selectionStartTime;
                         }
                     });
-                    // set the current item as the selection start
+                    // Set the current item as the selection start.
                     fileSystemExplorer.dataset.selectionStart = currentIndex;
-                    // store the current timestamp for future double-click checks
+                    // Store the current timestamp for future double-click checks.
                     e.currentTarget.dataset.selectionStartTime = currentTime;
                 }
             }
-            else // if its selection mode, just toggle selection of item, when clicked
+            else // If its selection mode, just toggle selection of item, when clicked.
                 e.currentTarget.classList.toggle('selected');
         }
         const selectedElements = document.querySelectorAll('.e.selected');
-        btnFileSystemBrowserConfirm.disabled = selectedElements.length === 0; // disable Confirm button if no item is selected
+        btnFileSystemBrowserConfirm.disabled = selectedElements.length === 0; // Disable Confirm button if no item is selected.
         if (selectedElements.length > 0) {
             var selectedPaths = '"';
             selectedElements.forEach((element) => {
@@ -1047,12 +1057,12 @@
      * @param {MouseEvent} e - The mouse event whose propagation is stopped.
      */
     function handleFileSystemEntityMouseDown(e) {
-        // stop the event from bubbling up to the explorer - we dont want to start selection rectangles when clicking files or directories
+        // Stop the event from bubbling up to the explorer - we dont want to start selection rectangles when clicking files or directories.
         e.stopPropagation();
     }
 
     //+======================================================================================+
-    //|                                   View Mode                                          |
+    //|                                   View Mode.                                         |
     //+======================================================================================+ 
 
     /**
@@ -1062,13 +1072,13 @@
      * @param {boolean} isManualSet - Indicates whether the mode change is triggered manually (by clicking a mode change icon) or automatically.
      */
     function switchViewMode(mode, iconSize, isManualSet) {
-        hasScrolledAfterModeChange = false; // reset the flag indicating a mode change
+        hasScrolledAfterModeChange = false; // Reset the flag indicating a mode change.
         setViewMode(mode, iconSize);
-        // check if content has been scrolled after the mode change; since scroll is the one triggering thumbnails retrieval,
-        // and there is no initial scroll when mode is changed, we need to trigger the retrieval manually
+        // Check if content has been scrolled after the mode change; since scroll is the one triggering thumbnails retrieval,
+        // and there is no initial scroll when mode is changed, we need to trigger the retrieval manually.
         setTimeout(() => {
             if (!hasScrolledAfterModeChange && showThumbnails && isManualSet) getFileSystemVisibleItems();
-        }, 50); // wait 50ms to ensure all other events have processed
+        }, 50); // Wait 50ms to ensure all other events have processed.
     }
 
     /**
@@ -1097,7 +1107,9 @@
         mode === 'list' ? addHorizontalScrolling(fileSystemExplorer) : removeHorizontalScrolling(fileSystemExplorer);
 
         fileSystemExplorer.querySelectorAll('.e').forEach(el => {
-            el.className = `e ${iconClass}`;
+            // Swap only the view mode class, so that the selection and hidden entry flags survive the mode change.
+            el.classList.remove(...viewModeClasses);
+            el.classList.add(iconClass);
         });
         mode === 'details' ? showExtraDetails() : hideExtraDetails();
     }
@@ -1145,7 +1157,7 @@
     }
 
     //+======================================================================================+
-    //|                                   Selection                                          |
+    //|                                   Selection.                                         |
     //+======================================================================================+ 
 
     /**
@@ -1163,18 +1175,18 @@
     function startSelection(e) {
         const explorerScrollbars = hasScrollbars(fileSystemExplorer);
         const containerExplorerScrollbars = hasScrollbars(fileSystemExplorerContainer);
-        // check if clicked on the horizontal or vertical scrollbar
+        // Check if clicked on the horizontal or vertical scrollbar.
         if (explorerScrollbars.horizontal && e.clientY > fileSystemExplorer.getBoundingClientRect().top + fileSystemExplorer.offsetHeight - scrollbarHeight)
             return;
         if (containerExplorerScrollbars.vertical && e.clientX > fileSystemExplorerContainer.getBoundingClientRect().left + fileSystemExplorerContainer.offsetWidth - scrollbarWidth)
             return;
-        // store information about selection start
+        // Store information about selection start.
         isSelecting = true;
-        document.body.style.overflowY = 'hidden'; // needed in order to not put a vertical scrollbar on the document, while in vertical layout selection
+        document.body.style.overflowY = 'hidden'; // Needed in order to not put a vertical scrollbar on the document, while in vertical layout selection.
         document.documentElement.style.overflowY = 'hidden';
         selectionStartPosition.x = e.pageX + fileSystemExplorer.scrollLeft;
-        selectionStartPosition.y = (e.pageY - getThemeTopOffset()) + fileSystemExplorerContainer.scrollTop; // not a mistake - in vertical mode, this is the overflow container!
-        // place the selection rectangle at the clicked location (relative to the whole page, and taking into account scroll offset), with 0 size
+        selectionStartPosition.y = (e.pageY - getThemeTopOffset()) + fileSystemExplorerContainer.scrollTop; // Not a mistake - in vertical mode, this is the overflow container!
+        // Place the selection rectangle at the clicked location (relative to the whole page, and taking into account scroll offset), with 0 size.
         visibleSelectionRectangle.style.left = e.pageX + 'px';
         visibleSelectionRectangle.style.top = (e.pageY - getThemeTopOffset()) + 'px';
         visibleSelectionRectangle.style.width = '0px';
@@ -1203,7 +1215,7 @@
      * Handler for the file system browser dialog selection end.
      */
     function endSelection() {
-        // selection ended, hide the selection rectangle
+        // Selection ended, hide the selection rectangle.
         isSelecting = false;
         document.body.style.removeProperty('overflow-y');
         document.documentElement.style.removeProperty('overflow-y');
@@ -1219,13 +1231,13 @@
         visibleSelectionRectangle.style.top = '0px';
         visibleSelectionRectangle.style.width = '0px';
         visibleSelectionRectangle.style.height = '0px';
-        // go through each .e item that was inside the selection rectangle, and mark it as selected
+        // Go through each .e item that was inside the selection rectangle, and mark it as selected.
         fileSystemExplorer.querySelectorAll('.e.selection-hover').forEach(item => {
             item.classList.add('selected');
             item.classList.remove('selection-hover');
         });
         const selectedElements = document.querySelectorAll('.e.selected');
-        btnFileSystemBrowserConfirm.disabled = selectedElements.length === 0; // disable Confirm button if no item is selected
+        btnFileSystemBrowserConfirm.disabled = selectedElements.length === 0; // Disable Confirm button if no item is selected.
         if (selectedElements.length > 0) {
             var selectedPaths = '"';
             selectedElements.forEach((element) => {
@@ -1241,21 +1253,21 @@
      * Function for handling the file system browser dialog selection.
      */
     function handleSelection() {
-        if (!isSelecting) // only relevant when we have a selection initialized
+        if (!isSelecting) // Only relevant when we have a selection initialized.
             return;
-        // calculate dimensions of the selection rectangle
+        // Calculate dimensions of the selection rectangle.
         const currentX = currentMousePosition.x;
         const currentY = currentMousePosition.y;
         const width = currentX - (selectionStartPosition.x - fileSystemExplorer.scrollLeft);
         const height = currentY - (selectionStartPosition.y - fileSystemExplorerContainer.scrollTop);
 
-        // update selection rectangle dimensions
+        // Update selection rectangle dimensions.
         visibleSelectionRectangle.style.width = Math.abs(width) + 'px';
         visibleSelectionRectangle.style.height = Math.abs(height) + 'px';
         selectionRectangle.style.width = Math.abs(width) + 'px';
         selectionRectangle.style.height = Math.abs(height) + 'px';
 
-        // adjust position based on selection direction
+        // Adjust position based on selection direction.
         if (width < 0) {
             selectionRectangle.style.left = currentX + 'px';
             visibleSelectionRectangle.style.left = currentX + 'px';
@@ -1271,7 +1283,7 @@
             visibleSelectionRectangle.style.top = (selectionStartPosition.y - fileSystemExplorerContainer.scrollTop) + 'px';
         }
 
-        // do not let the selection rectangle go outside of explorer container, clip it if needed
+        // Do not let the selection rectangle go outside of explorer container, clip it if needed.
         const containerRect = fileSystemExplorerContainer.getBoundingClientRect();
         const left = parseFloat(visibleSelectionRectangle.style.left);
         const top = parseFloat(visibleSelectionRectangle.style.top) + 1;
@@ -1294,17 +1306,17 @@
         if (bottom > containerRect.bottom)
             visibleSelectionRectangle.style.height = (containerRect.bottom - top) + 'px';
 
-        // change color of items that fall within selection rectangle            
+        // Change color of items that fall within selection rectangle.
         const selectionRect = selectionRectangle.getBoundingClientRect();
-        // go through each .e item which has not had its thumbnail retrieved yet
+        // Go through each .e item which has not had its thumbnail retrieved yet.
         fileSystemExplorer.querySelectorAll('.e').forEach(item => {
             const itemRect = item.getBoundingClientRect();
-            // check if the item is fully or partially visible horizontally and vertically
+            // Check if the item is fully or partially visible horizontally and vertically.
             const isFullyVisibleHorizontally = itemRect.left >= selectionRect.left && itemRect.right <= selectionRect.right;
             const isFullyVisibleVertically = itemRect.top >= selectionRect.top && itemRect.bottom <= selectionRect.bottom;
             const isPartiallyVisibleHorizontally = itemRect.left < selectionRect.right && itemRect.right > selectionRect.left;
             const isPartiallyVisibleVertically = itemRect.top < selectionRect.bottom && itemRect.bottom > selectionRect.top;
-            // if the item is fully or partially visible in both directions, add it to our list
+            // If the item is fully or partially visible in both directions, add it to our list.
             if ((isFullyVisibleHorizontally || isPartiallyVisibleHorizontally) && (isFullyVisibleVertically || isPartiallyVisibleVertically))
                 item.classList.add('selection-hover');
             else
@@ -1327,22 +1339,22 @@
     }
 
     /**
-     * Handler for the mouse up event of the file system browser dialog explorer
+     * Handler for the mouse up event of the file system browser dialog explorer.
      * @param {MouseEvent} e - The mouseup event object.
      */
     function handleFileSystemExplorerMouseUp(e) {
         const explorerScrollbars = hasScrollbars(fileSystemExplorer);
-        // check if clicked on the horizontal scrollbar
+        // Check if clicked on the horizontal scrollbar.
         if (explorerScrollbars.horizontal && e.clientY > fileSystemExplorer.getBoundingClientRect().top + fileSystemExplorer.offsetHeight - scrollbarHeight)
             return;
         if (!e.ctrlKey && !e.shiftKey && !isSelectionMode) {
-            // deselect all file system elements when their explorer is clicked
+            // Deselect all file system elements when their explorer is clicked.
             fileSystemExplorer.querySelectorAll('.e.selected').forEach(item => {
                 item.classList.remove('selected');
             });
-            // do not store information about what item was clicked first, in context of Shift-selection
+            // Do not store information about what item was clicked first, in context of Shift-selection.
             fileSystemExplorer.removeAttribute('data-selection-start');
-            btnFileSystemBrowserConfirm.disabled = document.querySelectorAll('.e.selected').length === 0; // disable Confirm button if no item is selected
+            btnFileSystemBrowserConfirm.disabled = document.querySelectorAll('.e.selected').length === 0; // Disable Confirm button if no item is selected.
         }
     }
 
@@ -1351,14 +1363,14 @@
      * Clears any previous timeout and creates a new one to fetch visible items.
      */
     function handleFileSystemBrowserScrollEvent() {
-        // clear any previously set timeouts to debounce the getFileSystemVisibleItems call
+        // Clear any previously set timeouts to debounce the getFileSystemVisibleItems call.
         if (scrollTimeout) clearTimeout(scrollTimeout);
-        // if there's an ongoing operation, abort it
+        // If there's an ongoing operation, abort it.
         if (abortController) {
             abortController.abort();
             abortController = null;
         }
-        // set a timeout to call getFileSystemVisibleItems once the user stops scrolling
+        // Set a timeout to call getFileSystemVisibleItems once the user stops scrolling.
         scrollTimeout = setTimeout(() => {
             if (showThumbnails)
                 getFileSystemVisibleItems();
@@ -1371,14 +1383,14 @@
      * Clears any previous timeout and creates a new one to fetch file system browser visible items.
      */
     function handleFileSystemBrowserResizeEvent() {
-        // clear any previously set timeouts to debounce the getFileSystemVisibleItems call during resize
+        // Clear any previously set timeouts to debounce the getFileSystemVisibleItems call during resize.
         if (resizeTimeout) clearTimeout(resizeTimeout);
-        // if there's an ongoing operation, abort it
+        // If there's an ongoing operation, abort it.
         if (abortController) {
             abortController.abort();
             abortController = null;
         }
-        // set a timeout to call getFileSystemVisibleItems once the user stops resizing
+        // Set a timeout to call getFileSystemVisibleItems once the user stops resizing.
         resizeTimeout = setTimeout(() => {
             if (showThumbnails)
                 getFileSystemVisibleItems();
@@ -1386,7 +1398,7 @@
     }
 
     //+======================================================================================+
-    //|                                   Thumbnails                                         |
+    //|                                   Thumbnails.                                        |
     //+======================================================================================+ 
 
     /**
@@ -1397,22 +1409,22 @@
     function getFileSystemVisibleItems() {
         const containerRect = fileSystemExplorerContainer.getBoundingClientRect();
         const visibleItems = [];
-        // go through each .e item which has not had its thumbnail retrieved yet
+        // Go through each .e item which has not had its thumbnail retrieved yet.
         const fileElements = Array.from(fileSystemExplorer.querySelectorAll('.e:not([data-thumbnail-retrieved])[data-type="File"]'));
-        // if the option for checking file header bytes is disabled, filter images by extension
+        // If the option for checking file header bytes is disabled, filter images by extension.
         const itemsToProcess = inspectFileForThumbnails ? fileElements : fileElements.filter(item => isImageFile(item.getAttribute('data-path')));
         itemsToProcess.forEach(item => {
             const itemPath = item.getAttribute('data-path');
             const itemRect = item.getBoundingClientRect();
-            // check if the item is fully or partially visible horizontally and vertically
+            // Check if the item is fully or partially visible horizontally and vertically.
             const isFullyVisibleHorizontally = itemRect.left >= containerRect.left && itemRect.right <= containerRect.right;
             const isFullyVisibleVertically = itemRect.top >= containerRect.top && itemRect.bottom <= containerRect.bottom;
             const isPartiallyVisibleHorizontally = itemRect.left < containerRect.right && itemRect.right > containerRect.left;
             const isPartiallyVisibleVertically = itemRect.top < containerRect.bottom && itemRect.bottom > containerRect.top;
-            // if the item is fully or partially visible in both directions, add it to our list
+            // If the item is fully or partially visible in both directions, add it to our list.
             if ((isFullyVisibleHorizontally || isPartiallyVisibleHorizontally) &&
                 (isFullyVisibleVertically || isPartiallyVisibleVertically)) {
-                // skip entries without an image element, which happens when the active theme does not provide icons
+                // Skip entries without an image element, which happens when the active theme does not provide icons.
                 const imgElement = item.querySelector('img');
                 if (imgElement) {
                     visibleItems.push({
@@ -1422,7 +1434,7 @@
                 }
             }
         });
-        // process the list of visible items
+        // Process the list of visible items.
         processVisibleItems(visibleItems);
     }
 
@@ -1438,11 +1450,11 @@
     async function processItem(item, visibleItems) {
         try {
             const result = await getThumbnailApiCall(item.path, imagePreviewsQuality);
-            // update the item's thumbnail using the retrieved data
+            // Update the item's thumbnail using the retrieved data.
             if (typeof result.base64Data !== "undefined")
                 item.img.src = `data:${result.mimeType};base64,${result.base64Data}`;
             item.img.closest('.e').setAttribute('data-thumbnail-retrieved', 'true');
-            // continue with next item if there are more in the queue
+            // Continue with next item if there are more in the queue.
             if (visibleItems.length > 0) {
                 const nextItem = visibleItems.shift();
                 processItem(nextItem, visibleItems);
@@ -1451,7 +1463,7 @@
             if (error.name === 'AbortError') {
                 // console.log('Fetch operation was aborted.');
             } else {
-                // on error, revert the icons to the default ones of the active theme
+                // On error, revert the icons to the default ones of the active theme.
                 let itemType = item.img.closest('.e').getAttribute('data-type');
                 const iconUrl = resolveIconUrl('', itemType);
                 if (iconUrl !== '')
@@ -1468,13 +1480,13 @@
      * @throws {Error} - Throws an error if the API call fails.
      */
     async function getThumbnailApiCall(path, quality) {
-        // fetch the thumbnail for the given item from the server, through the Web application, which proxies the request with the authentication of the current user
+        // Fetch the thumbnail for the given item from the server, through the Web application, which proxies the request with the authentication of the current user.
         const response = await fetch(`${clientBasePath}thumbnails/api-get-thumbnail?path=` + encodeURIComponent(path) + '&quality=' + quality, {
-            signal: abortController.signal // use the abort signal 
+            signal: abortController.signal // Use the abort signal.
         });
         if (!response.ok)
             throw new Error('Failed to fetch the thumbnail');
-        // convert the response to a JSON object
+        // Convert the response to a JSON object.
         const blob = await response.blob();
         const base64Data = await blobToBase64Async(blob);
         const mimeType = response.headers.get('Content-Type');
@@ -1485,13 +1497,13 @@
     }
 
     /**
-     * Initiates the processing of visible items. Processing is batched based on thumbnailsRetrievalBatchSize. * 
+     * Initiates the processing of visible items. Processing is batched based on thumbnailsRetrievalBatchSize. *
      * @param {Array} visibleItemsList - List of visible items to be processed.
      */
     async function processVisibleItems(visibleItemsList) {
         const visibleItems = [...visibleItemsList];
-        abortController = new AbortController(); // create a new AbortController
-        // process items in batches determined by thumbnailsRetrievalBatchSize
+        abortController = new AbortController(); // Create a new AbortController.
+        // Process items in batches determined by thumbnailsRetrievalBatchSize.
         for (let i = 0; i < Math.min(thumbnailsRetrievalBatchSize, visibleItems.length); i++) {
             const item = visibleItems.shift();
             processItem(item, visibleItems);
@@ -1500,7 +1512,7 @@
 
 
     //+======================================================================================+
-    //|                                  Miscellaneous                                       |
+    //|                                  Miscellaneous.                                      |
     //+======================================================================================+ 
 
     /**
@@ -1516,7 +1528,7 @@
             showFileSystemTreeView ? element.classList.add('enabled') : element.classList.remove('enabled');
         });
         showFileSystemTreeView ? fileSystemTreeViewContainer.classList.remove('collapsed') : fileSystemTreeViewContainer.classList.add('collapsed');
-        // if file system treeview needs to be displayed, get its file system tree structure from the API
+        // If file system treeview needs to be displayed, get its file system tree structure from the API.
         if (showFileSystemTreeView && isManualSet && addressBarInput.value !== null) {
             if (!addressBarInput.value.endsWith(pathSeparator))
                 addressBarInput.value += pathSeparator;
@@ -1579,7 +1591,7 @@
     }
 
     //+======================================================================================+
-    //|                                Event Handlers                                        |
+    //|                                Event Handlers.                                       |
     //+======================================================================================+ 
 
     /**
@@ -1594,7 +1606,7 @@
             element.addEventListener(eventName, handler, options);
     }
 
-    // event handlers for changing file system view modes
+    // Event handlers for changing file system view modes.
     addEventListenerIfPresent(btnListView, 'click', () => switchViewMode('list', null, true));
     addEventListenerIfPresent(btnDetailsView, 'click', () => switchViewMode('details', null, true));
     addEventListenerIfPresent(btnSmallIconsView, 'click', () => switchViewMode('icons', 'small', true));
@@ -1661,11 +1673,11 @@
      * Event handler for the addressbar Click event.
      */
     addEventListenerIfPresent(addressBar, 'click', function (e) {
-        // if the clicked element is the ul itself or one of its direct children (but not deeper nested children)
+        // If the clicked element is the ul itself or one of its direct children (but not deeper nested children).
         if (e.target === e.currentTarget || e.target.parentElement === e.currentTarget) {
-            this.style.display = 'none'; // hide #addressBar
-            addressBarInput.style.display = 'block'; // show #addressBarInput
-            addressBarInput.focus(); // focus on the input
+            this.style.display = 'none'; // Hide #addressBar.
+            addressBarInput.style.display = 'block'; // Show #addressBarInput.
+            addressBarInput.focus(); // Focus on the input.
         }
     });
 
@@ -1674,7 +1686,7 @@
      */
     window.addEventListener('resize', function () {
         handleFileSystemBrowserResizeEvent();
-        // update all dropdowns' positions on resize
+        // Update all dropdowns' positions on resize.
         const dropdown = document.querySelector('.navigator-dropdown[data-detached="true"]');
         if (dropdown) {
             const pathSegmentId = dropdown.getAttribute('data-path-segment-id');
@@ -1683,7 +1695,7 @@
         }
     });
 
-    // expose the functions and DOM elements that need to be accessed globally
+    // Expose the functions and DOM elements that need to be accessed globally.
     window.initFileSystemBrowser = initFileSystemBrowser;
     window.showFileSystemBrowserDialogAsync = showFileSystemBrowserDialogAsync;
     window.addressBar = addressBar;

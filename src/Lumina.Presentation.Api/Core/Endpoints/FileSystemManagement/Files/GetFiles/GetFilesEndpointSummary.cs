@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Contracts.Requests.FileSystemManagement.Files;
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
 using Lumina.Contracts.Responses.FileSystemManagement.Files;
 using System;
 using System.Collections.Generic;
@@ -38,8 +37,8 @@ public class GetFilesEndpointSummary : Summary<GetFilesEndpoint, GetFilesRequest
 
         Response(200, "The list of files is returned.",
             example: new FileResponse[] {
-                new(Path: "/media/movies/The Matrix (1999)/The Matrix.mkv", Name: "The Matrix.mkv", DateCreated: DateTime.UtcNow, DateModified: DateTime.UtcNow.AddMinutes(-10), Size: 754045401),
-                new(Path: "/media/movies/The Matrix (1999)/The Matrix.en.srt", Name: "The Matrix.en.srt", DateCreated: DateTime.UtcNow, DateModified: DateTime.UtcNow.AddMinutes(-10), Size: 6897)
+                new(Path: "/media/movies/The Matrix (1999)/The Matrix.mkv", Name: "The Matrix.mkv", DateCreated: DateTime.UtcNow, DateModified: DateTime.UtcNow.AddMinutes(-10), Size: 754045401, IsHidden: false),
+                new(Path: "/media/movies/The Matrix (1999)/The Matrix.en.srt", Name: "The Matrix.en.srt", DateCreated: DateTime.UtcNow, DateModified: DateTime.UtcNow.AddMinutes(-10), Size: 6897, IsHidden: false)
             });
 
         Response(401, "Authentication required.", "application/problem+json",

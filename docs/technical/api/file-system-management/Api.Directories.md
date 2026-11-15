@@ -32,14 +32,16 @@ GET api/v1/directories/get-directories?path=C%3A%5CUsers%5C&shouldIncludeHiddenE
     "path": "/media/movies/The Matrix (1999)/",
     "name": "The Matrix",
     "dateCreated": "2025-01-01T13:50:38.3183787Z",
-    "dateModified": "2025-01-01T13:40:38.3183791Z"
+    "dateModified": "2025-01-01T13:40:38.3183791Z",
+    "isHidden": false
   },
   {
     "items": [],
     "path": "/media/movies/The Lord of the Rings - The Fellowship of the Ring (2001)/",
     "name": "The Lord of the Rings - The Fellowship of the Ring (2001)",
     "dateCreated": "2025-01-01T13:50:38.3184681Z",
-    "dateModified": "2025-01-01T13:40:38.3184683Z"
+    "dateModified": "2025-01-01T13:40:38.3184683Z",
+    "isHidden": false
   }
 ]
 ```

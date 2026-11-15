@@ -22,6 +22,13 @@ public interface IDirectoryProviderService
     Result<IEnumerable<FileSystemPathId>> GetSubdirectoryPaths(FileSystemPathId path, bool shouldIncludeHiddenElements);
 
     /// <summary>
+    /// Checks if the directory at the specified path is hidden.
+    /// </summary>
+    /// <param name="path">The path of the directory to check.</param>
+    /// <returns><see langword="true"/> when the directory is hidden, otherwise <see langword="false"/>, including when its attributes cannot be read.</returns>
+    bool IsHidden(FileSystemPathId path);
+
+    /// <summary>
     /// Checks if a directory with the specified path exists.
     /// </summary>
     /// <param name="path">The path of the directory whose existance is checked.</param>

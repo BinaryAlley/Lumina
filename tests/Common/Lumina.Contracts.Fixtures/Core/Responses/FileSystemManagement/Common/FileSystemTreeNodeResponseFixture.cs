@@ -23,14 +23,16 @@ public class FileSystemTreeNodeResponseFixture
     /// <param name="currentDepth">The current depth in the tree structure. Default is 0 (root level).</param>
     /// <param name="maxDepth">The maximum depth of the tree structure. Default is 2.</param>
     /// <param name="maxChildren">The maximum number of children for each node. Default is 3.</param>
+    /// <param name="isHidden">Optional. Whether the node is hidden. If not provided, a random value is generated.</param>
     /// <returns>A <see cref="FileSystemTreeNodeResponse"/> with a nested structure.</returns>
-    public FileSystemTreeNodeResponse Create(int currentDepth = 0, int maxDepth = 2, int maxChildren = 3)
+    public FileSystemTreeNodeResponse Create(int currentDepth = 0, int maxDepth = 2, int maxChildren = 3, bool? isHidden = null)
     {
         FileSystemTreeNodeResponse response = new()
         {
             Path = _faker.System.FilePath(),
             Name = _faker.System.FileName(),
             ItemType = FileSystemItemType.Directory,
+            IsHidden = isHidden ?? _faker.Random.Bool(),
             IsExpanded = _faker.Random.Bool(),
             ChildrenLoaded = true,
             Children = []

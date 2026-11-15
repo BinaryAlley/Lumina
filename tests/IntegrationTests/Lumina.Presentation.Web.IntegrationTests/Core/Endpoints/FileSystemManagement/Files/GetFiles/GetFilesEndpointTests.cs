@@ -39,7 +39,7 @@ public class GetFilesEndpointTests : IClassFixture<LuminaWebFactory>
         // Arrange
         _apiFactory.ApiClientStub.Reset();
         string path = @"C:\Users\test";
-        FileDto[] expectedFiles = [_fileDtoFixture.Create(path: path, name: "book.pdf")];
+        FileDto[] expectedFiles = [_fileDtoFixture.Create(path: path, name: "book.pdf", isHidden: true)];
         string expectedEndpoint = $"files/get-files?path={Uri.EscapeDataString(path)}&shouldIncludeHiddenElements=True";
         _apiFactory.ApiClientStub.RegisterGetResponse(expectedEndpoint, expectedFiles);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
@@ -56,6 +56,7 @@ public class GetFilesEndpointTests : IClassFixture<LuminaWebFactory>
         using JsonDocument json = JsonDocument.Parse(content);
         Assert.True(json.RootElement.GetProperty("success").GetBoolean());
         Assert.Equal(expectedFiles.Length, json.RootElement.GetProperty("data").GetArrayLength());
+        Assert.True(json.RootElement.GetProperty("data")[0].GetProperty("isHidden").GetBoolean());
         Assert.Contains(expectedEndpoint, _apiFactory.ApiClientStub.GetEndpointsCalled);
     }
 }

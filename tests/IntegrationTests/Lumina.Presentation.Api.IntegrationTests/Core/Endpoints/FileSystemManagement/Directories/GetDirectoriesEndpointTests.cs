@@ -58,7 +58,7 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         // Arrange
         string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
-        testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // two levels to get to the element that has a hidden element as child
+        testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // Two levels to get to the element that has a hidden element as child.
         string encodedPath = Uri.EscapeDataString(testPath);
         bool shouldIncludeHiddenElements = false;
         try
@@ -82,13 +82,13 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         }
     }
 
-    [Fact]
+    [SkipWhenHiddenAttributeNotSupportedFact]
     public async Task GetDirectories_WhenCalledWithValidPathAndWithShouldIncludeHiddenElements_ShouldReturnDirectoriesWithHiddenElements()
     {
         // Arrange
         string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
         testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
-        testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // two levels to get to the element that has a hidden element as child
+        testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // Two levels to get to the element that has a hidden element as child.
         string encodedPath = Uri.EscapeDataString(testPath);
         bool shouldIncludeHiddenElements = true;
         try
@@ -112,7 +112,8 @@ public class GetDirectoriesEndpointTests : IClassFixture<AuthenticatedLuminaApiF
             DirectoryResponse firstDirectory = directories!.First();
             Assert.Equal((s_isUnix ? "." : string.Empty) + "NestedDirectory_2", directories!.First().Name);
             Assert.Equal(System.IO.Path.Combine(testPath, (s_isUnix ? "." : string.Empty) + "NestedDirectory_2" + System.IO.Path.DirectorySeparatorChar), directories.First().Path);
-            Assert.Single(directories); // only directories
+            Assert.True(firstDirectory.IsHidden);
+            Assert.Single(directories); // Only directories.
         }
         finally
         {

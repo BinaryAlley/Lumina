@@ -51,7 +51,11 @@ public class GetFilesQueryHandlerTests
         // Arrange
         GetFilesQuery getFilesQuery = _getFilesQueryFixture.Create(shouldIncludeHiddenElements: false);
 
-        IEnumerable<File> files = _fileFixture.CreateMany();
+        IEnumerable<File> files =
+        [
+            _fileFixture.Create(isHidden: true),
+            _fileFixture.Create(isHidden: false)
+        ];
 
         _mockFileService.GetFiles(getFilesQuery.Path!, getFilesQuery.ShouldIncludeHiddenElements)
             .Returns(Result.From(files));
@@ -74,6 +78,7 @@ public class GetFilesQueryHandlerTests
             Assert.Equal(filesList[i].DateCreated.Value, resultList[i].DateCreated);
             Assert.Equal(filesList[i].DateModified.Value, resultList[i].DateModified);
             Assert.Equal(filesList[i].Size, resultList[i].Size);
+            Assert.Equal(filesList[i].IsHidden, resultList[i].IsHidden);
         }
 
         _mockFileService.Received(1).GetFiles(getFilesQuery.Path!, getFilesQuery.ShouldIncludeHiddenElements);
@@ -85,7 +90,11 @@ public class GetFilesQueryHandlerTests
         // Arrange
         GetFilesQuery getFilesQuery = _getFilesQueryFixture.Create(shouldIncludeHiddenElements: true);
 
-        IEnumerable<File> files = _fileFixture.CreateMany();
+        IEnumerable<File> files =
+        [
+            _fileFixture.Create(isHidden: true),
+            _fileFixture.Create(isHidden: false)
+        ];
 
         _mockFileService.GetFiles(getFilesQuery.Path!, getFilesQuery.ShouldIncludeHiddenElements)
             .Returns(Result.From(files));
@@ -108,6 +117,7 @@ public class GetFilesQueryHandlerTests
             Assert.Equal(filesList[i].DateCreated.Value, resultList[i].DateCreated);
             Assert.Equal(filesList[i].DateModified.Value, resultList[i].DateModified);
             Assert.Equal(filesList[i].Size, resultList[i].Size);
+            Assert.Equal(filesList[i].IsHidden, resultList[i].IsHidden);
         }
 
         _mockFileService.Received(1).GetFiles(getFilesQuery.Path!, getFilesQuery.ShouldIncludeHiddenElements);

@@ -20,11 +20,13 @@ public class FileMappingTests
 {
     private readonly FileFixture _fileFixture = new();
 
-    [Fact]
-    public void ToFileSystemTreeNodeResponse_WhenMappingFile_ShouldMapCorrectly()
+    [Theory]
+    [InlineData(true)] // hidden file
+    [InlineData(false)] // visible file
+    public void ToFileSystemTreeNodeResponse_WhenMappingFile_ShouldMapCorrectly(bool isHidden)
     {
         // Arrange
-        File domainModel = _fileFixture.Create();
+        File domainModel = _fileFixture.Create(isHidden: isHidden);
 
         // Act
         FileSystemTreeNodeResponse result = domainModel.ToFileSystemTreeNodeResponse();
@@ -34,6 +36,7 @@ public class FileMappingTests
         Assert.Equal(domainModel.Name, result.Name);
         Assert.Equal(domainModel.Id.Path, result.Path);
         Assert.Equal(domainModel.Type, result.ItemType);
+        Assert.Equal(domainModel.IsHidden, result.IsHidden);
         Assert.False(result.IsExpanded);
         Assert.False(result.ChildrenLoaded);
     }
@@ -42,7 +45,11 @@ public class FileMappingTests
     public void ToFileSystemTreeNodeResponses_WhenMappingMultipleFiles_ShouldMapCorrectly()
     {
         // Arrange
-        IEnumerable<File> domainModels = _fileFixture.CreateMany();
+        IEnumerable<File> domainModels =
+        [
+            _fileFixture.Create(isHidden: true),
+            _fileFixture.Create(isHidden: false)
+        ];
 
         // Act
         IEnumerable<FileSystemTreeNodeResponse> result = domainModels.ToFileSystemTreeNodeResponses();
@@ -58,17 +65,20 @@ public class FileMappingTests
             Assert.Equal(domainModelsList[i].Name, resultList[i].Name);
             Assert.Equal(domainModelsList[i].Id.Path, resultList[i].Path);
             Assert.Equal(domainModelsList[i].Type, resultList[i].ItemType);
+            Assert.Equal(domainModelsList[i].IsHidden, resultList[i].IsHidden);
             Assert.False(resultList[i].IsExpanded);
             Assert.False(resultList[i].ChildrenLoaded);
             Assert.Empty(resultList[i].Children);
         }
     }
 
-    [Fact]
-    public void ToResponse_WhenMappingFile_ShouldMapCorrectly()
+    [Theory]
+    [InlineData(true)] // hidden file
+    [InlineData(false)] // visible file
+    public void ToResponse_WhenMappingFile_ShouldMapCorrectly(bool isHidden)
     {
         // Arrange
-        File domainModel = _fileFixture.Create();
+        File domainModel = _fileFixture.Create(isHidden: isHidden);
 
         // Act
         FileResponse result = domainModel.ToResponse();
@@ -80,13 +90,18 @@ public class FileMappingTests
         Assert.Equal(domainModel.DateCreated.Value, result.DateCreated);
         Assert.Equal(domainModel.DateModified.Value, result.DateModified);
         Assert.Equal(domainModel.Size, result.Size);
+        Assert.Equal(domainModel.IsHidden, result.IsHidden);
     }
 
     [Fact]
     public void ToResponses_WhenMappingMultipleFiles_ShouldMapCorrectly()
     {
         // Arrange
-        IEnumerable<File> domainModels = _fileFixture.CreateMany();
+        IEnumerable<File> domainModels =
+        [
+            _fileFixture.Create(isHidden: true),
+            _fileFixture.Create(isHidden: false)
+        ];
 
         // Act
         IEnumerable<FileResponse> result = domainModels.ToResponses();
@@ -104,6 +119,7 @@ public class FileMappingTests
             Assert.Equal(domainModelsList[i].Size, resultList[i].Size);
             Assert.Equal(domainModelsList[i].DateCreated.Value, resultList[i].DateCreated);
             Assert.Equal(domainModelsList[i].DateModified.Value, resultList[i].DateModified);
+            Assert.Equal(domainModelsList[i].IsHidden, resultList[i].IsHidden);
         }
     }
 }

@@ -1,10 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
-
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -52,6 +50,19 @@ internal class DirectoryProviderService : IDirectoryProviderService
                                                         .Where(pathIdResult => !pathIdResult.IsFailure)
                                                         .Select(pathIdResult => pathIdResult.Value)
                                                         .AsEnumerable());
+    }
+
+    /// <summary>
+    /// Checks if the directory at the specified path is hidden.
+    /// </summary>
+    /// <param name="path">The path of the directory to check.</param>
+    /// <returns><see langword="true"/> when the directory is hidden, otherwise <see langword="false"/>, including when its attributes cannot be read.</returns>
+    public bool IsHidden(FileSystemPathId path)
+    {
+        // The hidden flag is metadata, so it follows the same read properties permission as the other metadata accessors.
+        if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false))
+            return false;
+        return (GetAttributes(path.Path) & FileAttributes.Hidden) == FileAttributes.Hidden;
     }
 
     /// <summary>
