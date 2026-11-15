@@ -33,12 +33,20 @@ public interface ITrackRepository : IRepository<TrackEntity>,
     Task<Result<IReadOnlyCollection<string>>> GetExistingPathsAsync(Guid libraryId, IReadOnlyCollection<string> paths, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Gets all the tracks of the album identified by <paramref name="albumId"/>.
+    /// Gets the tracks of the album identified by <paramref name="albumId"/> that are not soft deleted.
     /// </summary>
     /// <param name="albumId">The Id of the album whose tracks are retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="TrackEntity"/>, or an error.</returns>
     Task<Result<IReadOnlyList<TrackEntity>>> GetByAlbumIdAsync(Guid albumId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets all the tracks of the album identified by <paramref name="albumId"/>, whether they are soft deleted or not.
+    /// </summary>
+    /// <param name="albumId">The Id of the album whose tracks are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="TrackEntity"/>, or an error.</returns>
+    Task<Result<IReadOnlyList<TrackEntity>>> GetByAlbumIdIncludingDeletedAsync(Guid albumId, CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets the lightweight read models of the tracks of the album identified by <paramref name="albumId"/>, projecting only the fields needed to display the tracks of an album.
@@ -146,4 +154,36 @@ public interface ITrackRepository : IRepository<TrackEntity>,
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the existing tracks, or an error.</returns>
     Task<Result<IReadOnlyList<TrackEntity>>> GetByIdsAsync(IReadOnlyCollection<Guid> trackIds, bool shouldIncludeNavigationProperties, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the soft deleted track identified by <paramref name="id"/>, when its album and artist are not soft deleted.
+    /// </summary>
+    /// <param name="id">The Id of the soft deleted track to get.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted <see cref="TrackEntity"/>, <see langword="null"/> when the track does not exist, is not soft deleted, or its album or artist is soft deleted, or an error.</returns>
+    Task<Result<TrackEntity?>> GetSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the soft deleted tracks of the media library identified by <paramref name="libraryId"/>, whose album and artist are not soft deleted.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose soft deleted tracks are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted tracks, or an error.</returns>
+    Task<Result<IReadOnlyList<TrackEntity>>> GetSoftDeletedByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Soft deletes the track identified by <paramref name="id"/>, without removing its stored metadata or artwork.
+    /// </summary>
+    /// <param name="id">The Id of the track to soft delete.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> SoftDeleteByIdAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Restores the soft deleted track identified by <paramref name="id"/>.
+    /// </summary>
+    /// <param name="id">The Id of the track to restore.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> RestoreSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken);
 }

@@ -434,16 +434,29 @@ public sealed class Artist : AggregateRoot<ArtistId>
     }
 
     /// <summary>
+    /// Ensures the provided <paramref name="album"/> can be removed from the artist, without leaving the artist without albums.
+    /// </summary>
+    /// <param name="album">The album that is about to be removed or deleted.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful check, or an error.</returns>
+    public Result<bool> CanRemoveAlbum(Album album)
+    {
+        if (!_albums.Contains(album))
+            return Errors.Music.TheArtistDoesNotHaveTheAlbum;
+        if (_albums.Count is 1)
+            return Errors.Music.ArtistMustHaveAtLeastOneAlbum;
+        return true;
+    }
+
+    /// <summary>
     /// Removes an album from the artist.
     /// </summary>
     /// <param name="album">The album to be removed.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public Result<Deleted> RemoveAlbum(Album album)
     {
-        if (!_albums.Contains(album))
-            return Errors.Music.TheArtistDoesNotHaveTheAlbum;
-        if (_albums.Count is 1)
-            return Errors.Music.ArtistMustHaveAtLeastOneAlbum; 
+        Result<bool> canRemoveAlbumResult = CanRemoveAlbum(album);
+        if (canRemoveAlbumResult.IsFailure)
+            return canRemoveAlbumResult.Errors;
         _albums.Remove(album);
         return Result.Deleted;
     }

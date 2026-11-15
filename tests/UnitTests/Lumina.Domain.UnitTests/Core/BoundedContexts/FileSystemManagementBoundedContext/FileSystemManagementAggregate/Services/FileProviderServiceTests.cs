@@ -955,4 +955,42 @@ public class FileProviderServiceTests
         Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
         _mockFileSystem.File.DidNotReceive().Delete(Arg.Any<string>());
     }
+
+    [Fact]
+    public void DeleteFile_WhenTheFileIsLocked_ShouldReturnFileDeleteError()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
+            s_isUnix ? "/LockedFileToDelete.txt" : @"C:\LockedFileToDelete.txt"
+        );
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Delete).Returns(true);
+        _mockFileSystem.File.When(file => file.Delete(path.Path))
+            .Do(_ => throw new IOException("The file is locked by another process"));
+
+        // Act
+        Result<Deleted> result = _sut.DeleteFile(path);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.FileDeleteError, result.FirstError);
+    }
+
+    [Fact]
+    public void DeleteFile_WhenTheFileIsReadOnly_ShouldReturnUnauthorizedAccessError()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(
+            s_isUnix ? "/ReadOnlyFileToDelete.txt" : @"C:\ReadOnlyFileToDelete.txt"
+        );
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Delete).Returns(true);
+        _mockFileSystem.File.When(file => file.Delete(path.Path))
+            .Do(_ => throw new UnauthorizedAccessException("The file is read-only"));
+
+        // Act
+        Result<Deleted> result = _sut.DeleteFile(path);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Permission.UnauthorizedAccess, result.FirstError);
+    }
 }

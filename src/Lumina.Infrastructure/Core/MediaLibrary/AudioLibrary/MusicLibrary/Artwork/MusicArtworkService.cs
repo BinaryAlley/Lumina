@@ -55,15 +55,16 @@ internal sealed class MusicArtworkService : IMusicArtworkService
     /// <param name="libraryId">The Id of the media library the album belongs to.</param>
     /// <param name="albumId">The Id of the album.</param>
     /// <param name="libraryName">The name of the media library the album belongs to.</param>
+    /// <param name="artistId">The Id of the artist of the album.</param>
     /// <param name="artistName">The name of the artist of the album.</param>
     /// <param name="albumTitle">The title of the album.</param>
     /// <param name="artwork">The artwork to store.</param>
     /// <param name="releaseTypeName">The name of the release type directory the album is stored under on disk, used to group the artwork of the different releases of an artist. When <see langword="null"/>, no release type segment is added.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the relative path of the stored artwork, or an error.</returns>
-    public async Task<Result<string>> SaveAlbumArtworkAsync(Guid libraryId, Guid albumId, string libraryName, string artistName, string albumTitle, ArtworkDto artwork, string? releaseTypeName, CancellationToken cancellationToken)
+    public async Task<Result<string>> SaveAlbumArtworkAsync(Guid libraryId, Guid albumId, string libraryName, Guid artistId, string artistName, string albumTitle, ArtworkDto artwork, string? releaseTypeName, CancellationToken cancellationToken)
     {
-        Result<string> artworkDirectoryPathResult = BuildAlbumArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle, releaseTypeName);
+        Result<string> artworkDirectoryPathResult = BuildAlbumArtworkDirectoryPath(libraryId, albumId, libraryName, artistId, artistName, albumTitle, releaseTypeName);
         if (artworkDirectoryPathResult.IsFailure)
             return artworkDirectoryPathResult.Errors;
         return await SaveArtworkAsync(artworkDirectoryPathResult.Value, artwork, cancellationToken).ConfigureAwait(false);
@@ -74,13 +75,14 @@ internal sealed class MusicArtworkService : IMusicArtworkService
     /// </summary>
     /// <param name="libraryId">The Id of the media library the artist belongs to.</param>
     /// <param name="libraryName">The name of the media library the artist belongs to.</param>
+    /// <param name="artistId">The Id of the artist.</param>
     /// <param name="artistName">The name of the artist.</param>
     /// <param name="artwork">The artwork to store.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the relative path of the stored artwork, or an error.</returns>
-    public async Task<Result<string>> SaveArtistArtworkAsync(Guid libraryId, string libraryName, string artistName, ArtworkDto artwork, CancellationToken cancellationToken)
+    public async Task<Result<string>> SaveArtistArtworkAsync(Guid libraryId, string libraryName, Guid artistId, string artistName, ArtworkDto artwork, CancellationToken cancellationToken)
     {
-        Result<string> artworkDirectoryPathResult = BuildArtistArtworkDirectoryPath(libraryId, libraryName, artistName);
+        Result<string> artworkDirectoryPathResult = BuildArtistArtworkDirectoryPath(libraryId, libraryName, artistId, artistName);
         if (artworkDirectoryPathResult.IsFailure)
             return artworkDirectoryPathResult.Errors;
         return await SaveArtworkAsync(artworkDirectoryPathResult.Value, artwork, cancellationToken).ConfigureAwait(false);
@@ -92,6 +94,7 @@ internal sealed class MusicArtworkService : IMusicArtworkService
     /// <param name="libraryId">The Id of the media library the album belongs to.</param>
     /// <param name="albumId">The Id of the album.</param>
     /// <param name="libraryName">The name of the media library the album belongs to.</param>
+    /// <param name="artistId">The Id of the artist of the album.</param>
     /// <param name="artistName">The name of the artist of the album.</param>
     /// <param name="albumTitle">The title of the album.</param>
     /// <param name="artwork">The stream of the uploaded artwork to store.</param>
@@ -99,14 +102,14 @@ internal sealed class MusicArtworkService : IMusicArtworkService
     /// <param name="releaseTypeName">The name of the release type directory the album is stored under on disk, used to group the artwork of the different releases of an artist. When <see langword="null"/>, no release type segment is added.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the relative path of the stored artwork, or an error.</returns>
-    public async Task<Result<string>> SaveAlbumArtworkAsync(Guid libraryId, Guid albumId, string libraryName, string artistName, string albumTitle, Stream artwork, string fileName, string? releaseTypeName, CancellationToken cancellationToken)
+    public async Task<Result<string>> SaveAlbumArtworkAsync(Guid libraryId, Guid albumId, string libraryName, Guid artistId, string artistName, string albumTitle, Stream artwork, string fileName, string? releaseTypeName, CancellationToken cancellationToken)
     {
         // The uploaded bytes are persisted to a temporary file first, so that the storage pipeline can treat the upload like any other local artwork source and clean it up afterwards.
         string temporaryPath = BuildTemporaryUploadPath(fileName);
         try
         {
             await WriteUploadedArtworkAsync(artwork, temporaryPath, cancellationToken).ConfigureAwait(false);
-            return await SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, new ArtworkDto(ArtworkType.Cover, 0, temporaryPath, null, IsTemporary: true), releaseTypeName, cancellationToken).ConfigureAwait(false);
+            return await SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistId, artistName, albumTitle, new ArtworkDto(ArtworkType.Cover, 0, temporaryPath, null, IsTemporary: true), releaseTypeName, cancellationToken).ConfigureAwait(false);
         }
         finally
         {
@@ -119,19 +122,20 @@ internal sealed class MusicArtworkService : IMusicArtworkService
     /// </summary>
     /// <param name="libraryId">The Id of the media library the artist belongs to.</param>
     /// <param name="libraryName">The name of the media library the artist belongs to.</param>
+    /// <param name="artistId">The Id of the artist.</param>
     /// <param name="artistName">The name of the artist.</param>
     /// <param name="artwork">The stream of the uploaded artwork to store.</param>
     /// <param name="fileName">The name of the uploaded artwork file.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the relative path of the stored artwork, or an error.</returns>
-    public async Task<Result<string>> SaveArtistArtworkAsync(Guid libraryId, string libraryName, string artistName, Stream artwork, string fileName, CancellationToken cancellationToken)
+    public async Task<Result<string>> SaveArtistArtworkAsync(Guid libraryId, string libraryName, Guid artistId, string artistName, Stream artwork, string fileName, CancellationToken cancellationToken)
     {
         // The uploaded bytes are persisted to a temporary file first, so that the storage pipeline can treat the upload like any other local artwork source and clean it up afterwards.
         string temporaryPath = BuildTemporaryUploadPath(fileName);
         try
         {
             await WriteUploadedArtworkAsync(artwork, temporaryPath, cancellationToken).ConfigureAwait(false);
-            return await SaveArtistArtworkAsync(libraryId, libraryName, artistName, new ArtworkDto(ArtworkType.Cover, 0, temporaryPath, null, IsTemporary: true), cancellationToken).ConfigureAwait(false);
+            return await SaveArtistArtworkAsync(libraryId, libraryName, artistId, artistName, new ArtworkDto(ArtworkType.Cover, 0, temporaryPath, null, IsTemporary: true), cancellationToken).ConfigureAwait(false);
         }
         finally
         {
@@ -232,13 +236,14 @@ internal sealed class MusicArtworkService : IMusicArtworkService
     /// <param name="libraryId">The Id of the media library the album belongs to.</param>
     /// <param name="albumId">The Id of the album.</param>
     /// <param name="libraryName">The name of the media library the album belongs to.</param>
+    /// <param name="artistId">The Id of the artist of the album.</param>
     /// <param name="artistName">The name of the artist of the album.</param>
     /// <param name="albumTitle">The title of the album.</param>
     /// <param name="releaseTypeName">The name of the release type directory the album is stored under on disk, used to group the artwork of the different releases of an artist. When omitted, no release type segment is added.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public Result<Deleted> DeleteAlbumArtwork(Guid libraryId, Guid albumId, string libraryName, string artistName, string albumTitle, string? releaseTypeName = null)
+    public Result<Deleted> DeleteAlbumArtwork(Guid libraryId, Guid albumId, string libraryName, Guid artistId, string artistName, string albumTitle, string? releaseTypeName = null)
     {
-        Result<string> artworkDirectoryPathResult = BuildAlbumArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle, releaseTypeName);
+        Result<string> artworkDirectoryPathResult = BuildAlbumArtworkDirectoryPath(libraryId, albumId, libraryName, artistId, artistName, albumTitle, releaseTypeName);
         if (artworkDirectoryPathResult.IsFailure)
             return artworkDirectoryPathResult.Errors;
         return DeleteArtworkInDirectory(artworkDirectoryPathResult.Value);
@@ -249,11 +254,12 @@ internal sealed class MusicArtworkService : IMusicArtworkService
     /// </summary>
     /// <param name="libraryId">The Id of the media library the artist belongs to.</param>
     /// <param name="libraryName">The name of the media library the artist belongs to.</param>
+    /// <param name="artistId">The Id of the artist.</param>
     /// <param name="artistName">The name of the artist.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public Result<Deleted> DeleteArtistArtwork(Guid libraryId, string libraryName, string artistName)
+    public Result<Deleted> DeleteArtistArtwork(Guid libraryId, string libraryName, Guid artistId, string artistName)
     {
-        Result<string> artworkDirectoryPathResult = BuildArtistArtworkDirectoryPath(libraryId, libraryName, artistName);
+        Result<string> artworkDirectoryPathResult = BuildArtistArtworkDirectoryPath(libraryId, libraryName, artistId, artistName);
         if (artworkDirectoryPathResult.IsFailure)
             return artworkDirectoryPathResult.Errors;
         return DeleteArtworkInDirectory(artworkDirectoryPathResult.Value);
@@ -281,8 +287,7 @@ internal sealed class MusicArtworkService : IMusicArtworkService
         if (!fileExistsResult.Value)
             return Result.Deleted;
 
-        _environmentContext.FileProviderService.DeleteFile(filePathIdResult.Value);
-        return Result.Deleted;
+        return _environmentContext.FileProviderService.DeleteFile(filePathIdResult.Value);
     }
 
     /// <summary>
@@ -469,13 +474,14 @@ internal sealed class MusicArtworkService : IMusicArtworkService
     /// <param name="libraryId">The Id of the media library the album belongs to.</param>
     /// <param name="albumId">The Id of the album.</param>
     /// <param name="libraryName">The name of the media library the album belongs to.</param>
+    /// <param name="artistId">The Id of the artist of the album.</param>
     /// <param name="artistName">The name of the artist of the album.</param>
     /// <param name="albumTitle">The title of the album.</param>
     /// <param name="releaseTypeName">The name of the release type directory the album is stored under on disk, or <see langword="null"/> to store the artwork directly under the artist directory.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the file system path of the album artwork directory, or an error.</returns>
-    private Result<string> BuildAlbumArtworkDirectoryPath(Guid libraryId, Guid albumId, string libraryName, string artistName, string albumTitle, string? releaseTypeName)
+    private Result<string> BuildAlbumArtworkDirectoryPath(Guid libraryId, Guid albumId, string libraryName, Guid artistId, string artistName, string albumTitle, string? releaseTypeName)
     {
-        Result<string> artistPathResult = BuildArtistArtworkDirectoryPath(libraryId, libraryName, artistName);
+        Result<string> artistPathResult = BuildArtistArtworkDirectoryPath(libraryId, libraryName, artistId, artistName);
         if (artistPathResult.IsFailure)
             return artistPathResult.Errors;
 
@@ -492,7 +498,7 @@ internal sealed class MusicArtworkService : IMusicArtworkService
             albumParentPathResult = releaseTypePathResult;
         }
 
-        Result<PathSegment> albumSegmentResult = _pathService.SanitizeSegment($"{albumTitle}-{albumId}");
+        Result<PathSegment> albumSegmentResult = _pathService.SanitizeCompositeSegment(albumTitle, albumId.ToString());
         if (albumSegmentResult.IsFailure)
             return albumSegmentResult.Errors;
         return _pathService.CombinePath(albumParentPathResult.Value, albumSegmentResult.Value.Name);
@@ -504,15 +510,19 @@ internal sealed class MusicArtworkService : IMusicArtworkService
     /// </summary>
     /// <param name="libraryId">The Id of the media library the artist belongs to.</param>
     /// <param name="libraryName">The name of the media library the artist belongs to.</param>
+    /// <param name="artistId">The Id of the artist.</param>
     /// <param name="artistName">The name of the artist.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the file system path of the artist artwork directory, or an error.</returns>
-    private Result<string> BuildArtistArtworkDirectoryPath(Guid libraryId, string libraryName, string artistName)
+    private Result<string> BuildArtistArtworkDirectoryPath(Guid libraryId, string libraryName, Guid artistId, string artistName)
     {
         Result<string> libraryPathResult = BuildLibraryArtworkDirectoryPath(libraryId, libraryName);
         if (libraryPathResult.IsFailure)
             return libraryPathResult.Errors;
 
-        Result<PathSegment> artistSegmentResult = _pathService.SanitizeSegment(string.IsNullOrWhiteSpace(artistName) ? "Unknown" : artistName);
+        // The Id is part of the segment because a deleted artist and a visible artist can share a name, and each must keep its own artwork.
+        // The composite segment keeps the Id even when the name is long enough to need shortening.
+        string resolvedArtistName = string.IsNullOrWhiteSpace(artistName) ? "Unknown" : artistName;
+        Result<PathSegment> artistSegmentResult = _pathService.SanitizeCompositeSegment(resolvedArtistName, artistId.ToString());
         if (artistSegmentResult.IsFailure)
             return artistSegmentResult.Errors;
         return _pathService.CombinePath(libraryPathResult.Value, artistSegmentResult.Value.Name);
@@ -533,7 +543,7 @@ internal sealed class MusicArtworkService : IMusicArtworkService
         if (musicPathResult.IsFailure)
             return musicPathResult.Errors;
 
-        Result<PathSegment> librarySegmentResult = _pathService.SanitizeSegment($"{libraryName}-{libraryId}");
+        Result<PathSegment> librarySegmentResult = _pathService.SanitizeCompositeSegment(libraryName, libraryId.ToString());
         if (librarySegmentResult.IsFailure)
             return librarySegmentResult.Errors;
         return _pathService.CombinePath(musicPathResult.Value, librarySegmentResult.Value.Name);

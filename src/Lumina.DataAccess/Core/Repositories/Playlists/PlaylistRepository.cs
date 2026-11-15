@@ -578,6 +578,9 @@ internal sealed class PlaylistRepository : IPlaylistRepository
             INNER JOIN Albums AS album ON album.Id = track.AlbumId
             INNER JOIN Artists AS artist ON artist.Id = album.ArtistId
             WHERE track.LibraryId = @libraryId
+              AND track.IsDeleted = 0
+              AND album.IsDeleted = 0
+              AND artist.IsDeleted = 0
             """);
         if (artistId is not null)
             insertSql.Append(" AND album.ArtistId = @artistId");
@@ -965,7 +968,7 @@ internal sealed class PlaylistRepository : IPlaylistRepository
             List<PlaylistEntryDisplayDto> chunkDetails = await (from track in _luminaDbContext.Tracks.AsNoTracking()
                                                                     join album in _luminaDbContext.Albums on track.AlbumId equals album.Id
                                                                     join artist in _luminaDbContext.Artists on album.ArtistId equals artist.Id
-                                                                    where chunk.Contains(track.Id)
+                                                                    where chunk.Contains(track.Id) && !track.IsDeleted && !album.IsDeleted && !artist.IsDeleted
                                                                     select new PlaylistEntryDisplayDto(
                                                                         track.Id,
                                                                         track.Title,

@@ -69,4 +69,7 @@
   <data name="AddToPlaylist" xml:space="preserve">
     <value>إضافة إلى قائمة التشغيل</value>
   </data>
+  <data name="DeletedItems" xml:space="preserve">
+    <value>العناصر المحذوفة</value>
+  </data>
 </root>

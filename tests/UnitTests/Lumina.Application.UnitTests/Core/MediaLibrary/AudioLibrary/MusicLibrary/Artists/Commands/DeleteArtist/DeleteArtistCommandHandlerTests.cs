@@ -9,7 +9,6 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Commands.DeleteArtist;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Commands.DeleteArtist;
@@ -34,7 +33,6 @@ public class DeleteArtistCommandHandlerTests
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly IArtistRepository _mockArtistRepository;
     private readonly ILibraryRepository _mockLibraryRepository;
-    private readonly IMusicArtworkCleanupService _mockMusicArtworkCleanupService;
     private readonly IAuthorizationService _mockAuthorizationService;
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IValidator<DeleteArtistCommand> _mockValidator;
@@ -54,31 +52,31 @@ public class DeleteArtistCommandHandlerTests
         _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockUnitOfWork.ArtistRepository.Returns(_mockArtistRepository);
         _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
-        _mockMusicArtworkCleanupService = Substitute.For<IMusicArtworkCleanupService>();
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockValidator = Substitute.For<IValidator<DeleteArtistCommand>>();
         _userId = Guid.NewGuid();
 
-        // Default stubs: the command is valid, the current user is authenticated, the ownership policy allows the deletion, the library exists, the artist deletion succeeds, the artwork cleanup succeeds and saving changes succeeds.
+        // Default stubs: the command is valid, the current user is authenticated, the ownership policy allows the deletion, the artist and the
+        // library exist, marking the artist as deleted succeeds, and saving changes succeeds.
         _mockValidator.Validate(Arg.Any<DeleteArtistCommand>()).Returns([]);
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(true);
+        _mockArtistRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(_ => Result.From<ArtistEntity?>(_artistEntityFixture.Create(includeAlbums: false, includeContributors: false)));
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(_ => Result.From<LibraryEntity?>(_libraryEntityFixture.Create()));
-        _mockMusicArtworkCleanupService.DeleteArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(Result.Deleted);
-        _mockArtistRepository.DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(Result.Deleted);
+        _mockArtistRepository.SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Updated);
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>())
             .Returns(Result.Success);
 
-        _sut = new DeleteArtistCommandHandler(_mockUnitOfWork, _mockMusicArtworkCleanupService, _mockAuthorizationService, _mockCurrentUserService, _mockValidator);
+        _sut = new DeleteArtistCommandHandler(_mockUnitOfWork, _mockAuthorizationService, _mockCurrentUserService, _mockValidator);
     }
 
     [Fact]
-    public async Task HandleAsync_WhenArtistExists_ShouldDeleteArtistAndReturnDeleted()
+    public async Task HandleAsync_WhenArtistExists_ShouldSoftDeleteArtistAndReturnDeleted()
     {
         // Arrange
         DeleteArtistCommand command = _deleteArtistCommandFixture.Create();
@@ -87,6 +85,8 @@ public class DeleteArtistCommandHandlerTests
         ArtistEntity artist = _artistEntityFixture.Create(id: artistId, libraryId: libraryId, includeAlbums: false, includeContributors: false);
         _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ArtistEntity?>(artist));
+        _mockLibraryRepository.GetByIdAsync(libraryId, Arg.Any<bool>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(id: libraryId)));
 
         // Act
         Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -94,17 +94,41 @@ public class DeleteArtistCommandHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(Result.Deleted, result.Value);
-        // The artwork of the artist and of its albums and tracks is removed before the artist row, so that no artwork is orphaned.
-        await _mockMusicArtworkCleanupService.Received(1).DeleteArtistArtworkAsync(artistId, Arg.Any<CancellationToken>());
-        Received.InOrder(() =>
-        {
-            _mockMusicArtworkCleanupService.DeleteArtistArtworkAsync(artistId, Arg.Any<CancellationToken>());
-            _mockArtistRepository.DeleteByIdAsync(artistId, Arg.Any<CancellationToken>());
-        });
-        await _mockArtistRepository.Received(1).DeleteByIdAsync(artistId, Arg.Any<CancellationToken>());
+        // The artist is only marked as deleted, so its metadata, artwork and paths stay available for a later restore.
+        await _mockArtistRepository.Received(1).SoftDeleteByIdAsync(artistId, Arg.Any<CancellationToken>());
+        await _mockArtistRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         await _mockAuthorizationService.Received(1).EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
             _userId, Arg.Is<LibraryOwnershipPolicyContext>(context => context.LibraryId == libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenCalled_ShouldLoadTheArtistAndTheLibraryWithoutNavigationPropertiesOrTracking()
+    {
+        // Arrange
+        DeleteArtistCommand command = _deleteArtistCommandFixture.Create();
+        Guid libraryId = Guid.Parse(command.LibraryId!);
+        Guid artistId = Guid.Parse(command.ArtistId!);
+        ArtistEntity artist = _artistEntityFixture.Create(id: artistId, libraryId: libraryId, includeAlbums: false, includeContributors: false);
+        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<ArtistEntity?>(artist));
+        _mockLibraryRepository.GetByIdAsync(libraryId, Arg.Any<bool>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(id: libraryId)));
+
+        // Act
+        await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        await _mockArtistRepository.Received(1).GetByIdAsync(
+            artistId,
+            shouldIncludeNavigationProperties: false,
+            shouldTrackEntities: false,
+            cancellationToken: Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.Received(1).GetByIdAsync(
+            libraryId,
+            shouldIncludeNavigationProperties: true,
+            shouldTrackEntities: false,
+            cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -122,8 +146,7 @@ public class DeleteArtistCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Music.ArtistIdCannotBeEmpty, result.FirstError);
         await _mockArtistRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
-        await _mockMusicArtworkCleanupService.DidNotReceive().DeleteArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
-        await _mockArtistRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockArtistRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -141,7 +164,9 @@ public class DeleteArtistCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
         await _mockArtistRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _mockArtistRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -158,7 +183,7 @@ public class DeleteArtistCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Persistence.UniqueConstraintViolation, result.FirstError);
-        await _mockArtistRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockArtistRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -177,6 +202,7 @@ public class DeleteArtistCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Music.ArtistNotFound, result.FirstError);
         await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
+        await _mockArtistRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -198,6 +224,7 @@ public class DeleteArtistCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Music.ArtistNotFound, result.FirstError);
         await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
+        await _mockArtistRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -223,7 +250,7 @@ public class DeleteArtistCommandHandlerTests
         await _mockAuthorizationService.Received(1).EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
             _userId, Arg.Is<LibraryOwnershipPolicyContext>(context => context.LibraryId == libraryId), Arg.Any<CancellationToken>());
         await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
-        await _mockArtistRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockArtistRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -246,7 +273,8 @@ public class DeleteArtistCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Persistence.UniqueConstraintViolation, result.FirstError);
-        await _mockArtistRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockArtistRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -268,12 +296,12 @@ public class DeleteArtistCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Library.LibraryNotFound, result.FirstError);
-        await _mockArtistRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockArtistRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task HandleAsync_WhenArtworkCleanupFails_ShouldReturnErrorWithoutDeletingTheArtist()
+    public async Task HandleAsync_WhenSoftDeleteFails_ShouldReturnErrorWithoutSaving()
     {
         // Arrange
         DeleteArtistCommand command = _deleteArtistCommandFixture.Create();
@@ -282,31 +310,9 @@ public class DeleteArtistCommandHandlerTests
         ArtistEntity artist = _artistEntityFixture.Create(id: artistId, libraryId: libraryId, includeAlbums: false, includeContributors: false);
         _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ArtistEntity?>(artist));
-        Error error = Error.Failure(description: "Failed to delete the artwork");
-        _mockMusicArtworkCleanupService.DeleteArtistArtworkAsync(artistId, Arg.Any<CancellationToken>())
-            .Returns(error);
-
-        // Act
-        Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
-
-        // Assert
-        Assert.True(result.IsFailure);
-        Assert.Equal(error, result.FirstError);
-        await _mockArtistRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task HandleAsync_WhenDeleteArtistFails_ShouldReturnErrorWithoutSaving()
-    {
-        // Arrange
-        DeleteArtistCommand command = _deleteArtistCommandFixture.Create();
-        Guid libraryId = Guid.Parse(command.LibraryId!);
-        Guid artistId = Guid.Parse(command.ArtistId!);
-        ArtistEntity artist = _artistEntityFixture.Create(id: artistId, libraryId: libraryId, includeAlbums: false, includeContributors: false);
-        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From<ArtistEntity?>(artist));
-        _mockArtistRepository.DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(libraryId, Arg.Any<bool>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(id: libraryId)));
+        _mockArtistRepository.SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(ApplicationErrors.Persistence.UniqueConstraintViolation);
 
         // Act
@@ -315,7 +321,7 @@ public class DeleteArtistCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Persistence.UniqueConstraintViolation, result.FirstError);
-        await _mockArtistRepository.Received(1).DeleteByIdAsync(artistId, Arg.Any<CancellationToken>());
+        await _mockArtistRepository.Received(1).SoftDeleteByIdAsync(artistId, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -329,6 +335,8 @@ public class DeleteArtistCommandHandlerTests
         ArtistEntity artist = _artistEntityFixture.Create(id: artistId, libraryId: libraryId, includeAlbums: false, includeContributors: false);
         _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ArtistEntity?>(artist));
+        _mockLibraryRepository.GetByIdAsync(libraryId, Arg.Any<bool>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(_libraryEntityFixture.Create(id: libraryId)));
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>())
             .Returns(ApplicationErrors.Persistence.UniqueConstraintViolation);
 
@@ -338,6 +346,6 @@ public class DeleteArtistCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Persistence.UniqueConstraintViolation, result.FirstError);
-        await _mockArtistRepository.Received(1).DeleteByIdAsync(artistId, Arg.Any<CancellationToken>());
+        await _mockArtistRepository.Received(1).SoftDeleteByIdAsync(artistId, Arg.Any<CancellationToken>());
     }
 }

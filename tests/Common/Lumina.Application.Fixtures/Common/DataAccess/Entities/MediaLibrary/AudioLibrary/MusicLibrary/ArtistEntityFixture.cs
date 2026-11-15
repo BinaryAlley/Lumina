@@ -27,11 +27,14 @@ public class ArtistEntityFixture
     /// <param name="website">Optional. The website of the artist.</param>
     /// <param name="musicBrainzArtistId">Optional. The MusicBrainz identifier of the artist.</param>
     /// <param name="albums">Optional. The albums of the artist.</param>
+    /// <param name="isDeleted">Whether the artist is soft deleted.</param>
+    /// <param name="deletedOnUtc">Optional. The date and time when the artist was deleted.</param>
     /// <param name="includeAlbums">Whether the artist should own a generated album, or no album at all.</param>
     /// <param name="includeWebsite">Whether the website should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMusicBrainzArtistId">Whether the MusicBrainz identifier should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeContributors">Whether the artist should own a generated media contributor, or none at all.</param>
     /// <param name="includeMetadata">Whether the owned metadata collections of the generated album should be included, or forced to empty collections.</param>
+    /// <param name="includeDeletedOnUtc">Whether a deleted artist should carry a deletion time, or <see langword="null"/>.</param>
     /// <returns>The created <see cref="ArtistEntity"/>.</returns>
     public ArtistEntity Create(
         Guid? id = null,
@@ -40,11 +43,14 @@ public class ArtistEntityFixture
         string? website = null,
         Guid? musicBrainzArtistId = null,
         List<AlbumEntity>? albums = null,
+        bool isDeleted = false,
+        DateTime? deletedOnUtc = null,
         bool includeAlbums = true,
         bool includeWebsite = true,
         bool includeMusicBrainzArtistId = true,
         bool includeContributors = true,
-        bool includeMetadata = true)
+        bool includeMetadata = true,
+        bool includeDeletedOnUtc = true)
     {
         Guid resolvedId = id ?? Guid.NewGuid();
         Guid resolvedLibraryId = libraryId ?? Guid.NewGuid();
@@ -65,6 +71,8 @@ public class ArtistEntityFixture
             .RuleFor(x => x.MusicBrainzArtistId, f => includeMusicBrainzArtistId ? (musicBrainzArtistId ?? f.Random.Guid()) : null)
             .RuleFor(x => x.Albums, resolvedAlbums)
             .RuleFor(x => x.Contributors, f => includeContributors ? _artistContributorEntityFixture.CreateMany(f.Random.Number(1, 3), artistId: resolvedId) : [])
+            .RuleFor(x => x.IsDeleted, isDeleted)
+            .RuleFor(x => x.DeletedOnUtc, f => isDeleted && includeDeletedOnUtc ? (deletedOnUtc ?? f.Date.Recent()) : null)
             .RuleFor(x => x.CreatedOnUtc, f => f.Date.Past())
             .RuleFor(x => x.UpdatedOnUtc, f => f.Date.Recent())
             .Generate();

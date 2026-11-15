@@ -83,6 +83,12 @@ public class ArtistConfiguration : IEntityTypeConfiguration<ArtistEntity>
         builder.Property(artist => artist.MetadataProvider)
             .HasMaxLength(100)
             .HasColumnOrder(19);
+        builder.Property(artist => artist.IsDeleted)
+            .IsRequired()
+            .HasDefaultValue(false)
+            .HasColumnOrder(20);
+        builder.Property(artist => artist.DeletedOnUtc)
+            .HasColumnOrder(21);
 
         // The areas are owned value objects that are never referenced on their own, so they are stored as JSON documents next to the artist.
         builder.OwnsOne(artist => artist.Area, areaBuilder => areaBuilder.ToJson());
@@ -202,7 +208,14 @@ public class ArtistConfiguration : IEntityTypeConfiguration<ArtistEntity>
             .HasForeignKey(contributor => contributor.ArtistId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // The same visible artist cannot appear twice in the same library, while a deleted artist does not block a new visible artist with the
+        // same name, so that a new file of an artist the user deleted can still materialize as a new, visible artist.
         builder.HasIndex(artist => new { artist.LibraryId, artist.Name })
-            .IsUnique(); // the same artist cannot appear twice in the same library
+            .IsUnique()
+            .HasFilter("\"IsDeleted\" = 0");
+        // The deleted items page filters by library and deletion state, and orders by the stored deletion time, the name and the Id, so the
+        // filtered index follows the same order and no temporary B-tree is needed for the sort, while visible rows add no entries to it.
+        builder.HasIndex(artist => new { artist.LibraryId, artist.IsDeleted, artist.DeletedOnUtc, artist.Name, artist.Id })
+            .HasFilter("\"IsDeleted\" = 1");
     }
 }

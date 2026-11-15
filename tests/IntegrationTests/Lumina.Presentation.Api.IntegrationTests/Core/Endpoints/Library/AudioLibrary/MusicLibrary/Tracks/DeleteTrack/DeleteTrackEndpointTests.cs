@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
@@ -64,7 +63,7 @@ public class DeleteTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Fact]
-    public async Task DeleteTrack_WhenTrackBelongsToAnOwnedLibrary_ShouldDeleteTheTrack()
+    public async Task DeleteTrack_WhenTrackBelongsToAnOwnedLibrary_ShouldSoftDeleteTheTrack()
     {
         // Arrange
         Guid userId = GetCurrentUserId();
@@ -78,14 +77,21 @@ public class DeleteTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        Assert.Null(await dbContext.Tracks.FirstOrDefaultAsync(track => track.Id == trackId));
-        // The album and the artist that contained the track are preserved.
-        Assert.NotNull(await dbContext.Albums.FirstOrDefaultAsync(album => album.Id == albumId));
-        Assert.NotNull(await dbContext.Artists.FirstOrDefaultAsync(artist => artist.Id == artistId));
+        TrackEntity? track = await dbContext.Tracks.FirstOrDefaultAsync(track => track.Id == trackId);
+        Assert.NotNull(track);
+        Assert.True(track!.IsDeleted);
+        Assert.NotNull(track.DeletedOnUtc);
+        // The album and the artist that contained the track are untouched.
+        AlbumEntity? album = await dbContext.Albums.FirstOrDefaultAsync(album => album.Id == albumId);
+        ArtistEntity? artist = await dbContext.Artists.FirstOrDefaultAsync(artist => artist.Id == artistId);
+        Assert.NotNull(album);
+        Assert.False(album!.IsDeleted);
+        Assert.NotNull(artist);
+        Assert.False(artist!.IsDeleted);
     }
 
     [Fact]
-    public async Task DeleteTrack_WhenTrackHasStoredArtwork_ShouldRemoveItsArtworkRecords()
+    public async Task DeleteTrack_WhenTrackHasStoredArtwork_ShouldKeepItsArtworkRecords()
     {
         // Arrange
         Guid userId = GetCurrentUserId();
@@ -100,8 +106,11 @@ public class DeleteTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        // The artwork of the track does not cascade from the track row, so it is removed together with the track.
-        Assert.Null(await dbContext.MusicArtwork.FirstOrDefaultAsync(artwork => artwork.OwnerType == MusicArtworkOwnerType.Track && artwork.OwnerId == trackId));
+        // The track is soft deleted, so its artwork stays available until the user restores it.
+        TrackEntity? track = await dbContext.Tracks.FirstOrDefaultAsync(track => track.Id == trackId);
+        Assert.NotNull(track);
+        Assert.True(track!.IsDeleted);
+        Assert.NotNull(await dbContext.MusicArtwork.FirstOrDefaultAsync(artwork => artwork.OwnerType == MusicArtworkOwnerType.Track && artwork.OwnerId == trackId));
     }
 
     [Fact]

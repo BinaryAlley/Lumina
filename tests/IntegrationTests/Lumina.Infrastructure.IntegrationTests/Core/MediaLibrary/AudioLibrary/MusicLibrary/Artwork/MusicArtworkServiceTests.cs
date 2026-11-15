@@ -82,6 +82,7 @@ public class MusicArtworkServiceTests
         Guid libraryId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
+        Guid artistId = Guid.NewGuid();
         string artistName = "Test Artist";
         string albumTitle = "Test Album";
 
@@ -92,7 +93,7 @@ public class MusicArtworkServiceTests
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Result.From(ImageType.JPEG));
 
-            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistId, artistName, albumTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
 
             _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
@@ -104,7 +105,7 @@ public class MusicArtworkServiceTests
                 .Returns(Result.From(renamedFileId));
 
             // Act
-            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistId, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
 
             // Assert
             Assert.False(result.IsFailure);
@@ -131,6 +132,7 @@ public class MusicArtworkServiceTests
         Guid libraryId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
+        Guid artistId = Guid.NewGuid();
         string artistName = "Test Artist";
         string albumTitle = "Test Album";
 
@@ -141,7 +143,7 @@ public class MusicArtworkServiceTests
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Result.From(ImageType.JPEG));
 
-            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistId, artistName, albumTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
 
             _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
@@ -150,7 +152,7 @@ public class MusicArtworkServiceTests
                 .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, expectedFileName))));
 
             // Act
-            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath, type: artworkType, ordinal: ordinal), null, CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistId, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath, type: artworkType, ordinal: ordinal), null, CancellationToken.None);
 
             // Assert
             Assert.False(result.IsFailure);
@@ -168,6 +170,7 @@ public class MusicArtworkServiceTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
         string libraryName = "Test Library";
         string albumTitle = "Test Album";
 
@@ -178,7 +181,7 @@ public class MusicArtworkServiceTests
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Result.From(ImageType.JPEG));
 
-            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName: "Unknown", albumTitle);
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistId, artistName: "Unknown", albumTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
 
             _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
@@ -187,11 +190,11 @@ public class MusicArtworkServiceTests
                 .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
 
             // Act
-            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName: "   ", albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistId, artistName: "   ", albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
 
             // Assert
             Assert.False(result.IsFailure);
-            _mockPathService.Received(1).SanitizeSegment("Unknown");
+            _mockPathService.Received(1).SanitizeCompositeSegment("Unknown", artistId.ToString());
         }
         finally
         {
@@ -218,7 +221,7 @@ public class MusicArtworkServiceTests
             MockPathBuilding();
 
             // Act
-            Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Artist", "Album", _artworkDtoFixture.Create(localPath: linkPath), null, CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", Guid.NewGuid(), "Artist", "Album", _artworkDtoFixture.Create(localPath: linkPath), null, CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -246,7 +249,7 @@ public class MusicArtworkServiceTests
             MockPathBuilding();
 
             // Act
-            Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Artist", "Album", _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", Guid.NewGuid(), "Artist", "Album", _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -272,7 +275,7 @@ public class MusicArtworkServiceTests
             MockPathBuilding();
 
             // Act
-            Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Artist", "Album", _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", Guid.NewGuid(), "Artist", "Album", _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -293,6 +296,7 @@ public class MusicArtworkServiceTests
         Guid libraryId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
+        Guid artistId = Guid.NewGuid();
         string artistName = "Test Artist";
         string albumTitle = "Test Album";
 
@@ -300,7 +304,7 @@ public class MusicArtworkServiceTests
         _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(ImageType.JPEG));
 
-        string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
+        string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistId, artistName, albumTitle);
         MockArtworkDirectoryStubs(artworkDirectoryPath);
 
         _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
@@ -309,7 +313,7 @@ public class MusicArtworkServiceTests
             .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
 
         // Act
-        Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(remoteUrl: "https://coverartarchive.org/cover.jpg"), null, CancellationToken.None);
+        Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistId, artistName, albumTitle, _artworkDtoFixture.Create(remoteUrl: "https://coverartarchive.org/cover.jpg"), null, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -327,7 +331,7 @@ public class MusicArtworkServiceTests
         MockPathBuilding();
 
         // Act
-        Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Artist", "Album", _artworkDtoFixture.Create(remoteUrl: "https://coverartarchive.org/cover.jpg"), null, CancellationToken.None);
+        Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", Guid.NewGuid(), "Artist", "Album", _artworkDtoFixture.Create(remoteUrl: "https://coverartarchive.org/cover.jpg"), null, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -342,7 +346,7 @@ public class MusicArtworkServiceTests
         MockPathBuilding();
 
         // Act
-        Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Artist", "Album", _artworkDtoFixture.Create(remoteUrl: "https://coverartarchive.org/cover.jpg"), null, CancellationToken.None);
+        Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", Guid.NewGuid(), "Artist", "Album", _artworkDtoFixture.Create(remoteUrl: "https://coverartarchive.org/cover.jpg"), null, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -356,6 +360,7 @@ public class MusicArtworkServiceTests
         Guid libraryId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
+        Guid artistId = Guid.NewGuid();
         string artistName = "Test Artist";
         string albumTitle = "Test Album";
 
@@ -366,7 +371,7 @@ public class MusicArtworkServiceTests
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Result.From(ImageType.JPEG));
 
-            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistId, artistName, albumTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
 
             _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
@@ -375,7 +380,7 @@ public class MusicArtworkServiceTests
                 .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
 
             // Act
-            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath, remoteUrl: "https://coverartarchive.org/cover.jpg"), null, CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistId, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath, remoteUrl: "https://coverartarchive.org/cover.jpg"), null, CancellationToken.None);
 
             // Assert
             Assert.False(result.IsFailure);
@@ -402,7 +407,7 @@ public class MusicArtworkServiceTests
         // Act
         async Task Act()
         {
-            await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Artist", "Album", _artworkDtoFixture.Create(remoteUrl: "https://coverartarchive.org/cover.jpg"), null, cancellationTokenSource.Token);
+            await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", Guid.NewGuid(), "Artist", "Album", _artworkDtoFixture.Create(remoteUrl: "https://coverartarchive.org/cover.jpg"), null, cancellationTokenSource.Token);
         }
 
         // Assert
@@ -422,7 +427,7 @@ public class MusicArtworkServiceTests
             MockPathBuilding();
 
             // Act
-            Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", "Artist", "Album", _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(Guid.NewGuid(), Guid.NewGuid(), "Library", Guid.NewGuid(), "Artist", "Album", _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -442,6 +447,7 @@ public class MusicArtworkServiceTests
         Guid libraryId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
+        Guid artistId = Guid.NewGuid();
         string artistName = "Test Artist";
         string albumTitle = "Test Album";
 
@@ -452,13 +458,13 @@ public class MusicArtworkServiceTests
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Result.From(ImageType.JPEG));
 
-            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistId, artistName, albumTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
             _mockDirectoryProviderService.CreateDirectory(Arg.Any<FileSystemPathId>(), Arg.Any<string>())
                 .Returns(Error.Failure("Directory.Error", "Failed to create the artwork directory"));
 
             // Act
-            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistId, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -478,6 +484,7 @@ public class MusicArtworkServiceTests
         Guid libraryId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
+        Guid artistId = Guid.NewGuid();
         string artistName = "Test Artist";
         string albumTitle = "Test Album";
 
@@ -488,13 +495,13 @@ public class MusicArtworkServiceTests
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Result.From(ImageType.JPEG));
 
-            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistId, artistName, albumTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
             _mockDirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>())
                 .Returns(Error.Failure("Directory.Error", "Failed to check the artwork directory"));
 
             // Act
-            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistId, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -514,6 +521,7 @@ public class MusicArtworkServiceTests
         Guid libraryId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
+        Guid artistId = Guid.NewGuid();
         string artistName = "Test Artist";
         string albumTitle = "Test Album";
 
@@ -524,13 +532,13 @@ public class MusicArtworkServiceTests
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Result.From(ImageType.JPEG));
 
-            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistId, artistName, albumTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
             _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
                 .Returns(Error.Failure("FileSystem.Error", "Failed to copy the artwork"));
 
             // Act
-            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistId, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -550,6 +558,7 @@ public class MusicArtworkServiceTests
         Guid libraryId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
+        Guid artistId = Guid.NewGuid();
         string artistName = "Test Artist";
         string albumTitle = "Test Album";
 
@@ -560,7 +569,7 @@ public class MusicArtworkServiceTests
             _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
                 .Returns(Result.From(ImageType.JPEG));
 
-            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
+            string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistId, artistName, albumTitle);
             MockArtworkDirectoryStubs(artworkDirectoryPath);
             _mockFileProviderService.CopyFile(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>(), true)
                 .Returns(Result.From(_fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"))));
@@ -568,7 +577,7 @@ public class MusicArtworkServiceTests
                 .Returns(Error.Failure("FileSystem.Error", "Failed to rename the artwork"));
 
             // Act
-            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistId, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -587,6 +596,7 @@ public class MusicArtworkServiceTests
         Guid libraryId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
+        Guid artistId = Guid.NewGuid();
         string artistName = "Test Artist";
         string albumTitle = "Test Album";
 
@@ -603,17 +613,18 @@ public class MusicArtworkServiceTests
             _mockPathService.CombinePath(mediaRoot, "music").Returns(Result.From(musicPath));
             _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>())
                 .Returns(callInfo => Result.From(Path.Combine(callInfo.ArgAt<string>(0), callInfo.ArgAt<string>(1))));
-            _mockPathService.SanitizeSegment(Arg.Any<string>())
+            _mockPathService.SanitizeCompositeSegment(Arg.Any<string>(), Arg.Any<string>())
                 .Returns(callInfo =>
                 {
-                    string name = callInfo.Arg<string>();
-                    return name == $"{libraryName}-{libraryId}"
-                        ? Result.From(_pathSegmentFixture.Create(name: name, isDirectory: true, isDrive: false))
-                        : Errors.FileSystemManagement.InvalidPath;
+                    string name = callInfo.ArgAt<string>(0);
+                    string identifier = callInfo.ArgAt<string>(1);
+                    return name == artistName
+                        ? Errors.FileSystemManagement.InvalidPath
+                        : Result.From(_pathSegmentFixture.Create(name: $"{name}-{identifier}", isDirectory: true, isDrive: false));
                 });
 
             // Act
-            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistId, artistName, albumTitle, _artworkDtoFixture.Create(localPath: sourcePath), null, CancellationToken.None);
 
             // Assert
             Assert.True(result.IsFailure);
@@ -633,10 +644,11 @@ public class MusicArtworkServiceTests
         Guid libraryId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
+        Guid artistId = Guid.NewGuid();
         string artistName = "Test Artist";
         string albumTitle = "Test Album";
 
-        string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
+        string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistId, artistName, albumTitle);
         MockArtworkDirectoryStubs(artworkDirectoryPath);
         _mockDirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
         FileSystemPathId coverFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"));
@@ -646,7 +658,7 @@ public class MusicArtworkServiceTests
         _mockFileProviderService.DeleteFile(Arg.Any<FileSystemPathId>()).Returns(Result.Deleted);
 
         // Act
-        Result<Deleted> result = _sut.DeleteAlbumArtwork(libraryId, albumId, libraryName, artistName, albumTitle);
+        Result<Deleted> result = _sut.DeleteAlbumArtwork(libraryId, albumId, libraryName, artistId, artistName, albumTitle);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -661,11 +673,12 @@ public class MusicArtworkServiceTests
         Guid libraryId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         string libraryName = "Test Library";
+        Guid artistId = Guid.NewGuid();
         string artistName = "Test Artist";
         string albumTitle = "Test Album";
         byte[] uploadedBytes = [10, 20, 30, 40, 50];
         string libraryDirectoryPath = BuildLibraryDirectoryPath(libraryName, libraryId);
-        string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistName, albumTitle);
+        string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistId, artistName, albumTitle);
         string expectedStoredPath = Path.Combine(artworkDirectoryPath, "cover.jpg");
         string? temporaryUploadPath = null;
         MockRealFileSystemStubs(pathId => temporaryUploadPath = pathId.Path);
@@ -675,7 +688,7 @@ public class MusicArtworkServiceTests
         try
         {
             // Act
-            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistName, albumTitle, artworkStream, "cover.jpg", null, CancellationToken.None);
+            Result<string> result = await _sut.SaveAlbumArtworkAsync(libraryId, albumId, libraryName, artistId, artistName, albumTitle, artworkStream, "cover.jpg", null, CancellationToken.None);
 
             // Assert
             Assert.False(result.IsFailure);
@@ -699,11 +712,12 @@ public class MusicArtworkServiceTests
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
         string libraryName = "Test Library";
         string artistName = "Test Artist";
         byte[] uploadedBytes = [60, 70, 80, 90];
         string libraryDirectoryPath = BuildLibraryDirectoryPath(libraryName, libraryId);
-        string artworkDirectoryPath = BuildArtistArtworkDirectoryPath(libraryId, libraryName, artistName);
+        string artworkDirectoryPath = BuildArtistArtworkDirectoryPath(libraryId, libraryName, artistId, artistName);
         string expectedStoredPath = Path.Combine(artworkDirectoryPath, "cover.png");
         string? temporaryUploadPath = null;
         MockRealFileSystemStubs(pathId => temporaryUploadPath = pathId.Path);
@@ -713,7 +727,7 @@ public class MusicArtworkServiceTests
         try
         {
             // Act
-            Result<string> result = await _sut.SaveArtistArtworkAsync(libraryId, libraryName, artistName, artworkStream, "cover.png", CancellationToken.None);
+            Result<string> result = await _sut.SaveArtistArtworkAsync(libraryId, libraryName, artistId, artistName, artworkStream, "cover.png", CancellationToken.None);
 
             // Assert
             Assert.False(result.IsFailure);
@@ -724,6 +738,44 @@ public class MusicArtworkServiceTests
             Assert.StartsWith(Path.GetTempPath(), temporaryUploadPath);
             Assert.EndsWith(".png", temporaryUploadPath);
             Assert.False(File.Exists(temporaryUploadPath));
+        }
+        finally
+        {
+            if (Directory.Exists(libraryDirectoryPath))
+                Directory.Delete(libraryDirectoryPath, recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task SaveArtistArtworkAsync_WhenTwoArtistsShareTheSameName_ShouldStoreTheirArtworkInDifferentDirectories()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid firstArtistId = Guid.NewGuid();
+        Guid secondArtistId = Guid.NewGuid();
+        string libraryName = "Test Library";
+        string artistName = "Queen";
+        string libraryDirectoryPath = BuildLibraryDirectoryPath(libraryName, libraryId);
+        string firstArtworkDirectoryPath = BuildArtistArtworkDirectoryPath(libraryId, libraryName, firstArtistId, artistName);
+        string secondArtworkDirectoryPath = BuildArtistArtworkDirectoryPath(libraryId, libraryName, secondArtistId, artistName);
+        MockRealFileSystemStubs();
+        _mockFileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(ImageType.PNG));
+        await using MemoryStream firstArtworkStream = new([1, 2, 3]);
+        await using MemoryStream secondArtworkStream = new([4, 5, 6]);
+        try
+        {
+            // Act
+            Result<string> firstResult = await _sut.SaveArtistArtworkAsync(libraryId, libraryName, firstArtistId, artistName, firstArtworkStream, "cover.png", CancellationToken.None);
+            Result<string> secondResult = await _sut.SaveArtistArtworkAsync(libraryId, libraryName, secondArtistId, artistName, secondArtworkStream, "cover.png", CancellationToken.None);
+
+            // Assert
+            // A visible artist and a deleted artist can share a name, so the artist Id keeps their artwork apart and replacing the cover of one never touches the file of the other.
+            Assert.False(firstResult.IsFailure);
+            Assert.False(secondResult.IsFailure);
+            Assert.NotEqual(firstResult.Value, secondResult.Value);
+            Assert.True(File.Exists(Path.Combine(firstArtworkDirectoryPath, "cover.png")));
+            Assert.True(File.Exists(Path.Combine(secondArtworkDirectoryPath, "cover.png")));
         }
         finally
         {
@@ -853,6 +905,14 @@ public class MusicArtworkServiceTests
                 return Result.From(_pathSegmentFixture.Create(name: name, isDirectory: true, isDrive: false));
             });
 
+        _mockPathService.SanitizeCompositeSegment(Arg.Any<string>(), Arg.Any<string>())
+            .Returns(callInfo =>
+            {
+                string name = callInfo.ArgAt<string>(0);
+                string identifier = callInfo.ArgAt<string>(1);
+                return Result.From(_pathSegmentFixture.Create(name: $"{name}-{identifier}", isDirectory: true, isDrive: false));
+            });
+
         _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>())
             .Returns(callInfo => Result.From(Path.Combine(callInfo.ArgAt<string>(0), callInfo.ArgAt<string>(1))));
     }
@@ -881,17 +941,18 @@ public class MusicArtworkServiceTests
     /// <param name="libraryId">The Id of the media library the album belongs to.</param>
     /// <param name="albumId">The Id of the album.</param>
     /// <param name="libraryName">The name of the media library the album belongs to.</param>
+    /// <param name="artistId">The Id of the artist of the album.</param>
     /// <param name="artistName">The name of the artist of the album.</param>
     /// <param name="albumTitle">The title of the album.</param>
     /// <returns>The expected file system path of the album artwork directory.</returns>
-    private static string BuildArtworkDirectoryPath(Guid libraryId, Guid albumId, string libraryName, string artistName, string albumTitle)
+    private static string BuildArtworkDirectoryPath(Guid libraryId, Guid albumId, string libraryName, Guid artistId, string artistName, string albumTitle)
     {
         return Path.Combine(
             AppContext.BaseDirectory,
             "media",
             "music",
             $"{libraryName}-{libraryId}",
-            artistName,
+            $"{artistName}-{artistId}",
             $"{albumTitle}-{albumId}");
     }
 
@@ -915,16 +976,17 @@ public class MusicArtworkServiceTests
     /// </summary>
     /// <param name="libraryId">The Id of the media library the artist belongs to.</param>
     /// <param name="libraryName">The name of the media library the artist belongs to.</param>
+    /// <param name="artistId">The Id of the artist.</param>
     /// <param name="artistName">The name of the artist.</param>
     /// <returns>The expected file system path of the artist artwork directory.</returns>
-    private static string BuildArtistArtworkDirectoryPath(Guid libraryId, string libraryName, string artistName)
+    private static string BuildArtistArtworkDirectoryPath(Guid libraryId, string libraryName, Guid artistId, string artistName)
     {
         return Path.Combine(
             AppContext.BaseDirectory,
             "media",
             "music",
             $"{libraryName}-{libraryId}",
-            artistName);
+            $"{artistName}-{artistId}");
     }
 
     /// <summary>

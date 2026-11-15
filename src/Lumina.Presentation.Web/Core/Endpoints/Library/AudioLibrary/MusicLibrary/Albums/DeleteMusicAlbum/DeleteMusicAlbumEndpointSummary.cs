@@ -17,7 +17,7 @@ public class DeleteMusicAlbumEndpointSummary : Summary<DeleteMusicAlbumEndpoint>
     public DeleteMusicAlbumEndpointSummary()
     {
         Summary = "Deletes a music album.";
-        Description = "Deletes the music album identified by the route, together with its tracks.";
+        Description = "Soft deletes the music album identified by the route, so its metadata, artwork and track paths are kept and the album can be restored.";
 
         Response(200, "The music album was deleted.");
     }

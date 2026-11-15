@@ -78,7 +78,7 @@ public class LibraryDeletedDomainEventHandler : IDomainEventHandler<LibraryDelet
         // live inside these directories, so removing them removes the library's stored media without touching the user's own files.
         DeleteLibraryDirectory(_mediaSettingsModel.LibrariesDirectory, libraryId.ToString());
 
-        Result<PathSegment> librarySegmentResult = _pathService.SanitizeSegment($"{domainEvent.Library.Title}-{libraryId}");
+        Result<PathSegment> librarySegmentResult = _pathService.SanitizeCompositeSegment(domainEvent.Library.Title, libraryId.ToString());
         if (librarySegmentResult.IsFailure)
             throw new EventualConsistencyException(librarySegmentResult.FirstError, librarySegmentResult.Errors);
         DeleteLibraryDirectory(_mediaSettingsModel.BooksDirectory, librarySegmentResult.Value.Name);

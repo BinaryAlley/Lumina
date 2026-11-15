@@ -79,8 +79,8 @@ public class LibraryDeletedDomainEventHandlerTests
         // default stubs: all path combinations succeed, segments are sanitized to their input, the library directories exist and they are deleted successfully
         _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>())
             .Returns(callInfo => Result.From(string.Concat(callInfo.ArgAt<string>(0), callInfo.ArgAt<string>(1))));
-        _mockPathService.SanitizeSegment(Arg.Any<string>())
-            .Returns(callInfo => PathSegment.Create(callInfo.ArgAt<string>(0), isDirectory: false, isDrive: false));
+        _mockPathService.SanitizeCompositeSegment(Arg.Any<string>(), Arg.Any<string>())
+            .Returns(callInfo => PathSegment.Create($"{callInfo.ArgAt<string>(0)}-{callInfo.ArgAt<string>(1)}", isDirectory: false, isDrive: false));
         _mockDirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
         _mockDirectoryProviderService.DeleteDirectory(Arg.Any<FileSystemPathId>()).Returns(Result.Deleted);
 
@@ -234,14 +234,14 @@ public class LibraryDeletedDomainEventHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_WhenSanitizeSegmentFails_ShouldThrowEventualConsistencyExceptionWithoutDeletingItemDirectories()
+    public async Task HandleAsync_WhenSanitizeCompositeSegmentFails_ShouldThrowEventualConsistencyExceptionWithoutDeletingItemDirectories()
     {
         // Arrange
         Guid libraryId = Guid.NewGuid();
         Library library = _libraryFixture.Create(id: libraryId);
         LibraryDeletedDomainEvent domainEvent = _libraryDeletedDomainEventFixture.Create(library: library);
         Error error = Error.Failure(description: "Failed to sanitize segment");
-        _mockPathService.SanitizeSegment(Arg.Any<string>()).Returns(error);
+        _mockPathService.SanitizeCompositeSegment(Arg.Any<string>(), Arg.Any<string>()).Returns(error);
 
         // Act
         EventualConsistencyException exception = await Assert.ThrowsAsync<EventualConsistencyException>(
@@ -274,7 +274,7 @@ public class LibraryDeletedDomainEventHandlerTests
         await _sut.HandleAsync(domainEvent, CancellationToken.None);
 
         // Assert
-        _mockPathService.Received(1).SanitizeSegment(librarySegment);
+        _mockPathService.Received(1).SanitizeCompositeSegment(libraryTitle, libraryId.ToString());
         _mockDirectoryProviderService.Received(1).DeleteDirectory(Arg.Is<FileSystemPathId>(path => path.Path == expectedLibrariesPath));
         _mockDirectoryProviderService.Received(1).DeleteDirectory(Arg.Is<FileSystemPathId>(path => path.Path == expectedBooksPath));
         _mockDirectoryProviderService.Received(1).DeleteDirectory(Arg.Is<FileSystemPathId>(path => path.Path == expectedMusicPath));

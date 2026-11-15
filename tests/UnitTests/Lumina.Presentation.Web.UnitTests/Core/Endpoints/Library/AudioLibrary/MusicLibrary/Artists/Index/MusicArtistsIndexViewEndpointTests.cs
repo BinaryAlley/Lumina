@@ -91,6 +91,7 @@ public class MusicArtistsIndexViewEndpointTests
         _mockUrlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS).Returns("http://localhost/en-us/tools/settings/api-get-user-settings");
         _mockUrlService.GetAbsoluteUrl(WebRoutes.Music.ARTIST, Arg.Any<object>()).Returns("http://localhost/en-us/library/audio-library/music-library/artists/00000000-0000-0000-0000-000000000000");
         _mockUrlService.GetAbsoluteUrl(WebRoutes.Music.DELETE_ARTIST, Arg.Any<object>()).Returns("http://localhost/en-us/library/audio-library/music-library/artists/00000000-0000-0000-0000-000000000000/api-delete-artist");
+        _mockUrlService.GetAbsoluteUrl(WebRoutes.Music.DELETED_MUSIC_ITEMS).Returns("http://localhost/en-us/library/audio-library/music-library/deleted-items");
         _mockThemePageRenderer.RenderAsync(Arg.Any<ThemePageDto>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(_themePageRenderResultDtoFixture.Create(content: "<section>content</section>", script: "<script>script</script>")));
 
@@ -120,6 +121,10 @@ public class MusicArtistsIndexViewEndpointTests
                 string.Equals(
                     page.PageData["deleteUrl"] as string,
                     "http://localhost/en-us/library/audio-library/music-library/artists/00000000-0000-0000-0000-000000000000/api-delete-artist",
+                    StringComparison.Ordinal) &&
+                string.Equals(
+                    page.PageData["deletedItemsUrl"] as string,
+                    "http://localhost/en-us/library/audio-library/music-library/deleted-items",
                     StringComparison.Ordinal)),
             Arg.Is<string?>(requestedThemeId => requestedThemeId == null),
             Arg.Any<CancellationToken>());

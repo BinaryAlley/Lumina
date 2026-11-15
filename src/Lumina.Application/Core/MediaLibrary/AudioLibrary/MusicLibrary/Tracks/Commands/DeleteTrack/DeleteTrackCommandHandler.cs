@@ -7,14 +7,9 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
 using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
-using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
@@ -29,7 +24,6 @@ namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.
 public class DeleteTrackCommandHandler : ICommandHandler<DeleteTrackCommand, Result<Deleted>>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMusicArtworkCleanupService _musicArtworkCleanupService;
     private readonly IAuthorizationService _authorizationService;
     private readonly ICurrentUserService _currentUserService;
     private readonly IValidator<DeleteTrackCommand> _validator;
@@ -38,14 +32,12 @@ public class DeleteTrackCommandHandler : ICommandHandler<DeleteTrackCommand, Res
     /// Initializes a new instance of the <see cref="DeleteTrackCommandHandler"/> class.
     /// </summary>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
-    /// <param name="musicArtworkCleanupService">Injected service for removing the artwork of a music library item and of its children.</param>
     /// <param name="authorizationService">Injected service for authorization related functionality.</param>
     /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
     /// <param name="validator">Injected validator for application validation rules.</param>
-    public DeleteTrackCommandHandler(IUnitOfWork unitOfWork, IMusicArtworkCleanupService musicArtworkCleanupService, IAuthorizationService authorizationService, ICurrentUserService currentUserService, IValidator<DeleteTrackCommand> validator)
+    public DeleteTrackCommandHandler(IUnitOfWork unitOfWork, IAuthorizationService authorizationService, ICurrentUserService currentUserService, IValidator<DeleteTrackCommand> validator)
     {
         _unitOfWork = unitOfWork;
-        _musicArtworkCleanupService = musicArtworkCleanupService;
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
         _validator = validator;
@@ -75,9 +67,9 @@ public class DeleteTrackCommandHandler : ICommandHandler<DeleteTrackCommand, Res
         Guid albumId = Guid.Parse(command.AlbumId!);
         Guid trackId = Guid.Parse(command.TrackId!);
 
-        // A track is a child of the artist aggregate, so the whole aggregate is loaded and the track is removed within it.
+        // Only the library of the artist is needed to scope the delete, so the artist row is read without its aggregate graph and without tracking.
         Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository
-            .GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+            .GetByIdAsync(artistId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getArtistResult.IsFailure)
             return getArtistResult.Errors;
         if (getArtistResult.Value is null)
@@ -95,13 +87,6 @@ public class DeleteTrackCommandHandler : ICommandHandler<DeleteTrackCommand, Res
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        AlbumEntity? existingAlbum = existingArtist.Albums.FirstOrDefault(album => album.Id == albumId);
-        if (existingAlbum is null)
-            return DomainErrors.Music.AlbumNotFound;
-        TrackEntity? existingTrack = existingAlbum.Tracks.FirstOrDefault(track => track.Id == trackId);
-        if (existingTrack is null)
-            return DomainErrors.Music.TrackNotFound;
-
         // A track can only belong to a library that exists, so a client can never delete a track of a library of the host that is not there.
         Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository
             .GetByIdAsync(libraryId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -110,31 +95,25 @@ public class DeleteTrackCommandHandler : ICommandHandler<DeleteTrackCommand, Res
         if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
 
-        // The write path goes through the aggregate root: a track is a child entity of the artist aggregate, unlike Book and Artist,
-        // which are aggregate roots and are deleted directly through their own repositories. This difference is intentional.
-        Result<Artist> artistResult = existingArtist.ToDomainEntity();
-        if (artistResult.IsFailure)
-            return artistResult.Errors;
-        // The album and the track are entities inside the artist aggregate, so they are referenced by object, not by id; the aggregate members are located here and passed through.
-        Album? domainAlbum = artistResult.Value.Albums.FirstOrDefault(album => album.Id.Value == albumId);
-        if (domainAlbum is null)
+        Result<AlbumEntity?> getAlbumResult = await _unitOfWork.AlbumRepository
+            .GetByIdAsync(albumId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getAlbumResult.IsFailure)
+            return getAlbumResult.Errors;
+        if (getAlbumResult.Value is null || getAlbumResult.Value.ArtistId != artistId || getAlbumResult.Value.LibraryId != libraryId)
             return DomainErrors.Music.AlbumNotFound;
-        Track? domainTrack = domainAlbum.Tracks.FirstOrDefault(track => track.Id.Value == trackId);
-        if (domainTrack is null)
+
+        Result<TrackEntity?> getTrackResult = await _unitOfWork.TrackRepository
+            .GetByIdAsync(trackId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getTrackResult.IsFailure)
+            return getTrackResult.Errors;
+        if (getTrackResult.Value is null || getTrackResult.Value.AlbumId != albumId || getTrackResult.Value.LibraryId != libraryId)
             return DomainErrors.Music.TrackNotFound;
-        Result<Deleted> removeTrackResult = artistResult.Value.RemoveTrackFromAlbum(domainAlbum, domainTrack);
-        if (removeTrackResult.IsFailure)
-            return removeTrackResult.Errors;
 
-        // The artwork of the track does not cascade from the track row, because the artwork table is shared by all the music library item
-        // types, so it is removed first, while the track is still present.
-        Result<Deleted> deleteArtworkResult = await _musicArtworkCleanupService.DeleteTrackArtworkAsync(trackId, cancellationToken).ConfigureAwait(false);
-        if (deleteArtworkResult.IsFailure)
-            return deleteArtworkResult.Errors;
-
-        Result<Updated> updateResult = await _unitOfWork.ArtistRepository.UpdateAsync(artistResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
-        if (updateResult.IsFailure)
-            return updateResult.Errors;
+        // The track is soft deleted, so its metadata, artwork and path stay available until the user restores it or the file disappears from disk.
+        // Keeping the row is also what makes the deletion survive an automatic scan, because the scan treats its path as already catalogued.
+        Result<Updated> deleteTrackResult = await _unitOfWork.TrackRepository.SoftDeleteByIdAsync(trackId, cancellationToken).ConfigureAwait(false);
+        if (deleteTrackResult.IsFailure)
+            return deleteTrackResult.Errors;
 
         Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)

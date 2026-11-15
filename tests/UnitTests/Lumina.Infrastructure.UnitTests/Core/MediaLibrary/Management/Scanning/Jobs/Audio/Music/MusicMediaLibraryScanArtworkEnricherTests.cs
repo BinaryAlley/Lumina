@@ -236,6 +236,7 @@ public class MusicMediaLibraryScanArtworkEnricherTests
         await _mockMusicArtworkService.Received(1).SaveArtistArtworkAsync(
             _libraryId.Value,
             Arg.Any<string>(),
+            artist.Id,
             artist.Name,
             Arg.Is<ArtworkDto>(artwork => artwork.Type == ArtworkType.Cover && artwork.Ordinal == 0),
             Arg.Any<CancellationToken>());
@@ -269,6 +270,7 @@ public class MusicMediaLibraryScanArtworkEnricherTests
             _libraryId.Value,
             album.Id,
             Arg.Any<string>(),
+            album.ArtistId,
             Arg.Any<string>(),
             album.Title,
             Arg.Is<ArtworkDto>(artwork => artwork.Type == ArtworkType.Cover && artwork.Ordinal == 0),
@@ -328,7 +330,7 @@ public class MusicMediaLibraryScanArtworkEnricherTests
         ArtistEntity artist = _artistEntityFixture.Create(libraryId: _libraryId.Value);
         SetupArtists(artist);
         _artistProvider.OnGetArtworkAsync = (_, _) => Task.FromResult<IReadOnlyList<ArtworkDto>>([_artworkDtoFixture.Create(localPath: "/tmp/cover.jpg", remoteUrl: null)]);
-        _mockMusicArtworkService.SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ArtworkDto>(), Arg.Any<CancellationToken>())
+        _mockMusicArtworkService.SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<ArtworkDto>(), Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Artwork.Error", "Failed to store the artwork"));
 
         // Act
@@ -347,7 +349,7 @@ public class MusicMediaLibraryScanArtworkEnricherTests
         ArtistEntity artist = _artistEntityFixture.Create(libraryId: _libraryId.Value);
         SetupArtists(artist);
         _artistProvider.OnGetArtworkAsync = (_, _) => Task.FromResult<IReadOnlyList<ArtworkDto>>([_artworkDtoFixture.Create(localPath: "/tmp/cover.jpg", remoteUrl: null)]);
-        _mockMusicArtworkService.DeleteArtistArtwork(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>())
+        _mockMusicArtworkService.DeleteArtistArtwork(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>())
             .Returns(Error.Failure("Artwork.Error", "Failed to clear the artwork files"));
 
         // Act
@@ -551,12 +553,12 @@ public class MusicMediaLibraryScanArtworkEnricherTests
     /// </summary>
     private void SetupSuccessArtworkStorage()
     {
-        _mockMusicArtworkService.SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ArtworkDto>(), Arg.Any<CancellationToken>())
+        _mockMusicArtworkService.SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<ArtworkDto>(), Arg.Any<CancellationToken>())
             .Returns(Result.From("/media/music/cover.jpg"));
-        _mockMusicArtworkService.SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ArtworkDto>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _mockMusicArtworkService.SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ArtworkDto>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Result.From("/media/music/cover.jpg"));
-        _mockMusicArtworkService.DeleteArtistArtwork(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns(Result.Deleted);
-        _mockMusicArtworkService.DeleteAlbumArtwork(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>()).Returns(Result.Deleted);
+        _mockMusicArtworkService.DeleteArtistArtwork(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>()).Returns(Result.Deleted);
+        _mockMusicArtworkService.DeleteAlbumArtwork(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string?>()).Returns(Result.Deleted);
         _mockMusicArtworkRepository.DeleteByOwnerAsync(Arg.Any<MusicArtworkOwnerType>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(Result.Deleted);
         _mockMusicArtworkRepository.InsertRangeAsync(Arg.Any<IReadOnlyCollection<MusicArtworkEntity>>(), Arg.Any<CancellationToken>()).Returns(Result.Created);
         _mockFileHashService.ComputeFileHash(Arg.Any<string>()).Returns(123UL);

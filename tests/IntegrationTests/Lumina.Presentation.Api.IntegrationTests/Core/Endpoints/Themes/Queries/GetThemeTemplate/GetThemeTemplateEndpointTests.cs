@@ -87,6 +87,34 @@ public class GetThemeTemplateEndpointTests : IClassFixture<AuthenticatedLuminaAp
         Assert.Contains("restoreUrlTemplate", result.Template);
     }
 
+    [Theory]
+    [InlineData("lumina-default")]
+    [InlineData("editorial-paper")]
+    public async Task GetThemeTemplate_WhenCalledForTheMusicDeletedItemsPage_ShouldReturnTheBundledTemplateWithItsRestoreHooks(string themeId)
+    {
+        // Arrange
+        await ThemeTestHelpers.WaitForBundledThemeAsync(_apiFactory);
+        HttpClient anonymousClient = _apiFactory.CreateClient();
+
+        // Act
+        HttpResponseMessage response = await anonymousClient.GetAsync($"/api/v1/themes/{themeId}/templates/library/audio-library/music-library/deleted-items");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        ThemeTemplateResponse? result = await response.Content.ReadFromJsonAsync<ThemeTemplateResponse>(_jsonOptions);
+        Assert.NotNull(result);
+        Assert.Equal(themeId, result!.Theme.ThemeId);
+        Assert.Contains("deleted-artists-table", result.Template);
+        Assert.Contains("deleted-albums-table", result.Template);
+        Assert.Contains("deleted-tracks-table", result.Template);
+        Assert.Contains("btn-restore-artist", result.Template);
+        Assert.Contains("btn-restore-album", result.Template);
+        Assert.Contains("btn-restore-track", result.Template);
+        Assert.Contains("pageData.artistRestoreUrl", result.Template);
+        Assert.Contains("pageData.albumRestoreUrl", result.Template);
+        Assert.Contains("pageData.trackRestoreUrl", result.Template);
+    }
+
     [Fact]
     public async Task GetThemeTemplate_WhenThemeDoesNotExist_ShouldReturnNotFound()
     {

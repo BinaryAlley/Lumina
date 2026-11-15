@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Title" xml:space="preserve">
+    <value>Elementi eliminati</value>
+  </data>
+  <data name="BackToLibrary" xml:space="preserve">
+    <value>Torna alla biblioteca</value>
+  </data>
+  <data name="NoDeletedItems" xml:space="preserve">
+    <value>Non ci sono elementi eliminati in questa biblioteca.</value>
+  </data>
+  <data name="Artists" xml:space="preserve">
+    <value>Artisti</value>
+  </data>
+  <data name="Albums" xml:space="preserve">
+    <value>Album</value>
+  </data>
+  <data name="Tracks" xml:space="preserve">
+    <value>Tracce</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nome</value>
+  </data>
+  <data name="Artist" xml:space="preserve">
+    <value>Artista</value>
+  </data>
+  <data name="Album" xml:space="preserve">
+    <value>Album</value>
+  </data>
+  <data name="TrackTitle" xml:space="preserve">
+    <value>Titolo</value>
+  </data>
+  <data name="DeletedOn" xml:space="preserve">
+    <value>Eliminato il</value>
+  </data>
+  <data name="Restore" xml:space="preserve">
+    <value>Ripristina</value>
+  </data>
+  <data name="Restored" xml:space="preserve">
+    <value>L&apos;elemento è stato ripristinato.</value>
+  </data>
+  <data name="RestoreFailed" xml:space="preserve">
+    <value>Non è stato possibile ripristinare l&apos;elemento.</value>
+  </data>
+</root>

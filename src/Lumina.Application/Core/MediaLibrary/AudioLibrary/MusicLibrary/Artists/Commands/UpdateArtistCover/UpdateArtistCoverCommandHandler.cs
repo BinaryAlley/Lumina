@@ -113,6 +113,7 @@ public class UpdateArtistCoverCommandHandler : ICommandHandler<UpdateArtistCover
         Result<string> storeArtworkResult = await _musicArtworkService.SaveArtistArtworkAsync(
             existingArtist.LibraryId,
             libraryName,
+            existingArtist.Id,
             existingArtist.Name,
             command.Cover!,
             command.FileName!,

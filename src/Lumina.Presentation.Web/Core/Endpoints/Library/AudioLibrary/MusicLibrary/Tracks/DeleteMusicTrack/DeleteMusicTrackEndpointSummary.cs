@@ -17,7 +17,7 @@ public class DeleteMusicTrackEndpointSummary : Summary<DeleteMusicTrackEndpoint>
     public DeleteMusicTrackEndpointSummary()
     {
         Summary = "Deletes a music track.";
-        Description = "Deletes the music track identified by the route, together with its metadata.";
+        Description = "Soft deletes the music track identified by the route, so its metadata, artwork and file path are kept and the track can be restored.";
 
         Response(200, "The music track was deleted.");
     }

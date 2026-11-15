@@ -165,6 +165,8 @@ public class BookArtworkServiceTests
         // Arrange
         _mockPathService.SanitizeSegment(Arg.Any<string>())
             .Returns(Errors.FileSystemManagement.InvalidPath);
+        _mockPathService.SanitizeCompositeSegment(Arg.Any<string>(), Arg.Any<string>())
+            .Returns(Errors.FileSystemManagement.InvalidPath);
 
         // Act
         Result<Deleted> result = _sut.DeleteBookArtwork(Guid.NewGuid(), Guid.NewGuid(), "Library", "Author", "Title");
@@ -190,6 +192,14 @@ public class BookArtworkServiceTests
             {
                 string name = callInfo.Arg<string>();
                 return Result.From(_pathSegmentFixture.Create(name: name, isDirectory: true, isDrive: false));
+            });
+
+        _mockPathService.SanitizeCompositeSegment(Arg.Any<string>(), Arg.Any<string>())
+            .Returns(callInfo =>
+            {
+                string name = callInfo.ArgAt<string>(0);
+                string identifier = callInfo.ArgAt<string>(1);
+                return Result.From(_pathSegmentFixture.Create(name: $"{name}-{identifier}", isDirectory: true, isDrive: false));
             });
 
         _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>())

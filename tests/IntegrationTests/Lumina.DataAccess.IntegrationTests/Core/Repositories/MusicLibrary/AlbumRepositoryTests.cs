@@ -47,6 +47,16 @@ public class AlbumRepositoryTests
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly MusicArtworkEntityFixture _musicArtworkEntityFixture = new();
     private readonly PaginationDataDtoFixture _paginationDataDtoFixture = new();
+    private readonly IDateTimeProvider _mockDateTimeProvider;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AlbumRepositoryTests"/> class.
+    /// </summary>
+    public AlbumRepositoryTests()
+    {
+        _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
+        _mockDateTimeProvider.UtcNow.Returns(new DateTime(2026, 11, 14, 10, 30, 0, DateTimeKind.Utc));
+    }
 
     [Fact]
     public async Task InsertAsync_WhenCalledWithAValidAlbum_ShouldPersistTheAlbumAndItsAggregate()
@@ -709,14 +719,482 @@ public class AlbumRepositoryTests
         Assert.Equal("covers/opera.jpg", row.CoverPath);
     }
 
+    [Fact]
+    public async Task GetByIdAsync_WhenTheAlbumIsSoftDeleted_ShouldReturnNull()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-getbyid-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId, artist.Id, "Deleted Album");
+        album.IsDeleted = true;
+        album.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<AlbumEntity?> result = await sut.GetByIdAsync(album.Id, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_WhenItsArtistIsSoftDeleted_ShouldReturnNull()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-getbyid-deleted-artist-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId, artist.Id, "Album Of Deleted Artist");
+        artist.IsDeleted = true;
+        artist.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<AlbumEntity?> result = await sut.GetByIdAsync(album.Id, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_WhenATrackIsSoftDeleted_ShouldExcludeItFromTheGraph()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-getbyid-deleted-track-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity album = BuildFullAlbum(artist.Id, libraryId, "Album");
+        TrackEntity activeTrack = album.Tracks[0];
+        TrackEntity deletedTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        deletedTrack.IsDeleted = true;
+        deletedTrack.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        album.Tracks = [activeTrack, deletedTrack];
+        context.Albums.Add(album);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+
+        // Act
+        Result<AlbumEntity?> result = await sut.GetByIdAsync(album.Id, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(activeTrack.Id, Assert.Single(result.Value!.Tracks).Id);
+    }
+
+    [Fact]
+    public async Task GetByArtistIdAsync_WhenAnAlbumIsSoftDeleted_ShouldExcludeIt()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-getbyartist-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity activeAlbum = await SeedAlbumAsync(context, libraryId, artist.Id, "Active Album");
+        AlbumEntity deletedAlbum = await SeedAlbumAsync(context, libraryId, artist.Id, "Deleted Album");
+        deletedAlbum.IsDeleted = true;
+        deletedAlbum.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<AlbumEntity>> result = await sut.GetByArtistIdAsync(artist.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(activeAlbum.Id, Assert.Single(result.Value).Id);
+    }
+
+    [Fact]
+    public async Task GetByArtistIdIncludingDeletedAsync_WhenCalled_ShouldReturnEveryAlbumOfTheArtistOrdered()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-getbyartist-including-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity betaAlbum = await SeedAlbumAsync(context, libraryId, artist.Id, "Beta");
+        AlbumEntity deletedAlbum = await SeedAlbumAsync(context, libraryId, artist.Id, "Alpha");
+        deletedAlbum.IsDeleted = true;
+        deletedAlbum.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        ArtistEntity otherArtist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity albumOfAnotherArtist = await SeedAlbumAsync(context, libraryId, otherArtist.Id, "Gamma");
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<AlbumEntity>> result = await sut.GetByArtistIdIncludingDeletedAsync(artist.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal([deletedAlbum.Id, betaAlbum.Id], result.Value.Select(album => album.Id));
+        Assert.DoesNotContain(result.Value, album => album.Id == albumOfAnotherArtist.Id);
+    }
+
+    [Fact]
+    public async Task GetIncludingDeletedByIdAsync_WhenTheAlbumIsSoftDeleted_ShouldReturnIt()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-get-including-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId, artist.Id, "Deleted Album");
+        album.IsDeleted = true;
+        album.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<AlbumEntity?> result = await sut.GetIncludingDeletedByIdAsync(album.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(album.Id, result.Value!.Id);
+        Assert.True(result.Value.IsDeleted);
+    }
+
+    [Fact]
+    public async Task GetSoftDeletedByLibraryIdAsync_WhenCalled_ShouldReturnOnlyDeletedAlbumsOfVisibleArtistsOrdered()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-getdeleted-library-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        DateTime deletedOnUtc = _mockDateTimeProvider.UtcNow;
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity olderDeletion = await SeedAlbumAsync(context, libraryId, artist.Id, "Older");
+        olderDeletion.IsDeleted = true;
+        olderDeletion.DeletedOnUtc = deletedOnUtc.AddHours(-2);
+        AlbumEntity newerDeletion = await SeedAlbumAsync(context, libraryId, artist.Id, "Newer");
+        newerDeletion.IsDeleted = true;
+        newerDeletion.DeletedOnUtc = deletedOnUtc.AddHours(-1);
+        AlbumEntity activeAlbum = await SeedAlbumAsync(context, libraryId, artist.Id, "Active");
+        ArtistEntity deletedArtist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity deletedAlbumOfDeletedArtist = await SeedAlbumAsync(context, libraryId, deletedArtist.Id, "Hidden");
+        deletedAlbumOfDeletedArtist.IsDeleted = true;
+        deletedAlbumOfDeletedArtist.DeletedOnUtc = deletedOnUtc;
+        deletedArtist.IsDeleted = true;
+        deletedArtist.DeletedOnUtc = deletedOnUtc;
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<AlbumEntity>> result = await sut.GetSoftDeletedByLibraryIdAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal([newerDeletion.Id, olderDeletion.Id], result.Value.Select(album => album.Id));
+        Assert.DoesNotContain(result.Value, album => album.Id == deletedAlbumOfDeletedArtist.Id);
+    }
+
+    [Fact]
+    public async Task SoftDeleteByIdAsync_WhenAnotherVisibleAlbumOfTheArtistRemains_ShouldPersistTheDeletionStateAndProviderTime()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-softdelete-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId, artist.Id, "Album");
+        await SeedAlbumAsync(context, libraryId, artist.Id, "Kept Album");
+
+        // Act
+        Result<Updated> result = await sut.SoftDeleteByIdAsync(album.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        AlbumEntity storedAlbum = await context.Albums.AsNoTracking().SingleAsync(candidate => candidate.Id == album.Id);
+        Assert.True(storedAlbum.IsDeleted);
+        Assert.Equal(_mockDateTimeProvider.UtcNow, storedAlbum.DeletedOnUtc);
+    }
+
+    [Fact]
+    public async Task SoftDeleteByIdAsync_WhenAlbumIsTheOnlyVisibleAlbumOfTheArtist_ShouldReturnArtistMustHaveAtLeastOneAlbumAndKeepItVisible()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-softdelete-last-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId, artist.Id, "Album");
+
+        // Act
+        Result<Updated> result = await sut.SoftDeleteByIdAsync(album.Id, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.ArtistMustHaveAtLeastOneAlbum, result.FirstError);
+        AlbumEntity storedAlbum = await context.Albums.AsNoTracking().SingleAsync(candidate => candidate.Id == album.Id);
+        Assert.False(storedAlbum.IsDeleted);
+        Assert.Null(storedAlbum.DeletedOnUtc);
+    }
+
+    [Fact]
+    public async Task SoftDeleteByIdAsync_WhenTheOtherAlbumsOfTheArtistAreDeleted_ShouldReturnArtistMustHaveAtLeastOneAlbum()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-softdelete-deleted-siblings-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId, artist.Id, "Album");
+        AlbumEntity deletedAlbum = await SeedAlbumAsync(context, libraryId, artist.Id, "Deleted Album");
+        deletedAlbum.IsDeleted = true;
+        deletedAlbum.DeletedOnUtc = _mockDateTimeProvider.UtcNow.AddHours(-1);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<Updated> result = await sut.SoftDeleteByIdAsync(album.Id, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.ArtistMustHaveAtLeastOneAlbum, result.FirstError);
+        AlbumEntity storedAlbum = await context.Albums.AsNoTracking().SingleAsync(candidate => candidate.Id == album.Id);
+        Assert.False(storedAlbum.IsDeleted);
+    }
+
+    [Fact]
+    public async Task SoftDeleteByIdAsync_WhenAlbumIsAlreadyDeleted_ShouldReturnAlbumNotFound()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-softdelete-already-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId, artist.Id, "Album");
+        await SeedAlbumAsync(context, libraryId, artist.Id, "Visible Album");
+        DateTime storedDeletedOnUtc = _mockDateTimeProvider.UtcNow.AddHours(-1);
+        album.IsDeleted = true;
+        album.DeletedOnUtc = storedDeletedOnUtc;
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<Updated> result = await sut.SoftDeleteByIdAsync(album.Id, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.AlbumNotFound, result.FirstError);
+        AlbumEntity storedAlbum = await context.Albums.AsNoTracking().SingleAsync(candidate => candidate.Id == album.Id);
+        Assert.Equal(storedDeletedOnUtc, storedAlbum.DeletedOnUtc);
+    }
+
+    [Fact]
+    public async Task SoftDeleteByIdAsync_WhenAlbumDoesNotExist_ShouldReturnAlbumNotFound()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-softdelete-missing-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        // Act
+        Result<Updated> result = await sut.SoftDeleteByIdAsync(Guid.NewGuid(), CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.AlbumNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task SoftDeleteByIdAsync_WhenAnotherWriterAlreadyDeletedTheOtherLastAlbum_ShouldReturnArtistMustHaveAtLeastOneAlbum()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-softdelete-race-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext firstContext = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        firstContext.Database.EnsureCreated();
+        using LuminaDbContext secondContext = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        AlbumRepository firstRepository = CreateAlbumRepository(firstContext);
+        AlbumRepository secondRepository = CreateAlbumRepository(secondContext);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(firstContext, libraryId);
+        AlbumEntity firstAlbum = await SeedAlbumAsync(firstContext, libraryId, artist.Id, "First Album");
+        AlbumEntity secondAlbum = await SeedAlbumAsync(firstContext, libraryId, artist.Id, "Second Album");
+
+        // The second writer reads the state a preceding check would have seen: both albums visible. The write must not trust that read.
+        int visibleAlbumsSeenBySecondWriter = await secondContext.Albums.CountAsync(album => album.ArtistId == artist.Id && !album.IsDeleted);
+        Assert.Equal(2, visibleAlbumsSeenBySecondWriter);
+
+        // Act
+        Result<Updated> firstResult = await firstRepository.SoftDeleteByIdAsync(firstAlbum.Id, CancellationToken.None);
+        Result<Updated> secondResult = await secondRepository.SoftDeleteByIdAsync(secondAlbum.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(firstResult.IsFailure);
+        Assert.True(secondResult.IsFailure);
+        Assert.Equal(Errors.Music.ArtistMustHaveAtLeastOneAlbum, secondResult.FirstError);
+        int remainingVisibleAlbums = await secondContext.Albums.CountAsync(album => album.ArtistId == artist.Id && !album.IsDeleted);
+        Assert.Equal(1, remainingVisibleAlbums);
+    }
+
+    [Fact]
+    public async Task RestoreSoftDeletedByIdAsync_WhenCalled_ShouldPersistTheClearedDeletionState()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-restore-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId, artist.Id, "Album");
+        album.IsDeleted = true;
+        album.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<Updated> result = await sut.RestoreSoftDeletedByIdAsync(album.Id, CancellationToken.None);
+        await context.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        AlbumEntity storedAlbum = await context.Albums.AsNoTracking().SingleAsync(candidate => candidate.Id == album.Id);
+        Assert.False(storedAlbum.IsDeleted);
+        Assert.Null(storedAlbum.DeletedOnUtc);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenTheAlbumIsSoftDeleted_ShouldReturnAlbumNotFound()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-update-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId, artist.Id, "Album");
+        album.IsDeleted = true;
+        album.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        await context.SaveChangesAsync();
+
+        AlbumEntity data = _albumEntityFixture.Create(id: album.Id, artistId: artist.Id, libraryId: libraryId, includeTracks: false, includeMetadata: false);
+
+        // Act
+        Result<Updated> result = await sut.UpdateAsync(data, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.AlbumNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenItsArtistIsSoftDeleted_ShouldReturnAlbumNotFound()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-update-deleted-artist-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId, artist.Id, "Album");
+        artist.IsDeleted = true;
+        artist.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        await context.SaveChangesAsync();
+
+        AlbumEntity data = _albumEntityFixture.Create(id: album.Id, artistId: artist.Id, libraryId: libraryId, includeTracks: false, includeMetadata: false);
+
+        // Act
+        Result<Updated> result = await sut.UpdateAsync(data, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.AlbumNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenIncomingDataIsMarkedDeleted_ShouldPreserveTheActiveRowsDeletionState()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-update-preserve-deletion-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        AlbumRepository sut = CreateAlbumRepository(context);
+
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId);
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId, artist.Id, "Album");
+        AlbumEntity data = await LoadDetachedAlbumAsync(context, album.Id);
+        data.Title = "A Night at the Opera";
+        data.IsDeleted = true;
+        data.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+
+        // Act
+        Result<Updated> result = await sut.UpdateAsync(data, CancellationToken.None);
+        await context.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        AlbumEntity storedAlbum = await context.Albums.AsNoTracking().SingleAsync(candidate => candidate.Id == album.Id);
+        Assert.Equal("A Night at the Opera", storedAlbum.Title);
+        Assert.False(storedAlbum.IsDeleted);
+        Assert.Null(storedAlbum.DeletedOnUtc);
+    }
+
     /// <summary>
     /// Creates an album repository backed by the provided context, wiring the real track repository.
     /// </summary>
     /// <param name="context">The context the repository operates on.</param>
     /// <returns>The created repository.</returns>
-    private static AlbumRepository CreateAlbumRepository(LuminaDbContext context)
+    private AlbumRepository CreateAlbumRepository(LuminaDbContext context)
     {
-        return new AlbumRepository(context, new TrackRepository(context));
+        return new AlbumRepository(context, new TrackRepository(context, _mockDateTimeProvider), _mockDateTimeProvider);
     }
 
     /// <summary>

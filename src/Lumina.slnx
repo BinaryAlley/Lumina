@@ -191,6 +191,8 @@
     <File Path="../docs/technical/requests/library/audio-library/music-library/albums/GetAlbum.http" />
     <File Path="../docs/technical/requests/library/audio-library/music-library/albums/GetAlbumTracks.http" />
     <File Path="../docs/technical/requests/library/audio-library/music-library/albums/GetAlbumTracksLite.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/albums/GetDeletedAlbums.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/albums/RestoreAlbum.http" />
     <File Path="../docs/technical/requests/library/audio-library/music-library/albums/UpdateAlbum.http" />
     <File Path="../docs/technical/requests/library/audio-library/music-library/albums/UpdateAlbumCover.http" />
   </Folder>
@@ -202,6 +204,8 @@
     <File Path="../docs/technical/requests/library/audio-library/music-library/artists/GetArtistAlbumsLite.http" />
     <File Path="../docs/technical/requests/library/audio-library/music-library/artists/GetArtists.http" />
     <File Path="../docs/technical/requests/library/audio-library/music-library/artists/GetArtistsLite.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/artists/GetDeletedArtists.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/artists/RestoreArtist.http" />
     <File Path="../docs/technical/requests/library/audio-library/music-library/artists/UpdateArtist.http" />
     <File Path="../docs/technical/requests/library/audio-library/music-library/artists/UpdateArtistCover.http" />
   </Folder>
@@ -210,6 +214,8 @@
     <File Path="../docs/technical/requests/library/audio-library/music-library/tracks/DeleteTrack.http" />
     <File Path="../docs/technical/requests/library/audio-library/music-library/tracks/GetPlaybackManifest.http" />
     <File Path="../docs/technical/requests/library/audio-library/music-library/tracks/GetTrack.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/tracks/GetDeletedTracks.http" />
+    <File Path="../docs/technical/requests/library/audio-library/music-library/tracks/RestoreTrack.http" />
     <File Path="../docs/technical/requests/library/audio-library/music-library/tracks/ShuffleTracks.http" />
     <File Path="../docs/technical/requests/library/audio-library/music-library/tracks/StreamTrack.http" />
     <File Path="../docs/technical/requests/library/audio-library/music-library/tracks/StreamTrackSegment.http" />

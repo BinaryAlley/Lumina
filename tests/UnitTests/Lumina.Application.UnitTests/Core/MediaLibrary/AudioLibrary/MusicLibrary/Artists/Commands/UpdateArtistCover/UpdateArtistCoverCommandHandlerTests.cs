@@ -82,7 +82,7 @@ public class UpdateArtistCoverCommandHandlerTests
         _mockMusicArtworkRepository.UpsertCoverAsync(Arg.Any<MusicArtworkOwnerType>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Updated));
         _mockMusicArtworkService.SaveArtistArtworkAsync(
-            Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(),
             Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(STORED_COVER_PATH));
         _mockMusicArtworkService.DeleteStoredArtwork(Arg.Any<string>()).Returns(Result.From(Result.Deleted));
@@ -106,7 +106,7 @@ public class UpdateArtistCoverCommandHandlerTests
         await _mockArtistRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>());
         await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
         await _mockMusicArtworkRepository.DidNotReceive().GetByOwnerAsync(Arg.Any<MusicArtworkOwnerType>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>());
-        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -124,7 +124,7 @@ public class UpdateArtistCoverCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
         await _mockArtistRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>());
-        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -143,7 +143,7 @@ public class UpdateArtistCoverCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Library.LibraryIdCannotBeEmpty, result.FirstError);
         await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
-        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -182,7 +182,7 @@ public class UpdateArtistCoverCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Music.ArtistNotFound, result.FirstError);
         await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
-        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -202,7 +202,7 @@ public class UpdateArtistCoverCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
         await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
-        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -222,7 +222,7 @@ public class UpdateArtistCoverCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Library.LibraryIdCannotBeEmpty, result.FirstError);
         await _mockMusicArtworkRepository.DidNotReceive().GetByOwnerAsync(Arg.Any<MusicArtworkOwnerType>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>());
-        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -241,7 +241,7 @@ public class UpdateArtistCoverCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Library.LibraryNotFound, result.FirstError);
-        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -261,7 +261,7 @@ public class UpdateArtistCoverCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Library.LibraryIdCannotBeEmpty, result.FirstError);
-        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
         await _mockMusicArtworkRepository.DidNotReceive().UpsertCoverAsync(Arg.Any<MusicArtworkOwnerType>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -274,7 +274,7 @@ public class UpdateArtistCoverCommandHandlerTests
         SetupExistingArtist(command);
         SetupExistingLibrary(command);
         _mockMusicArtworkService.SaveArtistArtworkAsync(
-            Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(),
             Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Errors.FileSystemManagement.FileTooLarge);
 
@@ -421,6 +421,7 @@ public class UpdateArtistCoverCommandHandlerTests
         await _mockMusicArtworkService.Received(1).SaveArtistArtworkAsync(
             existingArtist.LibraryId,
             library.Title,
+            existingArtist.Id,
             existingArtist.Name,
             Arg.Any<Stream>(),
             command.FileName!,

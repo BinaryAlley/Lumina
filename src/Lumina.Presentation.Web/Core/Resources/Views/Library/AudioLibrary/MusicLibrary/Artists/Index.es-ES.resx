@@ -69,4 +69,7 @@
   <data name="AddToPlaylist" xml:space="preserve">
     <value>Añadir a la lista de reproducción</value>
   </data>
+  <data name="DeletedItems" xml:space="preserve">
+    <value>Elementos eliminados</value>
+  </data>
 </root>

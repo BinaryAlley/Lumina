@@ -472,6 +472,38 @@ public class ArtistTests
     }
 
     [Fact]
+    public void EnsureCanRemoveAlbum_WhenTheArtistHasAnotherAlbum_ShouldReturnSuccess()
+    {
+        // Arrange
+        Album firstAlbum = _albumFixture.Create();
+        Album secondAlbum = _albumFixture.Create();
+        Artist artist = _artistFixture.Create(albums: [firstAlbum, secondAlbum]);
+
+        // Act
+        Result<bool> result = artist.CanRemoveAlbum(firstAlbum);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(2, artist.Albums.Count);
+    }
+
+    [Fact]
+    public void EnsureCanRemoveAlbum_WhenAlbumIsTheOnlyAlbumOfTheArtist_ShouldReturnArtistMustHaveAtLeastOneAlbumError()
+    {
+        // Arrange
+        Album onlyAlbum = _albumFixture.Create();
+        Artist artist = _artistFixture.Create(albums: [onlyAlbum]);
+
+        // Act
+        Result<bool> result = artist.CanRemoveAlbum(onlyAlbum);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.ArtistMustHaveAtLeastOneAlbum, result.FirstError);
+        Assert.Single(artist.Albums);
+    }
+
+    [Fact]
     public void UpdateContributors_WhenCalledWithNewContributors_ShouldReplaceThemInPlace()
     {
         // Arrange

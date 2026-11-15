@@ -327,13 +327,13 @@ internal sealed class BookArtworkService : IBookArtworkService
         if (booksPathResult.IsFailure)
             return booksPathResult.Errors;
 
-        Result<PathSegment> librarySegmentResult = _pathService.SanitizeSegment($"{libraryName}-{libraryId}");
+        Result<PathSegment> librarySegmentResult = _pathService.SanitizeCompositeSegment(libraryName, libraryId.ToString());
         if (librarySegmentResult.IsFailure)
             return librarySegmentResult.Errors;
         Result<PathSegment> authorSegmentResult = _pathService.SanitizeSegment(string.IsNullOrWhiteSpace(authorName) ? "Unknown" : authorName);
         if (authorSegmentResult.IsFailure)
             return authorSegmentResult.Errors;
-        Result<PathSegment> bookSegmentResult = _pathService.SanitizeSegment($"{bookTitle}-{bookId}");
+        Result<PathSegment> bookSegmentResult = _pathService.SanitizeCompositeSegment(bookTitle, bookId.ToString());
         if (bookSegmentResult.IsFailure)
             return bookSegmentResult.Errors;
 

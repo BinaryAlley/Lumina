@@ -81,6 +81,15 @@ public interface IPathService
     Result<PathSegment> SanitizeSegment(string name);
 
     /// <summary>
+    /// Sanitizes a human-readable <paramref name="name"/> into a safe path segment that ends with <paramref name="identifier"/>,
+    /// truncating only the name when the combined segment would exceed the maximum segment length.
+    /// </summary>
+    /// <param name="name">The human-readable name to sanitize.</param>
+    /// <param name="identifier">The identifier that must be preserved at the end of the segment.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing the sanitized path segment, or an error.</returns>
+    Result<PathSegment> SanitizeCompositeSegment(string name, string identifier);
+
+    /// <summary>
     /// Returns the root portion of the given path.
     /// </summary>
     /// <param name="path">The path for which to get the root.</param>

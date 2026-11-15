@@ -121,13 +121,14 @@ public class UpdateAlbumCoverCommandHandler : ICommandHandler<UpdateAlbumCoverCo
             .Where(artwork => artwork.ArtworkType == ArtworkType.Cover)
             .Select(artwork => artwork.FileName)
             .FirstOrDefault();
-        string? releaseTypeName = ExtractReleaseTypeDirectoryName(existingCoverPath, artistName)
+        string? releaseTypeName = ExtractReleaseTypeDirectoryName(existingCoverPath, artistName, existingAlbum.ArtistId)
             ?? (existingAlbum.ReleaseTypes.Count > 0 ? existingAlbum.ReleaseTypes[0].ReleaseType.ToString() : null);
 
         Result<string> storeArtworkResult = await _musicArtworkService.SaveAlbumArtworkAsync(
             existingAlbum.LibraryId,
             existingAlbum.Id,
             libraryName,
+            existingAlbum.ArtistId,
             artistName,
             existingAlbum.Title,
             command.Cover!,
@@ -164,19 +165,21 @@ public class UpdateAlbumCoverCommandHandler : ICommandHandler<UpdateAlbumCoverCo
     /// </summary>
     /// <param name="coverRelativePath">The relative path of the existing cover image of the album, or <see langword="null"/> when the album has no cover.</param>
     /// <param name="artistName">The name of the artist of the album.</param>
+    /// <param name="artistId">The Id of the artist of the album.</param>
     /// <returns>The name of the on-disk release type directory, or <see langword="null"/> when the album does not use one.</returns>
-    private string? ExtractReleaseTypeDirectoryName(string? coverRelativePath, string artistName)
+    private string? ExtractReleaseTypeDirectoryName(string? coverRelativePath, string artistName, Guid artistId)
     {
         if (string.IsNullOrWhiteSpace(coverRelativePath))
             return null;
-        // The path is media/music/{library}/{artist}[/{releaseType}]/{album}/{file}, so the segment right before the album directory is the release
-        // type directory when the album uses one, and the artist directory otherwise. An artist whose name happens to match a release type, like
-        // "Live", must not be mistaken for one, so the segment is only accepted as a release type when it is not the directory of the artist.
+        // The path is media/music/{libraryName}-{libraryId}/{artistName}-{artistId}[/{releaseType}]/{albumTitle}-{albumId}/{file}, so the segment
+        // right before the album directory is the release type directory when the album uses one, and the artist directory otherwise. An artist
+        // whose name happens to match a release type, like "Live", must not be mistaken for one, so the segment is only accepted as a release type
+        // when it is not the directory of the artist.
         string[] segments = coverRelativePath.Split(_pathService.PathSeparator, StringSplitOptions.RemoveEmptyEntries);
         if (segments.Length < 3)
             return null;
         string candidate = segments[^3];
-        if (IsArtistDirectory(candidate, artistName))
+        if (IsArtistDirectory(candidate, artistName, artistId))
             return null;
         return Enum.TryParse(candidate, ignoreCase: true, out MusicReleaseType releaseType) && Enum.IsDefined(releaseType) ? candidate : null;
     }
@@ -186,12 +189,12 @@ public class UpdateAlbumCoverCommandHandler : ICommandHandler<UpdateAlbumCoverCo
     /// </summary>
     /// <param name="pathSegment">The path segment to be checked.</param>
     /// <param name="artistName">The name of the artist of the album.</param>
+    /// <param name="artistId">The Id of the artist of the album.</param>
     /// <returns><see langword="true"/> when the segment is the artwork directory of the artist, <see langword="false"/> otherwise.</returns>
-    private bool IsArtistDirectory(string pathSegment, string artistName)
+    private bool IsArtistDirectory(string pathSegment, string artistName, Guid artistId)
     {
-        if (string.IsNullOrWhiteSpace(artistName))
-            return false;
-        Result<PathSegment> artistSegmentResult = _pathService.SanitizeSegment(artistName);
+        string resolvedArtistName = string.IsNullOrWhiteSpace(artistName) ? "Unknown" : artistName;
+        Result<PathSegment> artistSegmentResult = _pathService.SanitizeCompositeSegment(resolvedArtistName, artistId.ToString());
         return artistSegmentResult.IsSuccess
             && string.Equals(pathSegment, artistSegmentResult.Value.Name, StringComparison.OrdinalIgnoreCase);
     }

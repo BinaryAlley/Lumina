@@ -15,6 +15,7 @@ public static partial class Errors
         public static Error PathMustBeMaximum260CharactersLong => Error.Failure(description: nameof(PathMustBeMaximum260CharactersLong));
         public static Error FileCopyError => Error.Failure(description: nameof(FileCopyError));
         public static Error FileMoveError => Error.Failure(description: nameof(FileMoveError));
+        public static Error FileDeleteError => Error.Failure(description: nameof(FileDeleteError));
         public static Error DirectoryCopyError => Error.Failure(description: nameof(DirectoryCopyError));
         public static Error DirectoryMoveError => Error.Failure(description: nameof(DirectoryMoveError));
         public static Error FileNotFound => Error.NotFound(description: nameof(FileNotFound));

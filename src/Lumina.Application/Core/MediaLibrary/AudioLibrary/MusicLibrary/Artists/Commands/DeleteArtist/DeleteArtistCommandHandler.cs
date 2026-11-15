@@ -7,7 +7,6 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
 using Lumina.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
@@ -25,7 +24,6 @@ namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists
 public class DeleteArtistCommandHandler : ICommandHandler<DeleteArtistCommand, Result<Deleted>>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMusicArtworkCleanupService _musicArtworkCleanupService;
     private readonly IAuthorizationService _authorizationService;
     private readonly ICurrentUserService _currentUserService;
     private readonly IValidator<DeleteArtistCommand> _validator;
@@ -34,14 +32,12 @@ public class DeleteArtistCommandHandler : ICommandHandler<DeleteArtistCommand, R
     /// Initializes a new instance of the <see cref="DeleteArtistCommandHandler"/> class.
     /// </summary>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
-    /// <param name="musicArtworkCleanupService">Injected service for removing the artwork of a music library item and of its children.</param>
     /// <param name="authorizationService">Injected service for authorization related functionality.</param>
     /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
     /// <param name="validator">Injected validator for application validation rules.</param>
-    public DeleteArtistCommandHandler(IUnitOfWork unitOfWork, IMusicArtworkCleanupService musicArtworkCleanupService, IAuthorizationService authorizationService, ICurrentUserService currentUserService, IValidator<DeleteArtistCommand> validator)
+    public DeleteArtistCommandHandler(IUnitOfWork unitOfWork, IAuthorizationService authorizationService, ICurrentUserService currentUserService, IValidator<DeleteArtistCommand> validator)
     {
         _unitOfWork = unitOfWork;
-        _musicArtworkCleanupService = musicArtworkCleanupService;
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
         _validator = validator;
@@ -96,13 +92,9 @@ public class DeleteArtistCommandHandler : ICommandHandler<DeleteArtistCommand, R
         if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
 
-        // The artwork of the artist and of its albums and tracks does not cascade from the artist row, because the artwork table is shared by all
-        // the music library item types, so it is removed first, while the artist and its children are still present.
-        Result<Deleted> deleteArtworkResult = await _musicArtworkCleanupService.DeleteArtistArtworkAsync(artistId, cancellationToken).ConfigureAwait(false);
-        if (deleteArtworkResult.IsFailure)
-            return deleteArtworkResult.Errors;
-
-        Result<Deleted> deleteArtistResult = await _unitOfWork.ArtistRepository.DeleteByIdAsync(artistId, cancellationToken).ConfigureAwait(false);
+        // The artist is soft deleted, so its metadata, artwork and paths stay available until the user restores it or the files disappear from disk.
+        // Keeping the row is also what makes the deletion survive an automatic scan, because the scan treats its track paths as already catalogued.
+        Result<Updated> deleteArtistResult = await _unitOfWork.ArtistRepository.SoftDeleteByIdAsync(artistId, cancellationToken).ConfigureAwait(false);
         if (deleteArtistResult.IsFailure)
             return deleteArtistResult.Errors;
 

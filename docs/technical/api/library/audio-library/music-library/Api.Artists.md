@@ -21,6 +21,12 @@
       - [Update Artist Cover Request](#update-artist-cover-request)
       - [Update Artist Cover Response](#update-artist-cover-response)
     - [Delete Artist](#delete-artist)
+    - [Get Deleted Artists](#get-deleted-artists)
+      - [Get Deleted Artists Request](#get-deleted-artists-request)
+      - [Get Deleted Artists Response](#get-deleted-artists-response)
+    - [Restore Artist](#restore-artist)
+      - [Restore Artist Request](#restore-artist-request)
+      - [Restore Artist Response](#restore-artist-response)
 
 ## Artist
 
@@ -672,17 +678,17 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists
           ]
         }
       ],
-      "coverPath": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+      "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg",
       "artwork": [
         {
           "type": "Cover",
           "ordinal": 0,
-          "path": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg"
+          "path": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg"
         }
       ]
     }
   ],
-  "coverPath": "/media/music/Queen-3b3a19f3/cover.jpg"
+  "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/cover.jpg"
 }
 ```
 
@@ -1021,17 +1027,17 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists?currentPage=1&
               ]
             }
           ],
-          "coverPath": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+          "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg",
           "artwork": [
             {
               "type": "Cover",
               "ordinal": 0,
-              "path": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg"
+              "path": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg"
             }
           ]
         }
       ],
-      "coverPath": "/media/music/Queen-3b3a19f3/cover.jpg"
+      "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/cover.jpg"
     }
   ],
   "currentPage": 1,
@@ -1072,7 +1078,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/lite?currentPa
     {
       "id": "d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a",
       "name": "Queen",
-      "coverPath": "/media/music/Queen-3b3a19f3/cover.jpg"
+      "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/cover.jpg"
     }
   ],
   "currentPage": 1,
@@ -1410,17 +1416,17 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
           ]
         }
       ],
-      "coverPath": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+      "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg",
       "artwork": [
         {
           "type": "Cover",
           "ordinal": 0,
-          "path": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg"
+          "path": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg"
         }
       ]
     }
   ],
-  "coverPath": "/media/music/Queen-3b3a19f3/cover.jpg"
+  "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/cover.jpg"
 }
 ```
 
@@ -2076,17 +2082,17 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
           ]
         }
       ],
-      "coverPath": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+      "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg",
       "artwork": [
         {
           "type": "Cover",
           "ordinal": 0,
-          "path": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg"
+          "path": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg"
         }
       ]
     }
   ],
-  "coverPath": "/media/music/Queen-3b3a19f3/cover.jpg"
+  "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/cover.jpg"
 }
 ```
 
@@ -2116,7 +2122,7 @@ Content-Type: image/jpeg
 
 ```json
 {
-  "coverPath": "/media/music/music-3f2504e0-4f89-41d3-9a0c-0305e82c3301/Queen-2b0e5f5a-0b3f-4b7e-8f4a-8c9e3d2f5a6b/cover.jpg"
+  "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/cover.jpg"
 }
 ```
 
@@ -2131,4 +2137,48 @@ DELETE api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}
 200 Ok
 ```
 
-Deletes the artist identified by the route, together with its albums and tracks.
+Soft deletes the artist identified by the route. The stored metadata, artwork, albums and tracks are kept, so the artist can be restored, and their paths stay reserved, so a scan does not add them back.
+
+
+### Get Deleted Artists
+
+#### Get Deleted Artists Request
+
+```js
+GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/deleted-items
+```
+
+#### Get Deleted Artists Response
+
+```js
+200 Ok
+```
+
+```json
+[
+  {
+    "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+    "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+    "name": "Queen",
+    "deletedOnUtc": "2026-11-14T18:35:00Z",
+    "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d/cover.jpg"
+  }
+]
+```
+
+
+### Restore Artist
+
+#### Restore Artist Request
+
+```js
+POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}/restore
+```
+
+#### Restore Artist Response
+
+```js
+200 Ok
+```
+
+Restores the deleted artist identified by the route, together with its stored metadata, artwork and the albums and tracks that were not deleted on their own. An artist cannot be restored when a visible artist with the same name already exists in the library.

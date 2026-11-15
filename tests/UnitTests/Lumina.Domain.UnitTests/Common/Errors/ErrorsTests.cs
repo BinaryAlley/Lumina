@@ -260,11 +260,12 @@ public class ErrorsTests
     {
         // Assert
         // The count assertion fails when an error is added or removed, reminding to update the assertions below.
-        Assert.Equal(20, typeof(DomainErrors.FileSystemManagement).GetProperties().Length);
+        Assert.Equal(21, typeof(DomainErrors.FileSystemManagement).GetProperties().Length);
         AssertError(DomainErrors.FileSystemManagement.ParentNodeCannotBeNull, ErrorType.Failure);
         AssertError(DomainErrors.FileSystemManagement.PathMustBeMaximum260CharactersLong, ErrorType.Failure);
         AssertError(DomainErrors.FileSystemManagement.FileCopyError, ErrorType.Failure);
         AssertError(DomainErrors.FileSystemManagement.FileMoveError, ErrorType.Failure);
+        AssertError(DomainErrors.FileSystemManagement.FileDeleteError, ErrorType.Failure);
         AssertError(DomainErrors.FileSystemManagement.DirectoryCopyError, ErrorType.Failure);
         AssertError(DomainErrors.FileSystemManagement.DirectoryMoveError, ErrorType.Failure);
         AssertError(DomainErrors.FileSystemManagement.FileNotFound, ErrorType.NotFound);

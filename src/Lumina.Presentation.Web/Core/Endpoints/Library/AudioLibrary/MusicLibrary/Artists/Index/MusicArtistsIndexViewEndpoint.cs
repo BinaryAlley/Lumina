@@ -96,6 +96,7 @@ public class MusicArtistsIndexViewEndpoint : BaseEndpoint<GetMusicArtistsViewReq
                 ["settingsUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS) ?? string.Empty,
                 ["artistUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Music.ARTIST, new { artistId = default(Guid) }) ?? string.Empty,
                 ["deleteUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Music.DELETE_ARTIST, new { artistId = default(Guid) }) ?? string.Empty,
+                ["deletedItemsUrl"] = _urlService.GetAbsoluteUrl(WebRoutes.Music.DELETED_MUSIC_ITEMS) ?? string.Empty,
                 ["strings"] = ThemePageDataFactory.CreateLocalizedStrings(_localizer)
             }
         };

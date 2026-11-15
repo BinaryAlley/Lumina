@@ -5,6 +5,7 @@ using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.Mu
 using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
 using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 using Lumina.Application.Common.DTO.Pagination;
+using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Fixtures.Common.DTO.Pagination;
@@ -36,6 +37,7 @@ public class AlbumRepositoryTests
 {
     private readonly LuminaDbContext _mockContext;
     private readonly ITrackRepository _mockTrackRepository;
+    private readonly IDateTimeProvider _mockDateTimeProvider;
     private readonly AlbumRepository _sut;
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly TrackEntityFixture _trackEntityFixture = new();
@@ -61,7 +63,9 @@ public class AlbumRepositoryTests
         _mockTrackRepository.UpdateAsync(Arg.Any<TrackEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Updated);
         _mockTrackRepository.GetExistingPathsAsync(Arg.Any<Guid>(), Arg.Any<IReadOnlyCollection<string>>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyCollection<string>>([]));
-        _sut = new AlbumRepository(_mockContext, _mockTrackRepository);
+        _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
+        _mockDateTimeProvider.UtcNow.Returns(new DateTime(2026, 11, 14, 10, 30, 0, DateTimeKind.Utc));
+        _sut = new AlbumRepository(_mockContext, _mockTrackRepository, _mockDateTimeProvider);
     }
 
     [Fact]
@@ -270,6 +274,7 @@ public class AlbumRepositoryTests
     {
         // Arrange
         AlbumEntity storedAlbum = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(storedAlbum);
         _mockContext.Albums.Add(storedAlbum);
         await _mockContext.SaveChangesAsync();
 
@@ -297,6 +302,7 @@ public class AlbumRepositoryTests
         Guid storedArtistId = Guid.NewGuid();
         Guid storedLibraryId = Guid.NewGuid();
         AlbumEntity storedAlbum = _albumEntityFixture.Create(artistId: storedArtistId, libraryId: storedLibraryId, includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(storedArtistId, storedLibraryId);
         _mockContext.Albums.Add(storedAlbum);
         await _mockContext.SaveChangesAsync();
 
@@ -328,6 +334,7 @@ public class AlbumRepositoryTests
         storedAlbum.CreatedBy = storedCreatedBy;
         storedAlbum.UpdatedOnUtc = null;
         storedAlbum.UpdatedBy = null;
+        await SeedVisibleArtistAsync(storedAlbum);
         _mockContext.Albums.Add(storedAlbum);
         await _mockContext.SaveChangesAsync();
 
@@ -365,6 +372,7 @@ public class AlbumRepositoryTests
             _audioRatingEntityFixture.Create(value: 5, maxValue: 5, source: AudioRatingSource.User, voteCount: 10),
             _audioRatingEntityFixture.Create(value: 2, maxValue: 5, source: AudioRatingSource.LastFm, voteCount: 20)
         ];
+        await SeedVisibleArtistAsync(storedAlbum);
         _mockContext.Albums.Add(storedAlbum);
         await _mockContext.SaveChangesAsync();
 
@@ -402,6 +410,7 @@ public class AlbumRepositoryTests
         AlbumContributorEntity keptContributor = _albumContributorEntityFixture.Create(
             albumId: storedAlbum.Id, mediaContributorId: keptMediaContributorId, role: MediaContributorRole.Producer);
         storedAlbum.Contributors = [keptContributor];
+        await SeedVisibleArtistAsync(storedAlbum);
         _mockContext.Albums.Add(storedAlbum);
         await _mockContext.SaveChangesAsync();
 
@@ -437,6 +446,7 @@ public class AlbumRepositoryTests
         AlbumContributorEntity removedContributor = _albumContributorEntityFixture.Create(
             albumId: storedAlbum.Id, mediaContributorId: removedMediaContributorId, role: MediaContributorRole.Composer);
         storedAlbum.Contributors = [keptContributor, removedContributor];
+        await SeedVisibleArtistAsync(storedAlbum);
         _mockContext.Albums.Add(storedAlbum);
         await _mockContext.SaveChangesAsync();
 
@@ -474,6 +484,7 @@ public class AlbumRepositoryTests
         AlbumEntity storedAlbum = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false);
         storedAlbum.Tags = [existingTag];
         storedAlbum.Genres = [existingGenre];
+        await SeedVisibleArtistAsync(storedAlbum);
         _mockContext.Albums.Add(storedAlbum);
         await _mockContext.SaveChangesAsync();
 
@@ -506,6 +517,7 @@ public class AlbumRepositoryTests
     {
         // Arrange
         AlbumEntity storedAlbum = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false, catalogNumbers: ["EMC 3006", "OC 062 o 94519"]);
+        await SeedVisibleArtistAsync(storedAlbum);
         _mockContext.Albums.Add(storedAlbum);
         await _mockContext.SaveChangesAsync();
 
@@ -532,6 +544,7 @@ public class AlbumRepositoryTests
     {
         // Arrange
         AlbumEntity album = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(album);
         _mockContext.Albums.Add(album);
         await _mockContext.SaveChangesAsync();
 
@@ -595,6 +608,8 @@ public class AlbumRepositoryTests
         AlbumEntity secondAlphaAlbum = _albumEntityFixture.Create(artistId: artistId, title: "Alpha", includeTracks: false, includeMetadata: false);
         AlbumEntity firstAlphaAlbum = _albumEntityFixture.Create(artistId: artistId, title: "Alpha", includeTracks: false, includeMetadata: false);
         AlbumEntity albumOfAnotherArtist = _albumEntityFixture.Create(title: "Gamma", includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(artistId, betaAlbum.LibraryId);
+        await SeedVisibleArtistAsync(albumOfAnotherArtist);
         _mockContext.Albums.AddRange(betaAlbum, secondAlphaAlbum, firstAlphaAlbum, albumOfAnotherArtist);
         await _mockContext.SaveChangesAsync();
 
@@ -646,6 +661,8 @@ public class AlbumRepositoryTests
         AlbumEntity secondAlbum = _albumEntityFixture.Create(artistId: artistId, title: "Album B", includeTracks: false, includeMetadata: false);
         AlbumEntity firstAlbum = _albumEntityFixture.Create(artistId: artistId, title: "Album A", includeTracks: false, includeMetadata: false);
         AlbumEntity albumOfAnotherArtist = _albumEntityFixture.Create(title: "Album C", includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(artistId, secondAlbum.LibraryId);
+        await SeedVisibleArtistAsync(albumOfAnotherArtist);
         _mockContext.Albums.AddRange(secondAlbum, firstAlbum, albumOfAnotherArtist);
         await _mockContext.SaveChangesAsync();
 
@@ -679,6 +696,7 @@ public class AlbumRepositoryTests
             albums[index].Title = $"Album {index}";
             albums[index].Tracks = [];
         }
+        await SeedVisibleArtistAsync(artistId, albums[0].LibraryId);
         _mockContext.Albums.AddRange(albums);
         await _mockContext.SaveChangesAsync();
 
@@ -704,6 +722,8 @@ public class AlbumRepositoryTests
         Guid artistId = Guid.NewGuid();
         AlbumEntity albumOfArtist = _albumEntityFixture.Create(artistId: artistId, includeTracks: false, includeMetadata: false);
         AlbumEntity albumOfAnotherArtist = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(artistId, albumOfArtist.LibraryId);
+        await SeedVisibleArtistAsync(albumOfAnotherArtist);
         _mockContext.Albums.AddRange(albumOfArtist, albumOfAnotherArtist);
         await _mockContext.SaveChangesAsync();
 
@@ -726,6 +746,7 @@ public class AlbumRepositoryTests
         Guid artistId = Guid.NewGuid();
         AlbumEntity album = _albumEntityFixture.Create(artistId: artistId, title: "A Night at the Opera", includeTracks: false, includeMetadata: false);
         album.TotalTracks = 12;
+        await SeedVisibleArtistAsync(album);
         _mockContext.Albums.Add(album);
         await _mockContext.SaveChangesAsync();
 
@@ -749,6 +770,7 @@ public class AlbumRepositoryTests
         Guid artistId = Guid.NewGuid();
         AlbumEntity album = _albumEntityFixture.Create(
             artistId: artistId, originalReleaseYear: 1975, reReleaseYear: 2011, includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(album);
         _mockContext.Albums.Add(album);
         await _mockContext.SaveChangesAsync();
 
@@ -770,6 +792,7 @@ public class AlbumRepositoryTests
         Guid artistId = Guid.NewGuid();
         AlbumEntity album = _albumEntityFixture.Create(
             artistId: artistId, originalReleaseYear: 1975, includeReReleaseYear: false, includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(album);
         _mockContext.Albums.Add(album);
         await _mockContext.SaveChangesAsync();
 
@@ -791,6 +814,7 @@ public class AlbumRepositoryTests
         Guid artistId = Guid.NewGuid();
         AlbumEntity album = _albumEntityFixture.Create(
             artistId: artistId, releaseType: MusicReleaseType.Single, includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(album);
         _mockContext.Albums.Add(album);
         await _mockContext.SaveChangesAsync();
 
@@ -812,6 +836,7 @@ public class AlbumRepositoryTests
         // Arrange
         Guid artistId = Guid.NewGuid();
         AlbumEntity album = _albumEntityFixture.Create(artistId: artistId, includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(album);
         _mockContext.Albums.Add(album);
         _mockContext.MusicArtwork.Add(
             _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Album, ownerId: album.Id, artworkType: ArtworkType.Cover, fileName: "covers/opera.jpg"));
@@ -834,6 +859,7 @@ public class AlbumRepositoryTests
         // Arrange
         Guid artistId = Guid.NewGuid();
         AlbumEntity album = _albumEntityFixture.Create(artistId: artistId, includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(album);
         _mockContext.Albums.Add(album);
         await _mockContext.SaveChangesAsync();
 
@@ -857,6 +883,10 @@ public class AlbumRepositoryTests
         AlbumEntity failedAlbum = _albumEntityFixture.Create(libraryId: libraryId, includeTracks: false, includeMetadata: false, metadataStatus: MetadataStatus.Failed);
         AlbumEntity enrichedAlbum = _albumEntityFixture.Create(libraryId: libraryId, includeTracks: false, includeMetadata: false, metadataStatus: MetadataStatus.Enriched);
         AlbumEntity albumOfAnotherLibrary = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false, metadataStatus: MetadataStatus.Pending);
+        await SeedVisibleArtistAsync(pendingAlbum);
+        await SeedVisibleArtistAsync(failedAlbum);
+        await SeedVisibleArtistAsync(enrichedAlbum);
+        await SeedVisibleArtistAsync(albumOfAnotherLibrary);
         _mockContext.Albums.AddRange(pendingAlbum, failedAlbum, enrichedAlbum, albumOfAnotherLibrary);
         await _mockContext.SaveChangesAsync();
 
@@ -866,6 +896,550 @@ public class AlbumRepositoryTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(2, result.Value);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_WhenAlbumIsSoftDeleted_ShouldReturnNull()
+    {
+        // Arrange
+        AlbumEntity album = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(album);
+        album.IsDeleted = true;
+        album.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<AlbumEntity?> result = await _sut.GetByIdAsync(album.Id, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_WhenItsArtistIsSoftDeleted_ShouldReturnNull()
+    {
+        // Arrange
+        AlbumEntity album = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false);
+        ArtistEntity artist = await SeedVisibleArtistAsync(album);
+        artist.IsDeleted = true;
+        artist.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<AlbumEntity?> result = await _sut.GetByIdAsync(album.Id, cancellationToken: CancellationToken.None);
+
+        // Assert
+        // A deleted artist hides every album it owns, because the albums are only reachable through it.
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetByArtistIdAsync_WhenAnAlbumIsSoftDeleted_ShouldExcludeIt()
+    {
+        // Arrange
+        Guid artistId = Guid.NewGuid();
+        AlbumEntity activeAlbum = _albumEntityFixture.Create(artistId: artistId, title: "Active", includeTracks: false, includeMetadata: false);
+        AlbumEntity deletedAlbum = _albumEntityFixture.Create(artistId: artistId, title: "Deleted", includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(artistId, activeAlbum.LibraryId);
+        deletedAlbum.IsDeleted = true;
+        deletedAlbum.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        _mockContext.Albums.AddRange(activeAlbum, deletedAlbum);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<AlbumEntity>> result = await _sut.GetByArtistIdAsync(artistId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(activeAlbum.Id, Assert.Single(result.Value).Id);
+    }
+
+    [Fact]
+    public async Task GetByArtistIdAsync_WhenTheArtistIsSoftDeleted_ShouldReturnEmpty()
+    {
+        // Arrange
+        Guid artistId = Guid.NewGuid();
+        AlbumEntity album = _albumEntityFixture.Create(artistId: artistId, includeTracks: false, includeMetadata: false);
+        ArtistEntity artist = await SeedVisibleArtistAsync(artistId, album.LibraryId);
+        artist.IsDeleted = true;
+        artist.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<AlbumEntity>> result = await _sut.GetByArtistIdAsync(artistId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Empty(result.Value);
+    }
+
+    [Fact]
+    public async Task GetByArtistIdIncludingDeletedAsync_WhenCalled_ShouldReturnEveryAlbumOfTheArtistOrderedByTitleThenId()
+    {
+        // Arrange
+        Guid artistId = Guid.NewGuid();
+        AlbumEntity betaAlbum = _albumEntityFixture.Create(artistId: artistId, title: "Beta", includeTracks: false, includeMetadata: false);
+        AlbumEntity deletedAlbum = _albumEntityFixture.Create(artistId: artistId, title: "Alpha", includeTracks: false, includeMetadata: false);
+        AlbumEntity albumOfAnotherArtist = _albumEntityFixture.Create(title: "Gamma", includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(artistId, betaAlbum.LibraryId);
+        await SeedVisibleArtistAsync(albumOfAnotherArtist);
+        deletedAlbum.IsDeleted = true;
+        deletedAlbum.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        _mockContext.Albums.AddRange(betaAlbum, deletedAlbum, albumOfAnotherArtist);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<AlbumEntity>> result = await _sut.GetByArtistIdIncludingDeletedAsync(artistId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal([deletedAlbum.Id, betaAlbum.Id], result.Value.Select(album => album.Id));
+    }
+
+    [Fact]
+    public async Task GetIncludingDeletedByIdAsync_WhenAlbumIsSoftDeleted_ShouldReturnIt()
+    {
+        // Arrange
+        AlbumEntity album = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(album);
+        album.IsDeleted = true;
+        album.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<AlbumEntity?> result = await _sut.GetIncludingDeletedByIdAsync(album.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(album.Id, result.Value!.Id);
+        Assert.True(result.Value.IsDeleted);
+    }
+
+    [Fact]
+    public async Task GetIncludingDeletedByIdAsync_WhenAlbumDoesNotExist_ShouldReturnNull()
+    {
+        // Act
+        Result<AlbumEntity?> result = await _sut.GetIncludingDeletedByIdAsync(Guid.NewGuid(), CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetAlbumsLiteByArtistIdAsync_WhenAnAlbumIsSoftDeleted_ShouldExcludeIt()
+    {
+        // Arrange
+        Guid artistId = Guid.NewGuid();
+        AlbumEntity activeAlbum = _albumEntityFixture.Create(artistId: artistId, title: "Active", includeTracks: false, includeMetadata: false);
+        AlbumEntity deletedAlbum = _albumEntityFixture.Create(artistId: artistId, title: "Deleted", includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(artistId, activeAlbum.LibraryId);
+        deletedAlbum.IsDeleted = true;
+        deletedAlbum.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        _mockContext.Albums.AddRange(activeAlbum, deletedAlbum);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<PaginatedResultDto<AlbumLiteRow>> result = await _sut.GetAlbumsLiteByArtistIdAsync(artistId, null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(activeAlbum.Id, Assert.Single(result.Value.Data).Id);
+    }
+
+    [Fact]
+    public async Task GetByTitleAsync_WhenAlbumIsSoftDeleted_ShouldReturnNull()
+    {
+        // Arrange
+        Guid artistId = Guid.NewGuid();
+        AlbumEntity album = _albumEntityFixture.Create(artistId: artistId, title: "A Night at the Opera", includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(artistId, album.LibraryId);
+        album.IsDeleted = true;
+        album.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<AlbumEntity?> result = await _sut.GetByTitleAsync(artistId, "A Night at the Opera", CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetByTitleAsync_WhenItsArtistIsSoftDeleted_ShouldReturnNull()
+    {
+        // Arrange
+        Guid artistId = Guid.NewGuid();
+        AlbumEntity album = _albumEntityFixture.Create(artistId: artistId, title: "A Night at the Opera", includeTracks: false, includeMetadata: false);
+        ArtistEntity artist = await SeedVisibleArtistAsync(artistId, album.LibraryId);
+        artist.IsDeleted = true;
+        artist.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<AlbumEntity?> result = await _sut.GetByTitleAsync(artistId, "A Night at the Opera", CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetByTrackDirectoryAsync_WhenAlbumIsSoftDeleted_ShouldReturnNull()
+    {
+        // Arrange
+        Guid artistId = Guid.NewGuid();
+        AlbumEntity album = _albumEntityFixture.Create(artistId: artistId, includeTracks: false, includeMetadata: false);
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: album.LibraryId, path: "/music/queen/a-night-at-the-opera/bohemian-rhapsody.flac", includeMetadata: false);
+        album.Tracks = [track];
+        await SeedVisibleArtistAsync(artistId, album.LibraryId);
+        album.IsDeleted = true;
+        album.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<AlbumEntity?> result = await _sut.GetByTrackDirectoryAsync(artistId, "/music/queen/a-night-at-the-opera", CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetSoftDeletedByIdAsync_WhenAlbumIsDeleted_ShouldReturnIt()
+    {
+        // Arrange
+        AlbumEntity album = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(album);
+        album.IsDeleted = true;
+        album.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<AlbumEntity?> result = await _sut.GetSoftDeletedByIdAsync(album.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(album.Id, result.Value!.Id);
+    }
+
+    [Fact]
+    public async Task GetSoftDeletedByIdAsync_WhenItsArtistIsDeleted_ShouldReturnNull()
+    {
+        // Arrange
+        AlbumEntity album = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false);
+        ArtistEntity artist = await SeedVisibleArtistAsync(album);
+        artist.IsDeleted = true;
+        artist.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        album.IsDeleted = true;
+        album.DeletedOnUtc = DateTime.UtcNow.AddHours(-2);
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<AlbumEntity?> result = await _sut.GetSoftDeletedByIdAsync(album.Id, CancellationToken.None);
+
+        // Assert
+        // A deleted artist hides its own deleted albums from the deleted items page, so the album is not offered for a restore that would stay hidden.
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetSoftDeletedByIdAsync_WhenAlbumIsNotDeleted_ShouldReturnNull()
+    {
+        // Arrange
+        AlbumEntity album = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(album);
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<AlbumEntity?> result = await _sut.GetSoftDeletedByIdAsync(album.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetSoftDeletedByLibraryIdAsync_WhenCalled_ShouldReturnOnlyTheDeletedAlbumsOfVisibleArtists()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity deletedAlbum = _albumEntityFixture.Create(libraryId: libraryId, includeTracks: false, includeMetadata: false);
+        ArtistEntity visibleArtist = await SeedVisibleArtistAsync(deletedAlbum);
+        AlbumEntity deletedAlbumOfDeletedArtist = _albumEntityFixture.Create(libraryId: libraryId, includeTracks: false, includeMetadata: false);
+        ArtistEntity deletedArtist = await SeedVisibleArtistAsync(deletedAlbumOfDeletedArtist);
+        AlbumEntity activeAlbum = _albumEntityFixture.Create(libraryId: libraryId, includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(activeAlbum);
+        deletedAlbum.IsDeleted = true;
+        deletedAlbum.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        deletedAlbumOfDeletedArtist.IsDeleted = true;
+        deletedAlbumOfDeletedArtist.DeletedOnUtc = DateTime.UtcNow.AddHours(-2);
+        deletedArtist.IsDeleted = true;
+        deletedArtist.DeletedOnUtc = DateTime.UtcNow.AddHours(-3);
+        _mockContext.Albums.AddRange(deletedAlbum, deletedAlbumOfDeletedArtist, activeAlbum);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<AlbumEntity>> result = await _sut.GetSoftDeletedByLibraryIdAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(deletedAlbum.Id, Assert.Single(result.Value).Id);
+    }
+
+    [Fact]
+    public async Task GetSoftDeletedByLibraryIdAsync_WhenCalled_ShouldOrderByTheStoredDeletionTimeThenTitleAndId()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        DateTime deletedOnUtc = new(2026, 11, 14, 10, 0, 0, DateTimeKind.Utc);
+        AlbumEntity olderDeletion = _albumEntityFixture.Create(libraryId: libraryId, title: "Beta", includeTracks: false, includeMetadata: false);
+        AlbumEntity newerDeletion = _albumEntityFixture.Create(libraryId: libraryId, title: "Alpha", includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(olderDeletion);
+        await SeedVisibleArtistAsync(newerDeletion);
+        olderDeletion.IsDeleted = true;
+        olderDeletion.DeletedOnUtc = deletedOnUtc.AddHours(-2);
+        olderDeletion.UpdatedOnUtc = deletedOnUtc;
+        newerDeletion.IsDeleted = true;
+        newerDeletion.DeletedOnUtc = deletedOnUtc.AddHours(-1);
+        newerDeletion.UpdatedOnUtc = deletedOnUtc.AddDays(-5);
+        _mockContext.Albums.AddRange(olderDeletion, newerDeletion);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<AlbumEntity>> result = await _sut.GetSoftDeletedByLibraryIdAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal([newerDeletion.Id, olderDeletion.Id], result.Value.Select(album => album.Id));
+    }
+
+    [Fact]
+    public async Task RestoreSoftDeletedByIdAsync_WhenCalled_ShouldClearTheDeletionStateAndTime()
+    {
+        // Arrange
+        AlbumEntity album = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(album);
+        album.IsDeleted = true;
+        album.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<Updated> result = await _sut.RestoreSoftDeletedByIdAsync(album.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.False(album.IsDeleted);
+        Assert.Null(album.DeletedOnUtc);
+    }
+
+    [Fact]
+    public async Task RestoreSoftDeletedByIdAsync_WhenAlbumIsNotDeleted_ShouldReturnAlbumNotFound()
+    {
+        // Arrange
+        AlbumEntity album = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(album);
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<Updated> result = await _sut.RestoreSoftDeletedByIdAsync(album.Id, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.AlbumNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task RestoreSoftDeletedByIdAsync_WhenAlbumDoesNotExist_ShouldReturnAlbumNotFound()
+    {
+        // Act
+        Result<Updated> result = await _sut.RestoreSoftDeletedByIdAsync(Guid.NewGuid(), CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.AlbumNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenAlbumIsSoftDeleted_ShouldReturnAlbumNotFound()
+    {
+        // Arrange
+        AlbumEntity storedAlbum = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(storedAlbum);
+        storedAlbum.IsDeleted = true;
+        storedAlbum.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        _mockContext.Albums.Add(storedAlbum);
+        await _mockContext.SaveChangesAsync();
+
+        AlbumEntity data = _albumEntityFixture.Create(id: storedAlbum.Id, includeTracks: false, includeMetadata: false);
+
+        // Act
+        Result<Updated> result = await _sut.UpdateAsync(data, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.AlbumNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenItsArtistIsSoftDeleted_ShouldReturnAlbumNotFound()
+    {
+        // Arrange
+        AlbumEntity storedAlbum = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false);
+        ArtistEntity artist = await SeedVisibleArtistAsync(storedAlbum);
+        artist.IsDeleted = true;
+        artist.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        _mockContext.Albums.Add(storedAlbum);
+        await _mockContext.SaveChangesAsync();
+
+        AlbumEntity data = _albumEntityFixture.Create(id: storedAlbum.Id, includeTracks: false, includeMetadata: false);
+
+        // Act
+        Result<Updated> result = await _sut.UpdateAsync(data, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.AlbumNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenIncomingDeletionStateDiffers_ShouldPreserveTheActiveStateAndClearItsModifiedFlags()
+    {
+        // Arrange
+        AlbumEntity storedAlbum = _albumEntityFixture.Create(includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(storedAlbum);
+        _mockContext.Albums.Add(storedAlbum);
+        await _mockContext.SaveChangesAsync();
+
+        AlbumEntity data = _albumEntityFixture.Create(id: storedAlbum.Id, includeTracks: false, includeMetadata: false);
+        data.Title = "A Night at the Opera";
+        data.IsDeleted = true;
+        data.DeletedOnUtc = DateTime.UtcNow;
+
+        // Act
+        Result<Updated> result = await _sut.UpdateAsync(data, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        EntityEntry<AlbumEntity> entry = _mockContext.Entry(storedAlbum);
+        Assert.False(storedAlbum.IsDeleted);
+        Assert.Null(storedAlbum.DeletedOnUtc);
+        Assert.False(entry.Property(album => album.IsDeleted).IsModified);
+        Assert.False(entry.Property(album => album.DeletedOnUtc).IsModified);
+    }
+
+    [Fact]
+    public async Task GetAlbumsNeedingMetadataCountAsync_WhenAnAlbumIsSoftDeleted_ShouldNotCountIt()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity pendingAlbum = _albumEntityFixture.Create(libraryId: libraryId, includeTracks: false, includeMetadata: false, metadataStatus: MetadataStatus.Pending);
+        AlbumEntity deletedAlbum = _albumEntityFixture.Create(libraryId: libraryId, includeTracks: false, includeMetadata: false, metadataStatus: MetadataStatus.Pending);
+        await SeedVisibleArtistAsync(pendingAlbum);
+        await SeedVisibleArtistAsync(deletedAlbum);
+        deletedAlbum.IsDeleted = true;
+        deletedAlbum.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        _mockContext.Albums.AddRange(pendingAlbum, deletedAlbum);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<int> result = await _sut.GetAlbumsNeedingMetadataCountAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(1, result.Value);
+    }
+
+    [Fact]
+    public async Task GetFirstTrackPathsByAlbumIdsAsync_WhenTheOnlyTrackIsSoftDeleted_ShouldNotReturnItsPath()
+    {
+        // Arrange
+        Guid albumId = Guid.NewGuid();
+        AlbumEntity album = _albumEntityFixture.Create(id: albumId, includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(album);
+        TrackEntity deletedTrack = _trackEntityFixture.Create(albumId: albumId, libraryId: album.LibraryId, path: "/music/queen/deleted.flac", includeMetadata: false);
+        deletedTrack.IsDeleted = true;
+        deletedTrack.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        album.Tracks = [deletedTrack];
+        _mockContext.Albums.Add(album);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyDictionary<Guid, string>> result = await _sut.GetFirstTrackPathsByAlbumIdsAsync([albumId], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Empty(result.Value);
+    }
+
+    [Fact]
+    public async Task GetAlbumsNeedingArtworkCountAsync_WhenAnAlbumIsSoftDeleted_ShouldNotCountIt()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity activeAlbum = _albumEntityFixture.Create(libraryId: libraryId, includeTracks: false, includeMetadata: false);
+        AlbumEntity deletedAlbum = _albumEntityFixture.Create(libraryId: libraryId, includeTracks: false, includeMetadata: false);
+        await SeedVisibleArtistAsync(activeAlbum);
+        await SeedVisibleArtistAsync(deletedAlbum);
+        deletedAlbum.IsDeleted = true;
+        deletedAlbum.DeletedOnUtc = DateTime.UtcNow.AddHours(-1);
+        _mockContext.Albums.AddRange(activeAlbum, deletedAlbum);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<int> result = await _sut.GetAlbumsNeedingArtworkCountAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(1, result.Value);
+    }
+
+    /// <summary>
+    /// Seeds an artist with the identity of the provided album, so that the album is part of a visible catalogue and its ancestor filters pass.
+    /// </summary>
+    /// <param name="album">The album whose artist is seeded.</param>
+    /// <returns>The persisted artist.</returns>
+    private Task<ArtistEntity> SeedVisibleArtistAsync(AlbumEntity album)
+    {
+        return SeedVisibleArtistAsync(album.ArtistId, album.LibraryId);
+    }
+
+    /// <summary>
+    /// Seeds the artist identified by <paramref name="artistId"/>, unless it is already stored, so that the albums owned by it are part of a visible catalogue.
+    /// </summary>
+    /// <param name="artistId">The Id of the artist to seed.</param>
+    /// <param name="libraryId">The Id of the library that owns the artist.</param>
+    /// <returns>The persisted artist.</returns>
+    private async Task<ArtistEntity> SeedVisibleArtistAsync(Guid artistId, Guid libraryId)
+    {
+        ArtistEntity? artist = await _mockContext.Artists.FirstOrDefaultAsync(candidate => candidate.Id == artistId);
+        if (artist is null)
+        {
+            artist = _artistEntityFixture.Create(
+                id: artistId,
+                libraryId: libraryId,
+                includeAlbums: false,
+                includeContributors: false);
+            _mockContext.Artists.Add(artist);
+            await _mockContext.SaveChangesAsync();
+        }
+        return artist;
     }
 
     /// <summary>
