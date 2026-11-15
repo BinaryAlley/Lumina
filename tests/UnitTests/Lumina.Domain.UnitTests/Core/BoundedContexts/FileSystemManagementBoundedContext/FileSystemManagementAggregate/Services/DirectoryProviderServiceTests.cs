@@ -227,6 +227,22 @@ public class DirectoryProviderServiceTests
     }
 
     [Fact]
+    public void IsHidden_WhenDirectoryPathEndsWithSeparator_ShouldCheckAttributesWithoutSeparator()
+    {
+        // Arrange
+        FileSystemPathId path = _fileSystemPathIdFixture.Create(_pathHidden2);
+        _mockFileSystem.Path.DirectorySeparatorChar.Returns(_dirSeparator);
+        _mockFileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false).Returns(true);
+        _mockFileSystem.File.GetAttributes(_pathHidden1).Returns(FileAttributes.Directory | FileAttributes.Hidden);
+
+        // Act
+        bool result = _sut.IsHidden(path);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
     public void IsHidden_WhenDirectoryDoesNotHaveHiddenAttribute_ShouldReturnFalse()
     {
         // Arrange

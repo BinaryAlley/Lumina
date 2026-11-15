@@ -62,7 +62,9 @@ internal class DirectoryProviderService : IDirectoryProviderService
         // The hidden flag is metadata, so it follows the same read properties permission as the other metadata accessors.
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.ReadProperties, false))
             return false;
-        return (GetAttributes(path.Path) & FileAttributes.Hidden) == FileAttributes.Hidden;
+        // Child directory paths carry a trailing separator, which prevents the Unix file system from reporting the dot-prefixed hidden entry.
+        string directoryPath = path.Path.EndsWith(_fileSystem.Path.DirectorySeparatorChar) ? path.Path[..^1] : path.Path;
+        return (GetAttributes(directoryPath) & FileAttributes.Hidden) == FileAttributes.Hidden;
     }
 
     /// <summary>
