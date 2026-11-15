@@ -1,8 +1,9 @@
 @startuml Media Library Scanning System Code
+!pragma layout elk
 !include <C4/C4_Component>
 
 LAYOUT_WITH_LEGEND()
-title Code diagram for Background Services 3.2.1
+title Code diagram for Media Library Scanning 3.2.1
 
 skinparam class {
     BackgroundColor White
@@ -21,6 +22,9 @@ interface IMediaLibraryScanJob {
     + AddChild(job: IMediaLibraryScanJob)
     + AddParent(job: IMediaLibraryScanJob)
     + ExecuteAsync<TInput>(id: Guid, input: TInput, token: CancellationToken): Task
+}
+
+interface IMediaLibraryScanDiscoveryJob {
 }
 
 abstract class MediaLibraryScanJob {
@@ -148,16 +152,16 @@ class MediaLibraryScanJobFactory {
 }
 
 interface IMediaLibraryScannerFactory {
-    + CreateLibraryScanner(libraryType: LibraryType): IMediaTypeScanner
+    + CreateLibraryScanner(libraryType: LibraryType): Result<IMediaTypeScanner>
 }
 
 class MediaLibraryScannerFactory {
-    + CreateLibraryScanner(libraryType: LibraryType): IMediaTypeScanner
+    + CreateLibraryScanner(libraryType: LibraryType): Result<IMediaTypeScanner>
 }
 
 interface IMediaTypeScanner {
     + SupportedLibraryType: LibraryType
-    + CreateScanJobsForLibrary(libraryId: LibraryId): IEnumerable<IMediaLibraryScanJob>
+    + CreateScanJobsForLibrary(libraryId: LibraryId): IMediaLibraryScanDiscoveryJob
 }
 
 interface IBookLibraryTypeScanner {
@@ -169,13 +173,13 @@ interface IMusicLibraryTypeScanner {
 class BookLibraryTypeScanner {
     - _mediaScanJobFactory: IMediaLibraryScanJobFactory
     + SupportedLibraryType: LibraryType
-    + CreateScanJobsForLibrary(libraryId: LibraryId): IEnumerable<IMediaLibraryScanJob>
+    + CreateScanJobsForLibrary(libraryId: LibraryId): IMediaLibraryScanDiscoveryJob
 }
 
 class MusicLibraryTypeScanner {
     - _mediaScanJobFactory: IMediaLibraryScanJobFactory
     + SupportedLibraryType: LibraryType
-    + CreateScanJobsForLibrary(libraryId: LibraryId): IEnumerable<IMediaLibraryScanJob>
+    + CreateScanJobsForLibrary(libraryId: LibraryId): IMediaLibraryScanDiscoveryJob
 }
 
 ' ============================== MEDIA TYPE STRATEGIES ==============================
@@ -183,7 +187,8 @@ class MusicLibraryTypeScanner {
 interface IMediaLibraryScanItemMaterializer {
     + SupportedLibraryType: LibraryType
     + ResetEnrichmentStateForChangedPathsAsync(unitOfWork: IUnitOfWork, libraryId: Guid, paths: IReadOnlyCollection<string>, token: CancellationToken): Task<Result<Updated>>
-    + MaterializeItemsAsync(unitOfWork: IUnitOfWork, libraryId: Guid, scanId: Guid, paths: IReadOnlyList<string>, token: CancellationToken): Task<Result<Success>>
+    + MaterializeItemsAsync(unitOfWork: IUnitOfWork, libraryId: Guid, scanId: Guid, paths: IReadOnlySet<string>, token: CancellationToken): Task<Result<Success>>
+    + ClearStagedDataAsync(unitOfWork: IUnitOfWork, libraryId: Guid, scanId: Guid, token: CancellationToken): Task<Result<Deleted>>
     + ResetMetadataStatusForLibraryAsync(unitOfWork: IUnitOfWork, libraryId: Guid, token: CancellationToken): Task<Result<Updated>>
     + ResetArtworkStatusForLibraryAsync(unitOfWork: IUnitOfWork, libraryId: Guid, token: CancellationToken): Task<Result<Updated>>
 }
@@ -263,6 +268,7 @@ class LibraryScan {
     + UserId: UserId
     + Status: LibraryScanJobStatus
     + {static} Create(libraryId: LibraryId, userId: UserId, pastScans: List<LibraryScan>): Result<LibraryScan>
+    + {static} Create(id: ScanId, libraryId: LibraryId, userId: UserId, status: LibraryScanJobStatus, pastScans: List<LibraryScan>): Result<LibraryScan>
     + QueueScan(): Result<Success>
     + StartScan(): Result<Success>
     + FinishScan(): Result<Success>
@@ -276,56 +282,62 @@ note right of LibraryScan
 end note
 
 interface IMediaLibraryScanningService {
-    + StartScanAsync(scan: LibraryScan, libraryType: LibraryType, token: CancellationToken): Task<Result<Success>>
+    + StartScanAsync(scan: LibraryScan, libraryType: LibraryType, token: CancellationToken): Task<Result<IMediaLibraryScanDiscoveryJob>>
     + CancelScan(scan: LibraryScan): Result<Success>
 }
 
 class MediaLibraryScanningService {
-    - _mediaLibrariesScanQueue: IMediaLibrariesScanQueue
     - _mediaLibraryScannerFactory: IMediaLibraryScannerFactory
     - _mediaLibrariesScanCancellationTracker: IMediaLibrariesScanCancellationTracker
     - _mediaLibrariesScanProgressTracker: IMediaLibrariesScanProgressTracker
     - _domainEventPublisher: IDomainEventPublisher
-    + StartScanAsync(scan: LibraryScan, libraryType: LibraryType, token: CancellationToken): Task<Result<Success>>
+    + StartScanAsync(scan: LibraryScan, libraryType: LibraryType, token: CancellationToken): Task<Result<IMediaLibraryScanDiscoveryJob>>
     + CancelScan(scan: LibraryScan): Result<Success>
 }
 
 note top of MediaLibraryScanningService
-  Central service that starts a scan by building its job graph,
-  registering it in the cancellation and progress trackers and
-  enqueueing the root jobs, and that cancels a running scan.
+  Central service that resolves the scanner of the library type,
+  builds the scan job graph, registers the scan in the cancellation
+  and progress trackers, and publishes the scan started events.
+  It returns the file system discovery job, which is the root of
+  the graph and whose execution completes the entire scan.
 end note
 
 ' ============================== QUEUE AND PROCESSING ==============================
 
 interface IMediaLibrariesScanQueue {
-    + Writer: ChannelWriter<IMediaLibraryScanJob>
-    + Reader: ChannelReader<IMediaLibraryScanJob>
+    + Writer: ChannelWriter<MediaLibraryScanCompositeId>
+    + Reader: ChannelReader<MediaLibraryScanCompositeId>
 }
 
 class MediaLibrariesScanQueue {
-    - _channel: Channel<IMediaLibraryScanJob>
-    + Writer: ChannelWriter<IMediaLibraryScanJob>
-    + Reader: ChannelReader<IMediaLibraryScanJob>
+    - _channel: Channel<MediaLibraryScanCompositeId>
+    + Writer: ChannelWriter<MediaLibraryScanCompositeId>
+    + Reader: ChannelReader<MediaLibraryScanCompositeId>
 }
 
 note bottom of MediaLibrariesScanQueue
-  In-memory queue that receives only the root scan jobs of a
-  scan. Children are triggered directly by their parents, and
-  are never placed on this queue.
+  In-memory queue of scan composite ids. The scan processor
+  prepares and executes one scan at a time, so the scans run
+  consecutively, in the order in which they were queued. The
+  jobs of a scan are never placed on this queue.
 end note
 
-class MediaLibraryScanJobProcessorJob {
-    - _mediaScanQueue: IMediaLibrariesScanQueue
+class MediaLibraryScanProcessorJob {
+    - _mediaLibrariesScanQueue: IMediaLibrariesScanQueue
     - _mediaLibrariesScanCancellationTracker: IMediaLibrariesScanCancellationTracker
+    - _serviceScopeFactory: IServiceScopeFactory
+    - _logger: ILogger<MediaLibraryScanProcessorJob>
     # ExecuteAsync(token: CancellationToken): Task
+    - ProcessScanAsync(compositeId: MediaLibraryScanCompositeId, token: CancellationToken): Task
+    - ReportScanFailureAsync(compositeId: MediaLibraryScanCompositeId, libraryId: LibraryId, exception: Exception, token: CancellationToken): Task
 }
 
-note top of MediaLibraryScanJobProcessorJob
-  Background service that launches the payload execution of the
-  root scan jobs that arrive on the in-memory queue, firing them
-  in a fire-and-forget manner without awaiting their long running
-  payload execution (see ADR-0001, ADR-0009).
+note top of MediaLibraryScanProcessorJob
+  Background service that consumes the queued scan ids one at a
+  time, reads the pending scan, prepares its job graph through the
+  scanning service and executes the discovery job. A failing scan
+  is reported and does not stop the scans queued behind it.
 end note
 
 ' ============================== TRACKERS ==============================
@@ -342,6 +354,7 @@ class MediaLibrariesScanCancellationTracker {
 }
 
 interface IMediaLibrariesScanProgressTracker {
+    + InitializeQueuedScanProgress(libraryId: LibraryId, compositeKey: MediaLibraryScanCompositeId): Result<Created>
     + InitializeScanProgress(libraryId: LibraryId, compositeKey: MediaLibraryScanCompositeId, totalJobs: int): Result<Created>
     + UpdateScanProgress(libraryId: LibraryId, compositeKey: MediaLibraryScanCompositeId): Result<Updated>
     + UpdateScanJobProgress(libraryId: LibraryId, compositeKey: MediaLibraryScanCompositeId, progress: MediaLibraryScanJobProgress): Result<Updated>
@@ -382,6 +395,12 @@ class LibraryScanQueuedDomainEventHandler {
     + HandleAsync(domainEvent: LibraryScanQueuedDomainEvent, token: CancellationToken): ValueTask
 }
 
+note right of LibraryScanQueuedDomainEventHandler
+  Registers the scan for cancellation, reports it as queued,
+  and writes its composite id to the scan queue. The scan
+  processor prepares and executes the job graph later.
+end note
+
 class LibraryScanStartedDomainEventHandler {
     + HandleAsync(domainEvent: LibraryScanStartedDomainEvent, token: CancellationToken): ValueTask
 }
@@ -410,8 +429,9 @@ class LibraryScanJobProgressChangedDomainEventHandler {
 
 IMediaLibraryScanJob <|.. MediaLibraryScanJob : implements
 
-IMediaLibraryScanJob <|-- IBooksFileSystemDiscoveryJob
-IMediaLibraryScanJob <|-- IMusicFileSystemDiscoveryJob
+IMediaLibraryScanJob <|-- IMediaLibraryScanDiscoveryJob
+IMediaLibraryScanDiscoveryJob <|-- IBooksFileSystemDiscoveryJob
+IMediaLibraryScanDiscoveryJob <|-- IMusicFileSystemDiscoveryJob
 IMediaLibraryScanJob <|-- IMusicMetadataExtractionJob
 IMediaLibraryScanJob <|-- IMediaLibraryScanDiffJob
 IMediaLibraryScanJob <|-- IMediaLibraryScanHashJob
@@ -442,12 +462,12 @@ IMediaLibraryScanResultsSaveJob <|.. MediaLibraryScanResultsSaveJob : implements
 
 ' ============================== JOB TRIGGER CHAIN ==============================
 
-BooksFileSystemDiscoveryJob ..> MediaLibraryScanDiffJob : triggers
-MusicFileSystemDiscoveryJob ..> MediaLibraryScanDiffJob : triggers
+BooksFileSystemDiscoveryJob ..> MediaLibraryScanDiffJob : triggers (books)
+MusicFileSystemDiscoveryJob ..> MediaLibraryScanDiffJob : triggers (music)
 MediaLibraryScanDiffJob ..> MediaLibraryScanHashJob : triggers
-MediaLibraryScanHashJob ..> MediaLibraryScanResultsSaveJob : triggers
-MediaLibraryScanHashJob ..> MusicMetadataExtractionJob : triggers
-MusicMetadataExtractionJob ..> MediaLibraryScanResultsSaveJob : triggers
+MediaLibraryScanHashJob ..> MediaLibraryScanResultsSaveJob : triggers (books)
+MediaLibraryScanHashJob ..> MusicMetadataExtractionJob : triggers (music)
+MusicMetadataExtractionJob ..> MediaLibraryScanResultsSaveJob : triggers (music)
 MediaLibraryScanResultsSaveJob ..> MediaLibraryScanProviderConfigurationInvalidationJob : triggers
 MediaLibraryScanProviderConfigurationInvalidationJob ..> MediaLibraryScanMetadataEnrichmentJob : triggers
 MediaLibraryScanMetadataEnrichmentJob ..> MediaLibraryScanArtworkEnrichmentJob : triggers
@@ -507,7 +527,6 @@ MediaLibraryScanJobFactory ..> IMediaLibraryScanJob : creates
 IMediaLibraryScanningService <|.. MediaLibraryScanningService : implements
 
 MediaLibraryScanningService --> IMediaLibraryScannerFactory : uses
-MediaLibraryScanningService --> IMediaLibrariesScanQueue : writes root jobs to
 MediaLibraryScanningService --> IMediaLibrariesScanCancellationTracker : registers scan
 MediaLibraryScanningService --> IMediaLibrariesScanProgressTracker : initializes progress
 MediaLibraryScanningService ..> LibraryScan : starts and cancels
@@ -516,9 +535,10 @@ MediaLibraryScanningService ..> LibraryScan : starts and cancels
 
 IMediaLibrariesScanQueue <|.. MediaLibrariesScanQueue : implements
 
-MediaLibraryScanJobProcessorJob --> IMediaLibrariesScanQueue : reads from
-MediaLibraryScanJobProcessorJob --> IMediaLibrariesScanCancellationTracker : links scan token
-MediaLibraryScanJobProcessorJob ..> IMediaLibraryScanJob : triggers root job
+MediaLibraryScanProcessorJob --> IMediaLibrariesScanQueue : reads queued scans from
+MediaLibraryScanProcessorJob --> IMediaLibrariesScanCancellationTracker : links the scan token
+MediaLibraryScanProcessorJob --> IMediaLibraryScanningService : prepares the job graph
+MediaLibraryScanProcessorJob ..> IMediaLibraryScanDiscoveryJob : executes the discovery job
 
 ' ============================== TRACKER RELATIONSHIPS ==============================
 
@@ -534,7 +554,9 @@ DebouncedMediaLibraryScanProgressNotifier --> IMediaLibrariesScanProgressTracker
 
 ' ============================== DOMAIN EVENT RELATIONSHIPS ==============================
 
-LibraryScanQueuedDomainEventHandler --> IMediaLibraryScanningService : starts scan
+LibraryScanQueuedDomainEventHandler --> IMediaLibrariesScanQueue : writes the scan to
+LibraryScanQueuedDomainEventHandler --> IMediaLibrariesScanCancellationTracker : registers the scan
+LibraryScanQueuedDomainEventHandler --> IMediaLibrariesScanProgressTracker : reports the queued scan
 LibraryScanCancelledDomainEventHandler --> IMediaLibraryScanningService : cancels scan
 
 LibraryScanFinishedDomainEventHandler --> IMediaLibrariesScanCancellationTracker : removes scan
@@ -554,7 +576,7 @@ LibraryScanProgressChangedDomainEventHandler --> IMediaLibraryScanProgressNotifi
 LibraryScanJobProgressChangedDomainEventHandler --> IMediaLibrariesScanProgressTracker : updates job progress
 LibraryScanJobProgressChangedDomainEventHandler --> IMediaLibraryScanProgressNotifier : notifies update
 
-caption [Code] Lumina - Background Services 3.2.1
+caption [Code] Lumina - Media Library Scanning 3.2.1
 
-footer The code diagram for the Background Services 3.2.1 - created with PlantUML
+footer The code diagram for the Media Library Scanning 3.2.1 - created with PlantUML
 @enduml

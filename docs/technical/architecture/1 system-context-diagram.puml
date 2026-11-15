@@ -1,4 +1,5 @@
 @startuml Lumina System Context Diagram
+!pragma layout elk
 !include <C4/C4_Context>
 
 LAYOUT_WITH_LEGEND()
@@ -9,10 +10,10 @@ Person(admin, "Administrator", "A person who manages the media library system")
 
 System(lumina, "Lumina 1.1", "Allows users to organize, manage, stream and read their personal media content [detailed in '2 container-diagram.puml']")
 
-System_Ext(metadataProvider, "Media Metadata Services", "External services that provide media information and metadata (TMDB, TVDB, GoodReads, MusicBrainz, etc)")
+System_Ext(metadataProvider, "Media Metadata and Artwork Services", "External services that provide media information and artwork (MusicBrainz, Open Library, Cover Art Archive)")
 
 Rel(user, lumina, "Views, streams and reads media content")
-Rel(admin, lumina, "Manages media library and system settings")
+Rel(admin, lumina, "Manages media library, plugins, themes and system settings")
 Rel(lumina, metadataProvider, "Retrieves media metadata and artwork")
 
 caption [System Context] Lumina

@@ -88,6 +88,7 @@
     <File Path="../docs/technical/api/users-management/Api.Settings.md" />
   </Folder>
   <Folder Name="/docs/technical/architecture/">
+    <File Path="../docs/technical/architecture/README.md" />
     <File Path="../docs/technical/architecture/1 system-context-diagram.puml" />
     <File Path="../docs/technical/architecture/1 system-context-diagram.svg" />
     <File Path="../docs/technical/architecture/2 container-diagram.puml" />

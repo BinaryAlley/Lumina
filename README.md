@@ -34,6 +34,7 @@ For those with technical curiosities, here are some goodies to browse through:
 5. [4.1 Code media library scanning diagram](./docs/technical/architecture/4.1%20code-media-library-scanning-diagram.svg)
 6. [4.2 Code book reading diagram](./docs/technical/architecture/4.2%20code-book-reading-diagram.svg)
 7. [4.3 Code scheduled jobs diagram](./docs/technical/architecture/4.3%20code-scheduler-diagram.svg)
+- To regenerate the diagrams after editing a `.puml` file, follow the [diagram rendering instructions](./docs/technical/architecture/README.md).
 - Also for Software Architects, you might want to take a look at the Architecture Decision Log, where you may find important stories from the past of Lumina's development, like [this one](./docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md), and others like it.
 
 ## Telemetry and Observability

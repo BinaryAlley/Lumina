@@ -1,4 +1,5 @@
 @startuml Scheduled Jobs Code
+!pragma layout elk
 !include <C4/C4_Component>
 
 LAYOUT_WITH_LEGEND()
@@ -21,6 +22,7 @@ class ScheduledJob {
     + LastStartedOnUtc: Optional<DateTime>
     + LastCompletedOnUtc: Optional<DateTime>
     + {static} Create(name: string, taskType: ScheduledTaskType, schedule: Schedule, ownerUserId: UserId): Result<ScheduledJob>
+    + {static} Create(id: ScheduledJobId, name: string, taskType: ScheduledTaskType, schedule: Schedule, ownerUserId: UserId, status: ScheduledJobStatus, lastStartedOnUtc: Optional<DateTime>, lastCompletedOnUtc: Optional<DateTime>): Result<ScheduledJob>
     + Add(): Result<Success>
     + StartCycle(): Result<Success>
     + StopCycle(): Result<Success>
@@ -56,6 +58,10 @@ class DailySchedule {
     + {static} Create(hour: int, minute: int): Result<DailySchedule>
 }
 
+class OnceAtStartupSchedule {
+    + {static} Create(): Result<OnceAtStartupSchedule>
+}
+
 class ScheduledJobId {
     + Value: Guid
     + {static} CreateUnique(): ScheduledJobId
@@ -73,6 +79,7 @@ class ScheduledJobExecutionStartedDomainEvent {
 }
 class ScheduledJobExecutionCompletedDomainEvent {
     + RunId: Guid
+    + TaskType: ScheduledTaskType
     + IsCycleRun: bool
     + CompletedOnUtc: DateTime
 }
@@ -96,8 +103,9 @@ interface IScheduledJobNotifier {
 
 interface IScheduledJobRepository {
     + GetByIdAsync(id: Guid, token: CancellationToken): Task<Result<ScheduledJobEntity?>>
-    + GetAllAsync(token: CancellationToken): Task<Result<IEnumerable<ScheduledJobEntity>>>
+    + GetByIdWithoutTrackingAsync(id: Guid, token: CancellationToken): Task<Result<ScheduledJobEntity?>>
     + GetActiveOrRunningAsync(token: CancellationToken): Task<Result<IEnumerable<ScheduledJobEntity>>>
+    + GetAllAsync(token: CancellationToken): Task<Result<IEnumerable<ScheduledJobEntity>>>
     + InsertAsync(entity: ScheduledJobEntity, token: CancellationToken): Task<Result<Created>>
     + UpdateAsync(entity: ScheduledJobEntity, token: CancellationToken): Task<Result<Updated>>
     + DeleteByIdAsync(id: Guid, token: CancellationToken): Task<Result<Deleted>>
@@ -110,6 +118,12 @@ interface IScheduledJobExecutionRepository {
     + InsertAsync(entity: ScheduledJobExecutionEntity, token: CancellationToken): Task<Result<Created>>
     + UpdateAsync(entity: ScheduledJobExecutionEntity, token: CancellationToken): Task<Result<Updated>>
     + DeleteByScheduledJobIdAsync(scheduledJobId: Guid, token: CancellationToken): Task<Result<Success>>
+    + DeleteOlderThanAsync(cutoffUtc: DateTime, token: CancellationToken): Task<Result<Success>>
+}
+
+interface ISchedulerDisplayPreferencesRepository {
+    + GetByUserIdAsync(userId: Guid, token: CancellationToken): Task<Result<SchedulerDisplayPreferencesEntity?>>
+    + UpsertAsync(preferences: SchedulerDisplayPreferencesEntity, token: CancellationToken): Task<Result<Updated>>
 }
 
 ' ============================== APPLICATION HANDLERS ==============================
@@ -140,6 +154,14 @@ class GetScheduledJobsQueryHandler {
 
 class GetScheduledJobHistoryQueryHandler {
     + HandleAsync(query: GetScheduledJobHistoryQuery, token: CancellationToken): Task<Result<IEnumerable<ScheduledJobExecutionResponse>>>
+}
+
+class UpdateSchedulerDisplayPreferencesCommandHandler {
+    + HandleAsync(command: UpdateSchedulerDisplayPreferencesCommand, token: CancellationToken): Task<Result<Updated>>
+}
+
+class GetSchedulerDisplayPreferencesQueryHandler {
+    + HandleAsync(query: GetSchedulerDisplayPreferencesQuery, token: CancellationToken): Task<Result<SchedulerDisplayPreferencesResponse>>
 }
 
 ' ============================== DOMAIN EVENT HANDLERS ==============================
@@ -178,8 +200,8 @@ class ScheduledJobRemovedDomainEventHandler {
 
 note bottom of ScheduledJobExecutionStartedDomainEventHandler
   Updates the scheduled job to Running, inserts the open execution
-  history row, and notifies the SignalR clients about the started
-  execution.
+  history row with whether its cycle was active, and notifies the
+  SignalR clients about the started execution.
 end note
 
 note bottom of ScheduledJobExecutionCompletedDomainEventHandler
@@ -193,28 +215,55 @@ end note
 class ScheduledJobSchedulerJob {
     - _serviceScopeFactory: IServiceScopeFactory
     - _runtimeRegistry: IScheduledJobRuntimeRegistry
-    - _logger: ILogger
+    - _logger: ILogger<ScheduledJobSchedulerJob>
+    - _cycleTickerFactory: Func<TimeSpan, IScheduledJobCycleTicker>
     + StartCycleAsync(scheduledJobId: ScheduledJobId, token: CancellationToken): Task
     + StopCycleAsync(scheduledJobId: ScheduledJobId, token: CancellationToken): Task
     + RunOnceAsync(scheduledJobId: ScheduledJobId, token: CancellationToken): Task
     + ExecuteAsync(stoppingToken: CancellationToken): Task
+    - SynchronizeBundledThemesIfNeededAsync(token: CancellationToken): Task
+    - EnsureTechnicalDataCleanupScheduledJobAsync(token: CancellationToken): Task
     - ResumeActiveCyclesAsync(token: CancellationToken): Task
-    - RunCycleWorkerAsync(scheduledJobId: ScheduledJobId, runImmediately: bool, stoppingToken: CancellationToken): Task
+    - RunCycleWorkerAsync(scheduledJobId: ScheduledJobId, shouldRunImmediately: bool, stoppingToken: CancellationToken): Task
+    - RunOnceWorkerAsync(scheduledJobId: ScheduledJobId, token: CancellationToken): Task
     - RunScheduledJobAsync(scheduledJobId: ScheduledJobId, isCycleRun: bool, token: CancellationToken): Task
     - ExecuteScheduledJobRunAsync(scheduledJobId: ScheduledJobId, isCycleRun: bool, token: CancellationToken): Task
+    - CompleteExecutionAsync(scheduledJob: ScheduledJob, unitOfWork: IUnitOfWork, domainEventPublisher: IDomainEventPublisher, isCycleRun: bool, token: CancellationToken): Task
+    - ReconcileInterruptedRunAsync(scheduledJobId: ScheduledJobId, token: CancellationToken): Task<ScheduledJobStatus>
+    - GetScheduleAsync(scheduledJobId: ScheduledJobId, token: CancellationToken): Task<Schedule?>
+    - CalculateDelayAsync(schedule: Schedule): Task<TimeSpan>
 }
 
 note right of ScheduledJobSchedulerJob
   Background service (registered as IScheduledJobScheduler and hosted)
-  that resumes the active execution cycles at startup, runs each cycle
-  worker on its schedule through PeriodicTimer, guards each execution
-  against overlapping runs, and publishes the started and completed
-  domain events of every run through the EventualConsistencyMiddleware.
+  that resumes the active execution cycles at startup, synchronizes
+  the bundled themes when no RepairThemes job exists, seeds the
+  technical data cleanup job, runs each cycle worker through an
+  IScheduledJobCycleTicker, guards each execution against overlapping
+  runs, and publishes the started and completed domain events of
+  every run through IDomainEventPublisher.
+end note
+
+interface IScheduledJobCycleTicker {
+    + Period: TimeSpan {set}
+    + WaitForNextTickAsync(token: CancellationToken): ValueTask<bool>
+}
+
+class PeriodicScheduledJobCycleTicker {
+    - _periodicTimer: PeriodicTimer
+}
+
+note bottom of IScheduledJobCycleTicker
+  Cancellable periodic ticker that drives the cadence of an
+  execution cycle. It is separated from PeriodicTimer so that
+  the cycle worker can be tested with a stubbed ticker.
 end note
 
 interface IScheduledJobRuntimeRegistry {
     + TryStartCycle(scheduledJobId: ScheduledJobId, cycleCancellationTokenSource: CancellationTokenSource): bool
+    + HasActiveCycle(scheduledJobId: ScheduledJobId): bool
     + StopCycle(scheduledJobId: ScheduledJobId)
+    + EndCycle(scheduledJobId: ScheduledJobId, cycleCancellationTokenSource: CancellationTokenSource)
     + TryAcquireRunSlot(scheduledJobId: ScheduledJobId): bool
     + ReleaseRunSlot(scheduledJobId: ScheduledJobId)
 }
@@ -239,6 +288,12 @@ class ScheduledTaskExecutorFactory {
     - _serviceProvider: IServiceProvider
     + CreateExecutor(taskType: ScheduledTaskType): IScheduledTaskExecutor
 }
+
+note right of ScheduledTaskExecutorFactory
+  Creates the executor of a scheduled job from its task type:
+  ScanMediaLibraries, CleanTemporaryFiles, RepairThemes,
+  CleanScheduledJobExecutionHistory or TechnicalDataCleanup.
+end note
 
 interface IScheduledTaskExecutor {
     + ExecutePayloadAsync(scheduledJob: ScheduledJob, token: CancellationToken): Task<Result<Success>>
@@ -265,6 +320,41 @@ note right of TemporaryFilesCleanupTaskExecutor
   Executes the CleanTemporaryFiles task: empties the temporary reading
   cache directory of the application, failing closed when the directory
   cannot be resolved safely inside the application base directory.
+end note
+
+class RepairThemesTaskExecutor {
+    - _themeService: IThemeService
+    - _unitOfWork: IUnitOfWork
+    - _logger: ILogger<RepairThemesTaskExecutor>
+    + ExecutePayloadAsync(scheduledJob: ScheduledJob, token: CancellationToken): Task<Result<Success>>
+}
+
+note right of RepairThemesTaskExecutor
+  Executes the RepairThemes task: reinstalls the files of the bundled
+  themes whose installed files are missing, through the theme service.
+end note
+
+class CleanScheduledJobExecutionHistoryTaskExecutor {
+    - _dateTimeProvider: IDateTimeProvider
+    - _unitOfWork: IUnitOfWork
+    - _logger: ILogger<CleanScheduledJobExecutionHistoryTaskExecutor>
+    + ExecutePayloadAsync(scheduledJob: ScheduledJob, token: CancellationToken): Task<Result<Success>>
+}
+
+note right of CleanScheduledJobExecutionHistoryTaskExecutor
+  Executes the CleanScheduledJobExecutionHistory task: removes the
+  execution history rows that are older than one month.
+end note
+
+class TechnicalDataCleanupTaskExecutor {
+    - _unitOfWork: IUnitOfWork
+    - _logger: ILogger<TechnicalDataCleanupTaskExecutor>
+    + ExecutePayloadAsync(scheduledJob: ScheduledJob, token: CancellationToken): Task<Result<Success>>
+}
+
+note right of TechnicalDataCleanupTaskExecutor
+  Executes the TechnicalDataCleanup task: marks the media library scans
+  that were interrupted by a previous shutdown as failed.
 end note
 
 ' ============================== INFRASTRUCTURE - NOTIFICATIONS ==============================
@@ -299,12 +389,15 @@ interface IScheduledJobsClient {
 interface IUnitOfWork {
     + ScheduledJobRepository: IScheduledJobRepository
     + ScheduledJobExecutionRepository: IScheduledJobExecutionRepository
+    + SchedulerDisplayPreferencesRepository: ISchedulerDisplayPreferencesRepository
     + SaveChangesAsync(token: CancellationToken): Task
 }
 
 class ScheduledJobRepository
 
 class ScheduledJobExecutionRepository
+
+class SchedulerDisplayPreferencesRepository
 
 ' ============================== STORAGE MODEL ==============================
 
@@ -329,6 +422,15 @@ class ScheduledJobExecutionEntity {
     + IsCycleRun: bool
     + StartedOnUtc: DateTime
     + CompletedOnUtc: DateTime?
+    + WasCycleActive: bool
+}
+
+class SchedulerDisplayPreferencesEntity {
+    + Id: Guid
+    + UserId: Guid
+    + JobTypeFilter: ScheduledTaskType?
+    + DisplayTimeSpan: int
+    + DisplayTimeUnit: SchedulerDisplayTimeUnit
 }
 
 note bottom of ScheduledJobEntity
@@ -340,12 +442,21 @@ end note
 note bottom of ScheduledJobExecutionEntity
   Stored in the ScheduledJobExecutions table, indexed by the started
   time and the scheduled job id for fast history queries and cleanup.
+  WasCycleActive records whether the execution belonged to an active
+  cycle, so an interrupted cycle is resumed after a restart.
+end note
+
+note bottom of SchedulerDisplayPreferencesEntity
+  Stored in the SchedulerDisplayPreferences table, one row per user,
+  and used by the scheduler page for its job type filter and its
+  display time span and unit.
 end note
 
 ' ============================== AGGREGATE AND VALUE OBJECT RELATIONSHIPS ==============================
 
 Schedule <|-- IntervalSchedule : inherits
 Schedule <|-- DailySchedule : inherits
+Schedule <|-- OnceAtStartupSchedule : inherits
 
 ScheduledJob *-- Schedule : has one
 ScheduledJob o-- ScheduledJobId : identified by
@@ -365,6 +476,7 @@ IScheduledJobScheduler <|.. ScheduledJobSchedulerJob : implements
 IScheduledJobNotifier <|.. ScheduledJobNotifier : implements
 IScheduledJobRepository <|.. ScheduledJobRepository : implements
 IScheduledJobExecutionRepository <|.. ScheduledJobExecutionRepository : implements
+ISchedulerDisplayPreferencesRepository <|.. SchedulerDisplayPreferencesRepository : implements
 
 ' ============================== COMMAND AND QUERY HANDLER RELATIONSHIPS ==============================
 
@@ -385,6 +497,9 @@ RemoveScheduledJobCommandHandler --> IScheduledJobScheduler : stops the running 
 
 GetScheduledJobsQueryHandler --> IScheduledJobRepository : reads all
 GetScheduledJobHistoryQueryHandler --> IScheduledJobExecutionRepository : reads by time range
+
+UpdateSchedulerDisplayPreferencesCommandHandler --> IUnitOfWork : upserts the preferences
+GetSchedulerDisplayPreferencesQueryHandler --> IUnitOfWork : reads the preferences
 
 ' ============================== DOMAIN EVENT HANDLER RELATIONSHIPS ==============================
 
@@ -408,10 +523,12 @@ ScheduledJobExecutionStoppedDomainEventHandler --> IScheduledJobNotifier : notif
 
 ScheduledJobSchedulerJob --> IScheduledJobRuntimeRegistry : tracks cycles and run slots
 ScheduledJobSchedulerJob --> IScheduledJobRepository : loads jobs and schedules
+ScheduledJobSchedulerJob --> IScheduledJobCycleTicker : ticks each execution cycle
 ScheduledJobSchedulerJob ..> ScheduledJobExecutionStartedDomainEvent : publishes
 ScheduledJobSchedulerJob ..> ScheduledJobExecutionCompletedDomainEvent : publishes
 ScheduledJobSchedulerJob ..> ScheduledJob : marks the execution started and completed
 
+IScheduledJobCycleTicker <|.. PeriodicScheduledJobCycleTicker : implements
 IScheduledJobRuntimeRegistry <|.. ScheduledJobRuntimeRegistry : implements
 
 ScheduledJobSchedulerJob --> IScheduledTaskExecutorFactory : creates the task executor
@@ -419,11 +536,20 @@ IScheduledTaskExecutorFactory <|.. ScheduledTaskExecutorFactory : implements
 
 ScheduledTaskExecutorFactory ..> MediaLibraryScanTaskExecutor : creates for ScanMediaLibraries
 ScheduledTaskExecutorFactory ..> TemporaryFilesCleanupTaskExecutor : creates for CleanTemporaryFiles
+ScheduledTaskExecutorFactory ..> RepairThemesTaskExecutor : creates for RepairThemes
+ScheduledTaskExecutorFactory ..> CleanScheduledJobExecutionHistoryTaskExecutor : creates for CleanScheduledJobExecutionHistory
+ScheduledTaskExecutorFactory ..> TechnicalDataCleanupTaskExecutor : creates for TechnicalDataCleanup
 
 IScheduledTaskExecutor <|.. MediaLibraryScanTaskExecutor : implements
 IScheduledTaskExecutor <|.. TemporaryFilesCleanupTaskExecutor : implements
+IScheduledTaskExecutor <|.. RepairThemesTaskExecutor : implements
+IScheduledTaskExecutor <|.. CleanScheduledJobExecutionHistoryTaskExecutor : implements
+IScheduledTaskExecutor <|.. TechnicalDataCleanupTaskExecutor : implements
 
 MediaLibraryScanTaskExecutor --> IUnitOfWork : queues the library scans of the owner
+RepairThemesTaskExecutor --> IUnitOfWork : repairs the themes from the bundled archives
+CleanScheduledJobExecutionHistoryTaskExecutor --> IUnitOfWork : deletes the old executions
+TechnicalDataCleanupTaskExecutor --> IUnitOfWork : fails the interrupted scans
 
 ' ============================== NOTIFICATION RELATIONSHIPS ==============================
 
@@ -435,6 +561,7 @@ ScheduledJobsHub --> IScheduledJobsClient : typed client contract
 
 ScheduledJobRepository --> ScheduledJobEntity : persists
 ScheduledJobExecutionRepository --> ScheduledJobExecutionEntity : persists
+SchedulerDisplayPreferencesRepository --> SchedulerDisplayPreferencesEntity : persists
 
 caption [Code] Lumina - Scheduled Jobs 3.2.3
 

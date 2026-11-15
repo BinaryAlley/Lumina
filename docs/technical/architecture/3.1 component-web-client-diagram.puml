@@ -1,4 +1,5 @@
 @startuml Lumina Web Application Components
+!pragma layout elk
 !include <C4/C4_Component>
 
 LAYOUT_WITH_LEGEND()
@@ -7,37 +8,59 @@ title Component diagram for Lumina Web Application Client 2.1
 Container_Ext(api, "API Server 2.2", "Lumina.Presentation.Api", "Provides media management functionality via JSON/HTTPS API [detailed in '3.2 component-api-server-diagram.puml']")
 
 Container_Boundary(wb, "Web Application 2.1") {
-    Component(fileSystem, "File System Management", "ASP.NET MVC Controllers", "Handles file system operations including drives, directories, and files browsing")
-    
-    Component(library, "Library Management", "ASP.NET MVC Controllers", "Manages media libraries and their content (books, etc); the library edit page lets the owner enable or disable the reader plugins per library")
-    
+    Component(fileSystem, "File System Management", "FastEndpoints + Razor views", "Handles file system operations including drives, directories, files browsing, path operations and thumbnails")
+
+    Component(library, "Library Management", "FastEndpoints + Razor views", "Manages media libraries and their content (books, music), their scan controls and their consumption statistics")
+
+    Component(favorites, "Favorites", "FastEndpoints + Razor views", "Lists, adds and removes the favorites of the current user")
+
+    Component(playlists, "Playlists", "FastEndpoints + Razor views", "Creates and edits playlists and their ordered entries")
+
     Component(bookReader, "Book Reading", "FastEndpoints + JavaScript", "Serves the book reader view and proxies the reading manifest, section and resource endpoints to the API")
-    
-    Component(scheduler, "Scheduler", "FastEndpoints + JavaScript", "Serves the scheduled jobs dashboard, proxies the scheduled job endpoints to the API, and plots the executions of the scheduled job tasks over time")
-    
-    Component(admin, "Administration", "ASP.NET MVC Controllers", "Handles system administration and configuration")
-    
-    Component(users, "User Management", "ASP.NET MVC Controllers", "Handles authentication and user management")
-    
-    Component(clientJs, "Client-Side Logic", "JavaScript", "Handles dynamic page updates, persistent media playback, the book reader (table of contents, page navigation, font size), and the scheduled jobs dashboard (job type filters, execution graph, live hub updates)")
-    
-    Component(httpClient, "API HTTP Client", "C# TypedHttpClient", "Handles communication with the API server")
+
+    Component(musicPlayback, "Music Playback", "FastEndpoints + JavaScript", "Serves the music player views and proxies track streams and normalized segments from the API without buffering them")
+
+    Component(mediaConsumption, "Media Consumption", "FastEndpoints", "Proxies playback and reading progress, resume points and completion events to the API")
+
+    Component(scheduler, "Scheduler", "FastEndpoints + JavaScript", "Serves the scheduled jobs dashboard, proxies the scheduled job and display preference endpoints to the API, and plots the executions of the scheduled job tasks over time")
+
+    Component(admin, "Administration", "FastEndpoints + Razor views", "Manages roles, permissions, users, plugins and themes")
+
+    Component(users, "User Management", "FastEndpoints + Razor views", "Handles authentication, registration, password recovery, the profile and user settings")
+
+    Component(themes, "Theming", "Razor views + theme engine", "Renders the active theme, its layouts, navigation, audio player and file system browser, and serves theme assets")
+
+    Component(clientJs, "Client-Side Logic", "JavaScript", "Handles dynamic page updates, persistent media playback, the book reader (table of contents, page navigation, font size), favorites and playlists, media library scan progress, and the scheduled jobs dashboard (job type filters, execution graph, live hub updates)")
+
+    Component(httpClient, "API HTTP Client", "C# TypedHttpClient", "Handles buffered communication with the API server")
+
+    Component(streamingClient, "Streaming API HTTP Client", "C# TypedHttpClient", "Streams track audio and segments from the API server without buffering them")
 }
 
 Rel(fileSystem, httpClient, "Uses")
 Rel(library, httpClient, "Uses")
+Rel(favorites, httpClient, "Uses")
+Rel(playlists, httpClient, "Uses")
 Rel(bookReader, httpClient, "Uses")
+Rel(musicPlayback, streamingClient, "Uses")
+Rel(mediaConsumption, httpClient, "Uses")
 Rel(scheduler, httpClient, "Uses")
 Rel(admin, httpClient, "Uses")
 Rel(users, httpClient, "Uses")
+Rel(themes, httpClient, "Uses")
 Rel(httpClient, api, "Makes API calls to", "JSON/HTTPS")
+Rel(streamingClient, api, "Streams track audio from", "JSON/HTTPS")
 Rel(clientJs, fileSystem, "Makes AJAX calls to")
 Rel(clientJs, library, "Makes AJAX calls to")
+Rel(clientJs, favorites, "Makes AJAX calls to")
+Rel(clientJs, playlists, "Makes AJAX calls to")
 Rel(clientJs, bookReader, "Makes AJAX calls to")
+Rel(clientJs, musicPlayback, "Makes AJAX calls to")
+Rel(clientJs, mediaConsumption, "Makes AJAX calls to")
 Rel(clientJs, scheduler, "Makes AJAX calls to")
 Rel(clientJs, admin, "Makes AJAX calls to")
 Rel(clientJs, users, "Makes AJAX calls to")
-Rel(clientJs, api, "Receives scheduled jobs and execution updates from the scheduled jobs hub", "SignalR")
+Rel(clientJs, api, "Receives media library scan progress and scheduled job updates from the SignalR hubs", "SignalR")
 
 caption [Component] Lumina - Web Application Client 2.1 (Lumina.Presentation.Web)
 
