@@ -46,6 +46,8 @@
                 <button id="sort-toggle" type="button" class="confirm-button">@_localizer["SortAscending"]</button>
                 <!-- Item count. -->
                 <span id="count-label" class="text-light-two"></span>
+                <!-- Deleted items. -->
+                <button id="deleted-items-button" type="button" class="abort-button">@_localizer["DeletedItems"]</button>
             </div>
             <div style="display: flex; align-items: flex-start;">
                 <!-- Artists grid. -->
@@ -89,6 +91,8 @@
         const prevPageButton = document.getElementById('prev-page');
         const nextPageButton = document.getElementById('next-page');
         const pageIndicator = document.getElementById('page-indicator');
+        const deletedItemsButton = document.getElementById('deleted-items-button');
+        const deletedItemsUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.DELETED_MUSIC_ITEMS)';
 
         // The special alpha keys for numbers and symbols, followed by the letters.
         const alphaKeys = ['#', '*', ...Array.from({ length: 26 }, (_, index) => String.fromCharCode(65 + index))];
@@ -492,6 +496,10 @@
             loadItemsAsync();
         }
 
+        async function handleDeletedItemsClick() {
+            await updateContentAsync(`${deletedItemsUrl}?libraryId=${encodeURIComponent(libraryId)}`, true);
+        }
+
         async function loadSettingsAsync() {
             const data = await callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS)');
             if (data) {
@@ -515,6 +523,7 @@
         bindEventHandler(sortToggle, 'click', handleSortToggle);
         bindEventHandler(prevPageButton, 'click', handlePrevPageClick);
         bindEventHandler(nextPageButton, 'click', handleNextPageClick);
+        bindEventHandler(deletedItemsButton, 'click', handleDeletedItemsClick);
         document.addEventListener('keydown', handleAlphaKeydown);
         document.addEventListener('click', handleCardMenuDismiss);
         document.addEventListener('keydown', handleCardMenuDismiss);
@@ -526,6 +535,7 @@
             unbindEventHandler(sortToggle, 'click', handleSortToggle);
             unbindEventHandler(prevPageButton, 'click', handlePrevPageClick);
             unbindEventHandler(nextPageButton, 'click', handleNextPageClick);
+            unbindEventHandler(deletedItemsButton, 'click', handleDeletedItemsClick);
             document.removeEventListener('keydown', handleAlphaKeydown);
             document.removeEventListener('click', handleCardMenuDismiss);
             document.removeEventListener('keydown', handleCardMenuDismiss);

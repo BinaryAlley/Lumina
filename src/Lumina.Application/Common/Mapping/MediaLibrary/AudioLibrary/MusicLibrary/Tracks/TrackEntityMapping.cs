@@ -294,6 +294,26 @@ public static class TrackEntityMapping
     }
 
     /// <summary>
+    /// Converts <paramref name="repositoryEntity"/> to <see cref="DeletedTrackResponse"/>.
+    /// </summary>
+    /// <param name="repositoryEntity">The repository entity to be converted.</param>
+    /// <param name="deletedOnUtc">The date and time when the track was deleted.</param>
+    /// <returns>The converted response entity.</returns>
+    public static DeletedTrackResponse ToResponse(this TrackEntity repositoryEntity, DateTime deletedOnUtc)
+    {
+        return new DeletedTrackResponse(
+            repositoryEntity.Id,
+            repositoryEntity.LibraryId,
+            repositoryEntity.Album?.ArtistId ?? Guid.Empty,
+            repositoryEntity.Album?.Artist?.Name ?? string.Empty,
+            repositoryEntity.AlbumId,
+            repositoryEntity.Album?.Title ?? string.Empty,
+            repositoryEntity.Title,
+            repositoryEntity.Path,
+            deletedOnUtc);
+    }
+
+    /// <summary>
     /// Converts <paramref name="repositoryEntities"/> to a collection of <see cref="TrackResponse"/>.
     /// </summary>
     /// <param name="repositoryEntities">The repository entities to be converted.</param>

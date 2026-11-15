@@ -130,6 +130,12 @@ public class AlbumConfiguration : IEntityTypeConfiguration<AlbumEntity>
         builder.Property(album => album.MetadataProvider)
             .HasMaxLength(100)
             .HasColumnOrder(38);
+        builder.Property(album => album.IsDeleted)
+            .IsRequired()
+            .HasDefaultValue(false)
+            .HasColumnOrder(39);
+        builder.Property(album => album.DeletedOnUtc)
+            .HasColumnOrder(40);
 
         builder.HasOne(album => album.Artist)
             .WithMany(artist => artist.Albums)
@@ -232,5 +238,9 @@ public class AlbumConfiguration : IEntityTypeConfiguration<AlbumEntity>
 
         builder.HasIndex(album => new { album.ArtistId, album.Title });
         builder.HasIndex(album => new { album.LibraryId, album.Title });
+        // The deleted items page filters by library and deletion state, and orders by the stored deletion time, the title and the Id, so the
+        // filtered index follows the same order and no temporary B-tree is needed for the sort, while visible rows add no entries to it.
+        builder.HasIndex(album => new { album.LibraryId, album.IsDeleted, album.DeletedOnUtc, album.Title, album.Id })
+            .HasFilter("\"IsDeleted\" = 1");
     }
 }

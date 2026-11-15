@@ -61,7 +61,7 @@ public class DeleteArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     }
 
     [Fact]
-    public async Task DeleteArtist_WhenArtistBelongsToAnOwnedLibrary_ShouldDeleteTheArtist()
+    public async Task DeleteArtist_WhenArtistBelongsToAnOwnedLibrary_ShouldSoftDeleteTheArtist()
     {
         // Arrange
         Guid userId = GetCurrentUserId();
@@ -75,11 +75,14 @@ public class DeleteArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        Assert.Null(await dbContext.Artists.FirstOrDefaultAsync(artist => artist.Id == artistId));
+        ArtistEntity? artist = await dbContext.Artists.FirstOrDefaultAsync(artist => artist.Id == artistId);
+        Assert.NotNull(artist);
+        Assert.True(artist!.IsDeleted);
+        Assert.NotNull(artist.DeletedOnUtc);
     }
 
     [Fact]
-    public async Task DeleteArtist_WhenArtistHasStoredArtwork_ShouldRemoveTheArtworkOfTheArtistAndOfItsChildren()
+    public async Task DeleteArtist_WhenArtistHasStoredArtwork_ShouldKeepTheArtworkOfTheArtistAndOfItsChildren()
     {
         // Arrange
         Guid userId = GetCurrentUserId();
@@ -96,13 +99,15 @@ public class DeleteArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        // The artist takes its albums and their tracks with it, and the artwork of all of them does not cascade, so it is removed together with the artist.
-        Assert.Null(await dbContext.Artists.FirstOrDefaultAsync(artist => artist.Id == artistId));
-        Assert.Null(await dbContext.Albums.FirstOrDefaultAsync(album => album.Id == albumId));
-        Assert.Null(await dbContext.Tracks.FirstOrDefaultAsync(track => track.Id == trackId));
-        Assert.Null(await dbContext.MusicArtwork.FirstOrDefaultAsync(artwork => artwork.OwnerType == MusicArtworkOwnerType.Artist && artwork.OwnerId == artistId));
-        Assert.Null(await dbContext.MusicArtwork.FirstOrDefaultAsync(artwork => artwork.OwnerType == MusicArtworkOwnerType.Album && artwork.OwnerId == albumId));
-        Assert.Null(await dbContext.MusicArtwork.FirstOrDefaultAsync(artwork => artwork.OwnerType == MusicArtworkOwnerType.Track && artwork.OwnerId == trackId));
+        // The artist is soft deleted, so its albums, tracks and artwork stay available until the user restores it.
+        ArtistEntity? artist = await dbContext.Artists.FirstOrDefaultAsync(artist => artist.Id == artistId);
+        Assert.NotNull(artist);
+        Assert.True(artist!.IsDeleted);
+        Assert.NotNull(await dbContext.Albums.FirstOrDefaultAsync(album => album.Id == albumId));
+        Assert.NotNull(await dbContext.Tracks.FirstOrDefaultAsync(track => track.Id == trackId));
+        Assert.NotNull(await dbContext.MusicArtwork.FirstOrDefaultAsync(artwork => artwork.OwnerType == MusicArtworkOwnerType.Artist && artwork.OwnerId == artistId));
+        Assert.NotNull(await dbContext.MusicArtwork.FirstOrDefaultAsync(artwork => artwork.OwnerType == MusicArtworkOwnerType.Album && artwork.OwnerId == albumId));
+        Assert.NotNull(await dbContext.MusicArtwork.FirstOrDefaultAsync(artwork => artwork.OwnerType == MusicArtworkOwnerType.Track && artwork.OwnerId == trackId));
     }
 
     [Fact]

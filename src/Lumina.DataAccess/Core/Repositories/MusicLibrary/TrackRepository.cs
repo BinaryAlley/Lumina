@@ -3,6 +3,7 @@ using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
 using Lumina.Application.Common.DTO.Pagination;
+using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using Lumina.DataAccess.Common.Persistence;
 using Lumina.DataAccess.Core.UoW;
@@ -26,14 +27,17 @@ namespace Lumina.DataAccess.Core.Repositories.MusicLibrary;
 internal sealed class TrackRepository : ITrackRepository
 {
     private readonly LuminaDbContext _luminaDbContext;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TrackRepository"/> class.
     /// </summary>
     /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public TrackRepository(LuminaDbContext luminaDbContext)
+    /// <param name="dateTimeProvider">Injected provider for the current UTC time, used to stamp deletions deterministically.</param>
+    public TrackRepository(LuminaDbContext luminaDbContext, IDateTimeProvider dateTimeProvider)
     {
         _luminaDbContext = luminaDbContext;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     /// <summary>
@@ -73,6 +77,10 @@ internal sealed class TrackRepository : ITrackRepository
     /// <summary>
     /// Gets the subset of <paramref name="paths"/> that is already used by a track of the library identified by <paramref name="libraryId"/>.
     /// </summary>
+    /// <remarks>
+    /// Soft deleted tracks are included on purpose: their paths must still count as taken, so that a scan never materializes a track that the user
+    /// deleted back into the catalogue.
+    /// </remarks>
     /// <param name="libraryId">The Id of the library whose tracks are searched.</param>
     /// <param name="paths">The track paths to check.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
@@ -113,7 +121,10 @@ internal sealed class TrackRepository : ITrackRepository
             .Include(repositoryTrack => repositoryTrack.Moods)
             .Include(repositoryTrack => repositoryTrack.Isrcs)
             .AsSplitQuery()
-            .FirstOrDefaultAsync(repositoryTrack => repositoryTrack.Id == data.Id, cancellationToken).ConfigureAwait(false);
+            .FirstOrDefaultAsync(repositoryTrack => repositoryTrack.Id == data.Id
+                && !repositoryTrack.IsDeleted
+                && !repositoryTrack.Album!.IsDeleted
+                && !repositoryTrack.Album!.Artist!.IsDeleted, cancellationToken).ConfigureAwait(false);
         if (foundTrack is null)
             return Errors.Music.TrackNotFound;
 
@@ -133,9 +144,17 @@ internal sealed class TrackRepository : ITrackRepository
         // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
         Guid albumId = foundTrack.AlbumId;
         Guid libraryId = foundTrack.LibraryId;
+        bool isDeleted = foundTrack.IsDeleted;
+        DateTime? deletedOnUtc = foundTrack.DeletedOnUtc;
         EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundTrack, data);
         foundTrack.AlbumId = albumId;
         foundTrack.LibraryId = libraryId;
+        // The deletion state is owned by the explicit delete and restore operations. Clearing the modified flags keeps it out of the UPDATE statement,
+        // so an edit that raced with a delete can never write the deletion state back and resurrect the track.
+        foundTrack.IsDeleted = isDeleted;
+        foundTrack.DeletedOnUtc = deletedOnUtc;
+        _luminaDbContext.Entry(foundTrack).Property(track => track.IsDeleted).IsModified = false;
+        _luminaDbContext.Entry(foundTrack).Property(track => track.DeletedOnUtc).IsModified = false;
 
         // Tags and genres are shared across the whole database, so the stored rows whose names already exist are reused, and only the missing names are inserted.
         Result<Updated> reconcileTagsResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundTrack.Tags, data.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
@@ -212,7 +231,9 @@ internal sealed class TrackRepository : ITrackRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="TrackEntity"/>, or an error.</returns>
     public async Task<Result<TrackEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
-        IQueryable<TrackEntity> query = _luminaDbContext.Tracks;
+        // A deleted track, or a track of a deleted album or artist, is kept in the storage medium only so that its path stays reserved and it
+        // can be restored, so it is never returned to a caller.
+        IQueryable<TrackEntity> query = _luminaDbContext.Tracks.Where(track => !track.IsDeleted && !track.Album!.IsDeleted && !track.Album!.Artist!.IsDeleted);
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         if (shouldIncludeNavigationProperties)
@@ -232,7 +253,7 @@ internal sealed class TrackRepository : ITrackRepository
     }
 
     /// <summary>
-    /// Gets all the tracks of the album identified by <paramref name="albumId"/>.
+    /// Gets the tracks of the album identified by <paramref name="albumId"/> that are not soft deleted.
     /// </summary>
     /// <param name="albumId">The Id of the album whose tracks are retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
@@ -247,8 +268,25 @@ internal sealed class TrackRepository : ITrackRepository
             .Include(track => track.Isrcs)
             .Include(track => track.Contributors)
             .AsSplitQuery()
+            .Where(track => track.AlbumId == albumId && !track.IsDeleted && !track.Album!.IsDeleted && !track.Album!.Artist!.IsDeleted)
+            .OrderBy(track => track.DiscNumber ?? 1) // Some releases don't have a disc number, assume 1.
+            .ThenBy(track => track.TrackNumber)
+            .ThenBy(track => track.Id)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets all the tracks of the album identified by <paramref name="albumId"/>, whether they are soft deleted or not.
+    /// </summary>
+    /// <param name="albumId">The Id of the album whose tracks are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="TrackEntity"/>, or an error.</returns>
+    public async Task<Result<IReadOnlyList<TrackEntity>>> GetByAlbumIdIncludingDeletedAsync(Guid albumId, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Tracks
+            .AsNoTracking()
             .Where(track => track.AlbumId == albumId)
-            .OrderBy(track => track.DiscNumber ?? 1) // some releases don't have a disc number, assume 1
+            .OrderBy(track => track.DiscNumber ?? 1)
             .ThenBy(track => track.TrackNumber)
             .ThenBy(track => track.Id)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
@@ -267,8 +305,8 @@ internal sealed class TrackRepository : ITrackRepository
         // The lightweight read models are always retrieved without tracking, because they are never modified by the caller.
         IQueryable<TrackLiteRow> liteRowsQuery = _luminaDbContext.Tracks
             .AsNoTracking()
-            .Where(track => track.AlbumId == albumId)
-            .OrderBy(track => track.DiscNumber ?? 1) // some releases don't have a disc number, assume 1
+            .Where(track => track.AlbumId == albumId && !track.IsDeleted && !track.Album!.IsDeleted && !track.Album!.Artist!.IsDeleted)
+            .OrderBy(track => track.DiscNumber ?? 1) // Some releases don't have a disc number, assume 1.
             .ThenBy(track => track.TrackNumber)
             .ThenBy(track => track.Id)
             .Select(track => new TrackLiteRow(
@@ -325,7 +363,7 @@ internal sealed class TrackRepository : ITrackRepository
     {
         IQueryable<TrackEntity> query = _luminaDbContext.Tracks
             .AsNoTracking()
-            .Where(track => track.LibraryId == libraryId);
+            .Where(track => track.LibraryId == libraryId && !track.IsDeleted && !track.Album!.IsDeleted && !track.Album!.Artist!.IsDeleted);
 
         if (artistId is not null)
             query = query.Where(track => track.Album!.ArtistId == artistId.Value);
@@ -357,6 +395,10 @@ internal sealed class TrackRepository : ITrackRepository
     /// <summary>
     /// Gets the track of the library identified by <paramref name="libraryId"/> that is stored at the provided <paramref name="path"/>.
     /// </summary>
+    /// <remarks>
+    /// Soft deleted tracks are included on purpose: when the file disappears from disk, the scan deletion strategy must be able to permanently
+    /// remove a track that the user had already deleted, instead of leaving its soft deleted row behind.
+    /// </remarks>
     /// <param name="libraryId">The Id of the library whose track is retrieved.</param>
     /// <param name="path">The file system path of the track to retrieve.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
@@ -388,7 +430,13 @@ internal sealed class TrackRepository : ITrackRepository
         // that is not in the named library, album and artist simply yields no row.
         return await _luminaDbContext.Tracks
             .AsNoTracking()
-            .Where(track => track.Id == trackId && track.LibraryId == libraryId && track.AlbumId == albumId && track.Album!.ArtistId == artistId)
+            .Where(track => track.Id == trackId
+                && track.LibraryId == libraryId
+                && track.AlbumId == albumId
+                && track.Album!.ArtistId == artistId
+                && !track.IsDeleted
+                && !track.Album!.IsDeleted
+                && !track.Album!.Artist!.IsDeleted)
             .Select(track => new TrackStreamDto(
                 track.Path,
                 track.LibraryId,
@@ -424,7 +472,13 @@ internal sealed class TrackRepository : ITrackRepository
         // that is not in the named library, album and artist simply yields no row.
         return await _luminaDbContext.Tracks
             .AsNoTracking()
-            .Where(track => track.Id == trackId && track.LibraryId == libraryId && track.AlbumId == albumId && track.Album!.ArtistId == artistId)
+            .Where(track => track.Id == trackId
+                && track.LibraryId == libraryId
+                && track.AlbumId == albumId
+                && track.Album!.ArtistId == artistId
+                && !track.IsDeleted
+                && !track.Album!.IsDeleted
+                && !track.Album!.Artist!.IsDeleted)
             .Select(track => new TrackPlaybackManifestDto(
                 track.Path,
                 track.Container,
@@ -439,6 +493,89 @@ internal sealed class TrackRepository : ITrackRepository
                 track.ReplayGainAlbumGain,
                 track.ReplayGainAlbumPeak))
             .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets the soft deleted track identified by <paramref name="id"/>, when its album and artist are not soft deleted.
+    /// </summary>
+    /// <param name="id">The Id of the soft deleted track to get.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted <see cref="TrackEntity"/>, <see langword="null"/> when the track does not exist, is not soft deleted, or its album or artist is soft deleted, or an error.</returns>
+    public async Task<Result<TrackEntity?>> GetSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Tracks
+            .AsNoTracking()
+            .FirstOrDefaultAsync(track => track.Id == id
+                && track.IsDeleted
+                && !track.Album!.IsDeleted
+                && !track.Album!.Artist!.IsDeleted, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets the soft deleted tracks of the media library identified by <paramref name="libraryId"/>, whose album and artist are not soft deleted.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose soft deleted tracks are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted tracks, or an error.</returns>
+    public async Task<Result<IReadOnlyList<TrackEntity>>> GetSoftDeletedByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        return await _luminaDbContext.Tracks
+            .AsNoTracking()
+            .Include(track => track.Album)
+                .ThenInclude(album => album!.Artist)
+            .Where(track => track.LibraryId == libraryId
+                && track.IsDeleted
+                && !track.Album!.IsDeleted
+                && !track.Album!.Artist!.IsDeleted)
+            // The deletion time is stored when the track is deleted, so later writes to the hidden row cannot change the order of the deleted items,
+            // and every deleted row carries a deletion time because the delete operation always sets it. All terms sort descending, so the filtered
+            // (LibraryId, IsDeleted, DeletedOnUtc, Title, Id) index can be scanned backwards and the database does not build a temporary B-tree.
+            .OrderByDescending(track => track.DeletedOnUtc)
+            .ThenByDescending(track => track.Title)
+            .ThenByDescending(track => track.Id)
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Soft deletes the track identified by <paramref name="id"/>, without removing its stored metadata or artwork.
+    /// </summary>
+    /// <remarks>
+    /// The update is executed directly against the storage medium, so an entity already tracked by the caller is not refreshed, and the audit fields
+    /// stamped by the change tracker are not updated; the deletion time is stored in <see cref="TrackEntity.DeletedOnUtc"/> instead.
+    /// </remarks>
+    /// <param name="id">The Id of the track to soft delete.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> SoftDeleteByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        DateTime deletedOnUtc = _dateTimeProvider.UtcNow;
+
+        // The update covers the existence check and the transition in one statement, so two concurrent deletes of the same track cannot both succeed.
+        int updatedRows = await _luminaDbContext.Tracks
+            .Where(track => track.Id == id && !track.IsDeleted)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(track => track.IsDeleted, true)
+                .SetProperty(track => track.DeletedOnUtc, deletedOnUtc), cancellationToken).ConfigureAwait(false);
+        if (updatedRows == 0)
+            return Errors.Music.TrackNotFound;
+        return Result.Updated;
+    }
+
+    /// <summary>
+    /// Restores the soft deleted track identified by <paramref name="id"/>.
+    /// </summary>
+    /// <param name="id">The Id of the track to restore.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Updated>> RestoreSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        TrackEntity? track = await _luminaDbContext.Tracks.FirstOrDefaultAsync(repositoryTrack => repositoryTrack.Id == id, cancellationToken).ConfigureAwait(false);
+        if (track is null || !track.IsDeleted)
+            return Errors.Music.TrackNotFound;
+
+        track.IsDeleted = false;
+        track.DeletedOnUtc = null;
+        return Result.Updated;
     }
 
     /// <summary>
@@ -529,7 +666,11 @@ internal sealed class TrackRepository : ITrackRepository
     public async Task<Result<int>> GetTracksNeedingMetadataCountAsync(Guid libraryId, CancellationToken cancellationToken)
     {
         return await _luminaDbContext.Tracks
-            .CountAsync(track => track.LibraryId == libraryId && track.MetadataStatus != MetadataStatus.Enriched, cancellationToken).ConfigureAwait(false);
+            .CountAsync(track => track.LibraryId == libraryId
+                        && !track.IsDeleted
+                        && !track.Album!.IsDeleted
+                        && !track.Album!.Artist!.IsDeleted
+                        && track.MetadataStatus != MetadataStatus.Enriched, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -566,7 +707,7 @@ internal sealed class TrackRepository : ITrackRepository
         {
             List<TrackLibraryCount> chunkCounts = await _luminaDbContext.Tracks
                 .AsNoTracking()
-                .Where(track => chunk.Contains(track.Id))
+                .Where(track => chunk.Contains(track.Id) && !track.IsDeleted && !track.Album!.IsDeleted && !track.Album!.Artist!.IsDeleted)
                 .GroupBy(track => track.LibraryId)
                 .Select(group => new TrackLibraryCount
                 {
@@ -616,7 +757,7 @@ internal sealed class TrackRepository : ITrackRepository
                     .Include(track => track.Contributors)
                     .AsSplitQuery();
             }
-            tracks.AddRange(await query.Where(track => chunk.Contains(track.Id)).ToListAsync(cancellationToken).ConfigureAwait(false));
+            tracks.AddRange(await query.Where(track => chunk.Contains(track.Id) && !track.IsDeleted && !track.Album!.IsDeleted && !track.Album!.Artist!.IsDeleted).ToListAsync(cancellationToken).ConfigureAwait(false));
         }
         return Result.From<IReadOnlyList<TrackEntity>>(tracks);
     }

@@ -1,0 +1,220 @@
+@*
+    FALLBACK DELETED ITEMS VIEW - READ BEFORE EDITING
+
+    This view is the application fallback of the deleted items page of a music library, rendered only when the
+    active theme does not provide its own template for the page. It keeps the DOM contract and the client script
+    the theme template mirrors, so that restoring a deleted artist, album or track keeps working even without the theme.
+
+    /library/audio-library/music-library/deleted-items?libraryId=...
+*@
+
+@using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary
+@using Lumina.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@{
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+    var libraryId = Model.Library.Id?.ToString() ?? string.Empty;
+}
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+
+@model DeletedMusicItemsPageDto
+
+@Html.AntiForgeryToken()
+
+<div style="display: grid; grid-template-rows: auto 1fr;">
+    <div style="min-height: 1rem;"></div>
+    <div class="enlightenment-panel shadow-effect mx-auto panel w-60 mb-10 deleted-music-items-panel" style="min-width: 320px;">
+        <div class="shine-effect"></div>
+        <div class="form-row deleted-music-items-top-bar">
+            <button id="btn-back-to-library" type="button" class="abort-button">@_localizer["BackToLibrary"]</button>
+        </div>
+        <div class="form-row deleted-music-items-title-row">
+            <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">@_localizer["Title"]</h1>
+        </div>
+        <p id="no-deleted-music-items" class="text-light-two text-center @(Model.DeletedArtists.Count == 0 && Model.DeletedAlbums.Count == 0 && Model.DeletedTracks.Count == 0 ? string.Empty : "hidden")">@_localizer["NoDeletedItems"]</p>
+
+        <section class="deleted-music-items-section @(Model.DeletedArtists.Count == 0 ? "hidden" : string.Empty)" data-section="artists">
+            <h2 class="text-light-two text-center">@_localizer["Artists"]</h2>
+            <table id="deleted-artists-table" class="w-100 form-table deleted-music-items-table">
+                <thead>
+                    <tr>
+                        <th>@_localizer["Name"]</th>
+                        <th>@_localizer["DeletedOn"]</th>
+                        <th class="w-100px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DeletedMusicArtistDto artist in Model.DeletedArtists)
+                    {
+                        <tr class="deleted-music-item-row deleted-artist-row" data-row-type="artists" data-artist-id="@artist.Id">
+                            <td>@artist.Name</td>
+                            <td>@artist.DeletedOnUtc.ToString("g")</td>
+                            <td>
+                                <button type="button" class="confirm-button w-100px btn-restore-artist" data-artist-id="@artist.Id">@_localizer["Restore"]</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </section>
+
+        <section class="deleted-music-items-section @(Model.DeletedAlbums.Count == 0 ? "hidden" : string.Empty)" data-section="albums">
+            <h2 class="text-light-two text-center">@_localizer["Albums"]</h2>
+            <table id="deleted-albums-table" class="w-100 form-table deleted-music-items-table">
+                <thead>
+                    <tr>
+                        <th>@_localizer["Artist"]</th>
+                        <th>@_localizer["Album"]</th>
+                        <th>@_localizer["DeletedOn"]</th>
+                        <th class="w-100px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DeletedMusicAlbumDto album in Model.DeletedAlbums)
+                    {
+                        <tr class="deleted-music-item-row deleted-album-row" data-row-type="albums" data-artist-id="@album.ArtistId" data-album-id="@album.Id">
+                            <td>@album.ArtistName</td>
+                            <td>@album.Title</td>
+                            <td>@album.DeletedOnUtc.ToString("g")</td>
+                            <td>
+                                <button type="button" class="confirm-button w-100px btn-restore-album" data-artist-id="@album.ArtistId" data-album-id="@album.Id">@_localizer["Restore"]</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </section>
+
+        <section class="deleted-music-items-section @(Model.DeletedTracks.Count == 0 ? "hidden" : string.Empty)" data-section="tracks">
+            <h2 class="text-light-two text-center">@_localizer["Tracks"]</h2>
+            <table id="deleted-tracks-table" class="w-100 form-table deleted-music-items-table">
+                <thead>
+                    <tr>
+                        <th>@_localizer["Artist"]</th>
+                        <th>@_localizer["Album"]</th>
+                        <th>@_localizer["TrackTitle"]</th>
+                        <th>@_localizer["DeletedOn"]</th>
+                        <th class="w-100px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DeletedMusicTrackDto track in Model.DeletedTracks)
+                    {
+                        <tr class="deleted-music-item-row deleted-track-row" data-row-type="tracks" data-artist-id="@track.ArtistId" data-album-id="@track.AlbumId" data-track-id="@track.Id">
+                            <td>@track.ArtistName</td>
+                            <td>@track.AlbumTitle</td>
+                            <td>@track.Title</td>
+                            <td>@track.DeletedOnUtc.ToString("g")</td>
+                            <td>
+                                <button type="button" class="confirm-button w-100px btn-restore-track" data-artist-id="@track.ArtistId" data-album-id="@track.AlbumId" data-track-id="@track.Id">@_localizer["Restore"]</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls. site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
+    <script type="text/plain" data-form="@scriptId">
+        // Create cleanup registry for this view.
+        const cleanupFunctions = [];
+        let isInitialized = false;
+
+        const libraryId = '@libraryId';
+        const libraryIndexUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.ARTISTS_INDEX)';
+        const restoreArtistUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.RESTORE_ARTIST, new { artistId = default(Guid) })';
+        const restoreAlbumUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.RESTORE_ALBUM, new { artistId = default(Guid), albumId = default(Guid) })';
+        const restoreTrackUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Music.RESTORE_TRACK, new { artistId = default(Guid), albumId = default(Guid), trackId = default(Guid) })';
+
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
+        const btnBackToLibrary = document.getElementById('btn-back-to-library');
+        const noDeletedMusicItems = document.getElementById('no-deleted-music-items');
+
+        const jsLocalizedStrings = {
+            restored: @Json.Serialize(_localizer["Restored"].Value),
+            restoreFailed: @Json.Serialize(_localizer["RestoreFailed"].Value)
+        };
+
+        // Replaces the first default Guid segment of a restore URL with the provided value.
+        function applySegment(url, value) {
+            return url.replace('/@(default(Guid))', `/${value}`);
+        }
+
+        function buildRestoreUrl(row) {
+            if (row.dataset.rowType === 'artists')
+                return applySegment(restoreArtistUrlTemplate, row.dataset.artistId) + `?libraryId=${encodeURIComponent(libraryId)}`;
+            if (row.dataset.rowType === 'albums') {
+                const albumUrl = applySegment(applySegment(restoreAlbumUrlTemplate, row.dataset.artistId), row.dataset.albumId);
+                return albumUrl + `?libraryId=${encodeURIComponent(libraryId)}`;
+            }
+            const trackUrl = applySegment(applySegment(applySegment(restoreTrackUrlTemplate, row.dataset.artistId), row.dataset.albumId), row.dataset.trackId);
+            return trackUrl + `?libraryId=${encodeURIComponent(libraryId)}`;
+        }
+
+        // Restores the clicked deleted music item, then removes its row from the page.
+        async function handleRestoreAsync(event) {
+            const button = event.target.closest('.btn-restore-artist, .btn-restore-album, .btn-restore-track');
+            if (!button || button.disabled)
+                return;
+            const row = button.closest('.deleted-music-item-row');
+            if (!row)
+                return;
+            button.disabled = true;
+            try {
+                const result = await callApiPostAsync(buildRestoreUrl(row), {});
+                if (result?.isRestored !== true) {
+                    notificationService.show(jsLocalizedStrings.restoreFailed, NotificationType.ERROR);
+                    return;
+                }
+                notificationService.show(jsLocalizedStrings.restored, NotificationType.SUCCESS);
+                const section = row.closest('.deleted-music-items-section');
+                row.remove();
+                if (section && section.querySelectorAll('.deleted-music-item-row').length === 0)
+                    section.classList.add('hidden');
+                if (document.querySelectorAll('.deleted-music-item-row').length === 0)
+                    noDeletedMusicItems?.classList.remove('hidden');
+            } finally {
+                if (button.isConnected)
+                    button.disabled = false;
+            }
+        }
+
+        // Navigates back to the library page of the deleted music items.
+        async function handleBackToLibraryAsync() {
+            await updateContentAsync(`${libraryIndexUrl}?libraryId=${encodeURIComponent(libraryId)}`, true);
+        }
+
+        // Add listeners.
+        btnBackToLibrary.addEventListener('click', handleBackToLibraryAsync);
+        document.addEventListener('click', handleRestoreAsync);
+        document.addEventListener('DOMContentLoaded', InitializeAsync);
+
+        // Register cleanup for these listeners.
+        cleanupFunctions.push(() => {
+            btnBackToLibrary.removeEventListener('click', handleBackToLibraryAsync);
+            document.removeEventListener('click', handleRestoreAsync);
+            document.removeEventListener('DOMContentLoaded', InitializeAsync);
+        });
+
+        function InitializeAsync() {
+            if (isInitialized)
+                return;
+            isInitialized = true;
+        }
+
+        // Store all cleanups for this view on window object using the scriptId.
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

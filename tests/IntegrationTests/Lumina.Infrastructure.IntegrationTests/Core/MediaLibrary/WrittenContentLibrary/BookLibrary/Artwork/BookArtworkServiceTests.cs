@@ -561,14 +561,15 @@ public class BookArtworkServiceTests
             _mockPathService.CombinePath(mediaRoot, "books").Returns(Result.From(booksPath));
             _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>())
                 .Returns(callInfo => Result.From(Path.Combine(callInfo.ArgAt<string>(0), callInfo.ArgAt<string>(1))));
-            _mockPathService.SanitizeSegment(Arg.Any<string>())
+            _mockPathService.SanitizeCompositeSegment(Arg.Any<string>(), Arg.Any<string>())
                 .Returns(callInfo =>
                 {
-                    string name = callInfo.Arg<string>();
-                    return name == $"{libraryName}-{libraryId}"
-                        ? Result.From(_pathSegmentFixture.Create(name: name, isDirectory: true, isDrive: false))
-                        : Errors.FileSystemManagement.InvalidPath;
+                    string name = callInfo.ArgAt<string>(0);
+                    string identifier = callInfo.ArgAt<string>(1);
+                    return Result.From(_pathSegmentFixture.Create(name: $"{name}-{identifier}", isDirectory: true, isDrive: false));
                 });
+            _mockPathService.SanitizeSegment(Arg.Any<string>())
+                .Returns(Errors.FileSystemManagement.InvalidPath);
 
             // Act
             Result<string> result = await _sut.SaveBookArtworkAsync(libraryId, bookId, libraryName, authorName, bookTitle, _artworkDtoFixture.Create(localPath: sourcePath), CancellationToken.None);
@@ -600,6 +601,14 @@ public class BookArtworkServiceTests
             {
                 string name = callInfo.Arg<string>();
                 return Result.From(_pathSegmentFixture.Create(name: name, isDirectory: true, isDrive: false));
+            });
+
+        _mockPathService.SanitizeCompositeSegment(Arg.Any<string>(), Arg.Any<string>())
+            .Returns(callInfo =>
+            {
+                string name = callInfo.ArgAt<string>(0);
+                string identifier = callInfo.ArgAt<string>(1);
+                return Result.From(_pathSegmentFixture.Create(name: $"{name}-{identifier}", isDirectory: true, isDrive: false));
             });
 
         _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>())

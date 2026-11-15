@@ -151,6 +151,17 @@ public class ArtistEntity : IStorageEntity, IAuditableEntity
     public string? MetadataProvider { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the artist was deleted by the user and is waiting to be restored or permanently removed.
+    /// A deleted artist is kept out of every catalogue read and is not materialized again by scans, so that an automatic scan never undoes the deletion.
+    /// </summary>
+    public bool IsDeleted { get; set; }
+
+    /// <summary>
+    /// Gets or sets the date and time when the artist was deleted, or <see langword="null"/> when the artist is not deleted.
+    /// </summary>
+    public DateTime? DeletedOnUtc { get; set; }
+
+    /// <summary>
     /// Gets or sets the time and date when the entity was added.
     /// </summary>
     public required DateTime CreatedOnUtc { get; set; }

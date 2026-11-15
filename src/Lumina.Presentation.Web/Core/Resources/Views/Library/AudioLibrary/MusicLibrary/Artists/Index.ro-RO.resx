@@ -69,4 +69,7 @@
   <data name="AddToPlaylist" xml:space="preserve">
     <value>Adaugă în listă de redare</value>
   </data>
+  <data name="DeletedItems" xml:space="preserve">
+    <value>Elemente șterse</value>
+  </data>
 </root>

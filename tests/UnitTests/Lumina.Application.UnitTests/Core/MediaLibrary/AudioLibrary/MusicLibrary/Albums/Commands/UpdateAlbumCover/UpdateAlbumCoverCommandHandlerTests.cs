@@ -89,12 +89,14 @@ public class UpdateAlbumCoverCommandHandlerTests
         _mockPathService.PathSeparator.Returns('/');
         _mockPathService.SanitizeSegment(Arg.Any<string>())
             .Returns(callInfo => PathSegment.Create(callInfo.Arg<string>(), isDirectory: true, isDrive: false));
+        _mockPathService.SanitizeCompositeSegment(Arg.Any<string>(), Arg.Any<string>())
+            .Returns(callInfo => PathSegment.Create($"{callInfo.ArgAt<string>(0)}-{callInfo.ArgAt<string>(1)}", isDirectory: true, isDrive: false));
         _mockMusicArtworkRepository.GetByOwnerAsync(Arg.Any<MusicArtworkOwnerType>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<MusicArtworkEntity>>([]));
         _mockMusicArtworkRepository.UpsertCoverAsync(Arg.Any<MusicArtworkOwnerType>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Updated));
         _mockMusicArtworkService.SaveAlbumArtworkAsync(
-            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(),
             Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(STORED_COVER_PATH));
         _mockMusicArtworkService.DeleteStoredArtwork(Arg.Any<string>()).Returns(Result.From(Result.Deleted));
@@ -119,7 +121,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         await _mockArtistRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>());
         await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
         await _mockMusicArtworkRepository.DidNotReceive().GetByOwnerAsync(Arg.Any<MusicArtworkOwnerType>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>());
-        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -137,7 +139,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
         await _mockAlbumRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>());
-        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -156,7 +158,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Library.LibraryIdCannotBeEmpty, result.FirstError);
         await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
-        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -195,7 +197,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Music.AlbumNotFound, result.FirstError);
         await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
-        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -216,7 +218,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Music.AlbumNotFound, result.FirstError);
         await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
-        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -236,7 +238,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
         await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
-        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -256,7 +258,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Library.LibraryIdCannotBeEmpty, result.FirstError);
         await _mockArtistRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>());
-        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -275,7 +277,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Library.LibraryNotFound, result.FirstError);
-        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -296,7 +298,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Library.LibraryIdCannotBeEmpty, result.FirstError);
         await _mockMusicArtworkRepository.DidNotReceive().GetByOwnerAsync(Arg.Any<MusicArtworkOwnerType>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>());
-        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -316,7 +318,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         await _mockMusicArtworkService.Received(1).SaveAlbumArtworkAsync(
-            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), string.Empty, Arg.Any<string>(),
+            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), string.Empty, Arg.Any<string>(),
             Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
     }
 
@@ -337,7 +339,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Library.LibraryIdCannotBeEmpty, result.FirstError);
-        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveAlbumArtworkAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
         await _mockMusicArtworkRepository.DidNotReceive().UpsertCoverAsync(Arg.Any<MusicArtworkOwnerType>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -351,7 +353,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         SetupExistingLibrary(command);
         SetupExistingArtist(command);
         _mockMusicArtworkService.SaveAlbumArtworkAsync(
-            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(),
             Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Errors.FileSystemManagement.FileTooLarge);
 
@@ -382,7 +384,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         await _mockMusicArtworkService.Received(1).SaveAlbumArtworkAsync(
-            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(),
             Arg.Any<Stream>(), Arg.Any<string>(), "Ep", Arg.Any<CancellationToken>());
     }
 
@@ -392,11 +394,11 @@ public class UpdateAlbumCoverCommandHandlerTests
         // Arrange
         UpdateAlbumCoverCommand command = _updateAlbumCoverCommandFixture.Create();
         // The artist is named "Live", which is also a release type name, but the album uses no release type, so the segment right before the album
-        // directory is the artist directory and must not be mistaken for a release type directory.
-        SetupExistingAlbum(command, includeReleaseType: false);
+        // directory is the artist directory ({artistName}-{artistId}) and must not be mistaken for a release type directory.
+        AlbumEntity existingAlbum = SetupExistingAlbum(command, includeReleaseType: false);
         SetupExistingLibrary(command);
         SetupExistingArtist(command, name: "Live");
-        SetupExistingArtwork(_musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Album, artworkType: ArtworkType.Cover, fileName: "/media/music/library/Live/album/cover.jpg"));
+        SetupExistingArtwork(_musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Album, artworkType: ArtworkType.Cover, fileName: $"/media/music/library/Live-{existingAlbum.ArtistId}/album/cover.jpg"));
 
         // Act
         Result<UpdateAlbumCoverResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -404,7 +406,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         await _mockMusicArtworkService.Received(1).SaveAlbumArtworkAsync(
-            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), "Live", Arg.Any<string>(),
+            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), "Live", Arg.Any<string>(),
             Arg.Any<Stream>(), Arg.Any<string>(), Arg.Is<string?>(releaseTypeName => releaseTypeName == null), Arg.Any<CancellationToken>());
     }
 
@@ -425,7 +427,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         await _mockMusicArtworkService.Received(1).SaveAlbumArtworkAsync(
-            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), "Album", Arg.Any<string>(),
+            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), "Album", Arg.Any<string>(),
             Arg.Any<Stream>(), Arg.Any<string>(), "Ep", Arg.Any<CancellationToken>());
     }
 
@@ -445,7 +447,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         await _mockMusicArtworkService.Received(1).SaveAlbumArtworkAsync(
-            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(),
             Arg.Any<Stream>(), Arg.Any<string>(), "Single", Arg.Any<CancellationToken>());
     }
 
@@ -466,7 +468,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         await _mockMusicArtworkService.Received(1).SaveAlbumArtworkAsync(
-            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(),
             Arg.Any<Stream>(), Arg.Any<string>(), "Single", Arg.Any<CancellationToken>());
     }
 
@@ -485,7 +487,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         await _mockMusicArtworkService.Received(1).SaveAlbumArtworkAsync(
-            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(),
             Arg.Any<Stream>(), Arg.Any<string>(), "Single", Arg.Any<CancellationToken>());
     }
 
@@ -504,7 +506,7 @@ public class UpdateAlbumCoverCommandHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         await _mockMusicArtworkService.Received(1).SaveAlbumArtworkAsync(
-            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(),
             Arg.Any<Stream>(), Arg.Any<string>(), Arg.Is<string?>(releaseTypeName => releaseTypeName == null), Arg.Any<CancellationToken>());
     }
 
@@ -649,6 +651,7 @@ public class UpdateAlbumCoverCommandHandlerTests
             existingAlbum.LibraryId,
             existingAlbum.Id,
             library.Title,
+            existingAlbum.ArtistId,
             artist.Name,
             existingAlbum.Title,
             Arg.Any<Stream>(),

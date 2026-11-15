@@ -8,7 +8,6 @@ using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
 using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.DeleteTrack;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
@@ -33,8 +32,9 @@ public class DeleteTrackCommandHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly IArtistRepository _mockArtistRepository;
+    private readonly IAlbumRepository _mockAlbumRepository;
+    private readonly ITrackRepository _mockTrackRepository;
     private readonly ILibraryRepository _mockLibraryRepository;
-    private readonly IMusicArtworkCleanupService _mockMusicArtworkCleanupService;
     private readonly IAuthorizationService _mockAuthorizationService;
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IValidator<DeleteTrackCommand> _mockValidator;
@@ -53,38 +53,51 @@ public class DeleteTrackCommandHandlerTests
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
         _mockArtistRepository = Substitute.For<IArtistRepository>();
+        _mockAlbumRepository = Substitute.For<IAlbumRepository>();
+        _mockTrackRepository = Substitute.For<ITrackRepository>();
         _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockUnitOfWork.ArtistRepository.Returns(_mockArtistRepository);
+        _mockUnitOfWork.AlbumRepository.Returns(_mockAlbumRepository);
+        _mockUnitOfWork.TrackRepository.Returns(_mockTrackRepository);
         _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
-        _mockMusicArtworkCleanupService = Substitute.For<IMusicArtworkCleanupService>();
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockValidator = Substitute.For<IValidator<DeleteTrackCommand>>();
         _userId = Guid.NewGuid();
 
-        // Default stubs: the command is valid, the current user is authenticated, the ownership policy allows the deletion, the artist update succeeds, the artwork cleanup succeeds and saving changes succeeds.
+        // Default stubs: the command is valid, the current user is authenticated, the ownership policy allows the deletion, the artist, the library,
+        // the album and the track exist, marking the track as deleted succeeds, and saving changes succeeds.
         _mockValidator.Validate(Arg.Any<DeleteTrackCommand>()).Returns([]);
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(true);
-        _mockMusicArtworkCleanupService.DeleteTrackArtworkAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
-            .Returns(Result.Deleted);
-        _mockArtistRepository.UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>())
+        _mockArtistRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(_ => Result.From<ArtistEntity?>(_artistEntityFixture.Create(includeAlbums: false, includeContributors: false)));
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(_ => Result.From<LibraryEntity?>(_libraryEntityFixture.Create()));
+        _mockAlbumRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(_ => Result.From<AlbumEntity?>(_albumEntityFixture.Create(includeTracks: false)));
+        _mockTrackRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(_ => Result.From<TrackEntity?>(_trackEntityFixture.Create(includeMetadata: false)));
+        _mockTrackRepository.SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>())
             .Returns(Result.Success);
 
-        _sut = new DeleteTrackCommandHandler(_mockUnitOfWork, _mockMusicArtworkCleanupService, _mockAuthorizationService, _mockCurrentUserService, _mockValidator);
+        _sut = new DeleteTrackCommandHandler(_mockUnitOfWork, _mockAuthorizationService, _mockCurrentUserService, _mockValidator);
     }
 
     [Fact]
-    public async Task HandleAsync_WhenTrackExists_ShouldRemoveTrackFromAlbumAndReturnDeleted()
+    public async Task HandleAsync_WhenTrackExists_ShouldSoftDeleteTrackAndReturnDeleted()
     {
         // Arrange
         DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
         (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = GetCommandIds(command);
-        ArtistEntity artist = CreateArtistWithAlbumAndTrack(libraryId, artistId, albumId, trackId);
-        StubArtistAndLibrary(artist, libraryId);
+        StubArtistAndLibrary(libraryId, artistId);
+        StubAlbum(libraryId, artistId, albumId);
+        TrackEntity track = _trackEntityFixture.Create(id: trackId, albumId: albumId, libraryId: libraryId, includeMetadata: false);
+        _mockTrackRepository.GetByIdAsync(trackId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<TrackEntity?>(track));
 
         // Act
         Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -92,31 +105,25 @@ public class DeleteTrackCommandHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(Result.Deleted, result.Value);
-        // The artwork of the track is removed before the track is removed from the artist aggregate, so that no artwork is orphaned.
-        await _mockMusicArtworkCleanupService.Received(1).DeleteTrackArtworkAsync(trackId, Arg.Any<CancellationToken>());
-        Received.InOrder(() =>
-        {
-            _mockMusicArtworkCleanupService.DeleteTrackArtworkAsync(trackId, Arg.Any<CancellationToken>());
-            _mockArtistRepository.UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
-        });
-        await _mockArtistRepository.Received(1).UpdateAsync(
-            Arg.Is<ArtistEntity>(updatedArtist =>
-                updatedArtist.Id == artistId &&
-                updatedArtist.Albums.Count == 1 &&
-                updatedArtist.Albums[0].Id == albumId &&
-                updatedArtist.Albums[0].Tracks.Count == 0),
-            Arg.Any<CancellationToken>());
+        // The track is only marked as deleted, so its metadata, artwork and path stay available for a later restore.
+        await _mockTrackRepository.Received(1).SoftDeleteByIdAsync(trackId, Arg.Any<CancellationToken>());
+        await _mockTrackRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockAuthorizationService.Received(1).EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
+            _userId, Arg.Is<LibraryOwnershipPolicyContext>(context => context.LibraryId == libraryId), Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task HandleAsync_WhenCalled_ShouldLoadTheArtistWithNavigationPropertiesAndTheLibraryWithoutTracking()
+    public async Task HandleAsync_WhenCalled_ShouldLoadTheScopingRowsWithoutNavigationPropertiesOrTracking()
     {
         // Arrange
         DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
         (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = GetCommandIds(command);
-        ArtistEntity artist = CreateArtistWithAlbumAndTrack(libraryId, artistId, albumId, trackId);
-        StubArtistAndLibrary(artist, libraryId);
+        StubArtistAndLibrary(libraryId, artistId);
+        StubAlbum(libraryId, artistId, albumId);
+        TrackEntity track = _trackEntityFixture.Create(id: trackId, albumId: albumId, libraryId: libraryId, includeMetadata: false);
+        _mockTrackRepository.GetByIdAsync(trackId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<TrackEntity?>(track));
 
         // Act
         await _sut.HandleAsync(command, CancellationToken.None);
@@ -124,17 +131,24 @@ public class DeleteTrackCommandHandlerTests
         // Assert
         await _mockArtistRepository.Received(1).GetByIdAsync(
             artistId,
-            shouldIncludeNavigationProperties: true,
+            shouldIncludeNavigationProperties: false,
             shouldTrackEntities: false,
             cancellationToken: Arg.Any<CancellationToken>());
         await _mockLibraryRepository.Received(1).GetByIdAsync(
             libraryId,
+            shouldIncludeNavigationProperties: true,
             shouldTrackEntities: false,
             cancellationToken: Arg.Any<CancellationToken>());
-        await _mockAuthorizationService.Received(1).EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
-            _userId,
-            Arg.Is<LibraryOwnershipPolicyContext>(context => context.LibraryId == libraryId),
-            Arg.Any<CancellationToken>());
+        await _mockAlbumRepository.Received(1).GetByIdAsync(
+            albumId,
+            shouldIncludeNavigationProperties: false,
+            shouldTrackEntities: false,
+            cancellationToken: Arg.Any<CancellationToken>());
+        await _mockTrackRepository.Received(1).GetByIdAsync(
+            trackId,
+            shouldIncludeNavigationProperties: false,
+            shouldTrackEntities: false,
+            cancellationToken: Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -153,13 +167,14 @@ public class DeleteTrackCommandHandlerTests
         Assert.Equal(DomainErrors.Music.TrackIdCannotBeEmpty, result.FirstError);
         await _mockArtistRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
         await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
-        await _mockMusicArtworkCleanupService.DidNotReceive().DeleteTrackArtworkAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
-        await _mockArtistRepository.DidNotReceive().UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
+        await _mockAlbumRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _mockTrackRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _mockTrackRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task HandleAsync_WhenCurrentUserIsNull_ShouldReturnNotAuthorizedError()
+    public async Task HandleAsync_WhenUserIsNotAuthenticated_ShouldReturnNotAuthorizedError()
     {
         // Arrange
         DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
@@ -172,27 +187,26 @@ public class DeleteTrackCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
         await _mockArtistRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _mockTrackRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task HandleAsync_WhenGetArtistFails_ShouldReturnError()
+    public async Task HandleAsync_WhenArtistRepositoryFails_ShouldReturnFailureResultWithoutDeleting()
     {
         // Arrange
         DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
-        (_, Guid artistId, _, _) = GetCommandIds(command);
-        Error error = Error.Failure(description: "Failed to get artist");
-        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(error);
+        _mockArtistRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(ApplicationErrors.Persistence.UniqueConstraintViolation);
 
         // Act
         Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(error, result.FirstError);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
-        await _mockArtistRepository.DidNotReceive().UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
+        Assert.Equal(ApplicationErrors.Persistence.UniqueConstraintViolation, result.FirstError);
+        await _mockTrackRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -201,9 +215,8 @@ public class DeleteTrackCommandHandlerTests
     {
         // Arrange
         DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
-        (_, Guid artistId, _, _) = GetCommandIds(command);
-        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From<ArtistEntity?>(null));
+        _mockArtistRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(_ => Result.From<ArtistEntity?>(null));
 
         // Act
         Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -211,18 +224,18 @@ public class DeleteTrackCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Music.ArtistNotFound, result.FirstError);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task HandleAsync_WhenArtistBelongsToAnotherLibrary_ShouldReturnArtistNotFoundErrorWithoutEvaluatingThePolicy()
+    public async Task HandleAsync_WhenArtistBelongsToAnotherLibrary_ShouldReturnArtistNotFoundWithoutEvaluatingThePolicy()
     {
         // Arrange
         DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
-        (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = GetCommandIds(command);
-        ArtistEntity artist = CreateArtistWithAlbumAndTrack(Guid.NewGuid(), artistId, albumId, trackId);
-        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+        (_, Guid artistId, _, _) = GetCommandIds(command);
+        ArtistEntity artist = _artistEntityFixture.Create(id: artistId, libraryId: Guid.NewGuid(), includeAlbums: false, includeContributors: false);
+        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<ArtistEntity?>(artist));
 
         // Act
@@ -233,7 +246,6 @@ public class DeleteTrackCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Music.ArtistNotFound, result.FirstError);
         await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -242,10 +254,8 @@ public class DeleteTrackCommandHandlerTests
     {
         // Arrange
         DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
-        (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = GetCommandIds(command);
-        ArtistEntity artist = CreateArtistWithAlbumAndTrack(libraryId, artistId, albumId, trackId);
-        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From<ArtistEntity?>(artist));
+        (Guid libraryId, Guid artistId, _, _) = GetCommandIds(command);
+        StubArtist(libraryId, artistId);
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(false);
 
@@ -255,72 +265,30 @@ public class DeleteTrackCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockAuthorizationService.Received(1).EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
+            _userId, Arg.Is<LibraryOwnershipPolicyContext>(context => context.LibraryId == libraryId), Arg.Any<CancellationToken>());
         await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
-        await _mockArtistRepository.DidNotReceive().UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
+        await _mockTrackRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task HandleAsync_WhenAlbumDoesNotExistInArtist_ShouldReturnAlbumNotFoundError()
+    public async Task HandleAsync_WhenLibraryRepositoryFails_ShouldReturnFailureResultWithoutDeleting()
     {
         // Arrange
         DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
-        (Guid libraryId, Guid artistId, _, Guid trackId) = GetCommandIds(command);
-        Guid otherAlbumId = Guid.NewGuid();
-        ArtistEntity artist = CreateArtistWithAlbumAndTrack(libraryId, artistId, otherAlbumId, trackId);
-        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From<ArtistEntity?>(artist));
+        (Guid libraryId, Guid artistId, _, _) = GetCommandIds(command);
+        StubArtist(libraryId, artistId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(ApplicationErrors.Persistence.UniqueConstraintViolation);
 
         // Act
         Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(DomainErrors.Music.AlbumNotFound, result.FirstError);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task HandleAsync_WhenTrackDoesNotExistInAlbum_ShouldReturnTrackNotFoundError()
-    {
-        // Arrange
-        DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
-        (Guid libraryId, Guid artistId, Guid albumId, _) = GetCommandIds(command);
-        ArtistEntity artist = CreateArtistWithAlbumAndTrack(libraryId, artistId, albumId, Guid.NewGuid());
-        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From<ArtistEntity?>(artist));
-
-        // Act
-        Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
-
-        // Assert
-        Assert.True(result.IsFailure);
-        Assert.Equal(DomainErrors.Music.TrackNotFound, result.FirstError);
-        await _mockLibraryRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task HandleAsync_WhenGetLibraryFails_ShouldReturnError()
-    {
-        // Arrange
-        DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
-        (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = GetCommandIds(command);
-        ArtistEntity artist = CreateArtistWithAlbumAndTrack(libraryId, artistId, albumId, trackId);
-        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From<ArtistEntity?>(artist));
-        Error error = Error.Failure(description: "Failed to get library");
-        _mockLibraryRepository.GetByIdAsync(libraryId, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(error);
-
-        // Act
-        Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
-
-        // Assert
-        Assert.True(result.IsFailure);
-        Assert.Equal(error, result.FirstError);
-        await _mockArtistRepository.DidNotReceive().UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
+        Assert.Equal(ApplicationErrors.Persistence.UniqueConstraintViolation, result.FirstError);
+        await _mockTrackRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -329,12 +297,10 @@ public class DeleteTrackCommandHandlerTests
     {
         // Arrange
         DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
-        (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = GetCommandIds(command);
-        ArtistEntity artist = CreateArtistWithAlbumAndTrack(libraryId, artistId, albumId, trackId);
-        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From<ArtistEntity?>(artist));
-        _mockLibraryRepository.GetByIdAsync(libraryId, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From<LibraryEntity?>(null));
+        (Guid libraryId, Guid artistId, _, _) = GetCommandIds(command);
+        StubArtist(libraryId, artistId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(_ => Result.From<LibraryEntity?>(null));
 
         // Act
         Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
@@ -342,77 +308,156 @@ public class DeleteTrackCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Library.LibraryNotFound, result.FirstError);
-        await _mockArtistRepository.DidNotReceive().UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
+        await _mockTrackRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task HandleAsync_WhenArtistDomainConversionFails_ShouldReturnError()
+    public async Task HandleAsync_WhenAlbumRepositoryFails_ShouldReturnFailureResultWithoutDeleting()
     {
         // Arrange
         DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
-        (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = GetCommandIds(command);
-        // An empty name is rejected by the artist aggregate invariant, so the repository entity fails to convert to a domain entity.
-        AlbumEntity album = CreateAlbumWithTrack(libraryId, artistId, albumId, trackId);
-        ArtistEntity artist = _artistEntityFixture.Create(
-            id: artistId,
-            libraryId: libraryId,
-            name: string.Empty,
-            albums: [album],
-            includeContributors: false,
-            includeMetadata: false);
-        StubArtistAndLibrary(artist, libraryId);
+        (Guid libraryId, Guid artistId, _, _) = GetCommandIds(command);
+        StubArtistAndLibrary(libraryId, artistId);
+        _mockAlbumRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(ApplicationErrors.Persistence.UniqueConstraintViolation);
 
         // Act
         Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(DomainErrors.Music.ArtistNameCannotBeEmpty, result.FirstError);
-        await _mockArtistRepository.DidNotReceive().UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
+        Assert.Equal(ApplicationErrors.Persistence.UniqueConstraintViolation, result.FirstError);
+        await _mockTrackRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task HandleAsync_WhenArtworkCleanupFails_ShouldReturnErrorWithoutUpdatingTheArtist()
+    public async Task HandleAsync_WhenAlbumDoesNotExist_ShouldReturnAlbumNotFoundError()
     {
         // Arrange
         DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
-        (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = GetCommandIds(command);
-        ArtistEntity artist = CreateArtistWithAlbumAndTrack(libraryId, artistId, albumId, trackId);
-        StubArtistAndLibrary(artist, libraryId);
-        Error error = Error.Failure(description: "Failed to delete the artwork");
-        _mockMusicArtworkCleanupService.DeleteTrackArtworkAsync(trackId, Arg.Any<CancellationToken>())
-            .Returns(error);
+        (Guid libraryId, Guid artistId, _, _) = GetCommandIds(command);
+        StubArtistAndLibrary(libraryId, artistId);
+        _mockAlbumRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(_ => Result.From<AlbumEntity?>(null));
 
         // Act
         Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(error, result.FirstError);
-        await _mockArtistRepository.DidNotReceive().UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
+        Assert.Equal(DomainErrors.Music.AlbumNotFound, result.FirstError);
+        await _mockTrackRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task HandleAsync_WhenUpdateArtistFails_ShouldReturnErrorWithoutSaving()
+    public async Task HandleAsync_WhenAlbumBelongsToAnotherArtist_ShouldReturnAlbumNotFoundError()
     {
         // Arrange
         DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
-        (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = GetCommandIds(command);
-        ArtistEntity artist = CreateArtistWithAlbumAndTrack(libraryId, artistId, albumId, trackId);
-        StubArtistAndLibrary(artist, libraryId);
-        Error error = Error.Failure(description: "Failed to update artist");
-        _mockArtistRepository.UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>())
-            .Returns(error);
+        (Guid libraryId, Guid artistId, Guid albumId, _) = GetCommandIds(command);
+        StubArtistAndLibrary(libraryId, artistId);
+        AlbumEntity album = _albumEntityFixture.Create(id: albumId, artistId: Guid.NewGuid(), libraryId: libraryId, includeTracks: false);
+        _mockAlbumRepository.GetByIdAsync(albumId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<AlbumEntity?>(album));
 
         // Act
         Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(error, result.FirstError);
+        Assert.Equal(DomainErrors.Music.AlbumNotFound, result.FirstError);
+        await _mockTrackRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenTrackRepositoryFails_ShouldReturnFailureResultWithoutDeleting()
+    {
+        // Arrange
+        DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
+        (Guid libraryId, Guid artistId, Guid albumId, _) = GetCommandIds(command);
+        StubArtistAndLibrary(libraryId, artistId);
+        StubAlbum(libraryId, artistId, albumId);
+        _mockTrackRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(ApplicationErrors.Persistence.UniqueConstraintViolation);
+
+        // Act
+        Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Persistence.UniqueConstraintViolation, result.FirstError);
+        await _mockTrackRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenTrackDoesNotExist_ShouldReturnTrackNotFoundError()
+    {
+        // Arrange
+        DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
+        (Guid libraryId, Guid artistId, Guid albumId, _) = GetCommandIds(command);
+        StubArtistAndLibrary(libraryId, artistId);
+        StubAlbum(libraryId, artistId, albumId);
+        _mockTrackRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(_ => Result.From<TrackEntity?>(null));
+
+        // Act
+        Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.Music.TrackNotFound, result.FirstError);
+        await _mockTrackRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenTrackBelongsToAnotherAlbum_ShouldReturnTrackNotFoundError()
+    {
+        // Arrange
+        DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
+        (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = GetCommandIds(command);
+        StubArtistAndLibrary(libraryId, artistId);
+        StubAlbum(libraryId, artistId, albumId);
+        TrackEntity track = _trackEntityFixture.Create(id: trackId, albumId: Guid.NewGuid(), libraryId: libraryId, includeMetadata: false);
+        _mockTrackRepository.GetByIdAsync(trackId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<TrackEntity?>(track));
+
+        // Act
+        Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.Music.TrackNotFound, result.FirstError);
+        await _mockTrackRepository.DidNotReceive().SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenSoftDeleteFails_ShouldReturnErrorWithoutSaving()
+    {
+        // Arrange
+        DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
+        (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = GetCommandIds(command);
+        StubArtistAndLibrary(libraryId, artistId);
+        StubAlbum(libraryId, artistId, albumId);
+        TrackEntity track = _trackEntityFixture.Create(id: trackId, albumId: albumId, libraryId: libraryId, includeMetadata: false);
+        _mockTrackRepository.GetByIdAsync(trackId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<TrackEntity?>(track));
+        _mockTrackRepository.SoftDeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(ApplicationErrors.Persistence.UniqueConstraintViolation);
+
+        // Act
+        Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Persistence.UniqueConstraintViolation, result.FirstError);
+        await _mockTrackRepository.Received(1).SoftDeleteByIdAsync(trackId, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -422,19 +467,21 @@ public class DeleteTrackCommandHandlerTests
         // Arrange
         DeleteTrackCommand command = _deleteTrackCommandFixture.Create();
         (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = GetCommandIds(command);
-        ArtistEntity artist = CreateArtistWithAlbumAndTrack(libraryId, artistId, albumId, trackId);
-        StubArtistAndLibrary(artist, libraryId);
-        Error error = Error.Failure(description: "Failed to save changes");
+        StubArtistAndLibrary(libraryId, artistId);
+        StubAlbum(libraryId, artistId, albumId);
+        TrackEntity track = _trackEntityFixture.Create(id: trackId, albumId: albumId, libraryId: libraryId, includeMetadata: false);
+        _mockTrackRepository.GetByIdAsync(trackId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<TrackEntity?>(track));
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>())
-            .Returns(error);
+            .Returns(ApplicationErrors.Persistence.UniqueConstraintViolation);
 
         // Act
         Result<Deleted> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(error, result.FirstError);
-        await _mockArtistRepository.Received(1).UpdateAsync(Arg.Any<ArtistEntity>(), Arg.Any<CancellationToken>());
+        Assert.Equal(ApplicationErrors.Persistence.UniqueConstraintViolation, result.FirstError);
+        await _mockTrackRepository.Received(1).SoftDeleteByIdAsync(trackId, Arg.Any<CancellationToken>());
     }
 
     /// <summary>
@@ -452,67 +499,40 @@ public class DeleteTrackCommandHandlerTests
     }
 
     /// <summary>
-    /// Creates an artist that contains a single album, which in turn contains a single track.
+    /// Stubs the artist repository so that the handler finds an artist that belongs to <paramref name="libraryId"/>.
     /// </summary>
     /// <param name="libraryId">The Id of the media library the artist belongs to.</param>
     /// <param name="artistId">The Id of the artist.</param>
-    /// <param name="albumId">The Id of the album.</param>
-    /// <param name="trackId">The Id of the track.</param>
-    /// <returns>The created artist entity, with its album and track graph.</returns>
-    private ArtistEntity CreateArtistWithAlbumAndTrack(Guid libraryId, Guid artistId, Guid albumId, Guid trackId)
+    private void StubArtist(Guid libraryId, Guid artistId)
     {
-        AlbumEntity album = CreateAlbumWithTrack(libraryId, artistId, albumId, trackId);
-        return _artistEntityFixture.Create(
-            id: artistId,
-            libraryId: libraryId,
-            albums: [album],
-            includeContributors: false,
-            includeMetadata: false);
+        ArtistEntity artist = _artistEntityFixture.Create(id: artistId, libraryId: libraryId, includeAlbums: false, includeContributors: false);
+        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<ArtistEntity?>(artist));
     }
 
     /// <summary>
-    /// Creates an album that contains a single track.
+    /// Stubs the album repository so that the handler finds an album of <paramref name="artistId"/>.
     /// </summary>
     /// <param name="libraryId">The Id of the media library the album belongs to.</param>
     /// <param name="artistId">The Id of the artist the album belongs to.</param>
     /// <param name="albumId">The Id of the album.</param>
-    /// <param name="trackId">The Id of the track.</param>
-    /// <returns>The created album entity, with its track.</returns>
-    private AlbumEntity CreateAlbumWithTrack(Guid libraryId, Guid artistId, Guid albumId, Guid trackId)
+    private void StubAlbum(Guid libraryId, Guid artistId, Guid albumId)
     {
-        TrackEntity track = _trackEntityFixture.Create(
-            id: trackId,
-            albumId: albumId,
-            libraryId: libraryId,
-            includeMetadata: false,
-            includeOriginalReleaseDate: false,
-            includeOriginalReleaseYear: false,
-            includeReReleaseDate: false,
-            includeReReleaseYear: false);
-        return _albumEntityFixture.Create(
-            id: albumId,
-            artistId: artistId,
-            libraryId: libraryId,
-            tracks: [track],
-            includeMetadata: false,
-            includeBarcode: false,
-            includeOriginalReleaseDate: false,
-            includeOriginalReleaseYear: false,
-            includeReReleaseDate: false,
-            includeReReleaseYear: false);
+        AlbumEntity album = _albumEntityFixture.Create(id: albumId, artistId: artistId, libraryId: libraryId, includeTracks: false);
+        _mockAlbumRepository.GetByIdAsync(albumId, shouldIncludeNavigationProperties: false, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<AlbumEntity?>(album));
     }
 
     /// <summary>
-    /// Stubs the artist and library repositories so that the handler finds the artist and the library.
+    /// Stubs the artist and library repositories so that the handler finds the artist and its library.
     /// </summary>
-    /// <param name="artist">The artist returned by the artist repository.</param>
-    /// <param name="libraryId">The Id of the media library returned by the library repository.</param>
-    private void StubArtistAndLibrary(ArtistEntity artist, Guid libraryId)
+    /// <param name="libraryId">The Id of the media library the artist belongs to.</param>
+    /// <param name="artistId">The Id of the artist.</param>
+    private void StubArtistAndLibrary(Guid libraryId, Guid artistId)
     {
-        _mockArtistRepository.GetByIdAsync(artist.Id, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(Result.From<ArtistEntity?>(artist));
+        StubArtist(libraryId, artistId);
         LibraryEntity library = _libraryEntityFixture.Create(id: libraryId);
-        _mockLibraryRepository.GetByIdAsync(libraryId, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+        _mockLibraryRepository.GetByIdAsync(libraryId, Arg.Any<bool>(), shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
     }
 }

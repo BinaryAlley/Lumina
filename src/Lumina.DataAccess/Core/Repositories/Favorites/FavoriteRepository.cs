@@ -113,17 +113,17 @@ internal sealed class FavoriteRepository : IFavoriteRepository
         {
             FavoriteMediaKind.MusicArtist => await _luminaDbContext.Artists
                 .AsNoTracking()
-                .Where(artist => artist.Id == mediaItemId)
+                .Where(artist => artist.Id == mediaItemId && !artist.IsDeleted)
                 .Select(artist => (Guid?)artist.LibraryId)
                 .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false),
             FavoriteMediaKind.MusicAlbum => await _luminaDbContext.Albums
                 .AsNoTracking()
-                .Where(album => album.Id == mediaItemId)
+                .Where(album => album.Id == mediaItemId && !album.IsDeleted && !album.Artist!.IsDeleted)
                 .Select(album => (Guid?)album.LibraryId)
                 .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false),
             FavoriteMediaKind.MusicTrack => await _luminaDbContext.Tracks
                 .AsNoTracking()
-                .Where(track => track.Id == mediaItemId)
+                .Where(track => track.Id == mediaItemId && !track.IsDeleted && !track.Album!.IsDeleted && !track.Album!.Artist!.IsDeleted)
                 .Select(track => (Guid?)track.LibraryId)
                 .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false),
             FavoriteMediaKind.Book => await _luminaDbContext.Books
@@ -293,7 +293,7 @@ internal sealed class FavoriteRepository : IFavoriteRepository
                 // The cover of the artist is the cover artwork stored for it, if any, the same one the artist listing exposes.
                 rows = await _luminaDbContext.Artists
                     .AsNoTracking()
-                    .Where(artist => requestedIds.Contains(artist.Id))
+                    .Where(artist => requestedIds.Contains(artist.Id) && !artist.IsDeleted)
                     .Select(artist => new DisplayRow(
                         artist.Id,
                         artist.LibraryId,
@@ -311,7 +311,7 @@ internal sealed class FavoriteRepository : IFavoriteRepository
             case FavoriteMediaKind.MusicAlbum:
                 rows = await (from album in _luminaDbContext.Albums.AsNoTracking()
                               join artist in _luminaDbContext.Artists on album.ArtistId equals artist.Id
-                              where requestedIds.Contains(album.Id)
+                              where requestedIds.Contains(album.Id) && !album.IsDeleted && !artist.IsDeleted
                               select new DisplayRow(
                                   album.Id,
                                   album.LibraryId,
@@ -331,7 +331,7 @@ internal sealed class FavoriteRepository : IFavoriteRepository
                 rows = await (from track in _luminaDbContext.Tracks.AsNoTracking()
                               join album in _luminaDbContext.Albums on track.AlbumId equals album.Id
                               join artist in _luminaDbContext.Artists on album.ArtistId equals artist.Id
-                              where requestedIds.Contains(track.Id)
+                              where requestedIds.Contains(track.Id) && !track.IsDeleted && !album.IsDeleted && !artist.IsDeleted
                               select new DisplayRow(
                                   track.Id,
                                   track.LibraryId,

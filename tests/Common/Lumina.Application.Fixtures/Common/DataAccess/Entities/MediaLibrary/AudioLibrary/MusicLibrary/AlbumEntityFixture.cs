@@ -55,10 +55,12 @@ public class AlbumEntityFixture
     /// <param name="releaseStatus">Optional. The release status of the album.</param>
     /// <param name="totalDiscs">Optional. The total number of discs of the album.</param>
     /// <param name="mediaFormat">Optional. The media format of the album.</param>
-    /// <param name="catalogNumber">Optional. The catalog number of the album.</param>
+    /// <param name="catalogNumbers">Optional. The catalog numbers of the album.</param>
     /// <param name="musicBrainzReleaseId">Optional. The MusicBrainz release identifier of the album.</param>
     /// <param name="musicBrainzReleaseGroupId">Optional. The MusicBrainz release group identifier of the album.</param>
     /// <param name="musicBrainzReleaseArtistId">Optional. The MusicBrainz release artist identifier of the album.</param>
+    /// <param name="isDeleted">Whether the album is soft deleted.</param>
+    /// <param name="deletedOnUtc">Optional. The date and time when the album was deleted.</param>
     /// <param name="includeTracks">Whether the album should own a generated track, or no track at all.</param>
     /// <param name="includeMetadata">Whether the owned metadata collections (Tags, Genres, Contributors, Ratings) should be included, or forced to empty collections.</param>
     /// <param name="includeOriginalReleaseDate">Whether the original release date should be included, or forced to <see langword="null"/>.</param>
@@ -78,6 +80,7 @@ public class AlbumEntityFixture
     /// <param name="includeMusicBrainzReleaseId">Whether the MusicBrainz release identifier should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMusicBrainzReleaseGroupId">Whether the MusicBrainz release group identifier should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeMusicBrainzReleaseArtistId">Whether the MusicBrainz release artist identifier should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeDeletedOnUtc">Whether a deleted album should carry a deletion time, or <see langword="null"/>.</param>
     /// <param name="metadataStatus">Optional. The metadata enrichment status of the album.</param>
     /// <returns>The created <see cref="AlbumEntity"/>.</returns>
     public AlbumEntity Create(
@@ -107,6 +110,8 @@ public class AlbumEntityFixture
         Guid? musicBrainzReleaseId = null,
         Guid? musicBrainzReleaseGroupId = null,
         Guid? musicBrainzReleaseArtistId = null,
+        bool isDeleted = false,
+        DateTime? deletedOnUtc = null,
         bool includeTracks = true,
         bool includeMetadata = true,
         bool includeOriginalReleaseDate = true,
@@ -126,6 +131,7 @@ public class AlbumEntityFixture
         bool includeMusicBrainzReleaseId = true,
         bool includeMusicBrainzReleaseGroupId = true,
         bool includeMusicBrainzReleaseArtistId = true,
+        bool includeDeletedOnUtc = true,
         MetadataStatus? metadataStatus = null)
     {
         Guid resolvedId = id ?? Guid.NewGuid();
@@ -182,6 +188,8 @@ public class AlbumEntityFixture
             .RuleFor(x => x.Contributors, f => includeMetadata ? _albumContributorEntityFixture.CreateMany(f.Random.Number(1, 3), albumId: resolvedId) : [])
             .RuleFor(x => x.Ratings, f => includeMetadata ? _audioRatingEntityFixture.CreateMany(f.Random.Number(1, 3)) : [])
             .RuleFor(x => x.Tracks, resolvedTracks)
+            .RuleFor(x => x.IsDeleted, isDeleted)
+            .RuleFor(x => x.DeletedOnUtc, f => isDeleted && includeDeletedOnUtc ? (deletedOnUtc ?? f.Date.Recent()) : null)
             .RuleFor(x => x.CreatedOnUtc, f => f.Date.Past())
             .RuleFor(x => x.UpdatedOnUtc, f => f.Date.Recent())
             .Generate();

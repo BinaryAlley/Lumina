@@ -19,7 +19,7 @@ public class DeleteArtistEndpointSummary : Summary<DeleteArtistEndpoint, EmptyRe
     public DeleteArtistEndpointSummary()
     {
         Summary = "Deletes an existing artist.";
-        Description = "Deletes the artist identified by the route, together with its albums and tracks. The artist is deleted by an Admin, who can delete the artists of all libraries, or by the owner of the library of the artist.";
+        Description = "Soft deletes the artist identified by the route, so its metadata, artwork and track paths are kept and the artist can be restored. The artist is deleted by an Admin, who can delete the artists of all libraries, or by the owner of the library of the artist.";
 
         Response(200, "The artist was successfully deleted.");
 

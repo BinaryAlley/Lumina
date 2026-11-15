@@ -86,7 +86,7 @@ The manifest is a JSON object describing the theme. The example below is the man
   "name": "Editorial Paper",
   "description": "A clean, readable proof of concept theme.",
   "author": "Lumina",
-  "version": "1.5.61",
+  "version": "1.6.0",
   "preview": "assets/preview.svg",
   "templates": {
     "default": "templates/index.html"
@@ -180,6 +180,7 @@ Known page keys:
 | `shared/audio-player/playlist-item` | The playlist item of the audio player bar. |
 | `library/written-content-library/book-library/books/index` | The books browsing page. |
 | `library/written-content-library/book-library/books/deleted-items` | The deleted items page of a book library, which restores deleted books. |
+| `library/audio-library/music-library/deleted-items` | The deleted items page of a music library, which restores deleted artists, albums and tracks. |
 | `playlists/index` | The page that lists and deletes the playlists of the current user. |
 | `playlists/item` | The page that creates a playlist, or edits, reorders, plays and deletes an existing playlist of the current user. The `isNew` page data field tells the two modes apart. |
 | `favorites/index` | The page that lists, filters and removes the favorites of the current user across media kinds. |
@@ -620,6 +621,42 @@ The page script drives these hooks:
 | `input[name="__RequestVerificationToken"]` | The anti-forgery token that the restore POST sends. |
 
 A theme that provides this page must keep these hooks and render the anti-forgery token, or reimplement the restore behavior itself.
+
+#### The Music Deleted Items Page
+
+`library/audio-library/music-library/deleted-items` lists the artists, albums and tracks that were deleted from a music library and lets the user restore them. Its fallback is `Core/Views/Library/AudioLibrary/MusicLibrary/DeletedItems.cshtml`. The bundled themes ship their own `templates/library/audio-library/music-library/deleted-items.html`; when a theme has no template for the page, the application renders the fallback view.
+
+Template resolution walks up the path scopes, so a theme that ships `templates/library/audio-library/music-library.html` without a `deleted-items.html` would render that parent template for this page. A theme that provides a music library parent template must also provide the deleted items template.
+
+Page data:
+
+| Field | Content |
+| --- | --- |
+| `libraryId` | The Id of the library whose deleted music items are listed. |
+| `libraryTitle` | The title of that library. |
+| `deletedArtistsJson` | The deleted artists, serialized as a JSON array. Each item carries `id`, `libraryId`, `name`, `deletedOnUtc` and `coverPath`. |
+| `deletedAlbumsJson` | The deleted albums, serialized as a JSON array. Each item carries `id`, `libraryId`, `artistId`, `artistName`, `title`, `deletedOnUtc` and `coverPath`. |
+| `deletedTracksJson` | The deleted tracks, serialized as a JSON array. Each item carries `id`, `libraryId`, `artistId`, `artistName`, `albumId`, `albumTitle`, `title`, `path` and `deletedOnUtc`. |
+| `artistRestoreUrl` | The route template that restores a deleted artist. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the artist, and `libraryId` is appended as a query parameter. |
+| `albumRestoreUrl` | The route template that restores a deleted album. Its two `00000000-0000-0000-0000-000000000000` segments are replaced, in order, by the Id of the artist and the Id of the album, and `libraryId` is appended as a query parameter. |
+| `trackRestoreUrl` | The route template that restores a deleted track. Its three `00000000-0000-0000-0000-000000000000` segments are replaced, in order, by the Id of the artist, the Id of the album and the Id of the track, and `libraryId` is appended as a query parameter. |
+| `backUrl` | The route of the artists page of the library. |
+| `antiforgeryToken` | The anti-forgery request token for the restore POST. |
+| `strings` | The localized strings of the page, keyed by their resource names. |
+| `stringsJson` | The same localized strings serialized as JSON, with camel case keys, for the page script. |
+
+The page script drives these hooks:
+
+| Hook | Purpose |
+| --- | --- |
+| `btn-back-to-library` | Returns to the artists page of the library. |
+| `deleted-artists-table`, `deleted-albums-table` and `deleted-tracks-table` | Hold the deleted artists, albums and tracks. The restore click handler is bound at the document level. |
+| `no-deleted-music-items` | The empty state, shown when no deleted music items remain. |
+| `.deleted-music-item-row` | A deleted music item row, carrying its kind in `data-row-type` and the Ids it needs to restore in `data-artist-id`, `data-album-id` and `data-track-id`. Removed after a successful restore. |
+| `.btn-restore-artist`, `.btn-restore-album` and `.btn-restore-track` | The restore button of a row, carrying the same Ids as its row. |
+| `input[name="__RequestVerificationToken"]` | The anti-forgery token that the restore POST sends. |
+
+A theme that provides this page must keep these hooks and render the anti-forgery token, or reimplement the restore behavior itself. The `library/audio-library/music-library/artists/index` page supplies a `deletedItemsUrl` page data field with the route of this page, and the artists page template must also provide the `deleted-items-button` hook when it wants to link to it. The page reads the library from the `libraryId` query parameter, so a theme that links to `deletedItemsUrl` must append `?libraryId=` with the Id of the library, as the application template does; the route alone lands on the home page.
 
 #### The Playlist Pages
 

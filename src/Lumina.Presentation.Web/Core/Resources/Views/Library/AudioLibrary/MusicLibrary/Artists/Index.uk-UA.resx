@@ -69,4 +69,7 @@
   <data name="AddToPlaylist" xml:space="preserve">
     <value>Додати до списку відтворення</value>
   </data>
+  <data name="DeletedItems" xml:space="preserve">
+    <value>Видалені елементи</value>
+  </data>
 </root>

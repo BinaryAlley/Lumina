@@ -24,12 +24,60 @@ public interface IAlbumRepository : IRepository<AlbumEntity>,
                                     IDeleteByIdRepositoryAction<Guid>
 {
     /// <summary>
-    /// Gets all the albums of the artist identified by <paramref name="artistId"/>.
+    /// Gets the albums of the artist identified by <paramref name="artistId"/> that are not soft deleted.
     /// </summary>
     /// <param name="artistId">The Id of the artist whose albums are retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="AlbumEntity"/>, or an error.</returns>
     Task<Result<IReadOnlyList<AlbumEntity>>> GetByArtistIdAsync(Guid artistId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets all the albums of the artist identified by <paramref name="artistId"/>, whether they are soft deleted or not.
+    /// </summary>
+    /// <param name="artistId">The Id of the artist whose albums are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="AlbumEntity"/>, or an error.</returns>
+    Task<Result<IReadOnlyList<AlbumEntity>>> GetByArtistIdIncludingDeletedAsync(Guid artistId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the album identified by <paramref name="id"/>, whether it is soft deleted or not, without loading its navigation properties.
+    /// </summary>
+    /// <param name="id">The Id of the album to get.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="AlbumEntity"/>, or an error.</returns>
+    Task<Result<AlbumEntity?>> GetIncludingDeletedByIdAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the soft deleted album identified by <paramref name="id"/>, when its artist is not soft deleted.
+    /// </summary>
+    /// <param name="id">The Id of the soft deleted album to get.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted <see cref="AlbumEntity"/>, <see langword="null"/> when the album does not exist, is not soft deleted, or its artist is soft deleted, or an error.</returns>
+    Task<Result<AlbumEntity?>> GetSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the soft deleted albums of the media library identified by <paramref name="libraryId"/>, whose artist is not soft deleted.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose soft deleted albums are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted albums, or an error.</returns>
+    Task<Result<IReadOnlyList<AlbumEntity>>> GetSoftDeletedByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Soft deletes the album identified by <paramref name="id"/>, without removing its stored metadata or artwork, when another visible album of its artist remains.
+    /// </summary>
+    /// <param name="id">The Id of the album to soft delete.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> SoftDeleteByIdAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Restores the soft deleted album identified by <paramref name="id"/>.
+    /// </summary>
+    /// <param name="id">The Id of the album to restore.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> RestoreSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets the lightweight read models of the albums of the artist identified by <paramref name="artistId"/>, projecting only the fields needed to display the albums in a card-based grid or a list.

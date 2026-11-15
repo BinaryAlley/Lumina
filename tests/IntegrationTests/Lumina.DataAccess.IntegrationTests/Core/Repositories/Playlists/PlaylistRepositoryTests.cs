@@ -44,6 +44,16 @@ public class PlaylistRepositoryTests
     private readonly AlbumEntityFixture _albumEntityFixture = new();
     private readonly TrackEntityFixture _trackEntityFixture = new();
     private readonly MusicArtworkEntityFixture _musicArtworkEntityFixture = new();
+    private readonly IDateTimeProvider _mockDateTimeProvider;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PlaylistRepositoryTests"/> class.
+    /// </summary>
+    public PlaylistRepositoryTests()
+    {
+        _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
+        _mockDateTimeProvider.UtcNow.Returns(new DateTime(2026, 11, 14, 10, 30, 0, DateTimeKind.Utc));
+    }
 
     [Fact]
     public async Task UpdateAsync_WhenNoEditableValueChanged_ShouldNotModifyTheStoredPlaylist()
@@ -738,6 +748,125 @@ public class PlaylistRepositoryTests
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         PlaylistEntryDto item = Assert.Single(result.Value!.Entries.Data);
+        Assert.Null(item.Display);
+    }
+
+    [Fact]
+    public async Task AddScopeEntriesAsync_WhenTheScopeContainsSoftDeletedItems_ShouldAppendOnlyTheVisibleTracks()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-scope-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        PlaylistRepository sut = new(context);
+        Guid userId = Guid.NewGuid();
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        Guid libraryId = Guid.NewGuid();
+
+        ArtistEntity visibleArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "Visible Artist", includeAlbums: false, includeContributors: false);
+        AlbumEntity visibleAlbum = _albumEntityFixture.Create(artistId: visibleArtist.Id, libraryId: libraryId, title: "Visible Album", includeTracks: false, includeMetadata: false);
+        TrackEntity visibleTrack = _trackEntityFixture.Create(albumId: visibleAlbum.Id, libraryId: libraryId, title: "Visible Track", includeMetadata: false);
+        TrackEntity deletedTrack = _trackEntityFixture.Create(albumId: visibleAlbum.Id, libraryId: libraryId, title: "Deleted Track", includeMetadata: false);
+        deletedTrack.IsDeleted = true;
+        deletedTrack.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        context.Artists.Add(visibleArtist);
+        context.Albums.Add(visibleAlbum);
+        context.Tracks.AddRange(visibleTrack, deletedTrack);
+
+        ArtistEntity artistOfDeletedAlbum = _artistEntityFixture.Create(libraryId: libraryId, name: "Album Artist", includeAlbums: false, includeContributors: false);
+        AlbumEntity deletedAlbum = _albumEntityFixture.Create(artistId: artistOfDeletedAlbum.Id, libraryId: libraryId, title: "Deleted Album", includeTracks: false, includeMetadata: false);
+        deletedAlbum.IsDeleted = true;
+        deletedAlbum.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        TrackEntity trackOfDeletedAlbum = _trackEntityFixture.Create(albumId: deletedAlbum.Id, libraryId: libraryId, title: "Deleted Album Track", includeMetadata: false);
+        context.Artists.Add(artistOfDeletedAlbum);
+        context.Albums.Add(deletedAlbum);
+        context.Tracks.Add(trackOfDeletedAlbum);
+
+        ArtistEntity deletedArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "Deleted Artist", includeAlbums: false, includeContributors: false);
+        deletedArtist.IsDeleted = true;
+        deletedArtist.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        AlbumEntity albumOfDeletedArtist = _albumEntityFixture.Create(artistId: deletedArtist.Id, libraryId: libraryId, title: "Album Of Deleted Artist", includeTracks: false, includeMetadata: false);
+        TrackEntity trackOfDeletedArtist = _trackEntityFixture.Create(albumId: albumOfDeletedArtist.Id, libraryId: libraryId, title: "Deleted Artist Track", includeMetadata: false);
+        context.Artists.Add(deletedArtist);
+        context.Albums.Add(albumOfDeletedArtist);
+        context.Tracks.Add(trackOfDeletedArtist);
+        PlaylistEntity playlist = _playlistEntityFixture.Create(userId: userId, type: PlaylistType.Music, entryCount: 0, version: 0);
+        context.Playlists.Add(playlist);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<PlaylistBulkAddResultDto> result = await sut.AddScopeEntriesAsync(
+            playlist.Id,
+            userId,
+            libraryId,
+            artistId: null,
+            albumId: null,
+            PlaylistMediaItemType.MusicTrack,
+            _mockDateTimeProvider.UtcNow,
+            CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(1, result.Value.AddedCount);
+        List<Guid> storedMediaItemIds = await context.PlaylistEntries
+            .AsNoTracking()
+            .Where(entry => entry.PlaylistId == playlist.Id)
+            .Select(entry => entry.MediaItemId)
+            .ToListAsync();
+        Assert.Equal([visibleTrack.Id], storedMediaItemIds);
+    }
+
+    [Theory]
+    [InlineData(true)] // The track itself is soft deleted.
+    [InlineData(false)] // An ancestor of the track is soft deleted.
+    public async Task GetDetailsForUserAsync_WhenAnEntryReferencesASoftDeletedTrack_ShouldKeepTheEntryWithoutDisplayData(bool isTrackDeleted)
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-deleted-{isTrackDeleted}-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        PlaylistRepository sut = new(context);
+        Guid userId = Guid.NewGuid();
+        Guid libraryId = Guid.NewGuid();
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        (ArtistEntity artist, AlbumEntity album, TrackEntity track) = await SeedTrackAsync(
+            context,
+            libraryId,
+            artistName: "Deleted Track Artist",
+            albumTitle: "Deleted Track Album",
+            trackTitle: "Deleted Track",
+            coverFileName: "deleted-track-cover.jpg");
+        if (isTrackDeleted)
+            track.IsDeleted = true;
+        else
+            album.IsDeleted = true;
+        await context.SaveChangesAsync();
+
+        Guid playlistId = Guid.NewGuid();
+        PlaylistEntryEntity entry = _playlistEntryEntityFixture.Create(
+            playlistId: playlistId,
+            mediaItemId: track.Id,
+            mediaItemType: PlaylistMediaItemType.MusicTrack,
+            position: 1_000_000_000L);
+        PlaylistEntity playlist = _playlistEntityFixture.Create(
+            id: playlistId,
+            userId: userId,
+            type: PlaylistType.Music,
+            entries: [entry],
+            entryCount: 1,
+            version: 0);
+        context.Playlists.Add(playlist);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<PlaylistDetailsDto?> result = await sut.GetDetailsForUserAsync(playlistId, userId, paginationData: null, CancellationToken.None);
+
+        // Assert
+        // A deleted item keeps its entry so its owner can see and remove it, but its display data is no longer exposed.
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        PlaylistEntryDto item = Assert.Single(result.Value!.Entries.Data);
+        Assert.Equal(entry.Id, item.Entry.Id);
         Assert.Null(item.Display);
     }
 

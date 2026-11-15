@@ -52,6 +52,7 @@ public class FavoriteRepositoryTests
     private readonly MediaContributorEntityFixture _mediaContributorEntityFixture = new();
     private readonly BookContributorEntityFixture _bookContributorEntityFixture = new();
     private readonly MusicArtworkEntityFixture _musicArtworkEntityFixture = new();
+    private readonly DateTime _deletedOnUtc = new(2026, 11, 14, 10, 30, 0, DateTimeKind.Utc);
 
     [Fact]
     public async Task InsertAsync_WhenTheFavoriteIsNew_ShouldReturnCreatedAndPersistEveryField()
@@ -1119,6 +1120,59 @@ public class FavoriteRepositoryTests
         Assert.Empty(result.Value);
     }
 
+    [Theory]
+    [InlineData(FavoriteMediaKind.MusicArtist, false)] // the artist itself is soft deleted
+    [InlineData(FavoriteMediaKind.MusicAlbum, false)] // the album itself is soft deleted
+    [InlineData(FavoriteMediaKind.MusicAlbum, true)] // the album's artist is soft deleted
+    [InlineData(FavoriteMediaKind.MusicTrack, false)] // the track itself is soft deleted
+    [InlineData(FavoriteMediaKind.MusicTrack, true)] // the track's album is soft deleted
+    public async Task GetMediaItemLibraryIdAsync_WhenTheMusicItemIsSoftDeleted_ShouldReturnSuccessWithNull(FavoriteMediaKind mediaKind, bool isAncestorDeleted)
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = CreateAnchorConnection($"library-id-deleted-music-{(int)mediaKind}-{isAncestorDeleted}");
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        FavoriteRepository sut = new(context);
+        Guid mediaItemId = await SeedSoftDeletedMusicItemAsync(context, mediaKind, isAncestorDeleted);
+
+        // Act
+        Result<Guid?> result = await sut.GetMediaItemLibraryIdAsync(mediaKind, mediaItemId, CancellationToken.None);
+
+        // Assert
+        // A deleted music item, or one hidden by a deleted ancestor, is not part of the catalogue, so adding it to favorites is rejected as if it did not exist.
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Theory]
+    [InlineData(FavoriteMediaKind.MusicArtist, false)] // the artist itself is soft deleted
+    [InlineData(FavoriteMediaKind.MusicAlbum, false)] // the album itself is soft deleted
+    [InlineData(FavoriteMediaKind.MusicAlbum, true)] // the album's artist is soft deleted
+    [InlineData(FavoriteMediaKind.MusicTrack, false)] // the track itself is soft deleted
+    [InlineData(FavoriteMediaKind.MusicTrack, true)] // the track's album is soft deleted
+    public async Task GetAllForUserAsync_WhenTheFavoritedMusicItemIsSoftDeleted_ShouldKeepTheFavoriteWithoutDisplayData(FavoriteMediaKind mediaKind, bool isAncestorDeleted)
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = CreateAnchorConnection($"list-deleted-music-{(int)mediaKind}-{isAncestorDeleted}");
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        FavoriteRepository sut = new(context);
+        Guid userId = Guid.NewGuid();
+        context.Users.Add(_userEntityFixture.Create(id: userId));
+        Guid mediaItemId = await SeedSoftDeletedMusicItemAsync(context, mediaKind, isAncestorDeleted);
+        FavoriteEntity favorite = CreateFavorite(userId, mediaKind, mediaItemId);
+        context.Favorites.Add(favorite);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<PaginatedResultDto<FavoriteItemDto>> result = await sut.GetAllForUserAsync(userId, mediaKind, paginationData: null, cancellationToken: CancellationToken.None);
+
+        // Assert
+        // A deleted item is hidden from the catalogue, so its favorite must fall back to the unavailable state instead of exposing its display data.
+        Assert.False(result.IsFailure);
+        FavoriteItemDto item = Assert.Single(result.Value.Data);
+        Assert.Equal(favorite.Id, item.Favorite.Id);
+        Assert.Null(item.Display);
+    }
+
     /// <summary>
     /// Creates an open in-memory SQLite anchor connection with a database name unique to the test.
     /// </summary>
@@ -1191,6 +1245,66 @@ public class FavoriteRepositoryTests
             createdBy: userId,
             includeUpdatedOnUtc: false,
             includeUpdatedBy: false);
+    }
+
+    /// <summary>
+    /// Seeds an artist, an album of that artist and a track of that album, and soft deletes the requested music item or one of its ancestors.
+    /// </summary>
+    /// <param name="context">The context the catalogue is persisted through.</param>
+    /// <param name="mediaKind">The kind of the media item that must be hidden from the catalogue.</param>
+    /// <param name="isAncestorDeleted">Whether an ancestor of the item is soft deleted instead of the item itself.</param>
+    /// <returns>The Id of the hidden media item.</returns>
+    private async Task<Guid> SeedSoftDeletedMusicItemAsync(LuminaDbContext context, FavoriteMediaKind mediaKind, bool isAncestorDeleted)
+    {
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = _artistEntityFixture.Create(libraryId: libraryId, includeAlbums: false, includeContributors: false);
+        context.Artists.Add(artist);
+        await context.SaveChangesAsync();
+
+        AlbumEntity album = _albumEntityFixture.Create(artistId: artist.Id, libraryId: libraryId, includeTracks: false, includeMetadata: false);
+        context.Albums.Add(album);
+        await context.SaveChangesAsync();
+
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        context.Tracks.Add(track);
+        await context.SaveChangesAsync();
+
+        switch (mediaKind)
+        {
+            case FavoriteMediaKind.MusicArtist:
+                artist.IsDeleted = true;
+                artist.DeletedOnUtc = _deletedOnUtc;
+                await context.SaveChangesAsync();
+                return artist.Id;
+            case FavoriteMediaKind.MusicAlbum:
+                if (isAncestorDeleted)
+                {
+                    artist.IsDeleted = true;
+                    artist.DeletedOnUtc = _deletedOnUtc;
+                }
+                else
+                {
+                    album.IsDeleted = true;
+                    album.DeletedOnUtc = _deletedOnUtc;
+                }
+                await context.SaveChangesAsync();
+                return album.Id;
+            case FavoriteMediaKind.MusicTrack:
+                if (isAncestorDeleted)
+                {
+                    album.IsDeleted = true;
+                    album.DeletedOnUtc = _deletedOnUtc;
+                }
+                else
+                {
+                    track.IsDeleted = true;
+                    track.DeletedOnUtc = _deletedOnUtc;
+                }
+                await context.SaveChangesAsync();
+                return track.Id;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(mediaKind), mediaKind, "The fixture only hides music items.");
+        }
     }
 
     /// <summary>

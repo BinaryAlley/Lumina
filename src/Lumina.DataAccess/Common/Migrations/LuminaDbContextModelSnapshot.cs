@@ -652,6 +652,10 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(32);
 
+                    b.Property<DateTime?>("DeletedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(40);
+
                     b.Property<string>("Description")
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT")
@@ -661,6 +665,12 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT")
                         .HasColumnOrder(6);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false)
+                        .HasColumnOrder(39);
 
                     b.Property<string>("Label")
                         .HasMaxLength(255)
@@ -807,6 +817,9 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.HasIndex("LibraryId", "Title");
 
+                    b.HasIndex("LibraryId", "IsDeleted", "DeletedOnUtc", "Title", "Id")
+                        .HasFilter("\"IsDeleted\" = 1");
+
                     b.ToTable("Albums", (string)null);
                 });
 
@@ -875,6 +888,10 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(13);
 
+                    b.Property<DateTime?>("DeletedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(21);
+
                     b.Property<string>("Disambiguation")
                         .HasMaxLength(255)
                         .HasColumnType("TEXT")
@@ -884,6 +901,12 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("TEXT")
                         .HasColumnOrder(6);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false)
+                        .HasColumnOrder(20);
 
                     b.Property<bool>("IsEnded")
                         .HasColumnType("INTEGER")
@@ -954,7 +977,11 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("LibraryId", "Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = 0");
+
+                    b.HasIndex("LibraryId", "IsDeleted", "DeletedOnUtc", "Name", "Id")
+                        .HasFilter("\"IsDeleted\" = 1");
 
                     b.ToTable("Artists", (string)null);
                 });
@@ -1279,6 +1306,10 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnOrder(37);
 
+                    b.Property<DateTime?>("DeletedOnUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(51);
+
                     b.Property<string>("Description")
                         .HasMaxLength(2000)
                         .HasColumnType("TEXT")
@@ -1296,6 +1327,12 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.Property<int>("DurationInSeconds")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(20);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false)
+                        .HasColumnOrder(50);
 
                     b.Property<bool>("IsVideo")
                         .HasColumnType("INTEGER")
@@ -1458,6 +1495,9 @@ namespace Lumina.DataAccess.Common.Migrations
 
                     b.HasIndex("LibraryId", "Path")
                         .IsUnique();
+
+                    b.HasIndex("LibraryId", "IsDeleted", "DeletedOnUtc", "Title", "Id")
+                        .HasFilter("\"IsDeleted\" = 1");
 
                     b.ToTable("Tracks", (string)null);
                 });

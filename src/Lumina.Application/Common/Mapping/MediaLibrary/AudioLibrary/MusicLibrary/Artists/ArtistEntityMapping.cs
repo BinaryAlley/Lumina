@@ -184,6 +184,23 @@ public static class ArtistEntityMapping
     }
 
     /// <summary>
+    /// Converts <paramref name="repositoryEntity"/> to <see cref="DeletedArtistResponse"/>.
+    /// </summary>
+    /// <param name="repositoryEntity">The repository entity to be converted.</param>
+    /// <param name="deletedOnUtc">The date and time when the artist was deleted.</param>
+    /// <param name="coverPath">The optional path of the image representing the artist.</param>
+    /// <returns>The converted response entity.</returns>
+    public static DeletedArtistResponse ToResponse(this ArtistEntity repositoryEntity, DateTime deletedOnUtc, string? coverPath = null)
+    {
+        return new DeletedArtistResponse(
+            repositoryEntity.Id,
+            repositoryEntity.LibraryId,
+            repositoryEntity.Name,
+            deletedOnUtc,
+            coverPath);
+    }
+
+    /// <summary>
     /// Converts <paramref name="repositoryEntities"/> to a collection of <see cref="ArtistResponse"/>.
     /// </summary>
     /// <param name="repositoryEntities">The repository entities to be converted.</param>

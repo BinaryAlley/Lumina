@@ -329,8 +329,8 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
             artworkProviders,
             musicArtworkService,
             fileHashService,
-            () => musicArtworkService!.DeleteArtistArtwork(artistEntity.LibraryId, libraryName, artistName),
-            (artwork, token) => musicArtworkService!.SaveArtistArtworkAsync(artistEntity.LibraryId, libraryName, artistName, artwork, token),
+            () => musicArtworkService!.DeleteArtistArtwork(artistEntity.LibraryId, libraryName, artistEntity.Id, artistName),
+            (artwork, token) => musicArtworkService!.SaveArtistArtworkAsync(artistEntity.LibraryId, libraryName, artistEntity.Id, artistName, artwork, token),
             shouldAggregateArtworkWhenMissing,
             unitOfWork,
             cancellationToken).ConfigureAwait(false);
@@ -380,8 +380,8 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
             artworkProviders,
             musicArtworkService,
             fileHashService,
-            () => musicArtworkService!.DeleteAlbumArtwork(albumEntity.LibraryId, albumEntity.Id, libraryName, artistName, albumEntity.Title, releaseTypeName),
-            (artwork, token) => musicArtworkService!.SaveAlbumArtworkAsync(albumEntity.LibraryId, albumEntity.Id, libraryName, artistName, albumEntity.Title, artwork, releaseTypeName, token),
+            () => musicArtworkService!.DeleteAlbumArtwork(albumEntity.LibraryId, albumEntity.Id, libraryName, albumEntity.ArtistId, artistName, albumEntity.Title, releaseTypeName),
+            (artwork, token) => musicArtworkService!.SaveAlbumArtworkAsync(albumEntity.LibraryId, albumEntity.Id, libraryName, albumEntity.ArtistId, artistName, albumEntity.Title, artwork, releaseTypeName, token),
             shouldAggregateArtworkWhenMissing,
             unitOfWork,
             cancellationToken).ConfigureAwait(false);

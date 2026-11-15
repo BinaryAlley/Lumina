@@ -24,6 +24,12 @@
       - [Update Track Request](#update-track-request)
       - [Update Track Response](#update-track-response)
     - [Delete Track](#delete-track)
+    - [Get Deleted Tracks](#get-deleted-tracks)
+      - [Get Deleted Tracks Request](#get-deleted-tracks-request)
+      - [Get Deleted Tracks Response](#get-deleted-tracks-response)
+    - [Restore Track](#restore-track)
+      - [Restore Track Request](#restore-track-request)
+      - [Restore Track Response](#restore-track-response)
 
 ## Track
 
@@ -360,7 +366,7 @@ Returns a uniformly random selection of tracks from every track of the library, 
     "albumId": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
     "albumTitle": "A Night at the Opera",
     "artistId": "d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a",
-    "coverPath": "\\media\\music\\music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a\\QUEEN\\Album\\A night at the opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f\\cover.jpg"
+    "coverPath": "\\media\\music\\music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a\\Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a\\Album\\A night at the opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f\\cover.jpg"
   }
 ]
 ```
@@ -688,4 +694,54 @@ DELETE api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f
 200 Ok
 ```
 
-Deletes the track identified by the route.
+Soft deletes the track identified by the route. The stored metadata, artwork and file path are kept, so the track can be restored, and its path stays reserved, so a scan does not add it back.
+
+
+### Get Deleted Tracks
+
+#### Get Deleted Tracks Request
+
+```js
+GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/tracks/deleted-items
+```
+
+#### Get Deleted Tracks Response
+
+```js
+200 Ok
+```
+
+```json
+[
+  {
+    "id": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
+    "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+    "artistId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+    "artistName": "Queen",
+    "albumId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+    "albumTitle": "A Night at the Opera",
+    "title": "Bohemian Rhapsody",
+    "path": "/music/queen/a-night-at-the-opera/01 - Bohemian Rhapsody.flac",
+    "deletedOnUtc": "2026-11-14T18:35:00Z"
+  }
+]
+```
+
+A track whose album or artist is also deleted is not returned until the album and the artist are restored.
+
+
+### Restore Track
+
+#### Restore Track Request
+
+```js
+POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/albums/e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/tracks/{trackId}/restore
+```
+
+#### Restore Track Response
+
+```js
+200 Ok
+```
+
+Restores the deleted track identified by the route, together with its stored metadata and artwork.

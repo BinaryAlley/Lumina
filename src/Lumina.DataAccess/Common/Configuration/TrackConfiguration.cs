@@ -155,6 +155,12 @@ public class TrackConfiguration : IEntityTypeConfiguration<TrackEntity>
         builder.Property(track => track.Container)
             .HasMaxLength(50)
             .HasColumnOrder(49);
+        builder.Property(track => track.IsDeleted)
+            .IsRequired()
+            .HasDefaultValue(false)
+            .HasColumnOrder(50);
+        builder.Property(track => track.DeletedOnUtc)
+            .HasColumnOrder(51);
 
         builder.HasOne(track => track.Album)
             .WithMany(album => album.Tracks)
@@ -291,5 +297,9 @@ public class TrackConfiguration : IEntityTypeConfiguration<TrackEntity>
         builder.HasIndex(track => new { track.AlbumId, track.TrackNumber });
         builder.HasIndex(track => new { track.LibraryId, track.Path })
             .IsUnique(); // the same physical track file cannot appear twice in the same library
+        // The deleted items page filters by library and deletion state, and orders by the stored deletion time, the title and the Id, so the
+        // filtered index follows the same order and no temporary B-tree is needed for the sort, while visible rows add no entries to it.
+        builder.HasIndex(track => new { track.LibraryId, track.IsDeleted, track.DeletedOnUtc, track.Title, track.Id })
+            .HasFilter("\"IsDeleted\" = 1");
     }
 }

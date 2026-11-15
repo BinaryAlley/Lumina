@@ -27,6 +27,12 @@
     - [Get Album Tracks Lite](#get-album-tracks-lite)
       - [Get Album Tracks Lite Request](#get-album-tracks-lite-request)
       - [Get Album Tracks Lite Response](#get-album-tracks-lite-response)
+    - [Get Deleted Albums](#get-deleted-albums)
+      - [Get Deleted Albums Request](#get-deleted-albums-request)
+      - [Get Deleted Albums Response](#get-deleted-albums-response)
+    - [Restore Album](#restore-album)
+      - [Restore Album Request](#restore-album-request)
+      - [Restore Album Response](#restore-album-response)
 
 ## Album
 
@@ -531,12 +537,12 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b
       ]
     }
   ],
-  "coverPath": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+  "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg",
   "artwork": [
     {
       "type": "Cover",
       "ordinal": 0,
-      "path": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg"
+      "path": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg"
     }
   ]
 }
@@ -797,12 +803,12 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
         ]
       }
     ],
-    "coverPath": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+    "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg",
     "artwork": [
       {
         "type": "Cover",
         "ordinal": 0,
-        "path": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg"
+        "path": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg"
       }
     ]
   }
@@ -836,7 +842,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
       "id": "e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f",
       "title": "A Night at the Opera",
       "totalTracks": 12,
-      "coverPath": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+      "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg",
       "releaseYear": 1975,
       "releaseTypes": [ "Album" ]
     }
@@ -1102,12 +1108,12 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
       ]
     }
   ],
-  "coverPath": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+  "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg",
   "artwork": [
     {
       "type": "Cover",
       "ordinal": 0,
-      "path": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg"
+      "path": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg"
     },
     {
       "type": "Back",
@@ -1447,12 +1453,12 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
       ]
     }
   ],
-  "coverPath": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg",
+  "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg",
   "artwork": [
     {
       "type": "Cover",
       "ordinal": 0,
-      "path": "/media/music/Queen-3b3a19f3/A Night at the Opera-e8d52f7b/cover.jpg"
+      "path": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg"
     }
   ]
 }
@@ -1484,7 +1490,7 @@ Content-Type: image/jpeg
 
 ```json
 {
-  "coverPath": "/media/music/music-3f2504e0-4f89-41d3-9a0c-0305e82c3301/Queen-2b0e5f5a-0b3f-4b7e-8f4a-8c9e3d2f5a6b/A Night at the Opera-7c1d2e3f-4a5b-6c7d-8e9f-0a1b2c3d4e5f/cover.jpg"
+  "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/A Night at the Opera-e8d52f7b-0a3c-4c2d-ab4f-8a7b6c5d4e3f/cover.jpg"
 }
 ```
 
@@ -1499,7 +1505,7 @@ DELETE api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f
 200 Ok
 ```
 
-Deletes the album identified by the route, together with its tracks. An artist must always keep at least one album.
+Soft deletes the album identified by the route. The stored metadata, artwork and track paths are kept, so the album can be restored, and its tracks stay reserved, so a scan does not add them back. The album is hidden until it is restored. An artist must always keep at least one album, so the last album of an artist cannot be deleted and the request fails with a forbidden problem.
 
 
 ### Get Album Tracks
@@ -1643,3 +1649,51 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-
   "numberOfPages": 1
 }
 ```
+
+
+### Get Deleted Albums
+
+#### Get Deleted Albums Request
+
+```js
+GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/albums/deleted-items
+```
+
+#### Get Deleted Albums Response
+
+```js
+200 Ok
+```
+
+```json
+[
+  {
+    "id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+    "libraryId": "3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a",
+    "artistId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+    "artistName": "Queen",
+    "title": "A Night at the Opera",
+    "deletedOnUtc": "2026-11-14T18:35:00Z",
+    "coverPath": "/media/music/music-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/Queen-a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d/A Night at the Opera-b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e/cover.jpg"
+  }
+]
+```
+
+An album whose artist is also deleted is not returned until the artist is restored.
+
+
+### Restore Album
+
+#### Restore Album Request
+
+```js
+POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/d7c41e6a-9f2b-4b1c-9a3e-7f6e5d4c3b2a/albums/{albumId}/restore
+```
+
+#### Restore Album Response
+
+```js
+200 Ok
+```
+
+Restores the deleted album identified by the route, together with its stored metadata, artwork and the tracks that were not deleted on their own.

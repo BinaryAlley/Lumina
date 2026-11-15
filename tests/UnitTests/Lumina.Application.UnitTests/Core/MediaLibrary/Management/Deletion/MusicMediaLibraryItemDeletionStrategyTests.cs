@@ -2,12 +2,15 @@
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
 using Lumina.Application.Common.DataAccess.UoW;
+using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
 using Lumina.Application.Core.MediaLibrary.Management.Deletion;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -29,10 +32,13 @@ public class MusicMediaLibraryItemDeletionStrategyTests
     private readonly IAlbumRepository _mockAlbumRepository;
     private readonly IArtistRepository _mockArtistRepository;
     private readonly IMusicArtworkRepository _mockMusicArtworkRepository;
+    private readonly IMusicArtworkService _mockMusicArtworkService;
+    private readonly ILogger<MusicMediaLibraryItemDeletionStrategy> _mockLogger;
     private readonly MusicMediaLibraryItemDeletionStrategy _sut;
     private readonly LibraryIdFixture _libraryIdFixture = new();
     private readonly TrackEntityFixture _trackEntityFixture = new();
     private readonly AlbumEntityFixture _albumEntityFixture = new();
+    private readonly MusicArtworkEntityFixture _musicArtworkEntityFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MusicMediaLibraryItemDeletionStrategyTests"/> class.
@@ -44,12 +50,18 @@ public class MusicMediaLibraryItemDeletionStrategyTests
         _mockAlbumRepository = Substitute.For<IAlbumRepository>();
         _mockArtistRepository = Substitute.For<IArtistRepository>();
         _mockMusicArtworkRepository = Substitute.For<IMusicArtworkRepository>();
+        _mockMusicArtworkService = Substitute.For<IMusicArtworkService>();
+        _mockLogger = Substitute.For<ILogger<MusicMediaLibraryItemDeletionStrategy>>();
         _mockUnitOfWork.TrackRepository.Returns(_mockTrackRepository);
         _mockUnitOfWork.AlbumRepository.Returns(_mockAlbumRepository);
         _mockUnitOfWork.ArtistRepository.Returns(_mockArtistRepository);
         _mockUnitOfWork.MusicArtworkRepository.Returns(_mockMusicArtworkRepository);
+        _mockMusicArtworkRepository.GetByOwnerAsync(Arg.Any<MusicArtworkOwnerType>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<MusicArtworkEntity>>([]));
+        _mockMusicArtworkService.DeleteStoredArtwork(Arg.Any<string>())
+            .Returns(Result.Deleted);
 
-        _sut = new MusicMediaLibraryItemDeletionStrategy(_mockUnitOfWork);
+        _sut = new MusicMediaLibraryItemDeletionStrategy(_mockUnitOfWork, _mockMusicArtworkService, _mockLogger);
     }
 
     [Fact]
@@ -67,9 +79,9 @@ public class MusicMediaLibraryItemDeletionStrategyTests
             .Returns(Result.Deleted);
         _mockTrackRepository.DeleteByIdAsync(track.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Deleted));
-        _mockAlbumRepository.GetByIdAsync(albumId, Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        _mockAlbumRepository.GetIncludingDeletedByIdAsync(albumId, Arg.Any<CancellationToken>())
             .Returns(Result.From<AlbumEntity?>(album));
-        _mockTrackRepository.GetByAlbumIdAsync(albumId, Arg.Any<CancellationToken>())
+        _mockTrackRepository.GetByAlbumIdIncludingDeletedAsync(albumId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<TrackEntity>>([otherTrack]));
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
@@ -80,6 +92,11 @@ public class MusicMediaLibraryItemDeletionStrategyTests
         Assert.True(result.IsSuccess);
         await _mockMusicArtworkRepository.Received(1).DeleteByOwnerAsync(MusicArtworkOwnerType.Track, track.Id, Arg.Any<CancellationToken>());
         await _mockTrackRepository.Received(1).DeleteByIdAsync(track.Id, Arg.Any<CancellationToken>());
+        // The album and its remaining tracks are read including the soft deleted ones, so a hidden track still keeps the album alive.
+        await _mockAlbumRepository.Received(1).GetIncludingDeletedByIdAsync(albumId, Arg.Any<CancellationToken>());
+        await _mockTrackRepository.Received(1).GetByAlbumIdIncludingDeletedAsync(albumId, Arg.Any<CancellationToken>());
+        await _mockAlbumRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _mockTrackRepository.DidNotReceive().GetByAlbumIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockMusicArtworkRepository.DidNotReceive().DeleteByOwnerAsync(MusicArtworkOwnerType.Album, Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockAlbumRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockArtistRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
@@ -102,15 +119,15 @@ public class MusicMediaLibraryItemDeletionStrategyTests
             .Returns(Result.Deleted);
         _mockTrackRepository.DeleteByIdAsync(track.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Deleted));
-        _mockAlbumRepository.GetByIdAsync(albumId, Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        _mockAlbumRepository.GetIncludingDeletedByIdAsync(albumId, Arg.Any<CancellationToken>())
             .Returns(Result.From<AlbumEntity?>(album));
-        _mockTrackRepository.GetByAlbumIdAsync(albumId, Arg.Any<CancellationToken>())
+        _mockTrackRepository.GetByAlbumIdIncludingDeletedAsync(albumId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<TrackEntity>>([track]));
         _mockMusicArtworkRepository.DeleteByOwnerAsync(MusicArtworkOwnerType.Album, albumId, Arg.Any<CancellationToken>())
             .Returns(Result.Deleted);
         _mockAlbumRepository.DeleteByIdAsync(albumId, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Deleted));
-        _mockAlbumRepository.GetByArtistIdAsync(artistId, Arg.Any<CancellationToken>())
+        _mockAlbumRepository.GetByArtistIdIncludingDeletedAsync(artistId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<AlbumEntity>>([otherAlbum]));
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
@@ -121,6 +138,9 @@ public class MusicMediaLibraryItemDeletionStrategyTests
         Assert.True(result.IsSuccess);
         await _mockMusicArtworkRepository.Received(1).DeleteByOwnerAsync(MusicArtworkOwnerType.Album, albumId, Arg.Any<CancellationToken>());
         await _mockAlbumRepository.Received(1).DeleteByIdAsync(albumId, Arg.Any<CancellationToken>());
+        // The remaining albums of the artist are read including the soft deleted ones, so a hidden album still keeps the artist alive.
+        await _mockAlbumRepository.Received(1).GetByArtistIdIncludingDeletedAsync(artistId, Arg.Any<CancellationToken>());
+        await _mockAlbumRepository.DidNotReceive().GetByArtistIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockMusicArtworkRepository.DidNotReceive().DeleteByOwnerAsync(MusicArtworkOwnerType.Artist, Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockArtistRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
@@ -141,15 +161,15 @@ public class MusicMediaLibraryItemDeletionStrategyTests
             .Returns(Result.Deleted);
         _mockTrackRepository.DeleteByIdAsync(track.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Deleted));
-        _mockAlbumRepository.GetByIdAsync(albumId, Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        _mockAlbumRepository.GetIncludingDeletedByIdAsync(albumId, Arg.Any<CancellationToken>())
             .Returns(Result.From<AlbumEntity?>(album));
-        _mockTrackRepository.GetByAlbumIdAsync(albumId, Arg.Any<CancellationToken>())
+        _mockTrackRepository.GetByAlbumIdIncludingDeletedAsync(albumId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<TrackEntity>>([track]));
         _mockMusicArtworkRepository.DeleteByOwnerAsync(MusicArtworkOwnerType.Album, albumId, Arg.Any<CancellationToken>())
             .Returns(Result.Deleted);
         _mockAlbumRepository.DeleteByIdAsync(albumId, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Deleted));
-        _mockAlbumRepository.GetByArtistIdAsync(artistId, Arg.Any<CancellationToken>())
+        _mockAlbumRepository.GetByArtistIdIncludingDeletedAsync(artistId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<AlbumEntity>>([album]));
         _mockMusicArtworkRepository.DeleteByOwnerAsync(MusicArtworkOwnerType.Artist, artistId, Arg.Any<CancellationToken>())
             .Returns(Result.Deleted);
@@ -166,7 +186,111 @@ public class MusicMediaLibraryItemDeletionStrategyTests
         await _mockMusicArtworkRepository.Received(1).DeleteByOwnerAsync(MusicArtworkOwnerType.Artist, artistId, Arg.Any<CancellationToken>());
         await _mockAlbumRepository.Received(1).DeleteByIdAsync(albumId, Arg.Any<CancellationToken>());
         await _mockArtistRepository.Received(1).DeleteByIdAsync(artistId, Arg.Any<CancellationToken>());
+        // Every scoping read includes the soft deleted rows, so hidden siblings are never missed when deciding what to remove.
+        await _mockAlbumRepository.Received(1).GetIncludingDeletedByIdAsync(albumId, Arg.Any<CancellationToken>());
+        await _mockTrackRepository.Received(1).GetByAlbumIdIncludingDeletedAsync(albumId, Arg.Any<CancellationToken>());
+        await _mockAlbumRepository.Received(1).GetByArtistIdIncludingDeletedAsync(artistId, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task DeleteItemAsync_WhenEveryItemHasStoredArtwork_ShouldDeleteEveryStoredFileAndRow()
+    {
+        // Arrange
+        LibraryId libraryId = _libraryIdFixture.Create();
+        Guid albumId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        TrackEntity track = _trackEntityFixture.Create(albumId: albumId, path: "/music/deleted.flac");
+        AlbumEntity album = _albumEntityFixture.Create(id: albumId, artistId: artistId, includeTracks: false);
+        MusicArtworkEntity trackArtwork = _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Track, ownerId: track.Id, fileName: "/media/music/track-cover.jpg");
+        MusicArtworkEntity albumArtwork = _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Album, ownerId: albumId, fileName: "/media/music/album-cover.jpg");
+        MusicArtworkEntity artistArtwork = _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Artist, ownerId: artistId, fileName: "/media/music/artist-cover.jpg");
+        _mockTrackRepository.GetByPathAsync(libraryId.Value, track.Path, Arg.Any<CancellationToken>())
+            .Returns(Result.From<TrackEntity?>(track));
+        _mockMusicArtworkRepository.GetByOwnerAsync(MusicArtworkOwnerType.Track, track.Id, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<MusicArtworkEntity>>([trackArtwork]));
+        _mockMusicArtworkRepository.DeleteByOwnerAsync(MusicArtworkOwnerType.Track, track.Id, Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
+        _mockTrackRepository.DeleteByIdAsync(track.Id, Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Deleted));
+        _mockAlbumRepository.GetIncludingDeletedByIdAsync(albumId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<AlbumEntity?>(album));
+        _mockTrackRepository.GetByAlbumIdIncludingDeletedAsync(albumId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<TrackEntity>>([track]));
+        _mockMusicArtworkRepository.GetByOwnerAsync(MusicArtworkOwnerType.Album, albumId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<MusicArtworkEntity>>([albumArtwork]));
+        _mockMusicArtworkRepository.DeleteByOwnerAsync(MusicArtworkOwnerType.Album, albumId, Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
+        _mockAlbumRepository.DeleteByIdAsync(albumId, Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Deleted));
+        _mockAlbumRepository.GetByArtistIdIncludingDeletedAsync(artistId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<AlbumEntity>>([album]));
+        _mockMusicArtworkRepository.GetByOwnerAsync(MusicArtworkOwnerType.Artist, artistId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<MusicArtworkEntity>>([artistArtwork]));
+        _mockMusicArtworkRepository.DeleteByOwnerAsync(MusicArtworkOwnerType.Artist, artistId, Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
+        _mockArtistRepository.DeleteByIdAsync(artistId, Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Deleted));
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
+
+        // Act
+        Result<Success> result = await _sut.DeleteItemAsync(libraryId.Value, track.Path, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        _mockMusicArtworkService.Received(1).DeleteStoredArtwork(trackArtwork.FileName!);
+        _mockMusicArtworkService.Received(1).DeleteStoredArtwork(albumArtwork.FileName!);
+        _mockMusicArtworkService.Received(1).DeleteStoredArtwork(artistArtwork.FileName!);
+        await _mockMusicArtworkRepository.Received(1).DeleteByOwnerAsync(MusicArtworkOwnerType.Track, track.Id, Arg.Any<CancellationToken>());
+        await _mockMusicArtworkRepository.Received(1).DeleteByOwnerAsync(MusicArtworkOwnerType.Album, albumId, Arg.Any<CancellationToken>());
+        await _mockMusicArtworkRepository.Received(1).DeleteByOwnerAsync(MusicArtworkOwnerType.Artist, artistId, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task DeleteItemAsync_WhenDeletingAStoredArtworkFileFails_ShouldLogAWarningAndStillDeleteTheRow()
+    {
+        // Arrange
+        LibraryId libraryId = _libraryIdFixture.Create();
+        Guid albumId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        TrackEntity track = _trackEntityFixture.Create(albumId: albumId, path: "/music/deleted.flac");
+        AlbumEntity album = _albumEntityFixture.Create(id: albumId, artistId: artistId, includeTracks: false);
+        AlbumEntity otherAlbum = _albumEntityFixture.Create(artistId: artistId, includeTracks: false);
+        MusicArtworkEntity trackArtwork = _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Track, ownerId: track.Id, fileName: "/media/music/track-cover.jpg");
+        _mockTrackRepository.GetByPathAsync(libraryId.Value, track.Path, Arg.Any<CancellationToken>())
+            .Returns(Result.From<TrackEntity?>(track));
+        _mockMusicArtworkRepository.GetByOwnerAsync(MusicArtworkOwnerType.Track, track.Id, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<MusicArtworkEntity>>([trackArtwork]));
+        _mockMusicArtworkService.DeleteStoredArtwork(trackArtwork.FileName!)
+            .Returns(Errors.FileSystemManagement.FileNotFound);
+        _mockMusicArtworkRepository.DeleteByOwnerAsync(MusicArtworkOwnerType.Track, track.Id, Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
+        _mockTrackRepository.DeleteByIdAsync(track.Id, Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Deleted));
+        _mockAlbumRepository.GetIncludingDeletedByIdAsync(albumId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<AlbumEntity?>(album));
+        _mockTrackRepository.GetByAlbumIdIncludingDeletedAsync(albumId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<TrackEntity>>([track]));
+        _mockMusicArtworkRepository.DeleteByOwnerAsync(MusicArtworkOwnerType.Album, albumId, Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
+        _mockAlbumRepository.DeleteByIdAsync(albumId, Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Deleted));
+        _mockAlbumRepository.GetByArtistIdIncludingDeletedAsync(artistId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<AlbumEntity>>([otherAlbum]));
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
+
+        // Act
+        Result<Success> result = await _sut.DeleteItemAsync(libraryId.Value, track.Path, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        await _mockMusicArtworkRepository.Received(1).DeleteByOwnerAsync(MusicArtworkOwnerType.Track, track.Id, Arg.Any<CancellationToken>());
+        _mockLogger.Received(1).Log(
+            LogLevel.Warning,
+            Arg.Any<EventId>(),
+            Arg.Is<object>(state => state.ToString()!.Contains("Failed to delete the stored")),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<object, Exception?, string>>());
     }
 
     [Fact]
@@ -182,7 +306,7 @@ public class MusicMediaLibraryItemDeletionStrategyTests
             .Returns(Result.Deleted);
         _mockTrackRepository.DeleteByIdAsync(track.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Deleted));
-        _mockAlbumRepository.GetByIdAsync(albumId, Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        _mockAlbumRepository.GetIncludingDeletedByIdAsync(albumId, Arg.Any<CancellationToken>())
             .Returns(Result.From<AlbumEntity?>(null));
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
 
@@ -192,6 +316,8 @@ public class MusicMediaLibraryItemDeletionStrategyTests
         // Assert
         Assert.True(result.IsSuccess);
         await _mockTrackRepository.Received(1).DeleteByIdAsync(track.Id, Arg.Any<CancellationToken>());
+        // A soft deleted album is still read, because its own tracks have to keep it alive until their files disappear too.
+        await _mockAlbumRepository.Received(1).GetIncludingDeletedByIdAsync(albumId, Arg.Any<CancellationToken>());
         await _mockAlbumRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -271,9 +397,9 @@ public class MusicMediaLibraryItemDeletionStrategyTests
             .Returns(Result.Deleted);
         _mockTrackRepository.DeleteByIdAsync(track.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Deleted));
-        _mockAlbumRepository.GetByIdAsync(albumId, Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        _mockAlbumRepository.GetIncludingDeletedByIdAsync(albumId, Arg.Any<CancellationToken>())
             .Returns(Result.From<AlbumEntity?>(album));
-        _mockTrackRepository.GetByAlbumIdAsync(albumId, Arg.Any<CancellationToken>())
+        _mockTrackRepository.GetByAlbumIdIncludingDeletedAsync(albumId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<TrackEntity>>([track]));
         _mockMusicArtworkRepository.DeleteByOwnerAsync(MusicArtworkOwnerType.Album, albumId, Arg.Any<CancellationToken>())
             .Returns(error);
@@ -304,15 +430,15 @@ public class MusicMediaLibraryItemDeletionStrategyTests
             .Returns(Result.Deleted);
         _mockTrackRepository.DeleteByIdAsync(track.Id, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Deleted));
-        _mockAlbumRepository.GetByIdAsync(albumId, Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+        _mockAlbumRepository.GetIncludingDeletedByIdAsync(albumId, Arg.Any<CancellationToken>())
             .Returns(Result.From<AlbumEntity?>(album));
-        _mockTrackRepository.GetByAlbumIdAsync(albumId, Arg.Any<CancellationToken>())
+        _mockTrackRepository.GetByAlbumIdIncludingDeletedAsync(albumId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<TrackEntity>>([track]));
         _mockMusicArtworkRepository.DeleteByOwnerAsync(MusicArtworkOwnerType.Album, albumId, Arg.Any<CancellationToken>())
             .Returns(Result.Deleted);
         _mockAlbumRepository.DeleteByIdAsync(albumId, Arg.Any<CancellationToken>())
             .Returns(Result.From(Result.Deleted));
-        _mockAlbumRepository.GetByArtistIdAsync(artistId, Arg.Any<CancellationToken>())
+        _mockAlbumRepository.GetByArtistIdIncludingDeletedAsync(artistId, Arg.Any<CancellationToken>())
             .Returns(Result.From<IReadOnlyList<AlbumEntity>>([album]));
         _mockMusicArtworkRepository.DeleteByOwnerAsync(MusicArtworkOwnerType.Artist, artistId, Arg.Any<CancellationToken>())
             .Returns(error);

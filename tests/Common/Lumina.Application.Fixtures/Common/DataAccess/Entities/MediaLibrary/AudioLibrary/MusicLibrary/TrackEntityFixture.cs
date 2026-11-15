@@ -44,6 +44,8 @@ public class TrackEntityFixture
     /// <param name="originalReleaseYear">Optional. The original release year of the track.</param>
     /// <param name="reReleaseDate">Optional. The re-release date of the track.</param>
     /// <param name="reReleaseYear">Optional. The re-release year of the track.</param>
+    /// <param name="isDeleted">Whether the track is soft deleted.</param>
+    /// <param name="deletedOnUtc">Optional. The date and time when the track was deleted.</param>
     /// <param name="includeMetadata">Whether the owned metadata collections (Tags, Genres, Moods, ISRCs, Contributors, Ratings) should be included, or forced to empty collections.</param>
     /// <param name="includeOriginalReleaseDate">Whether the original release date should be included, or forced to <see langword="null"/>.</param>
     /// <param name="includeOriginalReleaseYear">Whether the original release year should be included, or forced to <see langword="null"/>.</param>
@@ -58,6 +60,7 @@ public class TrackEntityFixture
     /// <param name="replayGainAlbumGain">Optional. The ReplayGain album gain of the track, in decibels.</param>
     /// <param name="replayGainAlbumPeak">Optional. The ReplayGain album peak of the track.</param>
     /// <param name="includeReplayGain">Whether the ReplayGain values should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeDeletedOnUtc">Whether a deleted track should carry a deletion time, or <see langword="null"/>.</param>
     /// <returns>The created <see cref="TrackEntity"/>.</returns>
     public TrackEntity Create(
         Guid? id = null,
@@ -72,6 +75,8 @@ public class TrackEntityFixture
         int? originalReleaseYear = null,
         DateOnly? reReleaseDate = null,
         int? reReleaseYear = null,
+        bool isDeleted = false,
+        DateTime? deletedOnUtc = null,
         bool includeMetadata = true,
         bool includeOriginalReleaseDate = true,
         bool includeOriginalReleaseYear = true,
@@ -85,7 +90,8 @@ public class TrackEntityFixture
         decimal? replayGainTrackPeak = null,
         decimal? replayGainAlbumGain = null,
         decimal? replayGainAlbumPeak = null,
-        bool includeReplayGain = true)
+        bool includeReplayGain = true,
+        bool includeDeletedOnUtc = true)
     {
         Guid resolvedId = id ?? Guid.NewGuid();
         Guid resolvedAlbumId = albumId ?? Guid.NewGuid();
@@ -154,6 +160,8 @@ public class TrackEntityFixture
             .RuleFor(x => x.Isrcs, f => includeMetadata ? _trackIsrcEntityFixture.CreateMany(f.Random.Number(1, 3)) : [])
             .RuleFor(x => x.Contributors, f => includeMetadata ? _trackContributorEntityFixture.CreateMany(f.Random.Number(1, 3), trackId: resolvedId) : [])
             .RuleFor(x => x.Ratings, f => includeMetadata ? _audioRatingEntityFixture.CreateMany(f.Random.Number(1, 3)) : [])
+            .RuleFor(x => x.IsDeleted, isDeleted)
+            .RuleFor(x => x.DeletedOnUtc, f => isDeleted && includeDeletedOnUtc ? (deletedOnUtc ?? f.Date.Recent()) : null)
             .RuleFor(x => x.CreatedOnUtc, f => f.Date.Past())
             .RuleFor(x => x.UpdatedOnUtc, f => f.Date.Recent())
             .Generate();

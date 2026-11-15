@@ -17,7 +17,7 @@ public class DeleteMusicArtistEndpointSummary : Summary<DeleteMusicArtistEndpoin
     public DeleteMusicArtistEndpointSummary()
     {
         Summary = "Deletes a music artist.";
-        Description = "Deletes the music artist identified by the route, together with its albums and tracks.";
+        Description = "Soft deletes the music artist identified by the route, so its metadata, artwork and track paths are kept and the artist can be restored.";
 
         Response(200, "The music artist was deleted.");
     }

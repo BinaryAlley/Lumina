@@ -229,6 +229,25 @@ public static class AlbumEntityMapping
     }
 
     /// <summary>
+    /// Converts <paramref name="repositoryEntity"/> to <see cref="DeletedAlbumResponse"/>.
+    /// </summary>
+    /// <param name="repositoryEntity">The repository entity to be converted.</param>
+    /// <param name="deletedOnUtc">The date and time when the album was deleted.</param>
+    /// <param name="coverPath">The optional path of the image representing the album.</param>
+    /// <returns>The converted response entity.</returns>
+    public static DeletedAlbumResponse ToResponse(this AlbumEntity repositoryEntity, DateTime deletedOnUtc, string? coverPath = null)
+    {
+        return new DeletedAlbumResponse(
+            repositoryEntity.Id,
+            repositoryEntity.LibraryId,
+            repositoryEntity.ArtistId,
+            repositoryEntity.Artist?.Name ?? string.Empty,
+            repositoryEntity.Title,
+            deletedOnUtc,
+            coverPath);
+    }
+
+    /// <summary>
     /// Converts <paramref name="repositoryEntities"/> to a collection of <see cref="AlbumResponse"/>.
     /// </summary>
     /// <param name="repositoryEntities">The repository entities to be converted.</param>

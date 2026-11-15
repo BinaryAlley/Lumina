@@ -7,6 +7,7 @@ using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.File
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using NSubstitute;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -770,6 +771,52 @@ public class PathServiceTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(100, result.Value.Name.Length);
+    }
+
+    [Fact]
+    public void SanitizeCompositeSegment_WhenTheNameFitsTheBudget_ShouldAppendTheIdentifier()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+        string identifier = Guid.NewGuid().ToString();
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeCompositeSegment("Queen", identifier);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal($"Queen-{identifier}", result.Value.Name);
+    }
+
+    [Fact]
+    public void SanitizeCompositeSegment_WhenTheNameExceedsTheBudget_ShouldTruncateOnlyTheName()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+        string identifier = Guid.NewGuid().ToString();
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeCompositeSegment(new string('a', 99), identifier);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(100, result.Value.Name.Length);
+        Assert.EndsWith($"-{identifier}", result.Value.Name);
+        Assert.Equal(new string('a', 63), result.Value.Name[..^($"-{identifier}".Length)]);
+    }
+
+    [Fact]
+    public void SanitizeCompositeSegment_WhenTheIdentifierLeavesNoRoomForTheName_ShouldReturnInvalidPath()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeCompositeSegment("Queen", new string('a', 99));
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
     }
 
     [Fact]

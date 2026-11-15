@@ -8,7 +8,6 @@ using Lumina.Application.Common.Infrastructure.Authorization;
 using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
 using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
@@ -29,7 +28,6 @@ namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.
 public class DeleteAlbumCommandHandler : ICommandHandler<DeleteAlbumCommand, Result<Deleted>>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMusicArtworkCleanupService _musicArtworkCleanupService;
     private readonly IAuthorizationService _authorizationService;
     private readonly ICurrentUserService _currentUserService;
     private readonly IValidator<DeleteAlbumCommand> _validator;
@@ -38,14 +36,12 @@ public class DeleteAlbumCommandHandler : ICommandHandler<DeleteAlbumCommand, Res
     /// Initializes a new instance of the <see cref="DeleteAlbumCommandHandler"/> class.
     /// </summary>
     /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
-    /// <param name="musicArtworkCleanupService">Injected service for removing the artwork of a music library item and of its children.</param>
     /// <param name="authorizationService">Injected service for authorization related functionality.</param>
     /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
     /// <param name="validator">Injected validator for application validation rules.</param>
-    public DeleteAlbumCommandHandler(IUnitOfWork unitOfWork, IMusicArtworkCleanupService musicArtworkCleanupService, IAuthorizationService authorizationService, ICurrentUserService currentUserService, IValidator<DeleteAlbumCommand> validator)
+    public DeleteAlbumCommandHandler(IUnitOfWork unitOfWork, IAuthorizationService authorizationService, ICurrentUserService currentUserService, IValidator<DeleteAlbumCommand> validator)
     {
         _unitOfWork = unitOfWork;
-        _musicArtworkCleanupService = musicArtworkCleanupService;
         _authorizationService = authorizationService;
         _currentUserService = currentUserService;
         _validator = validator;
@@ -74,7 +70,7 @@ public class DeleteAlbumCommandHandler : ICommandHandler<DeleteAlbumCommand, Res
         Guid artistId = Guid.Parse(command.ArtistId!);
         Guid albumId = Guid.Parse(command.AlbumId!);
 
-        // An album is a child of the artist aggregate, so the whole aggregate is loaded and the album is removed within it.
+        // An album is a child of the artist aggregate, so the whole aggregate is loaded and the album is looked up within it.
         Result<ArtistEntity?> getArtistResult = await _unitOfWork.ArtistRepository
             .GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getArtistResult.IsFailure)
@@ -94,10 +90,6 @@ public class DeleteAlbumCommandHandler : ICommandHandler<DeleteAlbumCommand, Res
         if (!canAccessLibrary)
             return ApplicationErrors.Authorization.NotAuthorized;
 
-        AlbumEntity? existingAlbum = existingArtist.Albums.FirstOrDefault(album => album.Id == albumId);
-        if (existingAlbum is null)
-            return DomainErrors.Music.AlbumNotFound;
-
         // An album can only belong to a library that exists, so a client can never delete an album of a library of the host that is not there.
         Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository
             .GetByIdAsync(libraryId, shouldTrackEntities: false, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -106,29 +98,25 @@ public class DeleteAlbumCommandHandler : ICommandHandler<DeleteAlbumCommand, Res
         if (getLibraryResult.Value is null)
             return DomainErrors.Library.LibraryNotFound;
 
-        // The write path goes through the aggregate root: an album is a child entity of the artist aggregate, unlike Book and Artist,
-        // which are aggregate roots and are deleted directly through their own repositories. This difference is intentional.
         Result<Artist> artistResult = existingArtist.ToDomainEntity();
         if (artistResult.IsFailure)
             return artistResult.Errors;
-        // The album is an entity inside the artist aggregate, so it is referenced by object, not by id; the aggregate member is located here and passed through.
         Album? domainAlbum = artistResult.Value.Albums.FirstOrDefault(album => album.Id.Value == albumId);
         if (domainAlbum is null)
             return DomainErrors.Music.AlbumNotFound;
-        Result<Deleted> removeAlbumResult = artistResult.Value.RemoveAlbum(domainAlbum);
-        if (removeAlbumResult.IsFailure)
-            return removeAlbumResult.Errors;
 
-        // The artwork of the album and of its tracks does not cascade from the album row, because the artwork table is shared by all the music
-        // library item types, so it is removed first, while the album and its tracks are still present.
-        Result<Deleted> deleteArtworkResult = await _musicArtworkCleanupService.DeleteAlbumArtworkAsync(albumId, cancellationToken).ConfigureAwait(false);
-        if (deleteArtworkResult.IsFailure)
-            return deleteArtworkResult.Errors;
 
-        Result<Updated> updateResult = await _unitOfWork.ArtistRepository
-            .UpdateAsync(artistResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
-        if (updateResult.IsFailure)
-            return updateResult.Errors;
+        Result<bool> canRemoveAlbumResult = artistResult.Value.CanRemoveAlbum(domainAlbum);
+        if (canRemoveAlbumResult.IsFailure)
+            return canRemoveAlbumResult.Errors;
+
+        // The album is soft deleted, so its metadata, artwork and track paths stay available until the user restores it or the files disappear
+        // from disk. The tracks of the album are not deleted themselves, so restoring the album brings back the tracks that were not deleted on their own.
+        // The write re-checks the last-album condition because this snapshot can be stale.
+        Result<Updated> deleteAlbumResult = await _unitOfWork.AlbumRepository.SoftDeleteByIdAsync(albumId, cancellationToken).ConfigureAwait(false);
+        if (deleteAlbumResult.IsFailure)
+            return deleteAlbumResult.Errors;
+
         Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)
             return saveChangesResult.Errors;

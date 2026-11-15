@@ -86,4 +86,36 @@ public interface IArtistRepository : IRepository<ArtistEntity>,
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the soft deleted artist identified by <paramref name="id"/>.
+    /// </summary>
+    /// <param name="id">The Id of the soft deleted artist to get.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted <see cref="ArtistEntity"/>, <see langword="null"/> when the artist does not exist or is not soft deleted, or an error.</returns>
+    Task<Result<ArtistEntity?>> GetSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the soft deleted artists of the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose soft deleted artists are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted artists, or an error.</returns>
+    Task<Result<IReadOnlyList<ArtistEntity>>> GetSoftDeletedByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Soft deletes the artist identified by <paramref name="id"/>, without removing its stored metadata or artwork.
+    /// </summary>
+    /// <param name="id">The Id of the artist to soft delete.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> SoftDeleteByIdAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Restores the soft deleted artist identified by <paramref name="id"/>.
+    /// </summary>
+    /// <param name="id">The Id of the artist to restore.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> RestoreSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken);
 }

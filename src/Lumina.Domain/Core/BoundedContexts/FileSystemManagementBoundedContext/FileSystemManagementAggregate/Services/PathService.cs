@@ -186,6 +186,27 @@ public class PathService : IPathService
     }
 
     /// <summary>
+    /// Sanitizes a human-readable <paramref name="name"/> into a safe path segment that ends with <paramref name="identifier"/>,
+    /// truncating only the name when the combined segment would exceed the maximum segment length.
+    /// </summary>
+    /// <param name="name">The human-readable name to sanitize.</param>
+    /// <param name="identifier">The identifier that must be preserved at the end of the segment.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing the sanitized path segment, or an error.</returns>
+    public Result<PathSegment> SanitizeCompositeSegment(string name, string identifier)
+    {
+        if (string.IsNullOrWhiteSpace(identifier))
+            return Errors.FileSystemManagement.NameCannotBeEmpty;
+
+        // The identifier is the part that tells two items with the same name apart, so only the name is ever shortened to fit the limit.
+        string suffix = $"-{identifier}";
+        if (suffix.Length >= MAX_DIRECTORY_SEGMENT_LENGTH)
+            return Errors.FileSystemManagement.InvalidPath;
+        int nameLengthBudget = MAX_DIRECTORY_SEGMENT_LENGTH - suffix.Length;
+        string nameWithinBudget = name.Length > nameLengthBudget ? name[..nameLengthBudget].TrimEnd() : name;
+        return SanitizeSegment($"{nameWithinBudget}{suffix}");
+    }
+
+    /// <summary>
     /// Returns the root portion of the given path.
     /// </summary>
     /// <param name="path">The path for which to get the root.</param>

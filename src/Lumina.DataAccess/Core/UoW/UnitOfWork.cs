@@ -145,7 +145,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _artistRepository ??= new ArtistRepository(_luminaDbContext, AlbumRepository, TrackRepository);
+            _artistRepository ??= new ArtistRepository(_luminaDbContext, AlbumRepository, TrackRepository, _dateTimeProvider);
             return _artistRepository;
         }
     }
@@ -157,7 +157,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _albumRepository ??= new AlbumRepository(_luminaDbContext, TrackRepository);
+            _albumRepository ??= new AlbumRepository(_luminaDbContext, TrackRepository, _dateTimeProvider);
             return _albumRepository;
         }
     }
@@ -169,7 +169,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _trackRepository ??= new TrackRepository(_luminaDbContext);
+            _trackRepository ??= new TrackRepository(_luminaDbContext, _dateTimeProvider);
             return _trackRepository;
         }
     }

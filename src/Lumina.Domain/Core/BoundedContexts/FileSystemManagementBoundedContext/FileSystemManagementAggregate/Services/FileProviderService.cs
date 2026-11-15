@@ -284,7 +284,19 @@ internal class FileProviderService : IFileProviderService
         // Check if the user has access permissions to the provided path.
         if (!_fileSystemPermissionsService.CanAccessPath(path, FileAccessMode.Delete))
             return Errors.Permission.UnauthorizedAccess;
-        _fileSystem.File.Delete(path.Path);
-        return Result.Deleted;
+        try
+        {
+            _fileSystem.File.Delete(path.Path);
+            return Result.Deleted;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Errors.Permission.UnauthorizedAccess;
+        }
+        catch (IOException)
+        {
+            // A file that is locked by another process, or is read-only, cannot be deleted, but that must not abort the caller.
+            return Errors.FileSystemManagement.FileDeleteError;
+        }
     }
 }

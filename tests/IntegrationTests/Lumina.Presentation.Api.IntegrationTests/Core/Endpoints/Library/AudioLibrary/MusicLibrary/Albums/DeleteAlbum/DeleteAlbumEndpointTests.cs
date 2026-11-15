@@ -61,7 +61,7 @@ public class DeleteAlbumEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Fact]
-    public async Task DeleteAlbum_WhenAlbumBelongsToAnOwnedArtist_ShouldDeleteTheAlbum()
+    public async Task DeleteAlbum_WhenAlbumBelongsToAnOwnedArtist_ShouldSoftDeleteTheAlbum()
     {
         // Arrange
         Guid userId = GetCurrentUserId();
@@ -75,13 +75,18 @@ public class DeleteAlbumEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        Assert.Null(await dbContext.Albums.FirstOrDefaultAsync(album => album.Id == albumId));
-        // The sibling album of the artist is preserved.
-        Assert.NotNull(await dbContext.Albums.FirstOrDefaultAsync(album => album.Id == otherAlbumId));
+        AlbumEntity? album = await dbContext.Albums.FirstOrDefaultAsync(album => album.Id == albumId);
+        Assert.NotNull(album);
+        Assert.True(album!.IsDeleted);
+        Assert.NotNull(album.DeletedOnUtc);
+        // The sibling album of the artist is untouched.
+        AlbumEntity? otherAlbum = await dbContext.Albums.FirstOrDefaultAsync(album => album.Id == otherAlbumId);
+        Assert.NotNull(otherAlbum);
+        Assert.False(otherAlbum!.IsDeleted);
     }
 
     [Fact]
-    public async Task DeleteAlbum_WhenAlbumHasStoredArtwork_ShouldRemoveTheArtworkOfTheAlbumAndOfItsTracks()
+    public async Task DeleteAlbum_WhenAlbumHasStoredArtwork_ShouldKeepTheArtworkOfTheAlbumAndOfItsTracks()
     {
         // Arrange
         Guid userId = GetCurrentUserId();
@@ -97,9 +102,34 @@ public class DeleteAlbumEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
-        // The artwork of the album and of its tracks does not cascade from the album row, so it is removed together with the album.
-        Assert.Null(await dbContext.MusicArtwork.FirstOrDefaultAsync(artwork => artwork.OwnerType == MusicArtworkOwnerType.Album && artwork.OwnerId == albumId));
-        Assert.Null(await dbContext.MusicArtwork.FirstOrDefaultAsync(artwork => artwork.OwnerType == MusicArtworkOwnerType.Track && artwork.OwnerId == trackId));
+        // The album is soft deleted, so its artwork and the artwork of its tracks stay available until the user restores it.
+        AlbumEntity? album = await dbContext.Albums.FirstOrDefaultAsync(album => album.Id == albumId);
+        Assert.NotNull(album);
+        Assert.True(album!.IsDeleted);
+        Assert.NotNull(await dbContext.MusicArtwork.FirstOrDefaultAsync(artwork => artwork.OwnerType == MusicArtworkOwnerType.Album && artwork.OwnerId == albumId));
+        Assert.NotNull(await dbContext.MusicArtwork.FirstOrDefaultAsync(artwork => artwork.OwnerType == MusicArtworkOwnerType.Track && artwork.OwnerId == trackId));
+    }
+
+    [Fact]
+    public async Task DeleteAlbum_WhenAlbumIsTheOnlyAlbumOfTheArtist_ShouldReturnForbiddenWithoutDeletingTheAlbum()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (Guid libraryId, Guid artistId, Guid albumId) = await SeedLibraryArtistWithSingleAlbumAsync(userId);
+        string url = $"/api/v1/libraries/{libraryId}/artists/{artistId}/albums/{albumId}";
+
+        // Act
+        HttpResponseMessage response = await _client.DeleteAsync(url);
+
+        // Assert
+        await AssertProblemDetails(response, HttpStatusCode.Forbidden, "General.Forbidden", "ArtistMustHaveAtLeastOneAlbum", url, "https://tools.ietf.org/html/rfc9110#section-15.5.4");
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        AlbumEntity? album = await dbContext.Albums.FirstOrDefaultAsync(album => album.Id == albumId);
+        Assert.NotNull(album);
+        Assert.False(album!.IsDeleted);
+        Assert.Null(album.DeletedOnUtc);
     }
 
     [Fact]
@@ -285,6 +315,36 @@ public class DeleteAlbumEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Queen Library", libraryType: LibraryType.Music, contentLocations: []));
         await dbContext.SaveChangesAsync();
         return libraryId;
+    }
+
+    /// <summary>
+    /// Seeds a music library owned by <paramref name="userId"/>, together with an artist that owns a single album.
+    /// </summary>
+    /// <param name="userId">The Id of the user that owns the library.</param>
+    /// <returns>The Ids of the seeded library, artist and album.</returns>
+    private async Task<(Guid libraryId, Guid artistId, Guid albumId)> SeedLibraryArtistWithSingleAlbumAsync(Guid userId)
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        Guid libraryId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
+        AlbumEntity album = _albumEntityFixture.Create(
+            id: albumId,
+            artistId: artistId,
+            libraryId: libraryId,
+            title: "A Night at the Opera",
+            includeTracks: false,
+            includeMetadata: false,
+            includeBarcode: false,
+            includeOriginalReleaseDate: false,
+            includeOriginalReleaseYear: false,
+            includeReReleaseDate: false,
+            includeReReleaseYear: false);
+        dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Queen Library", libraryType: LibraryType.Music, contentLocations: []));
+        dbContext.Artists.Add(_artistEntityFixture.Create(id: artistId, libraryId: libraryId, name: "Queen", albums: [album], includeContributors: false));
+        await dbContext.SaveChangesAsync();
+        return (libraryId, artistId, albumId);
     }
 
     /// <summary>

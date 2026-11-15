@@ -49,6 +49,16 @@ public class TrackRepositoryTests
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly MusicArtworkEntityFixture _musicArtworkEntityFixture = new();
     private readonly PaginationDataDtoFixture _paginationDataDtoFixture = new();
+    private readonly IDateTimeProvider _mockDateTimeProvider;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TrackRepositoryTests"/> class.
+    /// </summary>
+    public TrackRepositoryTests()
+    {
+        _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
+        _mockDateTimeProvider.UtcNow.Returns(new DateTime(2026, 11, 14, 10, 30, 0, DateTimeKind.Utc));
+    }
 
     [Fact]
     public async Task InsertAsync_WhenCalledWithAValidTrack_ShouldPersistTheTrackAndItsChildren()
@@ -58,7 +68,7 @@ public class TrackRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -107,7 +117,7 @@ public class TrackRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -133,7 +143,7 @@ public class TrackRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid firstLibraryId = Guid.NewGuid();
         AlbumEntity firstAlbum = await SeedAlbumAsync(context, firstLibraryId);
@@ -165,7 +175,7 @@ public class TrackRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -198,7 +208,7 @@ public class TrackRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -226,7 +236,7 @@ public class TrackRepositoryTests
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -275,7 +285,7 @@ public class TrackRepositoryTests
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -319,7 +329,7 @@ public class TrackRepositoryTests
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -360,7 +370,7 @@ public class TrackRepositoryTests
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -402,7 +412,7 @@ public class TrackRepositoryTests
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -444,7 +454,7 @@ public class TrackRepositoryTests
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -504,7 +514,7 @@ public class TrackRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -545,7 +555,7 @@ public class TrackRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -572,7 +582,7 @@ public class TrackRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -626,7 +636,7 @@ public class TrackRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -675,7 +685,7 @@ public class TrackRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -707,7 +717,7 @@ public class TrackRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -752,7 +762,7 @@ public class TrackRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -780,7 +790,7 @@ public class TrackRepositoryTests
         anchorConnection.Open();
         using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -805,7 +815,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
         context.Tracks.Add(_trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false));
@@ -827,7 +837,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
         TrackEntity firstTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/first.flac", includeMetadata: false);
@@ -855,7 +865,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
         TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/hidden.flac", includeMetadata: false);
@@ -897,7 +907,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-include-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId, includeMetadata: true);
         ArtistEntity artist = await context.Artists.AsNoTracking().FirstAsync(candidate => candidate.Id == album.ArtistId);
@@ -941,7 +951,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
         const int TRACK_COUNT = 501;
@@ -969,7 +979,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-library-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
         AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
@@ -998,7 +1008,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-artist-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
         AlbumEntity artistAlbum = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
@@ -1026,7 +1036,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-album-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
         AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
@@ -1053,7 +1063,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-bothfilters-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
         AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
@@ -1083,7 +1093,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-excluded-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
         AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
@@ -1109,7 +1119,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-count-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
         AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
@@ -1132,7 +1142,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-fewertracks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
         AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
@@ -1155,7 +1165,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-nomatch-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
         AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
@@ -1178,7 +1188,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-projection-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
         AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
@@ -1214,7 +1224,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-cover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
         AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
@@ -1239,7 +1249,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-nocover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
         AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
@@ -1262,7 +1272,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-noncover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
         AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
@@ -1286,7 +1296,7 @@ public class TrackRepositoryTests
         using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-othercover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         using LuminaDbContext context = CreateContext(anchorConnection);
-        TrackRepository sut = new(context);
+        TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
         AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
@@ -1304,8 +1314,607 @@ public class TrackRepositoryTests
         Assert.Null(row.CoverPath);
     }
 
+    [Fact]
+    public async Task InsertAsync_WhenATrackWithTheSamePathIsSoftDeleted_ShouldReturnTrackAlreadyExists()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-insert-deleted-path-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity deletedTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/deleted.flac", includeMetadata: false);
+        deletedTrack.IsDeleted = true;
+        deletedTrack.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        context.Tracks.Add(deletedTrack);
+        await context.SaveChangesAsync();
+
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/deleted.flac", includeMetadata: false);
+
+        // Act
+        Result<Created> result = await sut.InsertAsync(track, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.TrackAlreadyExists, result.FirstError);
+    }
+
+    [Fact]
+    public async Task GetExistingPathsAsync_WhenTheOnlyTrackIsSoftDeleted_ShouldStillReportThePath()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-existing-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity deletedTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/deleted.flac", includeMetadata: false);
+        deletedTrack.IsDeleted = true;
+        deletedTrack.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        context.Tracks.Add(deletedTrack);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyCollection<string>> result = await sut.GetExistingPathsAsync(libraryId, ["/music/queen/deleted.flac"], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(["/music/queen/deleted.flac"], result.Value);
+    }
+
+    [Fact]
+    public async Task GetByPathAsync_WhenTheTrackIsSoftDeleted_ShouldReturnIt()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbypath-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity deletedTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, path: "/music/queen/deleted.flac", includeMetadata: false);
+        deletedTrack.IsDeleted = true;
+        deletedTrack.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        context.Tracks.Add(deletedTrack);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<TrackEntity?> result = await sut.GetByPathAsync(libraryId, "/music/queen/deleted.flac", CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(deletedTrack.Id, result.Value!.Id);
+        Assert.True(result.Value.IsDeleted);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_WhenTheTrackIsSoftDeleted_ShouldReturnNull()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyid-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        track.IsDeleted = true;
+        track.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        context.Tracks.Add(track);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<TrackEntity?> result = await sut.GetByIdAsync(track.Id, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Theory]
+    [InlineData(true)] // The album of the track is soft deleted.
+    [InlineData(false)] // The artist of the album is soft deleted.
+    public async Task GetByIdAsync_WhenAnAncestorIsSoftDeleted_ShouldReturnNull(bool isAlbumDeleted)
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyid-deleted-ancestor-{isAlbumDeleted}-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        context.Tracks.Add(track);
+        if (isAlbumDeleted)
+            album.IsDeleted = true;
+        else
+            artist.IsDeleted = true;
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<TrackEntity?> result = await sut.GetByIdAsync(track.Id, cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetByAlbumIdAsync_WhenTracksAreSoftDeleted_ShouldExcludeThem()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyalbum-deleted-tracks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity activeTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        TrackEntity deletedTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        deletedTrack.IsDeleted = true;
+        deletedTrack.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        context.Tracks.AddRange(activeTrack, deletedTrack);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<TrackEntity>> result = await sut.GetByAlbumIdAsync(album.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(activeTrack.Id, Assert.Single(result.Value).Id);
+    }
+
+    [Fact]
+    public async Task GetByAlbumIdAsync_WhenTheAlbumIsSoftDeleted_ShouldReturnEmpty()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyalbum-deleted-album-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        context.Tracks.Add(track);
+        album.IsDeleted = true;
+        album.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<TrackEntity>> result = await sut.GetByAlbumIdAsync(album.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Empty(result.Value);
+    }
+
+    [Fact]
+    public async Task GetByAlbumIdIncludingDeletedAsync_WhenCalled_ShouldReturnEveryTrackOfTheAlbumOrdered()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyalbum-including-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity activeTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, trackNumber: 2, includeMetadata: false);
+        activeTrack.DiscNumber = 1;
+        TrackEntity deletedTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, trackNumber: 1, includeMetadata: false);
+        deletedTrack.DiscNumber = 1;
+        deletedTrack.IsDeleted = true;
+        deletedTrack.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        context.Tracks.AddRange(activeTrack, deletedTrack);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<TrackEntity>> result = await sut.GetByAlbumIdIncludingDeletedAsync(album.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal([deletedTrack.Id, activeTrack.Id], result.Value.Select(track => track.Id));
+    }
+
+    [Fact]
+    public async Task GetShuffleTracksLiteAsync_WhenTracksOrAncestorsAreSoftDeleted_ShouldExcludeThem()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity visibleArtist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity visibleAlbum = await SeedAlbumForArtistAsync(context, libraryId, visibleArtist.Id, "A Night at the Opera");
+        TrackEntity visibleTrack = _trackEntityFixture.Create(albumId: visibleAlbum.Id, libraryId: libraryId, includeMetadata: false);
+        TrackEntity deletedTrack = _trackEntityFixture.Create(albumId: visibleAlbum.Id, libraryId: libraryId, includeMetadata: false);
+        deletedTrack.IsDeleted = true;
+        deletedTrack.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        context.Tracks.AddRange(visibleTrack, deletedTrack);
+
+        ArtistEntity artistOfDeletedAlbum = await SeedArtistAsync(context, libraryId, "Deleted Album Artist");
+        AlbumEntity deletedAlbum = await SeedAlbumForArtistAsync(context, libraryId, artistOfDeletedAlbum.Id, "Deleted Album");
+        context.Tracks.Add(_trackEntityFixture.Create(albumId: deletedAlbum.Id, libraryId: libraryId, includeMetadata: false));
+        deletedAlbum.IsDeleted = true;
+        deletedAlbum.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+
+        ArtistEntity deletedArtist = await SeedArtistAsync(context, libraryId, "Deleted Artist");
+        AlbumEntity albumOfDeletedArtist = await SeedAlbumForArtistAsync(context, libraryId, deletedArtist.Id, "Hidden Album");
+        context.Tracks.Add(_trackEntityFixture.Create(albumId: albumOfDeletedArtist.Id, libraryId: libraryId, includeMetadata: false));
+        deletedArtist.IsDeleted = true;
+        deletedArtist.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<ShuffleTrackRowDto>> result = await sut.GetShuffleTracksLiteAsync(libraryId, null, null, [], 10, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(visibleTrack.Id, Assert.Single(result.Value).TrackId);
+    }
+
+    [Theory]
+    [InlineData(true)] // The track itself is soft deleted.
+    [InlineData(false)] // An ancestor of the track is soft deleted.
+    public async Task GetTrackStreamInfoAsync_WhenTheTrackIsOrHasASoftDeletedAncestor_ShouldReturnNull(bool isTrackDeleted)
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-stream-deleted-{isTrackDeleted}-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        context.Tracks.Add(track);
+        if (isTrackDeleted)
+            track.IsDeleted = true;
+        else
+            album.IsDeleted = true;
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<TrackStreamDto?> result = await sut.GetTrackStreamInfoAsync(libraryId, album.Id, artist.Id, track.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Theory]
+    [InlineData(true)] // The track itself is soft deleted.
+    [InlineData(false)] // An ancestor of the track is soft deleted.
+    public async Task GetPlaybackManifestInfoAsync_WhenTheTrackIsOrHasASoftDeletedAncestor_ShouldReturnNull(bool isTrackDeleted)
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-manifest-deleted-{isTrackDeleted}-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        context.Tracks.Add(track);
+        if (isTrackDeleted)
+            track.IsDeleted = true;
+        else
+            artist.IsDeleted = true;
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<TrackPlaybackManifestDto?> result = await sut.GetPlaybackManifestInfoAsync(libraryId, album.Id, artist.Id, track.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
+    public async Task GetAccessInfoByIdsAsync_WhenTracksOrAncestorsAreSoftDeleted_ShouldExcludeThem()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-access-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        TrackEntity activeTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        TrackEntity deletedTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        deletedTrack.IsDeleted = true;
+        deletedTrack.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        context.Tracks.AddRange(activeTrack, deletedTrack);
+
+        ArtistEntity deletedArtist = await SeedArtistAsync(context, libraryId, "Deleted Artist");
+        AlbumEntity albumOfDeletedArtist = await SeedAlbumForArtistAsync(context, libraryId, deletedArtist.Id, "Hidden Album");
+        TrackEntity trackOfDeletedArtist = _trackEntityFixture.Create(albumId: albumOfDeletedArtist.Id, libraryId: libraryId, includeMetadata: false);
+        context.Tracks.Add(trackOfDeletedArtist);
+        deletedArtist.IsDeleted = true;
+        deletedArtist.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<TrackAccessSummaryDto> result = await sut.GetAccessInfoByIdsAsync([activeTrack.Id, deletedTrack.Id, trackOfDeletedArtist.Id], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(1, result.Value.TrackCount);
+        Assert.Equal([libraryId], result.Value.LibraryIds);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenTracksOrAncestorsAreSoftDeleted_ShouldExcludeThem()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        TrackEntity activeTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        TrackEntity deletedTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        deletedTrack.IsDeleted = true;
+        deletedTrack.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        context.Tracks.AddRange(activeTrack, deletedTrack);
+
+        ArtistEntity artistOfDeletedAlbum = await SeedArtistAsync(context, libraryId, "Album Artist");
+        AlbumEntity deletedAlbum = await SeedAlbumForArtistAsync(context, libraryId, artistOfDeletedAlbum.Id, "Deleted Album");
+        TrackEntity trackOfDeletedAlbum = _trackEntityFixture.Create(albumId: deletedAlbum.Id, libraryId: libraryId, includeMetadata: false);
+        context.Tracks.Add(trackOfDeletedAlbum);
+        deletedAlbum.IsDeleted = true;
+        deletedAlbum.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<TrackEntity>> result = await sut.GetByIdsAsync([activeTrack.Id, deletedTrack.Id, trackOfDeletedAlbum.Id], false, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(activeTrack.Id, Assert.Single(result.Value).Id);
+    }
+
+    [Fact]
+    public async Task GetTracksNeedingMetadataCountAsync_WhenATrackOrItsAncestorsAreSoftDeleted_ShouldNotCountIt()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-count-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
+        AlbumEntity album = await SeedAlbumForArtistAsync(context, libraryId, artist.Id, "A Night at the Opera");
+        TrackEntity pendingTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false, metadataStatus: MetadataStatus.Pending);
+        TrackEntity deletedTrack = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false, metadataStatus: MetadataStatus.Pending);
+        deletedTrack.IsDeleted = true;
+        deletedTrack.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        context.Tracks.AddRange(pendingTrack, deletedTrack);
+
+        ArtistEntity artistOfDeletedAlbum = await SeedArtistAsync(context, libraryId, "Album Artist");
+        AlbumEntity deletedAlbum = await SeedAlbumForArtistAsync(context, libraryId, artistOfDeletedAlbum.Id, "Deleted Album");
+        context.Tracks.Add(_trackEntityFixture.Create(
+            albumId: deletedAlbum.Id, libraryId: libraryId, includeMetadata: false, metadataStatus: MetadataStatus.Pending));
+        deletedAlbum.IsDeleted = true;
+        deletedAlbum.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<int> result = await sut.GetTracksNeedingMetadataCountAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(1, result.Value);
+    }
+
+    [Fact]
+    public async Task SoftDeleteByIdAsync_WhenCalled_ShouldPersistTheDeletionStateAndProviderTime()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-softdelete-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        context.Tracks.Add(track);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<Updated> result = await sut.SoftDeleteByIdAsync(track.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        TrackEntity storedTrack = await context.Tracks.AsNoTracking().SingleAsync(candidate => candidate.Id == track.Id);
+        Assert.True(storedTrack.IsDeleted);
+        Assert.Equal(_mockDateTimeProvider.UtcNow, storedTrack.DeletedOnUtc);
+    }
+
+    [Fact]
+    public async Task SoftDeleteByIdAsync_WhenTrackIsAlreadyDeleted_ShouldReturnTrackNotFound()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-softdelete-already-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        DateTime storedDeletedOnUtc = _mockDateTimeProvider.UtcNow.AddHours(-1);
+        track.IsDeleted = true;
+        track.DeletedOnUtc = storedDeletedOnUtc;
+        context.Tracks.Add(track);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<Updated> result = await sut.SoftDeleteByIdAsync(track.Id, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.TrackNotFound, result.FirstError);
+        TrackEntity storedTrack = await context.Tracks.AsNoTracking().SingleAsync(candidate => candidate.Id == track.Id);
+        Assert.Equal(storedDeletedOnUtc, storedTrack.DeletedOnUtc);
+    }
+
+    [Fact]
+    public async Task SoftDeleteByIdAsync_WhenTrackDoesNotExist_ShouldReturnTrackNotFound()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-softdelete-missing-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+
+        // Act
+        Result<Updated> result = await sut.SoftDeleteByIdAsync(Guid.NewGuid(), CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.TrackNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task RestoreSoftDeletedByIdAsync_WhenCalled_ShouldPersistTheClearedDeletionState()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-restore-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        track.IsDeleted = true;
+        track.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        context.Tracks.Add(track);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<Updated> result = await sut.RestoreSoftDeletedByIdAsync(track.Id, CancellationToken.None);
+        await context.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        TrackEntity storedTrack = await context.Tracks.AsNoTracking().SingleAsync(candidate => candidate.Id == track.Id);
+        Assert.False(storedTrack.IsDeleted);
+        Assert.Null(storedTrack.DeletedOnUtc);
+    }
+
+    [Fact]
+    public async Task GetSoftDeletedByLibraryIdAsync_WhenCalled_ShouldReturnOnlyDeletedTracksWithVisibleAncestorsOrdered()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getdeleted-library-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        DateTime deletedOnUtc = _mockDateTimeProvider.UtcNow;
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity olderDeletion = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, title: "Alpha", includeMetadata: false);
+        olderDeletion.IsDeleted = true;
+        olderDeletion.DeletedOnUtc = deletedOnUtc.AddHours(-2);
+        TrackEntity newerDeletion = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, title: "Beta", includeMetadata: false);
+        newerDeletion.IsDeleted = true;
+        newerDeletion.DeletedOnUtc = deletedOnUtc.AddHours(-1);
+        TrackEntity sameTimeDeletion = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, title: "Gamma", includeMetadata: false);
+        sameTimeDeletion.IsDeleted = true;
+        sameTimeDeletion.DeletedOnUtc = deletedOnUtc.AddHours(-1);
+        context.Tracks.AddRange(olderDeletion, newerDeletion, sameTimeDeletion);
+
+        ArtistEntity deletedArtist = await SeedArtistAsync(context, libraryId, "Deleted Artist");
+        AlbumEntity albumOfDeletedArtist = await SeedAlbumForArtistAsync(context, libraryId, deletedArtist.Id, "Hidden Album");
+        TrackEntity hiddenDeletedTrack = _trackEntityFixture.Create(albumId: albumOfDeletedArtist.Id, libraryId: libraryId, includeMetadata: false);
+        hiddenDeletedTrack.IsDeleted = true;
+        hiddenDeletedTrack.DeletedOnUtc = deletedOnUtc;
+        context.Tracks.Add(hiddenDeletedTrack);
+        deletedArtist.IsDeleted = true;
+        deletedArtist.DeletedOnUtc = deletedOnUtc;
+        await context.SaveChangesAsync();
+
+        TrackEntity[] expectedDeletedTracks = [olderDeletion, newerDeletion, sameTimeDeletion];
+        Guid[] expectedOrder = [.. expectedDeletedTracks
+            .OrderByDescending(track => track.DeletedOnUtc)
+            .ThenByDescending(track => track.Title)
+            .ThenByDescending(track => track.Id)
+            .Select(track => track.Id)];
+
+        // Act
+        Result<IReadOnlyList<TrackEntity>> result = await sut.GetSoftDeletedByLibraryIdAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(expectedOrder, result.Value.Select(track => track.Id));
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenTheTrackIsSoftDeleted_ShouldReturnTrackNotFound()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-update-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        track.IsDeleted = true;
+        track.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+        context.Tracks.Add(track);
+        await context.SaveChangesAsync();
+
+        TrackEntity data = _trackEntityFixture.Create(id: track.Id, albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+
+        // Act
+        Result<Updated> result = await sut.UpdateAsync(data, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.TrackNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_WhenIncomingDataIsMarkedDeleted_ShouldPreserveTheActiveRowsDeletionState()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-update-preserve-deletion-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using LuminaDbContext context = CreateContext(anchorConnection);
+        TrackRepository sut = CreateTrackRepository(context);
+        Guid libraryId = Guid.NewGuid();
+        AlbumEntity album = await SeedAlbumAsync(context, libraryId);
+        TrackEntity track = _trackEntityFixture.Create(albumId: album.Id, libraryId: libraryId, includeMetadata: false);
+        context.Tracks.Add(track);
+        await context.SaveChangesAsync();
+
+        TrackEntity data = await LoadDetachedTrackAsync(context, track.Id);
+        data.Title = "Somebody to Love";
+        data.IsDeleted = true;
+        data.DeletedOnUtc = _mockDateTimeProvider.UtcNow;
+
+        // Act
+        Result<Updated> result = await sut.UpdateAsync(data, CancellationToken.None);
+        await context.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        TrackEntity storedTrack = await context.Tracks.AsNoTracking().SingleAsync(candidate => candidate.Id == track.Id);
+        Assert.Equal("Somebody to Love", storedTrack.Title);
+        Assert.False(storedTrack.IsDeleted);
+        Assert.Null(storedTrack.DeletedOnUtc);
+    }
+
     /// <summary>
-    /// Creates a list of tracks with distinct paths and empty metadata collections, so that the chunked lookup can be exercised without extra graph data.
+    /// Creates a list of tracks of the provided album with distinct paths and empty metadata collections, so that the chunked lookup can be exercised without extra graph data.
     /// </summary>
     /// <param name="count">The number of tracks to create.</param>
     /// <param name="albumId">The Id of the album that owns the tracks.</param>
@@ -1315,6 +1924,16 @@ public class TrackRepositoryTests
     {
         return [.. Enumerable.Range(0, count).Select(_ => _trackEntityFixture.Create(
             albumId: albumId, libraryId: libraryId, path: $"/music/generated-{Guid.NewGuid():N}.flac", includeMetadata: false))];
+    }
+
+    /// <summary>
+    /// Creates a track repository backed by the provided context, using the deterministic time provider of the test class.
+    /// </summary>
+    /// <param name="context">The context the repository operates on.</param>
+    /// <returns>The created repository.</returns>
+    private TrackRepository CreateTrackRepository(LuminaDbContext context)
+    {
+        return new TrackRepository(context, _mockDateTimeProvider);
     }
 
     /// <summary>
