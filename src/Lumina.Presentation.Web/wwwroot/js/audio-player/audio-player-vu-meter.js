@@ -949,7 +949,7 @@
                 return;
             const elapsed = this.advanceClock(timestamp);
             const now = this.clockMilliseconds;
-            // levels is null on most frames: either the meter is stopped, or no new block of samples is due yet (see
+            // Levels is null on most frames: either the meter is stopped, or no new block of samples is due yet (see
             // readLevels). A null means "no new measurement", not "silence", so the code below only lets the bars fall.
             const levels = this.isInputActive && this.spectrum ? this.spectrum.readLevels(now / 1000) : null;
             this.ensureLevelArrays();

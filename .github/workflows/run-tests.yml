@@ -4,7 +4,7 @@ on:
   pull_request:
     branches:
       - master
-  workflow_dispatch: # enable manual triggers
+  workflow_dispatch: # Enable manual triggers.
 
 jobs:
   run-platform-tests:
@@ -32,8 +32,8 @@ jobs:
       - name: Build
         run: dotnet build src/Lumina.slnx --no-restore -p:SixLaborsLicenseEnforceBuild=true
       - name: Run tests
-        # blame-hang terminates a test that blocks for 10 minutes and dumps the hang stack,
-        # turning the recurring 'stuck job' into a failing job that names the culprit test
+        # Blame-hang terminates a test that blocks for 10 minutes and dumps the hang stack,
+        # turning the recurring 'stuck job' into a failing job that names the culprit test.
         run: dotnet test src/Lumina.slnx --no-build --verbosity normal --blame-hang --blame-hang-timeout 10m
       - name: Upload hang diagnostics
         if: failure()

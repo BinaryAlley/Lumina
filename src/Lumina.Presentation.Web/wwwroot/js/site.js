@@ -6,7 +6,7 @@ const progressIndicatorValueShadow = document.getElementById('progress-indicator
 const progressIndicatorValueText = document.getElementById('progress-indicator-value-text');
 const audioPlayerExpandToggle = document.getElementById('audio-player-expand-toggle');
 
-let enableConsoleDebugMessages = false; // whether to display debug messages at the developer console, or not
+let enableConsoleDebugMessages = false; // Whether to display debug messages at the developer console, or not.
 
 var ajaxCallCounter = 0;
 
@@ -74,14 +74,14 @@ async function showHttpErrorAsync(response) {
  */
 async function callApiGetAsync(url) {
     try {
-        // call the API
+        // Call the API.
         const response = await fetch(url, {
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
-        if (response.redirected) // if a redirect is requested, perform it
+        if (response.redirected) // If a redirect is requested, perform it.
             window.location.href = response.url;
         else {
             if (!response.ok) {
@@ -128,27 +128,27 @@ async function callApiPostAsync(url, data, options = {}) {
     };
     const finalOptions = { ...defaultOptions, ...options };
     try {
-        // prepare headers
+        // Prepare headers.
         const headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
             ...finalOptions.headers
         };
-        // add anti-forgery token if enabled
+        // Add anti-forgery token if enabled.
         if (finalOptions.useAntiForgery) {
             const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
             if (token)
                 headers['RequestVerificationToken'] = token;
         }
-        // make the request; when no data is provided, send an empty JSON object, because FastEndpoints parses the JSON body when
-        // the content type is application/json, so an empty body would fail to deserialize
+        // Make the request; when no data is provided, send an empty JSON object, because FastEndpoints parses the JSON body when
+        // the content type is application/json, so an empty body would fail to deserialize.
         const response = await fetch(url, {
             method: 'POST',
             headers: headers,
             body: JSON.stringify(data ?? {})
         });
-        if (response.redirected) // if a redirect is requested, perform it
+        if (response.redirected) // If a redirect is requested, perform it.
             window.location.href = response.url;
         else {
             if (!response.ok) {
@@ -196,27 +196,27 @@ async function callApiPutAsync(url, data, options = {}) {
     };
     const finalOptions = { ...defaultOptions, ...options };
     try {
-        // prepare headers
+        // Prepare headers.
         const headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
             ...finalOptions.headers
         };
-        // add anti-forgery token if enabled
+        // Add anti-forgery token if enabled.
         if (finalOptions.useAntiForgery) {
             const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
             if (token)
                 headers['RequestVerificationToken'] = token;
         }
-        // make the request; when no data is provided, send an empty JSON object, because FastEndpoints parses the JSON body when
-        // the content type is application/json, so an empty body would fail to deserialize
+        // Make the request; when no data is provided, send an empty JSON object, because FastEndpoints parses the JSON body when
+        // the content type is application/json, so an empty body would fail to deserialize.
         const response = await fetch(url, {
             method: 'PUT',
             headers: headers,
             body: JSON.stringify(data ?? {})
         });
-        if (response.redirected) // if a redirect is requested, perform it
+        if (response.redirected) // If a redirect is requested, perform it.
             window.location.href = response.url;
         else {
             if (!response.ok) {
@@ -264,26 +264,26 @@ async function callApiDeleteAsync(url, options = {}) {
     };
     const finalOptions = { ...defaultOptions, ...options };
     try {
-        // prepare headers
+        // Prepare headers.
         const headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
             ...finalOptions.headers
         };
-        // add anti-forgery token if enabled
+        // Add anti-forgery token if enabled.
         if (finalOptions.useAntiForgery) {
             const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
             if (token)
                 headers['RequestVerificationToken'] = token;
         }
-        // make the request
+        // Make the request.
         const response = await fetch(url, {
             method: 'DELETE',
             headers: headers,
-            body: '{}' // FastEndpoints parses the JSON body when the content type is application/json, so an empty body would fail to deserialize
+            body: '{}' // FastEndpoints parses the JSON body when the content type is application/json, so an empty body would fail to deserialize.
         });
-        if (response.redirected) // if a redirect is requested, perform it
+        if (response.redirected) // If a redirect is requested, perform it.
             window.location.href = response.url;
         else {
             if (!response.ok) {
@@ -324,21 +324,21 @@ async function callApiDeleteAsync(url, options = {}) {
  * and managing back/forward browser actions.
  */
 function initializeNavigation() {
-    // store initial state
+    // Store initial state.
     const initialState = {
         url: window.location.href,
         content: document.querySelector('main').innerHTML,
         title: document.title
     };
     history.replaceState(initialState, document.title, window.location.href);
-    // initial nav-link binding
+    // Initial nav-link binding.
     bindNavigationLinks();
 
-    // handle browser back/forward
+    // Handle browser back/forward.
     window.addEventListener('popstate', handlePopStateAsync);
 
-    // execute the view scripts of the initially loaded page, now that the application scripts are loaded; the view scripts are
-    // stored with a non-executable type, so the browser does not run them before the application scripts are available
+    // Execute the view scripts of the initially loaded page, now that the application scripts are loaded; the view scripts are
+    // stored with a non-executable type, so the browser does not run them before the application scripts are available.
     showServerUnreachableNotificationIfNeeded();
     processViewScriptsAsync(document.querySelector('[data-section="scripts"]'));
 }
@@ -366,7 +366,7 @@ function showServerUnreachableNotificationIfNeeded() {
  */
 function bindNavigationLinks() {
     document.querySelectorAll('.nav-link').forEach(link => {
-        // only bind if not already bound
+        // Only bind if not already bound.
         if (!link.dataset.boundNavigation) {
             link.addEventListener('click', handleNavigationAsync);
             link.dataset.boundNavigation = 'true';
@@ -393,12 +393,12 @@ async function handleNavigationAsync(e) {
  */
 async function handlePopStateAsync(e) {
     if (e.state) {
-        // if we have cached content in state, use it immediately
+        // If we have cached content in state, use it immediately.
         if (e.state.content) {
             document.querySelector('main').innerHTML = e.state.content;
             document.title = e.state.title;
         }
-        // still fetch fresh content to ensure it's up to date
+        // Still fetch fresh content to ensure it's up to date.
         await updateContentAsync(e.state.url, false);
     }
 }
@@ -415,41 +415,41 @@ async function processViewScriptsAsync(sourceContainer) {
     if (viewScripts.length === 0)
         return;
 
-    // get or create scripts container
+    // Get or create scripts container.
     let scriptsContainer = document.querySelector('[data-section="scripts"]');
     if (!scriptsContainer) {
         scriptsContainer = document.createElement('div');
         scriptsContainer.setAttribute('data-section', 'scripts');
         document.body.appendChild(scriptsContainer);
     }
-    // clear existing scripts in container
+    // Clear existing scripts in container.
     scriptsContainer.innerHTML = '';
 
-    // process view scripts
+    // Process view scripts.
     for (const script of viewScripts) {
         const scriptId = script.getAttribute('data-form');
-        // remove existing script with same Id if it exists
+        // Remove existing script with same Id if it exists.
         const existingScript = document.querySelector(`script[data-form="${scriptId}"]`);
         if (existingScript)
             existingScript.remove();
 
         const newScript = document.createElement('script');
-        // copy script attributes, except the type, which is overridden so that the stored non-executable scripts are executed
+        // Copy script attributes, except the type, which is overridden so that the stored non-executable scripts are executed.
         Array.from(script.attributes).forEach(attr => {
             if (attr.name !== 'type')
                 newScript.setAttribute(attr.name, attr.value);
         });
 
-        // handle both inline and external scripts
+        // Handle both inline and external scripts.
         if (script.src) {
             newScript.src = script.src;
-            // wait for external script to load
+            // Wait for external script to load.
             await new Promise((resolve, reject) => {
                 newScript.onload = resolve;
                 newScript.onerror = reject;
             });
         } else {
-            // wrap inline scripts in a safety check
+            // Wrap inline scripts in a safety check.
             newScript.textContent = `
             (async function() {
                 const safeGetElement = (id) => document.getElementById(id);
@@ -458,13 +458,13 @@ async function processViewScriptsAsync(sourceContainer) {
                         element.addEventListener(e, handler);
                 };
                 ${script.textContent}
-                // call Initialize function, if defined in this script's scope
+                // Call Initialize function, if defined in this script's scope.
                 if (typeof InitializeAsync === 'function') 
                     await InitializeAsync();
             })();
         `;
         }
-        // add script to scripts container
+        // Add script to scripts container.
         scriptsContainer.appendChild(newScript);
     }
 }
@@ -476,13 +476,13 @@ async function processViewScriptsAsync(sourceContainer) {
  */
 async function updateContentAsync(url, addToHistory) {
     try {
-        // first, run cleanup of current view's scripts (unsubscribes handlers in the currently displayed razor views' script section, so it can be properly unloaded)
+        // First, run cleanup of current view's scripts (unsubscribes handlers in the currently displayed razor views' script section, so it can be properly unloaded).
         if (window.viewCleanups) {
             Object.values(window.viewCleanups).forEach(cleanup => {
                 if (typeof cleanup === 'function')
                     cleanup();
             });
-            // reset cleanups object
+            // Reset cleanups object.
             window.viewCleanups = {};
         }
 
@@ -494,7 +494,7 @@ async function updateContentAsync(url, addToHistory) {
                 'Accept': 'text/html'
             }
         });
-        if (response.redirected) // if a redirect is requested, perform it
+        if (response.redirected) // If a redirect is requested, perform it.
             window.location.href = response.url;
         else if (!response.ok) {
             // The server answered with an error page for the requested address. Keep the address the user asked for in the bar
@@ -510,29 +510,29 @@ async function updateContentAsync(url, addToHistory) {
         else {
             const html = await response.text();
 
-            // parse the new content
+            // Parse the new content.
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             const content = doc.querySelector('main').innerHTML;
             const title = doc.querySelector('title')?.textContent || document.title;
 
-            // update the page content
+            // Update the page content.
             document.querySelector('main').innerHTML = content;
             document.title = title;
             // The page scripts may start calling the API immediately, so the outage flag must be set before they run.
             showServerUnreachableNotificationIfNeeded();
 
-            // process all scripts in order: component scripts first, then view scripts
+            // Process all scripts in order: component scripts first, then view scripts.
             const componentScripts = doc.querySelectorAll('script[data-component-script]');
             for (const script of componentScripts) {
                 const newScript = document.createElement('script');
-                // copy script attributes
+                // Copy script attributes.
                 Array.from(script.attributes).forEach(attr => {
                     newScript.setAttribute(attr.name, attr.value);
                 });
 
                 if (script.src) {
-                    // wait for external script to fully load before continuing
+                    // Wait for external script to fully load before continuing.
                     await new Promise((resolve, reject) => {
                         newScript.onload = resolve;
                         newScript.onerror = reject;
@@ -540,23 +540,23 @@ async function updateContentAsync(url, addToHistory) {
                     });
                 }
             }
-            // execute component initialization scripts
+            // Execute component initialization scripts.
             const componentInits = doc.querySelectorAll('script[data-component-init]');
             for (const script of componentInits) {
                 const newScript = document.createElement('script');
-                // copy script attributes
+                // Copy script attributes.
                 Array.from(script.attributes).forEach(attr => {
                     newScript.setAttribute(attr.name, attr.value);
                 });
                 newScript.textContent = script.textContent;
                 document.body.appendChild(newScript);
             }
-            // process view scripts
+            // Process view scripts.
             await processViewScriptsAsync(doc.querySelector('[data-section="scripts"]'));
-            // bind navigation links in the new content
+            // Bind navigation links in the new content.
             bindNavigationLinks();
 
-            // save to history if needed
+            // Save to history if needed.
             if (addToHistory) {
                 const state = { url, content, title };
                 history.pushState(state, title, url);
@@ -647,7 +647,7 @@ async function blobToBase64Async(blob) {
  * @returns {boolean} True if the file path ends with an image file extension, false otherwise.
  */
 function isImageFile(filePath) {
-    // Adjust the regex pattern to match the image file extensions you support
+    // Adjust the regex pattern to match the image file extensions you support.
     return /\.(jpe?g|png|gif|bmp|svg|ico|webp)$/i.test(filePath);
 }
 
@@ -684,7 +684,7 @@ function hasScrollbars(element) {
  * @returns {number} Height of the scrollbar in pixels.
  */
 function getScrollbarHeight() {
-    // create an outer div and set its height and overflowY properties
+    // Create an outer div and set its height and overflowY properties.
     const outer = document.createElement('div');
     outer.style.visibility = 'hidden';
     outer.style.height = '100px';
@@ -692,7 +692,7 @@ function getScrollbarHeight() {
     document.body.appendChild(outer);
     const heightNoScroll = outer.offsetHeight;
     const heightWithScroll = outer.clientHeight;
-    // cleanup after measuring
+    // Cleanup after measuring.
     outer.parentNode.removeChild(outer);
     return heightNoScroll - heightWithScroll;
 }
@@ -702,19 +702,19 @@ function getScrollbarHeight() {
  * @returns {number} Width of the scrollbar in pixels.
  */
 function getScrollbarWidth() {
-    // create an outer div and set its width
+    // Create an outer div and set its width.
     const outer = document.createElement('div');
     outer.style.visibility = 'hidden';
     outer.style.width = '100px';
     document.body.appendChild(outer);
     const widthNoScroll = outer.offsetWidth;
-    // apply overflow and append an inner div
+    // Apply overflow and append an inner div.
     outer.style.overflow = 'scroll';
     const inner = document.createElement('div');
     inner.style.width = '100%';
     outer.appendChild(inner);
     const widthWithScroll = inner.offsetWidth;
-    // cleanup and calculate the difference
+    // Cleanup and calculate the difference.
     outer.parentNode.removeChild(outer);
     return widthNoScroll - widthWithScroll;
 }
@@ -824,15 +824,15 @@ document.addEventListener('click', function (e) {
         var value = e.target.getAttribute('data-value');
         var combobox = e.target.closest('.enlightenment-combobox');
 
-        // update the displayed text
+        // Update the displayed text.
         var selectedText = combobox.querySelector('.enlightenment-selected-text');
         if (selectedText) {
             selectedText.textContent = text;
-            // update the data-value attribute with the actual value
+            // Update the data-value attribute with the actual value.
             selectedText.setAttribute('data-value', value);
         }
 
-        // close the dropdown
+        // Close the dropdown.
         var toggleCheckbox = combobox.querySelector('.enlightenment-toggle-checkbox');
         if (toggleCheckbox)
             toggleCheckbox.checked = false;
@@ -843,18 +843,18 @@ document.addEventListener('click', function (e) {
  * Global click event for the entire document. Closes all combobox dropdowns if the clicked target is outside any combobox.
  */
 document.addEventListener('click', function (e) {
-    // enlightenment combobox logic
+    // Enlightenment combobox logic.
     if (!e.target.closest('.enlightenment-combobox')) {
         const checkbox = document.querySelector('.enlightenment-toggle-checkbox:checked');
         if (checkbox)
             checkbox.checked = false;
     }
-    // navigator combobox logic
+    // Navigator combobox logic.
     if (!e.target.closest('.navigator-combobox') && typeof addressBar !== 'undefined' && addressBar !== null) {
         const checkbox = document.querySelector('.navigator-toggle-checkbox:checked');
         if (checkbox)
             checkbox.checked = false;
-        // when drop down closes, hide address bar overflow
+        // When drop down closes, hide address bar overflow.
         addressBar.style.overflowX = 'auto';
         addressBar.style.overflowY = 'hidden';
         reattachDropdown();
@@ -866,7 +866,7 @@ document.addEventListener('click', function (e) {
  */
 document.addEventListener("click", function (e) {
     if (e.target.matches('.navigator-option')) {
-        // the address bar drop downs may be destroyed when an option is clicked - they are regenerated each time anyway
+        // The address bar drop downs may be destroyed when an option is clicked - they are regenerated each time anyway.
         addressBar.removeEventListener('scroll', adjustDropdownPosition);
 
         var parentElement = e.target.parentElement;

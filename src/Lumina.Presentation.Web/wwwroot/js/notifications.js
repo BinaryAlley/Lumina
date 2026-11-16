@@ -51,7 +51,7 @@ class NotificationService {
         this.notifications.push(notification);
         this.displayNotification(notification);
 
-        // log the notification to the console
+        // Log the notification to the console.
         const message = `${notification.type.charAt(0).toUpperCase() + notification.type.slice(1)}: ${notification.message}`;
         if (notification.type === 'info')
             console.info(message);
@@ -62,7 +62,7 @@ class NotificationService {
         else
             console.log(message);
 
-        // set a timeout to remove the notification after 10 seconds (fading out effect is handled in notification.css)
+        // Set a timeout to remove the notification after 10 seconds (fading out effect is handled in notification.css).
         setTimeout(() => this.removeNotification(notification.id), 10000);
     }
 
@@ -102,5 +102,5 @@ class NotificationService {
     }
 }
 
-// create a global instance of the NotificationService
+// Create a global instance of the NotificationService.
 const notificationService = new NotificationService();

@@ -1,6 +1,6 @@
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
+# This stage is used when running from VS in fast mode (Default for Debug configuration).
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-# curl is used by the container healthcheck to probe the /health endpoints
+# Curl is used by the container healthcheck to probe the /health endpoints.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/* \
@@ -17,13 +17,13 @@ ARG BUILD_CONFIGURATION=Release
 
 WORKDIR /src
 
-# restore NuGet packages (keeping this section separate from the rest of the project files allows Docker to cache the restored packages)
+# Restore NuGet packages (keeping this section separate from the rest of the project files allows Docker to cache the restored packages).
 COPY ["AssemblyInfo_Shared.cs", "."]
 COPY ["Lumina.Presentation.Web/Lumina.Presentation.Web.csproj", "Lumina.Presentation.Web/"]
 
 RUN dotnet restore "./Lumina.Presentation.Web/Lumina.Presentation.Web.csproj" /p:BaseOutputPath=/app/publish/
 
-# build the project
+# Build the project.
 COPY ["Lumina.Presentation.Web/", "Lumina.Presentation.Web/"]
 COPY . .
 WORKDIR /src/Lumina.Presentation.Web
@@ -45,10 +45,10 @@ WORKDIR /app
 
 COPY --from=publish /app/publish .
 # The HTTP port is controlled per run mode: launchSettings.json for local development, ASPNETCORE_HTTP_PORTS here for
-# Docker, and for a published DLL run directly on a host, ASPNETCORE_URLS (or ASPNETCORE_HTTP_PORTS) must be set
+# Docker, and for a published DLL run directly on a host, ASPNETCORE_URLS (or ASPNETCORE_HTTP_PORTS) must be set.
 ENV ASPNETCORE_HTTP_PORTS=5012
 EXPOSE 5012
 ENTRYPOINT ["dotnet", "Lumina.Presentation.Web.dll"]
 
-# to build this Docker image, run the following command from the root of the project (location of the .slnx solution file):
+# To build this Docker image, run the following command from the root of the project (location of the .slnx solution file):
 # docker build --no-cache -t lumina-web -f Lumina.Presentation.Web/Dockerfile .

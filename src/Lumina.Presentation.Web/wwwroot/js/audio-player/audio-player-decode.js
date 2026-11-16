@@ -411,7 +411,7 @@
                 return;
             try {
                 const closing = decoder.close();
-                // close never rejects, but a decoder implementation that returns a rejected promise must not leave an
+                // Close never rejects, but a decoder implementation that returns a rejected promise must not leave an
                 // unhandled rejection behind, so the outcome is deliberately discarded.
                 if (closing && typeof closing.catch === 'function')
                     closing.catch(() => {});

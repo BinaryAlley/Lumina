@@ -55,10 +55,10 @@
     function readMember(target, name) {
         if (target === null || target === undefined || typeof target !== 'object')
             return undefined;
-        // expose the collection count under the same 'Count' member as the server side engine
+        // Expose the collection count under the same 'Count' member as the server side engine.
         if (name.toLowerCase() === 'count' && Array.isArray(target))
             return target.length;
-        // match member names case-insensitively, only against the own enumerable properties, so prototype members cannot be reached
+        // Match member names case-insensitively, only against the own enumerable properties, so prototype members cannot be reached.
         for (const key of Object.keys(target))
             if (key.toLowerCase() === name.toLowerCase())
                 return target[key];
@@ -180,7 +180,7 @@
             return scope.value;
         if (explicitParentCount > 0)
             return resolvePath(scope.value, expression);
-        // resolve against the scope chain, so that a section scope can fall back to its parent values
+        // Resolve against the scope chain, so that a section scope can fall back to its parent values.
         for (let candidate = scope; candidate !== null; candidate = candidate.parent) {
             const resolved = resolvePath(candidate.value, expression);
             if (resolved !== undefined)
@@ -207,7 +207,7 @@
                 output += node.shouldEscape ? escapeHtml(value) : value;
                 continue;
             }
-            // sections are rendered when their expression is truthy, iterated when it is an array, and skipped otherwise
+            // Sections are rendered when their expression is truthy, iterated when it is an array, and skipped otherwise.
             const value = resolveExpression(node.expression, scope);
             const truthy = isTruthy(value);
             if (node.inverted) {
