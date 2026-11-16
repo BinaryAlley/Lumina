@@ -12,6 +12,10 @@ namespace Lumina.Domain.Core.BoundedContexts.VideoLibraryBoundedContext.TvShowLi
 [DebuggerDisplay("{Id}: {Title}")]
 public sealed class Episode : Entity<EpisodeId>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Episode"/> class.
+    /// </summary>
+    /// <param name="id">The unique identifier of the episode.</param>
     public Episode(EpisodeId id) : base(id)
     {
     }

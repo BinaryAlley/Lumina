@@ -11,6 +11,9 @@ namespace Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.
 /// </summary>
 public interface IPathStrategy
 {
+    /// <summary>
+    /// Gets the character used to separate path segments on the current platform.
+    /// </summary>
     char PathSeparator { get; }
 
     /// <summary>
@@ -32,7 +35,7 @@ public interface IPathStrategy
     /// Tries to combine <paramref name="path"/> with <paramref name="name"/>.
     /// </summary>
     /// <param name="path">The path to be combined.</param>
-    /// <param name="path">The name to be combined with the path.</param>
+    /// <param name="name">The name to be combined with the path.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing the combined path, or an error.</returns>
     Result<FileSystemPathId> CombinePath(FileSystemPathId path, string name);
 

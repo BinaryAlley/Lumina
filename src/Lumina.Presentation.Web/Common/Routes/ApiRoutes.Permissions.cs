@@ -10,6 +10,9 @@ public static partial class ApiRoutes
     /// </summary>
     public static class Permissions
     {
+        /// <summary>
+        /// The route for the permissions retrieval API endpoint.
+        /// </summary>
         public const string GET_PERMISSIONS = "auth/permissions";
     }
 }

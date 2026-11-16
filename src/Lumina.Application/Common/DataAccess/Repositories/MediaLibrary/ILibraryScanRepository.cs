@@ -23,6 +23,7 @@ public interface ILibraryScanRepository : IRepository<LibraryScanEntity>,
     /// <summary>
     /// Gets the media library scans that belong to a media library identified by <paramref name="libraryId"/>, for the previous month, from the storage medium.
     /// </summary>
+    /// <param name="libraryId">The unique identifier of the media library whose scans are retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryScanEntity"/>, or an error.</returns>
     Task<Result<IEnumerable<LibraryScanEntity>>> GetPastMonthScansByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);

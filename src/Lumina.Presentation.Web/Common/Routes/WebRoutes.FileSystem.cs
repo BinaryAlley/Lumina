@@ -10,6 +10,9 @@ public static partial class WebRoutes
     /// </summary>
     public static class FileSystem
     {
+        /// <summary>
+        /// The route for the action that retrieves the file system type of the host machine.
+        /// </summary>
         public const string GET_TYPE = "file-system/api-get-type";
     }
 }

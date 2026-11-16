@@ -11,6 +11,9 @@ namespace Lumina.Domain.Common.Models.Core;
 /// <typeparam name="TId">The type representing the unique identifier for the Aggregate Root. It should be a non-nullable type.</typeparam>
 public abstract class AggregateRoot<TId> : Entity<TId> where TId : notnull
 {
+    /// <summary>
+    /// The domain events raised by this aggregate root that have not been collected yet.
+    /// </summary>
     protected readonly List<IDomainEvent> _domainEvents = [];
 
     /// <summary>

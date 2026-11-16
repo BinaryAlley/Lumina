@@ -19,7 +19,7 @@
 - Contributors are expected to add themselves to the list at the end of this file.
 
 ## Documentation Standards
-- **Every** construct (class, interface, struct, record, method, property, etc.) should have documentation. For example:
+- **Every** construct (class, interface, struct, record, method, property, etc.) should have documentation. Every production project generates an XML documentation file and treats a missing XML comment on a publicly visible member (CS1591) as an error, so undocumented public API fails the build. For example:
 ```csharp
 /// <summary>
 /// Represents a user in the application.
@@ -41,7 +41,7 @@ public class User
 }
 
 /// <summary>
-/// Query for getting a user identified by <param name="UserId">.
+/// Query for getting a user identified by <paramref name="UserId"/>.
 /// </summary>
 /// <param name="UserId">The id of the user to get.</param>
 public record GetUserQuery(int UserId);
@@ -68,14 +68,14 @@ public enum ThemeStyle
 public interface IUserService
 {
     /// <summary>
-    /// Gets a user identified by <param name="userId">.
+    /// Gets a user identified by <paramref name="userId"/>.
     /// </summary>
     /// <param name="userId">The unique identifier of the user.</param>
     /// <returns>The user associated with the specified identifier.</returns>
     User GetUserById(Guid userId);
 
     /// <summary>
-    /// Updates the profile of the specified <param name="user">.
+    /// Updates the profile of the specified <paramref name="user"/>.
     /// </summary>
     /// <param name="user">The user object containing updated information.</param>
     void UpdateUserProfile(User user);

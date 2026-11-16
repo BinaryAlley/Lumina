@@ -10,6 +10,9 @@ public static partial class WebRoutes
     /// </summary>
     public static class Language
     {
+        /// <summary>
+        /// The route for the action that sets the display language of the Web application.
+        /// </summary>
         public const string SET_LANGUAGE = "{culture}/tools/language/set-language";
     }
 }

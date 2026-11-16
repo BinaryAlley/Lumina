@@ -7,6 +7,7 @@ namespace Lumina.Contracts.DTO.MediaLibrary.Management;
 /// <summary>
 /// Data transfer object for a media library content location.
 /// </summary>
+/// <param name="Path">The file system path of the content location.</param>
 [DebuggerDisplay("Path: {Path}")]
 public record LibraryContentLocationDto(
     string Path

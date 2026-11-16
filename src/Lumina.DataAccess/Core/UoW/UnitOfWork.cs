@@ -198,6 +198,9 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the media contributor repository.
+    /// </summary>
     public IMediaContributorRepository MediaContributorRepository
     {
         get

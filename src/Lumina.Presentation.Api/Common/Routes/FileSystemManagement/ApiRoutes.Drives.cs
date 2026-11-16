@@ -10,6 +10,9 @@ public static partial class ApiRoutes
     /// </summary>
     public static class Drives
     {
+        /// <summary>
+        /// The route for getting the drives of the file system.
+        /// </summary>
         public const string GET_DRIVES = "/drives/get-drives";
     }
 }

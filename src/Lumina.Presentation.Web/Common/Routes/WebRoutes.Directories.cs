@@ -10,6 +10,9 @@ public static partial class WebRoutes
     /// </summary>
     public static class Directories
     {
+        /// <summary>
+        /// The route for the action that retrieves the subdirectories of a directory.
+        /// </summary>
         public const string GET_DIRECTORIES = "directories/api-get-directories";
     }
 }

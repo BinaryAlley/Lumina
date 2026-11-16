@@ -5,8 +5,19 @@ namespace Lumina.Presentation.Web.Common.Http;
 /// </summary>
 public static class HttpContextItemKeys
 {
+    /// <summary>
+    /// The key under which the validation errors of the current request are stored.
+    /// </summary>
     public const string ERRORS = "errors";
+
+    /// <summary>
+    /// The key under which the flag indicating that the super administrator account still has to be set up is stored.
+    /// </summary>
     public const string PENDING_SUPER_ADMIN_SETUP = "PendingSuperAdminSetup";
+
+    /// <summary>
+    /// The key under which the URL of the last displayed view is stored.
+    /// </summary>
     public const string LAST_DISPLAYED_VIEW = "LastViewUrl";
 
     /// <summary>

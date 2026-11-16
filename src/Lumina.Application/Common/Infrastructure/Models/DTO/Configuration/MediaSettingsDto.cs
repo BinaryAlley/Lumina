@@ -10,6 +10,9 @@ namespace Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
 [DebuggerDisplay("{SECTION_NAME}")]
 public class MediaSettingsDto
 {
+    /// <summary>
+    /// The name of the configuration section that holds the media settings.
+    /// </summary>
     public const string SECTION_NAME = "MediaSettings";
 
     /// <summary>

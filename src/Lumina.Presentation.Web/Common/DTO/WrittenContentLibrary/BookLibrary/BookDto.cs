@@ -140,9 +140,9 @@ public class BookDto
     /// </summary>
     public float? VolumeNumber { get; init; }
 
-    /// <summary>
-    /// Gets the series id, if the book is part of a series.
-    /// </summary>
+    ///// <summary>
+    ///// Gets the series id, if the book is part of a series.
+    ///// </summary>
     //public Guid? BookSeriesId { get; init; } = null;
 
     /// <summary>
@@ -181,7 +181,7 @@ public class BookDto
     public string? GoogleBooksId { get; init; } = null!;
 
     /// <summary>
-    /// Gets the Barnes & Noble ID of the book.
+    /// Gets the Barnes &amp; Noble ID of the book.
     /// </summary>
     public string? BarnesAndNobleId { get; init; } = null!;
 
@@ -195,9 +195,9 @@ public class BookDto
     /// </summary>
     public List<IsbnDto> ISBNs { get; set; } = [];
 
-    /// <summary>
-    /// Gets the list of media contributors that contributed to this book.
-    /// </summary>
+    ///// <summary>
+    ///// Gets the list of media contributors that contributed to this book.
+    ///// </summary>
     //public List<ContributorIdModel> ContributorIds { get; init; } = [];
 
     /// <summary>

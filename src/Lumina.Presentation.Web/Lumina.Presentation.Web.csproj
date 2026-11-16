@@ -5,8 +5,7 @@
         <ImplicitUsings>disable</ImplicitUsings>
         <BaseOutputPath>$(SolutionDir)..\bin\web\</BaseOutputPath>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902;NU1903;NU1904;EXTEXP0018</WarningsNotAsErrors>
+        <WarningsNotAsErrors>$(WarningsNotAsErrors);EXTEXP0018</WarningsNotAsErrors>
         <UserSecretsId>10a94da9-18ed-4c70-a9da-b461e08958c4</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <ContainerRepository>lumina-web</ContainerRepository>

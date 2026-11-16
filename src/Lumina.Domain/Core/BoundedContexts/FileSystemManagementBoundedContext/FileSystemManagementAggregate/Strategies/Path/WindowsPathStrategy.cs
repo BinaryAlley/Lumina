@@ -19,6 +19,9 @@ public class WindowsPathStrategy : IWindowsPathStrategy
 {
     private readonly IFileSystem _fileSystem;
 
+    /// <summary>
+    /// Gets the character used to separate path segments on Windows platforms.
+    /// </summary>
     public char PathSeparator => '\\';
 
     /// <summary>

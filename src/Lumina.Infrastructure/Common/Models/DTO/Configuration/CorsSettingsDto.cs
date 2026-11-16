@@ -5,11 +5,14 @@ using System.Diagnostics;
 namespace Lumina.Infrastructure.Common.Models.DTO.Configuration;
 
 /// <summary>
-/// Data transfer object for deserializing media settings.
+/// Data transfer object for deserializing cross-origin resource sharing settings.
 /// </summary>
 [DebuggerDisplay("{SECTION_NAME}")]
 public class CorsSettingsDto
 {
+    /// <summary>
+    /// The name of the configuration section that holds the cross-origin resource sharing settings.
+    /// </summary>
     public const string SECTION_NAME = "CorsSettings";
 
     /// <summary>

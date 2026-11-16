@@ -1,7 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using Ganss.Xss;
-using System;
-using System.Collections.Generic;
 #endregion
 
 namespace Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
@@ -12,6 +10,9 @@ namespace Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibr
 /// </summary>
 public static class ReadingContentSanitizer
 {
+    /// <summary>
+    /// The name of the attribute that carries the opaque key of a resource referenced by a reading section, which the reader replaces with the URL of the resource endpoint.
+    /// </summary>
     public const string RESOURCE_ATTRIBUTE = "data-lumina-resource";
 
     // The sanitizer that preserves the style attribute, used for the users who want the books to keep their original look, and the

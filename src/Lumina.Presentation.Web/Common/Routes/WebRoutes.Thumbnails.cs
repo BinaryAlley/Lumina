@@ -10,6 +10,9 @@ public static partial class WebRoutes
     /// </summary>
     public static class Thumbnails
     {
+        /// <summary>
+        /// The route for the action that retrieves a thumbnail.
+        /// </summary>
         public const string GET_THUMBNAIL = "thumbnails/api-get-thumbnail";
     }
 }

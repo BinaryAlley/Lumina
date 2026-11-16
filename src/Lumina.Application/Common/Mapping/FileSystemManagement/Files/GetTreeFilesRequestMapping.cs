@@ -11,7 +11,7 @@ namespace Lumina.Application.Common.Mapping.FileSystemManagement.Files;
 public static class GetTreeFilesRequestMapping
 {
     /// <summary>
-    /// Converts <paramref name="request"/> to <see cref="GetTreeDirectoriesQuery"/>.
+    /// Converts <paramref name="request"/> to <see cref="GetTreeFilesQuery"/>.
     /// </summary>
     /// <param name="request">The request to be converted.</param>
     /// <returns>The converted query.</returns>

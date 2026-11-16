@@ -10,6 +10,9 @@ public static partial class ApiRoutes
     /// </summary>
     public static class Thumbnails
     {
+        /// <summary>
+        /// The route for the thumbnail retrieval API endpoint.
+        /// </summary>
         public const string GET_THUMBNAIL = "thumbnails/get-thumbnail";
     }
 }

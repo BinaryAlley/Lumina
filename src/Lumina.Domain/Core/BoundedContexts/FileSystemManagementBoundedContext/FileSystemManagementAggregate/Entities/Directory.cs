@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Primitives;
-
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using System;
@@ -49,6 +48,7 @@ public sealed class Directory : FileSystemItem
     /// <summary>
     /// Creates a new instance of the <see cref="Directory"/> class.
     /// </summary>
+    /// <param name="path">The file system path of the directory.</param>
     /// <param name="name">The name of the directory.</param>
     /// <param name="dateCreated">The date and time the directory was created. Can be optional if unknown.</param>
     /// <param name="dateModified">The date and time the directory was last modified. Can be optional if unknown.</param>
@@ -86,6 +86,7 @@ public sealed class Directory : FileSystemItem
     /// <summary>
     /// Creates a new instance of the <see cref="Directory"/> class.
     /// </summary>
+    /// <param name="id">The unique identifier of the directory in the file system path.</param>
     /// <param name="name">The name of the directory.</param>
     /// <param name="dateCreated">The date and time the directory was created. Can be optional if unknown.</param>
     /// <param name="dateModified">The date and time the directory was last modified. Can be optional if unknown.</param>

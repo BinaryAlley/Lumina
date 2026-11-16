@@ -54,7 +54,7 @@ public static class FileSystemItemMapping
     }
 
     /// <summary>
-    /// Converts <paramref name="domainEntities"/> to <see cref="IEnumerable<FileSystemTreeNodeResponse>"/>.
+    /// Converts <paramref name="domainEntities"/> to a collection of <see cref="FileSystemTreeNodeResponse"/>.
     /// </summary>
     /// <param name="domainEntities">The domain entities to be converted.</param>
     /// <returns>The converted entities.</returns>

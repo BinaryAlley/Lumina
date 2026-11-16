@@ -10,6 +10,9 @@ namespace Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
 [DebuggerDisplay("{SECTION_NAME}")]
 public class PluginsSettingsDto
 {
+    /// <summary>
+    /// The name of the configuration section that holds the plugins settings.
+    /// </summary>
     public const string SECTION_NAME = "PluginsSettings";
 
     /// <summary>

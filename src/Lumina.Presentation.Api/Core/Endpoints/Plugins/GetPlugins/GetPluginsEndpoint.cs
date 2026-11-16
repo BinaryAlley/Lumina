@@ -44,6 +44,7 @@ public class GetPluginsEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <summary>
     /// Gets the list of all the detected plugins.
     /// </summary>
+    /// <param name="_">The empty request, which carries no data.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest _, CancellationToken cancellationToken)
     {

@@ -10,6 +10,9 @@ namespace Lumina.Infrastructure.Common.Models.DTO.Configuration;
 [DebuggerDisplay("Section name: {SECTION_NAME}")]
 public sealed class ThemeEngineOptionsDto
 {
+    /// <summary>
+    /// The name of the configuration section that holds the theme engine settings.
+    /// </summary>
     public const string SECTION_NAME = "ThemeEngine";
 
     /// <summary>

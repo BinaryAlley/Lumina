@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Domain.Common.Primitives;
-
 using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
 using Lumina.Domain.Common.Errors;
@@ -49,6 +48,7 @@ public sealed class File : FileSystemItem
     /// <summary>
     /// Creates a new instance of the <see cref="File"/> class.
     /// </summary>
+    /// <param name="path">The file system path of the file.</param>
     /// <param name="name">The name of the file.</param>
     /// <param name="dateCreated">The date and time the file was created. Can be optional if unknown.</param>
     /// <param name="dateModified">The date and time the file was last modified. Can be optional if unknown.</param>

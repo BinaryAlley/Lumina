@@ -11,7 +11,7 @@ namespace Lumina.DataAccess.Common.Dapper;
 /// </summary>
 /// <remarks>
 /// The SQLite provider stores <see cref="Guid"/> columns as upper case TEXT. Dapper falls back to Convert.ChangeType when materializing
-/// such columns into <see cref="Guid"/> properties. <see cref="Guid"/> has no string <see cref="TypeConverter"/>, so that conversion
+/// such columns into <see cref="Guid"/> properties. <see cref="Guid"/> has no string <see cref="System.ComponentModel.TypeConverter"/>, so that conversion
 /// throws an <see cref="InvalidCastException"/>; this handler performs the conversion explicitly instead, and writes the same upper case
 /// representation so raw key comparisons and foreign keys match the rows created by Entity Framework.
 /// </remarks>

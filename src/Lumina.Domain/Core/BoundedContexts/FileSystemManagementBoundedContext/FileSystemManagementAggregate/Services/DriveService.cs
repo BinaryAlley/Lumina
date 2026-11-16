@@ -24,6 +24,7 @@ public class DriveService : IDriveService
     /// Initializes a new instance of the <see cref="DriveService"/> class.
     /// </summary>
     /// <param name="fileSystem">Injected service used to interact with the local filesystem.</param>
+    /// <param name="platformContextManager">Injected facade service for platform contextual services.</param>
     public DriveService(IFileSystem fileSystem, IPlatformContextManager platformContextManager)
     {
         _fileSystem = fileSystem;

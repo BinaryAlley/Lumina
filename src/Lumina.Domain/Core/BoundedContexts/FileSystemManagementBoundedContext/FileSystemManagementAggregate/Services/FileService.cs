@@ -322,6 +322,14 @@ public class FileService : IFileService
         return _environmentContext.FileProviderService.DeleteFile(path);
     }
 
+    /// <summary>
+    /// Reads the file at the specified <paramref name="path"/>.
+    /// </summary>
+    /// <remarks>
+    /// This method is a placeholder that always reports success without reading the file, so it has no error path yet.
+    /// </remarks>
+    /// <param name="path">The identifier of the file system path of the file to read.</param>
+    /// <returns>A <see cref="Result{TValue}"/> that currently always contains <see langword="true"/>.</returns>
     public Result<bool> ReadFile(FileSystemPathId path)
     {
         return true;
