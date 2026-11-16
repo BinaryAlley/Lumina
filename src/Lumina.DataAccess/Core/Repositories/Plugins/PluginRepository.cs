@@ -37,6 +37,8 @@ internal sealed class PluginRepository : IPluginRepository
     /// Gets a plugin by its Id.
     /// </summary>
     /// <param name="id">The Id of the plugin to get.</param>
+    /// <param name="shouldIncludeNavigationProperties">Whether the navigation properties of the plugin should be loaded together with the plugin itself.</param>
+    /// <param name="shouldTrackEntities">Whether the retrieved plugin should be tracked by the persistence medium, so that changes to it can be saved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="PluginEntity"/>, or an error.</returns>
     public async Task<Result<PluginEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)

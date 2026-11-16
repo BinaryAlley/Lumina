@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Lumina.Contracts.Responses.UsersManagement;
 
-/// </summary>
+/// <summary>
 /// Represents a response for verifying the initialization status of the application.
 /// </summary>
 /// <param name="IsInitialized">Indicates whether the application has been run before, and the super admin account has been created.</param>

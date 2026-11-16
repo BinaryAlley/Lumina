@@ -19,6 +19,9 @@ public class UnixPathStrategy : IUnixPathStrategy
 {
     private readonly IFileSystem _fileSystem;
 
+    /// <summary>
+    /// Gets the character used to separate path segments on UNIX platforms.
+    /// </summary>
     public char PathSeparator => '/';
 
     /// <summary>

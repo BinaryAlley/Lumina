@@ -43,6 +43,7 @@ public class ScanLibrariesEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IR
     /// <summary>
     /// Initiates a scan of all media libraries.
     /// </summary>
+    /// <param name="_">The empty request, which carries no data.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(FastEndpoints.EmptyRequest _, CancellationToken cancellationToken)
     {

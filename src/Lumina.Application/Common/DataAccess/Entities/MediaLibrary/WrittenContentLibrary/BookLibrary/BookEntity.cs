@@ -142,9 +142,9 @@ public class BookEntity : IStorageEntity, IAuditableEntity
     /// </summary>
     public float? VolumeNumber { get; set; }
     // TODO: uncomment when series is implemented.
-    /// <summary>
-    /// Gets or sets the series id, if the book is part of a series.
-    /// </summary>
+    ///// <summary>
+    ///// Gets or sets the series id, if the book is part of a series.
+    ///// </summary>
     //public Guid? BookSeriesId { get; set; }
 
     /// <summary>
@@ -183,7 +183,7 @@ public class BookEntity : IStorageEntity, IAuditableEntity
     public string? GoogleBooksId { get; set; }
 
     /// <summary>
-    /// Gets or sets the Barnes & Noble ID of the book.
+    /// Gets or sets the Barnes &amp; Noble ID of the book.
     /// </summary>
     public string? BarnesAndNobleId { get; set; }
 

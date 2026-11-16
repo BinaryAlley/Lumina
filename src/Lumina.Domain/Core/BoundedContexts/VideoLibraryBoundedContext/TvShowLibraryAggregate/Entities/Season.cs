@@ -12,6 +12,10 @@ namespace Lumina.Domain.Core.BoundedContexts.VideoLibraryBoundedContext.TvShowLi
 [DebuggerDisplay("{Id}: {Title}")]
 public sealed class Season : Entity<SeasonId>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Season"/> class.
+    /// </summary>
+    /// <param name="id">The unique identifier of the season.</param>
     public Season(SeasonId id) : base(id)
     {
     }

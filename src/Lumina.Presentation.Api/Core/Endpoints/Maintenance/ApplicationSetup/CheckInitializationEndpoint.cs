@@ -43,6 +43,7 @@ public class CheckInitializationEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <summary>
     /// Checks the initialization status of the application (if the Admin account exists).
     /// </summary>
+    /// <param name="_">The empty request, which carries no data.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest _, CancellationToken cancellationToken)
     {

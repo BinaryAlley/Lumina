@@ -13,6 +13,9 @@ namespace Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext
 [DebuggerDisplay("{Value}")]
 public sealed class BookSeriesId : ValueObject
 {
+    /// <summary>
+    /// Gets the unique identifier value of the book series.
+    /// </summary>
     public Guid Value { get; }
 
     /// <summary>

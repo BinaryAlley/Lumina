@@ -308,7 +308,7 @@ public static class ValidatorUtilities
     /// </summary>
     /// <remarks>
     /// If the property is <see langword="null"/> or not a string, this rule fails (use
-    /// <see cref="When{TRequest, TProperty}(IRuleBuilder{TRequest, TProperty}, Func{TRequest, bool})"/> to skip optional properties).
+    /// <c>When</c> to skip optional properties).
     /// </remarks>
     /// <typeparam name="TRequest">The type of the request being validated.</typeparam>
     /// <typeparam name="TProperty">The type of the property being validated.</typeparam>

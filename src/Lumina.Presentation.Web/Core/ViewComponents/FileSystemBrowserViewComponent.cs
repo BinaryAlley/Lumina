@@ -29,7 +29,7 @@ public class FileSystemBrowserViewComponent : ViewComponent
     }
 
     /// <summary>
-    /// Invokes the <see cref="FileSystemBrowser"/> view component, rendering the theme template of the file system browser when available.
+    /// Invokes the <c>FileSystemBrowser</c> view component, rendering the theme template of the file system browser when available.
     /// </summary>
     /// <returns>An <see cref="IViewComponentResult"/> that renders the themed component, or the application fallback view when the theme template is unavailable.</returns>
     public async Task<IViewComponentResult> InvokeAsync()

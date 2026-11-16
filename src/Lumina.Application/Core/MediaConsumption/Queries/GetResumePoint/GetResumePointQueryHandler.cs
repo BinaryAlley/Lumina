@@ -165,7 +165,7 @@ public class GetResumePointQueryHandler : IQueryHandler<GetResumePointQuery, Res
     /// Commits the deletion of a stale or orphan resume point, so that the cleanup survives the not-found response of this query.
     /// </summary>
     /// <remarks>
-    /// The request transaction is committed by <see cref="EventualConsistencyMiddleware"/> only when the response is a success, and this query intentionally
+    /// The request transaction is committed by the <c>EventualConsistencyMiddleware</c> only when the response is a success, and this query intentionally
     /// responds with a not-found error after it cleans up, so the deletion is committed here. A failed save has nothing to persist, and a concurrency
     /// conflict means that the row is already gone, which is the desired outcome. Committing when no transaction is open is a no-op, which keeps the handler usable outside of the HTTP pipeline.
     /// </remarks>

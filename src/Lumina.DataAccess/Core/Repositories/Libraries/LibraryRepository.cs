@@ -54,6 +54,8 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// Gets a <see cref="LibraryEntity"/> identified by <paramref name="id"/> from the storage medium.
     /// </summary>
     /// <param name="id">The Id of the library to get.</param>
+    /// <param name="shouldIncludeNavigationProperties">Whether the navigation properties of the library should be loaded together with the library itself.</param>
+    /// <param name="shouldTrackEntities">Whether the retrieved library should be tracked by the persistence medium, so that changes to it can be saved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="LibraryEntity"/> identified by <paramref name="id"/>, or an error.</returns>
     public async Task<Result<LibraryEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)

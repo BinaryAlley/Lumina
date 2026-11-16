@@ -10,6 +10,9 @@ public static partial class WebRoutes
     /// </summary>
     public static class Drives
     {
+        /// <summary>
+        /// The route for the action that retrieves the drives of the host machine.
+        /// </summary>
         public const string GET_DRIVES = "drives/api-get-drives";
     }
 }

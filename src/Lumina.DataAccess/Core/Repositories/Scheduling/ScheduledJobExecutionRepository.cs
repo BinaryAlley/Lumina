@@ -35,6 +35,8 @@ internal sealed class ScheduledJobExecutionRepository : IScheduledJobExecutionRe
     /// Gets an execution identified by <paramref name="id"/> from the storage medium.
     /// </summary>
     /// <param name="id">The id of the execution to get.</param>
+    /// <param name="shouldIncludeNavigationProperties">Whether the navigation properties of the execution should be loaded together with the execution itself.</param>
+    /// <param name="shouldTrackEntities">Whether the retrieved execution should be tracked by the persistence medium, so that changes to it can be saved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="ScheduledJobExecutionEntity"/> identified by <paramref name="id"/>, or an error.</returns>
     public async Task<Result<ScheduledJobExecutionEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)

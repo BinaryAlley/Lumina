@@ -41,8 +41,9 @@ public class CancelLibraryScanEndpoint : BaseEndpoint<CancelLibraryScanRequest, 
     }
 
     /// <summary>
-    /// Cancels a previously started scan of all media libraries.
+    /// Cancels a previously started scan of a media library.
     /// </summary>
+    /// <param name="request">The request containing the media library and the scan to cancel.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(CancelLibraryScanRequest request, CancellationToken cancellationToken)
     {

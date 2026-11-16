@@ -42,6 +42,7 @@ public class GetSchedulerDisplayPreferencesEndpoint : BaseEndpoint<FastEndpoints
     /// <summary>
     /// Gets the display preferences of the scheduler page of the current user.
     /// </summary>
+    /// <param name="request">The empty request, which carries no data.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(FastEndpoints.EmptyRequest request, CancellationToken cancellationToken)
     {

@@ -5,8 +5,6 @@
         <ImplicitUsings>disable</ImplicitUsings>
         <BaseOutputPath>$(SolutionDir)..\bin\api\</BaseOutputPath>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
         <UserSecretsId>37d55c87-4374-4971-82e9-012fcaad1853</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <ContainerRepository>lumina-api</ContainerRepository>

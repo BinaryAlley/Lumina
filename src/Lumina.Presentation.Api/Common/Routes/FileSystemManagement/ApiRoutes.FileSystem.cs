@@ -10,6 +10,9 @@ public static partial class ApiRoutes
     /// </summary>
     public static class FileSystem
     {
+        /// <summary>
+        /// The route for getting the type of the file system.
+        /// </summary>
         public const string GET_TYPES = "/file-system/get-type";
     }
 }

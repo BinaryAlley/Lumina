@@ -50,6 +50,8 @@ internal sealed class UserSettingsRepository : IUserSettingsRepository
     /// Gets the settings identified by <paramref name="id"/>, if they exist.
     /// </summary>
     /// <param name="id">The Id of the user settings to get.</param>
+    /// <param name="shouldIncludeNavigationProperties">Whether the navigation properties of the user settings should be loaded together with the user settings themselves.</param>
+    /// <param name="shouldTrackEntities">Whether the retrieved user settings should be tracked by the persistence medium, so that changes to them can be saved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="UserSettingsEntity"/> identified by <paramref name="id"/>, or an error.</returns>
     public async Task<Result<UserSettingsEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)

@@ -32,7 +32,14 @@ namespace Lumina.Presentation.Api.Common.DependencyInjection;
 [ExcludeFromCodeCoverage]
 public static class PresentationApiLayerServices
 {
+    /// <summary>
+    /// The name of the rate limiting policy applied to the authentication endpoints.
+    /// </summary>
     public const string AUTHENTICATION_RATE_LIMIT_POLICY = "authenticationPolicy";
+
+    /// <summary>
+    /// The name of the rate limiting policy applied to the endpoints that stream tracks.
+    /// </summary>
     public const string TRACK_STREAM_RATE_LIMIT_POLICY = "trackStreamPolicy";
 
     /// <summary>

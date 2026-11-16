@@ -5,5 +5,8 @@ namespace Lumina.Presentation.Api.Common.Http;
 /// </summary>
 public static class HttpContextItemKeys
 {
+    /// <summary>
+    /// The key under which the errors of the current HTTP request are stored in the items collection of the HTTP context.
+    /// </summary>
     public const string ERRORS = "errors";
 }

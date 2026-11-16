@@ -470,7 +470,7 @@ internal sealed class MusicMediaLibraryScanMetadataEnricher : IMediaLibraryScanM
     }
 
     /// <summary>
-    /// Finds the media contributor with the name of the provided <paramref name="contributor"/>, or creates it, caching it by its normalized display name
+    /// Finds the media contributors with the names of the provided <paramref name="contributors"/>, or creates them, caching them by their normalized display name
     /// so that a contributor is only created once even when the same person is discovered for many items of the same page.
     /// </summary>
     /// <param name="contributors">The metadata contributors to resolve.</param>

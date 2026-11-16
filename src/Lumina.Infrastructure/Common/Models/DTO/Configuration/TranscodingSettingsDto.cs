@@ -10,6 +10,9 @@ namespace Lumina.Infrastructure.Common.Models.DTO.Configuration;
 [DebuggerDisplay("Section name: {SECTION_NAME}")]
 public sealed class TranscodingSettingsDto
 {
+    /// <summary>
+    /// The name of the configuration section that holds the settings of the audio normalization pipeline.
+    /// </summary>
     public const string SECTION_NAME = "TranscodingSettings";
 
     /// <summary>

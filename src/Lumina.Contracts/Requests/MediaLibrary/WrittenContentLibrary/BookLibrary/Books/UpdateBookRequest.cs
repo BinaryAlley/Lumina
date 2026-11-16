@@ -24,7 +24,7 @@ namespace Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibra
 /// <param name="OpenLibraryId">The Open Library Id of the book. Optional.</param>
 /// <param name="LibraryThingId">The LibraryThing Id of the book. Optional.</param>
 /// <param name="GoogleBooksId">The Google Books Id of the book. Optional.</param>
-/// <param name="BarnesAndNobleId">The Barnes & Noble Id of the book. Optional.</param>
+/// <param name="BarnesAndNobleId">The Barnes &amp; Noble Id of the book. Optional.</param>
 /// <param name="AppleBooksId">The Apple Books Id of the book. Optional.</param>
 /// <param name="ISBNs">The list of ISBN (International Standard Book Number) of the book. Required.</param>
 /// <param name="Contributors">The list of media contributors of the book. Required.</param>

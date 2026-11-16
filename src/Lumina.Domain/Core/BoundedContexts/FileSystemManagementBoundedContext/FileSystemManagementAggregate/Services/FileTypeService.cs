@@ -123,7 +123,7 @@ public class FileTypeService : IFileTypeService
     /// Identifies the image type based on the provided header bytes.
     /// </summary>
     /// <param name="firstBytes">The first bytes of the file, typically used to identify the file type.</param>
-    /// <returns>The type of the image, or <see cref="{ImageType.None}"/> if unrecognized.</returns>
+    /// <returns>The type of the image, or <see cref="ImageType.None"/> if unrecognized.</returns>
     private static ImageType IdentifyHeader(byte[] firstBytes)
     {
         if (Encoding.ASCII.GetBytes("BM").SequenceEqual(firstBytes[..2]))

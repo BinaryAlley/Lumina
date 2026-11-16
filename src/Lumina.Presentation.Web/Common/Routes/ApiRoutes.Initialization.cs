@@ -10,7 +10,14 @@ public static partial class ApiRoutes
     /// </summary>
     public static class Initialization
     {
+        /// <summary>
+        /// The route for the application setup API endpoint.
+        /// </summary>
         public const string SETUP_APPLICATION = "initialization";
+
+        /// <summary>
+        /// The route for the initialization status API endpoint.
+        /// </summary>
         public const string CHECK_INITIALIZATION = "initialization";
     }
 }

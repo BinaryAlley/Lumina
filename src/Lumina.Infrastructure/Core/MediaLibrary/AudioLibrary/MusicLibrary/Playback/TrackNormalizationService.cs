@@ -718,6 +718,7 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
     /// <summary>
     /// Runs ffmpeg to write the normalized audio of a track into a temporary directory, and builds the index of the produced segments.
     /// </summary>
+    /// <param name="cacheId">The opaque identifier of the cache entry the normalized audio is produced for.</param>
     /// <param name="request">The track, the delivery decision and the quality cap the normalized audio is produced with.</param>
     /// <param name="inputPath">The path of the private snapshot of the stored audio file, which was copied from the validated handle.</param>
     /// <param name="format">The container and codec combination the normalized audio is produced in.</param>

@@ -28,7 +28,7 @@ namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary
 /// <param name="OpenLibraryId">The Open Library ID of the book, if applicable.</param>
 /// <param name="LibraryThingId">The LibraryThing ID of the book, if applicable.</param>
 /// <param name="GoogleBooksId">The Google Books ID of the book, if applicable.</param>
-/// <param name="BarnesAndNobleId">The Barnes & Noble ID of the book, if applicable.</param>
+/// <param name="BarnesAndNobleId">The Barnes &amp; Noble ID of the book, if applicable.</param>
 /// <param name="AppleBooksId">The Apple Books ID of the book, if applicable.</param>
 /// <param name="ISBNs">The list of ISBN (International Standard Book Number) of the book.</param>
 /// <param name="Contributors">The list of media contributors that contributed to this book.</param>

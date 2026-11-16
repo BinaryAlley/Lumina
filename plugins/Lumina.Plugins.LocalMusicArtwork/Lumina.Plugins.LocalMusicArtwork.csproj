@@ -5,9 +5,6 @@
         <Nullable>enable</Nullable>
         <BaseOutputPath>$(SolutionDir)..\bin\plugins\</BaseOutputPath>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     </PropertyGroup>
 

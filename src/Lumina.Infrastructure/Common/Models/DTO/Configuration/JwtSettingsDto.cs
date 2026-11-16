@@ -5,11 +5,14 @@ using System.Diagnostics;
 namespace Lumina.Infrastructure.Common.Models.DTO.Configuration;
 
 /// <summary>
-/// Data transfer object for deserializing media settings.
+/// Data transfer object for deserializing JSON Web Token settings.
 /// </summary>
 [DebuggerDisplay("{SECTION_NAME}")]
 public class JwtSettingsDto
 {
+    /// <summary>
+    /// The name of the configuration section that holds the JSON Web Token settings.
+    /// </summary>
     public const string SECTION_NAME = "JwtSettings";
 
     /// <summary>

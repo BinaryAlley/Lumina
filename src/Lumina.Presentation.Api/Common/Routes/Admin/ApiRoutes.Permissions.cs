@@ -10,6 +10,9 @@ public static partial class ApiRoutes
     /// </summary>
     public static class Permissions
     {
+        /// <summary>
+        /// The route for getting the authorization permissions.
+        /// </summary>
         public const string GET_PERMISSIONS = "/auth/permissions";
     }
 }

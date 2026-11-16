@@ -10,15 +10,18 @@ namespace Lumina.Presentation.Web.Common.DTO.Configuration;
 [DebuggerDisplay("Section name: {SECTION_NAME}")]
 public class ServerConfigurationDto
 {
+    /// <summary>
+    /// The name of the configuration section that holds the server settings.
+    /// </summary>
     public const string SECTION_NAME = "ServerConfiguration";
 
     /// <summary>
-    /// Gets or sets the remote API server path.
+    /// Gets or sets the version of the remote API used in the request URL.
     /// </summary>
     public required char ApiVersion { get; init; }
 
     /// <summary>
-    /// Gets or sets the remote API server path.
+    /// Gets or sets the remote API server address.
     /// </summary>
     public required string BaseAddress { get; init; }
 

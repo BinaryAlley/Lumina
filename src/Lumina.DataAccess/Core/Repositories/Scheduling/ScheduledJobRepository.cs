@@ -39,6 +39,8 @@ internal sealed class ScheduledJobRepository : IScheduledJobRepository
     /// Gets a scheduled job identified by <paramref name="id"/> from the storage medium.
     /// </summary>
     /// <param name="id">The id of the scheduled job to get.</param>
+    /// <param name="shouldIncludeNavigationProperties">Whether the navigation properties of the scheduled job should be loaded together with the scheduled job itself.</param>
+    /// <param name="shouldTrackEntities">Whether the retrieved scheduled job should be tracked by the persistence medium, so that changes to it can be saved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="ScheduledJobEntity"/> identified by <paramref name="id"/>, or an error.</returns>
     public async Task<Result<ScheduledJobEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)

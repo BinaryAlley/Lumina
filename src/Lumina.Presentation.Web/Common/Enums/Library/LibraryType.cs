@@ -101,7 +101,7 @@ public enum LibraryType
     LiveRecordingVideo,
 
     /// <summary>
-    /// Recorded conversations and Q&A sessions in video format.
+    /// Recorded conversations and Q&amp;A sessions in video format.
     /// </summary>
     InterviewVideo,
 
@@ -131,7 +131,7 @@ public enum LibraryType
     LiveRecordingAudio,
 
     /// <summary>
-    /// Recorded conversations and Q&A sessions in audio format.
+    /// Recorded conversations and Q&amp;A sessions in audio format.
     /// </summary>
     InterviewAudio,
 

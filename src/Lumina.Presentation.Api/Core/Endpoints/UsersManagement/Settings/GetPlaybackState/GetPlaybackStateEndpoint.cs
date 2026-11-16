@@ -46,6 +46,7 @@ public class GetPlaybackStateEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <summary>
     /// Gets the playback state the player reported for the current user automatically.
     /// </summary>
+    /// <param name="request">The empty request, which carries no data.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest request, CancellationToken cancellationToken)
     {

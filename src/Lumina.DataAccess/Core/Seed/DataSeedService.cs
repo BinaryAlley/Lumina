@@ -30,7 +30,7 @@ public class DataSeedService : IDataSeedService
     /// <summary>
     /// Initializes a new instance of the <see cref="DataSeedService"/> class.
     /// </summary>
-    /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param
+    /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
     /// <param name="dateTimeProvider">Injected service for time related concerns.</param>
     public DataSeedService(IUnitOfWork unitOfWork, IDateTimeProvider dateTimeProvider)
     {

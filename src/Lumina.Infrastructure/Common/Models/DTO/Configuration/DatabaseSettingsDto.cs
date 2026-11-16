@@ -10,6 +10,9 @@ namespace Lumina.Infrastructure.Common.Models.DTO.Configuration;
 [DebuggerDisplay("{SECTION_NAME}")]
 public class DatabaseSettingsDto
 {
+    /// <summary>
+    /// The name of the configuration section that holds the database connection strings.
+    /// </summary>
     public const string SECTION_NAME = "ConnectionStrings";
 
     /// <summary>

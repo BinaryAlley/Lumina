@@ -43,6 +43,7 @@ public class GetEnabledLibrariesEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <summary>
     /// Gets the list of enabled media libraries.
     /// </summary>
+    /// <param name="_">The empty request, which carries no data.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest _, CancellationToken cancellationToken)
     {

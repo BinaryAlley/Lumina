@@ -23,39 +23,174 @@ namespace Lumina.DataAccess.Core.UoW;
 /// <remarks>To update the database: update-database -p Lumina.DataAccess -s Lumina.Presentation.Api</remarks>
 public class LuminaDbContext : DbContext
 {
+    /// <summary>
+    /// Gets or sets the books stored in the database.
+    /// </summary>
     public virtual DbSet<BookEntity> Books { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the artists stored in the database.
+    /// </summary>
     public virtual DbSet<ArtistEntity> Artists { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the albums stored in the database.
+    /// </summary>
     public virtual DbSet<AlbumEntity> Albums { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the tracks stored in the database.
+    /// </summary>
     public virtual DbSet<TrackEntity> Tracks { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the artwork of the music library items stored in the database.
+    /// </summary>
     public virtual DbSet<MusicArtworkEntity> MusicArtwork { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the metadata extracted from the music files discovered during a scan, stored in the database.
+    /// </summary>
     public virtual DbSet<MusicLibraryScanItemMetadataEntity> MusicLibraryScanItemMetadata { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the users stored in the database.
+    /// </summary>
     public virtual DbSet<UserEntity> Users { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the settings of the users stored in the database.
+    /// </summary>
     public virtual DbSet<UserSettingsEntity> UserSettings { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the media libraries stored in the database.
+    /// </summary>
     public virtual DbSet<LibraryEntity> Libraries { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the scans of the media libraries stored in the database.
+    /// </summary>
     public virtual DbSet<LibraryScanEntity> LibraryScans { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the results of the media library scans stored in the database.
+    /// </summary>
     public virtual DbSet<LibraryScanResultEntity> LibraryScanResults { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the snapshots of the media library items produced by the scans, stored in the database.
+    /// </summary>
     public virtual DbSet<LibraryScanSnapshotEntity> LibraryScanSnapshots { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the staging results of the media library scans, holding the discovered file system items, stored in the database.
+    /// </summary>
     public virtual DbSet<LibraryScanStagingResultsEntity> LibraryScanStagingResults { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the fingerprints of the scanned directories, holding their last write time, stored in the database.
+    /// </summary>
     public virtual DbSet<DirectoryScanFingerprintEntity> DirectoryScanFingerprints { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the authorization roles stored in the database.
+    /// </summary>
     public virtual DbSet<RoleEntity> Roles { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the associations between users and roles stored in the database.
+    /// </summary>
     public virtual DbSet<UserRoleEntity> UserRoles { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the authorization permissions stored in the database.
+    /// </summary>
     public virtual DbSet<PermissionEntity> Permissions { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the associations between users and permissions stored in the database.
+    /// </summary>
     public virtual DbSet<UserPermissionEntity> UserPermissions { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the associations between roles and permissions stored in the database.
+    /// </summary>
     public virtual DbSet<RolePermissionEntity> RolePermissions { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the plugins stored in the database.
+    /// </summary>
     public virtual DbSet<PluginEntity> Plugins { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the metadata provider configurations of the media libraries stored in the database.
+    /// </summary>
     public virtual DbSet<LibraryMetadataProviderConfigurationEntity> LibraryMetadataProviderConfigurations { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the artwork provider configurations of the media libraries stored in the database.
+    /// </summary>
     public virtual DbSet<LibraryArtworkProviderConfigurationEntity> LibraryArtworkProviderConfigurations { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the book reader configurations of the media libraries stored in the database.
+    /// </summary>
     public virtual DbSet<LibraryBookReaderConfigurationEntity> LibraryBookReaderConfigurations { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the themes stored in the database.
+    /// </summary>
     public virtual DbSet<ThemeEntity> Themes { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the media contributors stored in the database.
+    /// </summary>
     public virtual DbSet<MediaContributorEntity> MediaContributors { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the participations of the media contributors in books stored in the database.
+    /// </summary>
     public virtual DbSet<BookContributorEntity> BookContributors { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the scheduled jobs stored in the database.
+    /// </summary>
     public virtual DbSet<ScheduledJobEntity> ScheduledJobs { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the executions of the scheduled jobs stored in the database.
+    /// </summary>
     public virtual DbSet<ScheduledJobExecutionEntity> ScheduledJobExecutions { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the display preferences of the scheduler page of the users stored in the database.
+    /// </summary>
     public virtual DbSet<SchedulerDisplayPreferencesEntity> SchedulerDisplayPreferences { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the playlists stored in the database.
+    /// </summary>
     public virtual DbSet<PlaylistEntity> Playlists { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the entries of the playlists stored in the database.
+    /// </summary>
     public virtual DbSet<PlaylistEntryEntity> PlaylistEntries { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the favorites stored in the database.
+    /// </summary>
     public virtual DbSet<FavoriteEntity> Favorites { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the media consumption records stored in the database.
+    /// </summary>
     public virtual DbSet<MediaConsumptionRecordEntity> MediaConsumptionRecords { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the media resume points stored in the database.
+    /// </summary>
     public virtual DbSet<MediaResumePointEntity> MediaResumePoints { get; set; } = null!;
 
     /// <summary>

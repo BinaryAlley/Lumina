@@ -180,6 +180,8 @@ internal sealed class UserRepository : IUserRepository
     /// Gets a <see cref="UserEntity"/> identified by <paramref name="id"/> from the storage medium.
     /// </summary>
     /// <param name="id">The id of the user to get.</param>
+    /// <param name="shouldIncludeNavigationProperties">Whether the navigation properties of the user should be loaded together with the user itself.</param>
+    /// <param name="shouldTrackEntities">Whether the retrieved user should be tracked by the persistence medium, so that changes to it can be saved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="UserEntity"/> identified by <paramref name="id"/>, or an error.</returns>
     public async Task<Result<UserEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)

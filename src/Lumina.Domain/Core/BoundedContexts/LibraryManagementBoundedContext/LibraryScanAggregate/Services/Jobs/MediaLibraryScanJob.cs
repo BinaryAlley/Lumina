@@ -16,6 +16,9 @@ namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.Lib
 /// </summary>
 public abstract class MediaLibraryScanJob : IMediaLibraryScanJob
 {
+    /// <summary>
+    /// The number of parent media library scan jobs whose payloads have completed and triggered this job. It is incremented atomically, because jobs can run in parallel.
+    /// </summary>
     protected int parentsPayloadsExecuted;
 
     /// <summary>

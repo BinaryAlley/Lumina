@@ -10,6 +10,9 @@ public static partial class ApiRoutes
     /// </summary>
     public static class Directories
     {
+        /// <summary>
+        /// The route for getting the directories of a path.
+        /// </summary>
         public const string GET_DIRECTORIES = "/directories/get-directories";
     }
 }

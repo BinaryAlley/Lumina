@@ -93,7 +93,7 @@ public sealed class Book : AggregateRoot<BookId>
     public Optional<string> GoogleBooksId { get; private set; }
 
     /// <summary>
-    /// Gets the Barnes & Noble ID of the book, if applicable.
+    /// Gets the Barnes &amp; Noble ID of the book, if applicable.
     /// </summary>
     public Optional<string> BarnesAndNobleId { get; private set; }
 
@@ -136,7 +136,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="openLibraryId">The optional Open Library ID of the book.</param>
     /// <param name="libraryThingId">The optional LibraryThing ID of the book.</param>
     /// <param name="googleBooksId">The optional Google Books ID of the book.</param>
-    /// <param name="barnesAndNobleId">The optional Barnes & Noble ID of the book.</param>
+    /// <param name="barnesAndNobleId">The optional Barnes &amp; Noble ID of the book.</param>
     /// <param name="appleBooksId">The optional Apple Books ID of the book.</param>
     /// <param name="createdOnUtc">The date and time when the entity was created.</param>
     /// <param name="updatedOnUtc">The date and time when the entity was last updated.</param>
@@ -208,7 +208,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="openLibraryId">The optional Open Library ID of the book.</param>
     /// <param name="libraryThingId">The optional LibraryThing ID of the book.</param>
     /// <param name="googleBooksId">The optional Google Books ID of the book.</param>
-    /// <param name="barnesAndNobleId">The optional Barnes & Noble ID of the book.</param>
+    /// <param name="barnesAndNobleId">The optional Barnes &amp; Noble ID of the book.</param>
     /// <param name="appleBooksId">The optional Apple Books ID of the book.</param>
     /// <param name="isbns">The list of ISBNs of the book.</param>
     /// <param name="contributors">The list of media contributors of the book, each carrying the role the contributor played.</param>
@@ -282,7 +282,7 @@ public sealed class Book : AggregateRoot<BookId>
     /// <param name="openLibraryId">The optional Open Library ID of the book.</param>
     /// <param name="libraryThingId">The optional LibraryThing ID of the book.</param>
     /// <param name="googleBooksId">The optional Google Books ID of the book.</param>
-    /// <param name="barnesAndNobleId">The optional Barnes & Noble ID of the book.</param>
+    /// <param name="barnesAndNobleId">The optional Barnes &amp; Noble ID of the book.</param>
     /// <param name="appleBooksId">The optional Apple Books ID of the book.</param>
     /// <param name="createdOnUtc">The date and time when the entity was created.</param>
     /// <param name="updatedOnUtc">The date and time when the entity was last updated.</param>

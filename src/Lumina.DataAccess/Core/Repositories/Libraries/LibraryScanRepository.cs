@@ -53,6 +53,8 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     /// Gets a <see cref="LibraryScanEntity"/> identified by <paramref name="id"/> from the storage medium.
     /// </summary>
     /// <param name="id">The id of the library scan to get.</param>
+    /// <param name="shouldIncludeNavigationProperties">Whether the navigation properties of the library scan should be loaded together with the library scan itself.</param>
+    /// <param name="shouldTrackEntities">Whether the retrieved library scan should be tracked by the persistence medium, so that changes to it can be saved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="LibraryScanEntity"/> identified by <paramref name="id"/>, or an error.</returns>
     public async Task<Result<LibraryScanEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
@@ -71,6 +73,7 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     /// <summary>
     /// Gets the media library scans that belong to a media library identified by <paramref name="libraryId"/>, for the previous month, from the storage medium.
     /// </summary>
+    /// <param name="libraryId">The Id of the media library whose scans are retrieved.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryScanEntity"/>, or an error.</returns>
     public async Task<Result<IEnumerable<LibraryScanEntity>>> GetPastMonthScansByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)

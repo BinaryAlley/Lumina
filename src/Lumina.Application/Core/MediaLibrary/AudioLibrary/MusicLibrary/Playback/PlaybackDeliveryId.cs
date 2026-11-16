@@ -4,7 +4,7 @@ namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playbac
 /// Defines the format of the opaque delivery handle of a playback manifest.
 /// </summary>
 /// <remarks>
-/// A handle is a <see cref="Guid"/> rendered with the <c>N</c> format: exactly 32 lowercase hexadecimal characters, with no separator. Every producer
+/// A handle is a <see cref="System.Guid"/> rendered with the <c>N</c> format: exactly 32 lowercase hexadecimal characters, with no separator. Every producer
 /// and consumer of a handle uses this rule, so a handle is never silently normalized into another value.
 /// </remarks>
 public static class PlaybackDeliveryId
