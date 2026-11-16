@@ -171,6 +171,37 @@ public class MusicArtworkServiceTests
     }
 
     [Fact]
+    public void DeleteAlbumArtwork_WhenDeletingAFileFails_ShouldReturnTheErrorAndStopDeletingTheRemainingFiles()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        string libraryName = "Test Library";
+        string artistName = "Test Artist";
+        string albumTitle = "Test Album";
+
+        string artworkDirectoryPath = BuildArtworkDirectoryPath(libraryId, albumId, libraryName, artistId, artistName, albumTitle);
+        MockArtworkDirectoryStubs(artworkDirectoryPath);
+        _mockDirectoryProviderService.DirectoryExists(Arg.Any<FileSystemPathId>()).Returns(Result.From(true));
+        FileSystemPathId coverFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "cover.jpg"));
+        FileSystemPathId bookletFileId = _fileSystemPathIdFixture.Create(Path.Combine(artworkDirectoryPath, "booklet-1.jpg"));
+        Error deleteError = Errors.FileSystemManagement.FileDeleteError;
+        _mockFileProviderService.GetFilePaths(Arg.Any<FileSystemPathId>(), true)
+            .Returns(Result.From<IEnumerable<FileSystemPathId>>([coverFileId, bookletFileId]));
+        _mockFileProviderService.DeleteFile(coverFileId).Returns(deleteError);
+
+        // Act
+        Result<Deleted> result = _sut.DeleteAlbumArtwork(libraryId, albumId, libraryName, artistId, artistName, albumTitle);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(deleteError, result.FirstError);
+        _mockFileProviderService.Received(1).DeleteFile(coverFileId);
+        _mockFileProviderService.DidNotReceive().DeleteFile(bookletFileId);
+    }
+
+    [Fact]
     public void DeleteAlbumArtwork_WhenCalledWithInvalidNameSegments_ShouldReturnError()
     {
         // Arrange

@@ -292,6 +292,7 @@ internal sealed class MusicArtworkService : IMusicArtworkService
 
     /// <summary>
     /// Deletes the files directly contained in <paramref name="artworkDirectoryPath"/>, leaving the subdirectories, such as the album directories of an artist, untouched.
+    /// The deletion stops at the first file that cannot be deleted, returning its error, so that a locked or read-only file is never silently ignored.
     /// </summary>
     /// <param name="artworkDirectoryPath">The file system path of the directory whose files are deleted.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
@@ -313,7 +314,12 @@ internal sealed class MusicArtworkService : IMusicArtworkService
             return getFilesResult.Errors;
 
         foreach (FileSystemPathId filePathId in getFilesResult.Value)
-            _environmentContext.FileProviderService.DeleteFile(filePathId);
+        {
+            // The bulk path stops at the first failure, because the artwork enricher only observes the bulk result: reporting the failure lets it retry the owner instead of storing new artwork over a file that could not be cleared.
+            Result<Deleted> deleteFileResult = _environmentContext.FileProviderService.DeleteFile(filePathId);
+            if (deleteFileResult.IsFailure)
+                return deleteFileResult.Errors;
+        }
 
         return Result.Deleted;
     }

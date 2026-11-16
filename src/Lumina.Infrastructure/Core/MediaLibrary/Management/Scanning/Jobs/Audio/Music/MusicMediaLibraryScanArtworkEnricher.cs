@@ -415,6 +415,18 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
         if (deleteStoredArtworkResult.IsFailure)
         {
             _logger.LogWarning("Failed to clear the stored artwork files of the {OwnerType} '{OwnerDescription}'.", ownerType, ownerDescription);
+
+            // Some files may have been deleted before the failure, so the stored records are dropped and the owner is marked as failed,
+            // keeping it eligible for a retry without serving the paths of the files that no longer exist.
+            Result<Deleted> deleteFailedEntitiesResult = await unitOfWork.MusicArtworkRepository.DeleteByOwnerAsync(ownerType, ownerId, cancellationToken).ConfigureAwait(false);
+            if (deleteFailedEntitiesResult.IsFailure)
+                _logger.LogWarning("Failed to clear the stored artwork records of the {OwnerType} '{OwnerDescription}'.", ownerType, ownerDescription);
+            else
+            {
+                List<MusicArtworkEntity> failedArtworkEntities = [CreateArtworkEntity(ownerId, ownerType, ArtworkType.Cover, 0, null, 0, ArtworkStatus.Failed, null)];
+                await PersistArtworkAsync(unitOfWork, failedArtworkEntities, cancellationToken).ConfigureAwait(false);
+            }
+
             DeleteTemporaryArtworks(resolution.Artworks.Select(resolvedArtwork => resolvedArtwork.Artwork));
             return false;
         }
