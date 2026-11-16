@@ -45,10 +45,10 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
     public string? TestUsername { get; private set; }
 
     /// <summary>
-    /// Creates an HTTP client with authentication headers and a test user
+    /// Creates an HTTP client with authentication headers and a test user.
     /// </summary>
     /// <param name="permissions">The permissions granted directly to the test user, if any.</param>
-    /// <returns>An HTTP client configured with auth headers</returns>
+    /// <returns>An HTTP client configured with auth headers.</returns>
     public async Task<HttpClient> CreateAuthenticatedClientAsync(params AuthorizationPermission[] permissions)
     {
         HttpClient client = CreateClient();
@@ -101,9 +101,9 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
     }
 
     /// <summary>
-    /// Creates an HTTP client with authentication headers and an admin test user with all permissions
+    /// Creates an HTTP client with authentication headers and an admin test user with all permissions.
     /// </summary>
-    /// <returns>An HTTP client configured with admin auth headers</returns>
+    /// <returns>An HTTP client configured with admin auth headers.</returns>
     public async Task<HttpClient> CreateAuthenticatedAdminClientAsync()
     {
         HttpClient client = CreateClient();

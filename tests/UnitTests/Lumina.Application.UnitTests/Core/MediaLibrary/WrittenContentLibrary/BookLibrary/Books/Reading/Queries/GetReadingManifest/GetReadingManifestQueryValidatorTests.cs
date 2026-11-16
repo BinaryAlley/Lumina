@@ -34,10 +34,10 @@ public class GetReadingManifestQueryValidatorTests
     }
 
     [Theory]
-    [InlineData(null)] // missing route value
-    [InlineData("")] // empty route value
-    [InlineData("not-a-library-guid")] // non-Guid route value
-    [InlineData("00000000-0000-0000-0000-000000000000")] // empty Guid route value
+    [InlineData(null)] // Missing route value.
+    [InlineData("")] // Empty route value.
+    [InlineData("not-a-library-guid")] // Non-Guid route value.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // Empty Guid route value.
     public void Validate_WhenLibraryIdIsEmptyOrInvalid_ShouldHaveValidationError(string? libraryId)
     {
         // Arrange
@@ -51,10 +51,10 @@ public class GetReadingManifestQueryValidatorTests
     }
 
     [Theory]
-    [InlineData(null)] // missing route value
-    [InlineData("")] // empty route value
-    [InlineData("not-a-guid")] // non-Guid route value
-    [InlineData("00000000-0000-0000-0000-000000000000")] // empty Guid route value
+    [InlineData(null)] // Missing route value.
+    [InlineData("")] // Empty route value.
+    [InlineData("not-a-guid")] // Non-Guid route value.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // Empty Guid route value.
     public void Validate_WhenBookIdIsEmptyOrInvalid_ShouldHaveValidationError(string? bookId)
     {
         // Arrange

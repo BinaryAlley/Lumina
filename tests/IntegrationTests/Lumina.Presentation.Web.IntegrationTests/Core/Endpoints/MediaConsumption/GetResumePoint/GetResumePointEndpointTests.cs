@@ -205,9 +205,9 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("MediaResumePointNotFound")] // the user has no resume point for the media item
-    [InlineData("BookNotFound")] // the book of the resume point no longer exists
-    [InlineData("TrackNotFound")] // the track of the resume point no longer exists
+    [InlineData("MediaResumePointNotFound")] // The user has no resume point for the media item.
+    [InlineData("BookNotFound")] // The book of the resume point no longer exists.
+    [InlineData("TrackNotFound")] // The track of the resume point no longer exists.
     public async Task GetResumePoint_WhenApiReportsAnAbsentResumePoint_ShouldReturnSuccessWithNullData(string detail)
     {
         // Arrange

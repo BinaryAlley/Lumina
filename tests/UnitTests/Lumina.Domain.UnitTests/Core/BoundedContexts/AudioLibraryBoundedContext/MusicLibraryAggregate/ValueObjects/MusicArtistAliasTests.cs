@@ -67,9 +67,9 @@ public class MusicArtistAliasTests
     }
 
     [Theory]
-    [InlineData(null)] // null alias name
-    [InlineData("")] // empty alias name
-    [InlineData("   ")] // whitespace alias name
+    [InlineData(null)] // Null alias name.
+    [InlineData("")] // Empty alias name.
+    [InlineData("   ")] // Whitespace alias name.
     public void Create_WhenNameIsNullOrWhitespace_ShouldReturnError(string? name)
     {
         // Act

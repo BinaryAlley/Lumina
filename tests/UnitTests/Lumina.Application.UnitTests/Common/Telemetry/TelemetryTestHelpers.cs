@@ -49,7 +49,7 @@ internal static class TelemetryTestHelpers
         };
         // InstrumentPublished fires for instruments created after Start(), and Start() also replays every instrument
         // that already exists on the meter; therefore the lazily-initialized static handler instruments are captured by
-        // every listener, whether they were created before or during the test
+        // every listener, whether they were created before or during the test.
         listener.SetMeasurementEventCallback<double>((instrument, value, tags, state) => measurements.Add((instrument.Name, value, GetOutcomeTag(tags))));
         listener.SetMeasurementEventCallback<long>((instrument, value, tags, state) => measurements.Add((instrument.Name, value, GetOutcomeTag(tags))));
         listener.Start();

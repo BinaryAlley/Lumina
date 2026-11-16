@@ -48,8 +48,8 @@ public class GetMusicArtistEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Artists; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Artists; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task GetMusicArtist_WithSQLInjectionInRouteId_ShouldNormalizeTheIdWithoutLeakingData(string maliciousId)
     {
         // Arrange

@@ -30,9 +30,9 @@ public class GetLibraryPathTemplatePartsRequestMappingTests
     }
 
     [Theory]
-    [InlineData("Book")] // a written content library type
-    [InlineData("Movie")] // a video library type
-    [InlineData("Music")] // an audio library type
+    [InlineData("Book")] // A written content library type.
+    [InlineData("Movie")] // A video library type.
+    [InlineData("Music")] // An audio library type.
     public void ToQuery_WhenMappingDifferentLibraryTypes_ShouldMapLibraryType(string libraryType)
     {
         // Arrange

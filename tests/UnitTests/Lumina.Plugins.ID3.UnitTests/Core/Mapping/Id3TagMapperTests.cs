@@ -392,13 +392,13 @@ public class Id3TagMapperTests
     }
 
     [Theory]
-    [InlineData("eng", "en", "English")] // a three letter code maps to the neutral culture
-    [InlineData("deu", "de", "German")] // another three letter code maps to the neutral culture
-    [InlineData("en", "en", "English")] // a two letter code maps too
-    [InlineData("zxx", "zxx", "No linguistic content")] // the special code of MusicBrainz
-    [InlineData("mul", "mul", "Multiple languages")] // the special code of MusicBrainz
-    [InlineData("und", "und", "Undetermined")] // the special code of MusicBrainz
-    [InlineData("eng/ara", "en", "English")] // only the first code of a multi language tag is used
+    [InlineData("eng", "en", "English")] // A three letter code maps to the neutral culture.
+    [InlineData("deu", "de", "German")] // Another three letter code maps to the neutral culture.
+    [InlineData("en", "en", "English")] // A two letter code maps too.
+    [InlineData("zxx", "zxx", "No linguistic content")] // The special code of MusicBrainz.
+    [InlineData("mul", "mul", "Multiple languages")] // The special code of MusicBrainz.
+    [InlineData("und", "und", "Undetermined")] // The special code of MusicBrainz.
+    [InlineData("eng/ara", "en", "English")] // Only the first code of a multi language tag is used.
     public void MapAlbum_WhenTheLanguageCodeIsPresent_ShouldMapIt(string language, string expectedCode, string expectedName)
     {
         // Arrange
@@ -539,7 +539,7 @@ public class Id3TagMapperTests
     [InlineData("minidisc", MusicMediaFormat.MiniDisc)]
     [InlineData("8cm cd", MusicMediaFormat.Cm8CD)]
     [InlineData("dat", MusicMediaFormat.DAT)]
-    [InlineData("vinyl disc", MusicMediaFormat.VinylDisc)] // parsed through the normalized fallback
+    [InlineData("vinyl disc", MusicMediaFormat.VinylDisc)] // Parsed through the normalized fallback.
     [InlineData("other", MusicMediaFormat.Other)]
     public void MapAlbum_WhenTheMediaFormatIsKnown_ShouldMapIt(string mediaFormat, MusicMediaFormat expected)
     {
@@ -955,7 +955,7 @@ public class Id3TagMapperTests
     [InlineData("Fm", MusicKey.FMinor)]
     [InlineData("G", MusicKey.GMajor)]
     [InlineData("Gm", MusicKey.GMinor)]
-    [InlineData("E\u266d", MusicKey.DSharpMajor)] // the flat sign is normalized to the sharp equivalent
+    [InlineData("E\u266d", MusicKey.DSharpMajor)] // The flat sign is normalized to the sharp equivalent.
     [InlineData("F# major", MusicKey.FSharpMajor)]
     [InlineData("Gb", MusicKey.FSharpMajor)]
     [InlineData("G#m", MusicKey.GSharpMinor)]

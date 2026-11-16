@@ -347,7 +347,7 @@ public class PathServiceTests
         // Arrange
         string validPath = @"C:\ValidPath\SubDir";
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(validPath);
-        List<PathSegment> expectedSegments = _pathSegmentFixture.CreateMany(2); // Assuming parent path has 2 segments
+        List<PathSegment> expectedSegments = _pathSegmentFixture.CreateMany(2); // Assuming parent path has 2 segments.
         _mockPathStrategy.GoUpOneLevel(pathId).Returns(Result.From(expectedSegments.AsEnumerable()));
 
         // Act
@@ -463,7 +463,7 @@ public class PathServiceTests
 
         // Act
         char[] result = _sut.GetInvalidPathCharsForPlatform();
-        result[0] = 'X'; // Attempt to modify the returned array
+        result[0] = 'X'; // Attempt to modify the returned array.
 
         // Assert
         char[] secondResult = _sut.GetInvalidPathCharsForPlatform();
@@ -627,7 +627,7 @@ public class PathServiceTests
     public void SanitizeSegment_WithForwardSlash_ShouldReturnInvalidPath()
     {
         // Arrange
-        // the forward slash is not an invalid character for a segment on Unix-like platforms, so only the path service can reject it
+        // The forward slash is not an invalid character for a segment on Unix-like platforms, so only the path service can reject it.
         _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['\0']);
 
         // Act
@@ -642,7 +642,7 @@ public class PathServiceTests
     public void SanitizeSegment_WithBackslash_ShouldReturnInvalidPath()
     {
         // Arrange
-        // the backslash is not an invalid character for a segment on Windows platforms, so only the path service can reject it
+        // The backslash is not an invalid character for a segment on Windows platforms, so only the path service can reject it.
         _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', '"', '|', '?', '*', ':']);
 
         // Act
@@ -654,10 +654,10 @@ public class PathServiceTests
     }
 
     [Theory]
-    [InlineData("../..")] // parent directory escape
-    [InlineData("a/../b")] // embedded parent directory escape
-    [InlineData("..\\..")] // Windows parent directory escape
-    [InlineData("a\\..\\b")] // embedded Windows parent directory escape
+    [InlineData("../..")] // Parent directory escape.
+    [InlineData("a/../b")] // Embedded parent directory escape.
+    [InlineData("..\\..")] // Windows parent directory escape.
+    [InlineData("a\\..\\b")] // Embedded Windows parent directory escape.
     public void SanitizeSegment_WithPathTraversal_ShouldReturnInvalidPath(string name)
     {
         // Arrange
@@ -675,7 +675,7 @@ public class PathServiceTests
     public void SanitizeSegment_WithAColon_WhenTheColonIsValidForThePlatform_ShouldKeepTheColon()
     {
         // Arrange
-        // the colon is not an invalid character for a segment on Unix-like platforms, so it must be preserved
+        // The colon is not an invalid character for a segment on Unix-like platforms, so it must be preserved.
         _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['\0']);
 
         // Act
@@ -690,7 +690,7 @@ public class PathServiceTests
     public void SanitizeSegment_WithAColon_WhenTheColonIsInvalidForThePlatform_ShouldReplaceItWithASpace()
     {
         // Arrange
-        // the colon is an invalid character for a segment on Windows platforms, so it must be replaced
+        // The colon is an invalid character for a segment on Windows platforms, so it must be replaced.
         _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', '"', '|', '?', '*', ':']);
 
         // Act
@@ -866,8 +866,8 @@ public class PathServiceTests
     }
 
     [Theory]
-    [InlineData('\\', @"C:\Music\Queen\Bohemian Rhapsody.mp3", "Bohemian Rhapsody.mp3")] // Windows separated path
-    [InlineData('/', "/music/queen/bohemian-rhapsody.mp3", "bohemian-rhapsody.mp3")] // Unix separated path
+    [InlineData('\\', @"C:\Music\Queen\Bohemian Rhapsody.mp3", "Bohemian Rhapsody.mp3")] // Windows separated path.
+    [InlineData('/', "/music/queen/bohemian-rhapsody.mp3", "bohemian-rhapsody.mp3")] // Unix separated path.
     public void GetFileName_WhenPathHasDirectories_ShouldReturnTheLastSegment(char separator, string path, string expectedFileName)
     {
         // Arrange
@@ -881,8 +881,8 @@ public class PathServiceTests
     }
 
     [Theory]
-    [InlineData('\\')] // Windows separated path
-    [InlineData('/')] // Unix separated path
+    [InlineData('\\')] // Windows separated path.
+    [InlineData('/')] // Unix separated path.
     public void GetFileName_WhenPathHasNoDirectory_ShouldReturnThePath(char separator)
     {
         // Arrange
@@ -908,8 +908,8 @@ public class PathServiceTests
     }
 
     [Theory]
-    [InlineData('\\', @"C:\Music\Queen\Bohemian Rhapsody.mp3", "Bohemian Rhapsody")] // Windows separated path
-    [InlineData('/', "/music/queen/bohemian-rhapsody.mp3", "bohemian-rhapsody")] // Unix separated path
+    [InlineData('\\', @"C:\Music\Queen\Bohemian Rhapsody.mp3", "Bohemian Rhapsody")] // Windows separated path.
+    [InlineData('/', "/music/queen/bohemian-rhapsody.mp3", "bohemian-rhapsody")] // Unix separated path.
     public void GetFileNameWithoutExtension_WhenPathHasDirectories_ShouldReturnTheFileNameWithoutItsExtension(char separator, string path, string expectedFileName)
     {
         // Arrange
@@ -923,8 +923,8 @@ public class PathServiceTests
     }
 
     [Theory]
-    [InlineData('\\')] // Windows separated path
-    [InlineData('/')] // Unix separated path
+    [InlineData('\\')] // Windows separated path.
+    [InlineData('/')] // Unix separated path.
     public void GetFileNameWithoutExtension_WhenFileNameHasNoExtension_ShouldReturnTheFileName(char separator)
     {
         // Arrange

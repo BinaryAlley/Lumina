@@ -48,8 +48,8 @@ public class ThemeAssetsEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Themes--")] // destructive injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Themes--")] // Destructive injection.
     public async Task ThemeAssets_WithInjectionInThemeId_ShouldNotLeakOrError(string maliciousThemeId)
     {
         // Arrange
@@ -71,8 +71,8 @@ public class ThemeAssetsEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("..\\..\\appsettings.json")] // path traversal
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("..\\..\\appsettings.json")] // Path traversal.
     public async Task ThemeAssets_WithInjectionInPath_ShouldNotLeakOrError(string maliciousPath)
     {
         // Arrange

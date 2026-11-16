@@ -122,16 +122,16 @@ public class PlaybackFormatServiceTests
     }
 
     [Theory]
-    [InlineData("MP3", "MPEG-1 Layer 3", "MP3")] // the free form description of an MPEG-1 Layer 3 stream
-    [InlineData("MP3", "MP3", "MP3")] // a codec that is already named canonically
-    [InlineData("FLAC", "Flac", "FLAC")] // the description of a FLAC stream
-    [InlineData("OGG", "Vorbis I", "VORBIS")] // the description of a Vorbis stream
-    [InlineData("OGG", "Opus", "OPUS")] // the description of an Opus stream
-    [InlineData("MP4", "Apple Lossless", "ALAC")] // the description of an Apple Lossless stream
-    [InlineData("AAC", "MPEG-4 AAC", "AAC")] // a description naming both MPEG and AAC is AAC, not MP3
-    [InlineData("WAV", "PCM", "PCM")] // the description of an uncompressed stream
-    [InlineData("WAV", "Uncompressed", "PCM")] // another description of an uncompressed stream
-    [InlineData("WMA", "Windows Media Audio", "WMA")] // the description of a Windows Media stream
+    [InlineData("MP3", "MPEG-1 Layer 3", "MP3")] // The free form description of an MPEG-1 Layer 3 stream.
+    [InlineData("MP3", "MP3", "MP3")] // A codec that is already named canonically.
+    [InlineData("FLAC", "Flac", "FLAC")] // The description of a FLAC stream.
+    [InlineData("OGG", "Vorbis I", "VORBIS")] // The description of a Vorbis stream.
+    [InlineData("OGG", "Opus", "OPUS")] // The description of an Opus stream.
+    [InlineData("MP4", "Apple Lossless", "ALAC")] // The description of an Apple Lossless stream.
+    [InlineData("AAC", "MPEG-4 AAC", "AAC")] // A description naming both MPEG and AAC is AAC, not MP3.
+    [InlineData("WAV", "PCM", "PCM")] // The description of an uncompressed stream.
+    [InlineData("WAV", "Uncompressed", "PCM")] // Another description of an uncompressed stream.
+    [InlineData("WMA", "Windows Media Audio", "WMA")] // The description of a Windows Media stream.
     public void DecideDelivery_WhenTheStoredCodecDescriptionIsRecognizable_ShouldCanonicalizeItAndDirectPlay(string container, string codecDescription, string canonicalCodec)
     {
         // Arrange
@@ -148,9 +148,9 @@ public class PlaybackFormatServiceTests
     }
 
     [Theory]
-    [InlineData("MPEG-1 Layer 2")] // MP2 shares the MP3 container but an MP3 decoder cannot decode it
-    [InlineData("MPEG-1 Layer 1")] // MP1 shares the MP3 container but an MP3 decoder cannot decode it
-    [InlineData("MPEG-4 Audio")] // a description that names no decodable codec is not mistaken for MP3
+    [InlineData("MPEG-1 Layer 2")] // MP2 shares the MP3 container but an MP3 decoder cannot decode it.
+    [InlineData("MPEG-1 Layer 1")] // MP1 shares the MP3 container but an MP3 decoder cannot decode it.
+    [InlineData("MPEG-4 Audio")] // A description that names no decodable codec is not mistaken for MP3.
     public void DecideDelivery_WhenAnMpegDescriptionIsNotLayer3_ShouldReturnTranscode(string codecDescription)
     {
         // Arrange
@@ -166,9 +166,9 @@ public class PlaybackFormatServiceTests
     }
 
     [Theory]
-    [InlineData(null, null)] // an absent probe result names no codec
-    [InlineData("", "")] // an empty probe result names no codec
-    [InlineData("MP3", "AC-3")] // a codec description the server does not recognize
+    [InlineData(null, null)] // An absent probe result names no codec.
+    [InlineData("", "")] // An empty probe result names no codec.
+    [InlineData("MP3", "AC-3")] // A codec description the server does not recognize.
     public void DecideDelivery_WhenTheStoredFormatIsUnknown_ShouldReturnTranscode(string? container, string? codec)
     {
         // Arrange

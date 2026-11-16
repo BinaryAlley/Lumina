@@ -48,8 +48,8 @@ public class GetBookDetailsEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Books; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Books; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task GetBookDetails_WithSQLInjectionInBookId_ShouldNormalizeTheIdWithoutLeakingData(string maliciousBookId)
     {
         // Arrange

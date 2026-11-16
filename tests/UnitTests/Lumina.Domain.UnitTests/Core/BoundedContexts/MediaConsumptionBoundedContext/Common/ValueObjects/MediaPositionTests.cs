@@ -59,7 +59,7 @@ public class MediaPositionTests
         MediaPosition position = MediaPosition.CreateTimeOffset(negativeTimeOffset);
 
         // Assert
-        // the value object does not validate the sign of the offset, the reported value is stored as given
+        // The value object does not validate the sign of the offset, the reported value is stored as given.
         Assert.Equal(TimeSpan.FromMinutes(-1), position.TimeOffset.Value);
     }
 
@@ -70,7 +70,7 @@ public class MediaPositionTests
         MediaPosition position = MediaPosition.CreateLocation(string.Empty);
 
         // Assert
-        // the value object does not validate the content of the location, the reported value is stored as given
+        // The value object does not validate the content of the location, the reported value is stored as given.
         Assert.True(position.Location.HasValue);
         Assert.Equal(string.Empty, position.Location.Value);
     }

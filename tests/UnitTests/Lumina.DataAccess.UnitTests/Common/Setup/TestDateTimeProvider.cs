@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Lumina.DataAccess.UnitTests.Common.Setup;
 
 /// <summary>
-/// Service for time related concerns
+/// Service for time related concerns.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class TestDateTimeProvider : IDateTimeProvider

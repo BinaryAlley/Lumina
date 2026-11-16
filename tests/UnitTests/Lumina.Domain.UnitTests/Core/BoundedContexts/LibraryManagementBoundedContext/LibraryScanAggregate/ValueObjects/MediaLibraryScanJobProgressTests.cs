@@ -76,9 +76,9 @@ public class MediaLibraryScanJobProgressTests
     }
 
     [Theory]
-    [InlineData(null)] // null current operation
-    [InlineData("")] // empty current operation
-    [InlineData("   ")] // whitespace current operation
+    [InlineData(null)] // Null current operation.
+    [InlineData("")] // Empty current operation.
+    [InlineData("   ")] // Whitespace current operation.
     public void Create_WhenCurrentOperationIsEmpty_ShouldReturnError(string? currentOperation)
     {
         // Act

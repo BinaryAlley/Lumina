@@ -52,8 +52,8 @@ public class GetLibraryBookReadersEndpointTests : IClassFixture<LuminaApiFactory
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Libraries--")] // destructive injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Libraries--")] // Destructive injection.
     public async Task GetLibraryBookReaders_WithSQLInjectionInLibraryId_ShouldNotLeakDatabaseDetails(string maliciousLibraryId)
     {
         // Act
@@ -61,7 +61,7 @@ public class GetLibraryBookReadersEndpointTests : IClassFixture<LuminaApiFactory
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        // the {libraryId} route parameter is Guid-typed, so the malicious value fails model binding before it reaches the handler
+        // The {libraryId} route parameter is Guid-typed, so the malicious value fails model binding before it reaches the handler.
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);

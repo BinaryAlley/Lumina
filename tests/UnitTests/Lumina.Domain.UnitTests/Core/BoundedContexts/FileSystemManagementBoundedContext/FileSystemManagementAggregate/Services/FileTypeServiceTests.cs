@@ -84,7 +84,7 @@ public class FileTypeServiceTests
     {
         // Arrange
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(@"C:\test.jpg");
-        byte[] fileContent = [1, 2, 3]; // Less than BUFFER_SIZE
+        byte[] fileContent = [1, 2, 3]; // Less than BUFFER_SIZE.
 
         SetupMockFileSystem(pathId, fileContent);
         sut = new FileTypeService(_mockFileSystem, _mockFileSystemPermissionsService);
@@ -124,7 +124,7 @@ public class FileTypeServiceTests
         // Arrange
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(@"C:\test.tga");
         byte[] tgaHeader = new byte[18];
-        tgaHeader[2] = 2; // Set image type to 2 (uncompressed true-color image)
+        tgaHeader[2] = 2; // Set image type to 2 (uncompressed true-color image).
         byte[] fileContent = [.. tgaHeader, .. Enumerable.Repeat<byte>(0, 100)];
 
         SetupMockFileSystem(pathId, fileContent);

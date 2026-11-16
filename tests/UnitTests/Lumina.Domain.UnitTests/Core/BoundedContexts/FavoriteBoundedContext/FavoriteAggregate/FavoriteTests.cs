@@ -29,10 +29,10 @@ public class FavoriteTests
     private readonly MediaItemIdFixture _mediaItemIdFixture = new();
 
     [Theory]
-    [InlineData(FavoriteMediaKind.MusicArtist)] // an artist of a music library
-    [InlineData(FavoriteMediaKind.MusicAlbum)] // an album of a music library
-    [InlineData(FavoriteMediaKind.MusicTrack)] // a track of a music library
-    [InlineData(FavoriteMediaKind.Book)] // a book of a book library
+    [InlineData(FavoriteMediaKind.MusicArtist)] // An artist of a music library.
+    [InlineData(FavoriteMediaKind.MusicAlbum)] // An album of a music library.
+    [InlineData(FavoriteMediaKind.MusicTrack)] // A track of a music library.
+    [InlineData(FavoriteMediaKind.Book)] // A book of a book library.
     public void Create_WhenMediaKindIsSupported_ShouldCreateFavoriteAndRaiseSingleAddedEvent(FavoriteMediaKind mediaKind)
     {
         // Arrange
@@ -80,10 +80,10 @@ public class FavoriteTests
     }
 
     [Theory]
-    [InlineData(FavoriteMediaKind.None)] // the default value, which is not a kind that can be favorited
-    [InlineData(FavoriteMediaKind.Video)] // a planned kind: video libraries are not catalogued yet
-    [InlineData(FavoriteMediaKind.Photo)] // a planned kind: photo libraries are not catalogued yet
-    [InlineData((FavoriteMediaKind)999)] // a value outside the declared enumeration members
+    [InlineData(FavoriteMediaKind.None)] // The default value, which is not a kind that can be favorited.
+    [InlineData(FavoriteMediaKind.Video)] // A planned kind: video libraries are not catalogued yet.
+    [InlineData(FavoriteMediaKind.Photo)] // A planned kind: photo libraries are not catalogued yet.
+    [InlineData((FavoriteMediaKind)999)] // A value outside the declared enumeration members.
     public void Create_WhenMediaKindIsNotSupported_ShouldReturnErrorAndProduceNoFavorite(FavoriteMediaKind mediaKind)
     {
         // Act
@@ -97,9 +97,9 @@ public class FavoriteTests
     }
 
     [Theory]
-    [InlineData(FavoriteMediaKind.MusicAlbum)] // a supported kind that was stored with an update
-    [InlineData(FavoriteMediaKind.None)] // the default value, preserved as it was recorded
-    [InlineData(FavoriteMediaKind.Video)] // a planned kind, stored as it was recorded, whatever its support today
+    [InlineData(FavoriteMediaKind.MusicAlbum)] // A supported kind that was stored with an update.
+    [InlineData(FavoriteMediaKind.None)] // The default value, preserved as it was recorded.
+    [InlineData(FavoriteMediaKind.Video)] // A planned kind, stored as it was recorded, whatever its support today.
     public void Create_WhenRehydratingWithUpdatedOnUtc_ShouldPreserveAllDataAndRaiseNoEvents(FavoriteMediaKind mediaKind)
     {
         // Arrange
@@ -216,15 +216,15 @@ public class FavoriteTests
     }
 
     [Theory]
-    [InlineData(FavoriteMediaKind.None, false)] // the default value, which is not a kind that can be favorited
-    [InlineData(FavoriteMediaKind.MusicArtist, true)] // an artist of a music library can be favorited
-    [InlineData(FavoriteMediaKind.MusicAlbum, true)] // an album of a music library can be favorited
-    [InlineData(FavoriteMediaKind.MusicTrack, true)] // a track of a music library can be favorited
-    [InlineData(FavoriteMediaKind.Book, true)] // a book of a book library can be favorited
-    [InlineData(FavoriteMediaKind.Video, false)] // a planned kind: video libraries are not catalogued yet
-    [InlineData(FavoriteMediaKind.Photo, false)] // a planned kind: photo libraries are not catalogued yet
-    [InlineData((FavoriteMediaKind)999, false)] // a value outside the declared enumeration members
-    [InlineData((FavoriteMediaKind)(-1), false)] // a value below the declared enumeration members
+    [InlineData(FavoriteMediaKind.None, false)] // The default value, which is not a kind that can be favorited.
+    [InlineData(FavoriteMediaKind.MusicArtist, true)] // An artist of a music library can be favorited.
+    [InlineData(FavoriteMediaKind.MusicAlbum, true)] // An album of a music library can be favorited.
+    [InlineData(FavoriteMediaKind.MusicTrack, true)] // A track of a music library can be favorited.
+    [InlineData(FavoriteMediaKind.Book, true)] // A book of a book library can be favorited.
+    [InlineData(FavoriteMediaKind.Video, false)] // A planned kind: video libraries are not catalogued yet.
+    [InlineData(FavoriteMediaKind.Photo, false)] // A planned kind: photo libraries are not catalogued yet.
+    [InlineData((FavoriteMediaKind)999, false)] // A value outside the declared enumeration members.
+    [InlineData((FavoriteMediaKind)(-1), false)] // A value below the declared enumeration members.
     public void IsSupported_WhenCalled_ShouldOnlySupportCataloguedMediaKinds(FavoriteMediaKind mediaKind, bool expectedIsSupported)
     {
         // Act

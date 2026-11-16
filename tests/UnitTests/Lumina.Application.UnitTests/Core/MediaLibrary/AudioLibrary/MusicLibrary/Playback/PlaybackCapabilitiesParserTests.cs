@@ -17,12 +17,12 @@ public class PlaybackCapabilitiesParserTests
     private readonly PlaybackCapabilityDtoFixture _playbackCapabilityDtoFixture = new();
 
     [Theory]
-    [InlineData(null)] // an absent input falls back to the default capabilities
-    [InlineData("")] // an empty input falls back to the default capabilities
-    [InlineData("   ")] // a blank input falls back to the default capabilities
-    [InlineData("not-a-pair")] // an input that does not name both a container and a codec falls back to the default capabilities
-    [InlineData("a/b/c")] // an input with more than two segments falls back to the default capabilities
-    [InlineData("a//b")] // an input whose container or codec is empty falls back to the default capabilities
+    [InlineData(null)] // An absent input falls back to the default capabilities.
+    [InlineData("")] // An empty input falls back to the default capabilities.
+    [InlineData("   ")] // A blank input falls back to the default capabilities.
+    [InlineData("not-a-pair")] // An input that does not name both a container and a codec falls back to the default capabilities.
+    [InlineData("a/b/c")] // An input with more than two segments falls back to the default capabilities.
+    [InlineData("a//b")] // An input whose container or codec is empty falls back to the default capabilities.
     public void Parse_WhenInputIsNotAValidCapabilitySet_ShouldReturnDefaultCapabilities(string? input)
     {
         // Act

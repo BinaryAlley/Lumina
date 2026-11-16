@@ -80,8 +80,8 @@ public class UpdateTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateTrack_WithSQLInjectionInBody_ShouldNotCorruptOrLeakData(string maliciousTitle)
     {
         // Arrange
@@ -115,8 +115,8 @@ public class UpdateTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("C:\\Windows\\System32\\drivers\\etc\\hosts")] // Windows sensitive file
-    [InlineData("/etc/passwd")] // Unix sensitive file
+    [InlineData("C:\\Windows\\System32\\drivers\\etc\\hosts")] // Windows sensitive file.
+    [InlineData("/etc/passwd")] // Unix sensitive file.
     public async Task UpdateTrack_WhenRequestBodyAttemptsToRedirectTheTrackFilePath_ShouldPreserveTheStoredPathAndNotLeakIt(string attemptedPath)
     {
         // Arrange
@@ -163,8 +163,8 @@ public class UpdateTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateTrack_WithSQLInjectionInLibraryRouteId_ShouldRemainSecure(string maliciousLibraryId)
     {
         // Arrange
@@ -181,8 +181,8 @@ public class UpdateTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateTrack_WithSQLInjectionInArtistRouteId_ShouldRemainSecure(string maliciousArtistId)
     {
         // Arrange
@@ -199,8 +199,8 @@ public class UpdateTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateTrack_WithSQLInjectionInAlbumRouteId_ShouldRemainSecure(string maliciousAlbumId)
     {
         // Arrange
@@ -217,8 +217,8 @@ public class UpdateTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateTrack_WithSQLInjectionInTrackRouteId_ShouldRemainSecure(string maliciousTrackId)
     {
         // Arrange

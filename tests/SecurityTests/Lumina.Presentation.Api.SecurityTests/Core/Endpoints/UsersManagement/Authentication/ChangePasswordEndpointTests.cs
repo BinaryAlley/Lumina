@@ -104,8 +104,8 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Users--")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Users--")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task ChangePassword_WithSQLInjectionInUsername_ShouldNotCorruptOrDeleteData(string maliciousUsername)
     {
         // Arrange

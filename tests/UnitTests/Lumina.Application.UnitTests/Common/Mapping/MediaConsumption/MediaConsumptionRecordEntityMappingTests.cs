@@ -351,8 +351,8 @@ public class MediaConsumptionRecordEntityMappingTests
     }
 
     [Theory]
-    [InlineData("")] // an empty location is not a usable position
-    [InlineData("   ")] // a whitespace only location is not a usable position
+    [InlineData("")] // An empty location is not a usable position.
+    [InlineData("   ")] // A whitespace only location is not a usable position.
     public void ToDomainEntity_WhenLocationPositionHasABlankLocation_ShouldReturnInvalidMediaPosition(string location)
     {
         // Arrange

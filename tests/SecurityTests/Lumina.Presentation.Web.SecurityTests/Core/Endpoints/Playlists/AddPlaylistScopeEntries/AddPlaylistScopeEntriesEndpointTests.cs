@@ -105,10 +105,10 @@ public class AddPlaylistScopeEntriesEndpointTests : IClassFixture<LuminaWebFacto
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Playlists--")] // destructive injection
-    [InlineData("../../admin")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Playlists--")] // Destructive injection.
+    [InlineData("../../admin")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task AddPlaylistScopeEntries_WithInjectionPayloadInPlaylistId_ShouldNormalizeItAndNotForwardTheRawValue(string payload)
     {
         // Arrange
@@ -134,9 +134,9 @@ public class AddPlaylistScopeEntriesEndpointTests : IClassFixture<LuminaWebFacto
     }
 
     [Theory]
-    [InlineData("libraryId")] // required scope identifier
-    [InlineData("artistId")] // optional scope identifier
-    [InlineData("albumId")] // optional scope identifier
+    [InlineData("libraryId")] // Required scope identifier.
+    [InlineData("artistId")] // Optional scope identifier.
+    [InlineData("albumId")] // Optional scope identifier.
     public async Task AddPlaylistScopeEntries_WithInjectionPayloadInScopeIds_ShouldRejectTheRequestWithoutCallingTheApi(string propertyName)
     {
         // Arrange

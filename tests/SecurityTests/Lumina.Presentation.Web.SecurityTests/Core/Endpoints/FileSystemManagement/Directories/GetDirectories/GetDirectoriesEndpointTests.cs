@@ -44,8 +44,8 @@ public class GetDirectoriesEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Directories--")] // destructive SQL injection
-    [InlineData("' OR '1'='1")] // basic SQL injection
+    [InlineData("'; DROP TABLE Directories--")] // Destructive SQL injection.
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
     public async Task GetDirectories_WhenCalledWithInjectionInPath_ShouldRemainSecure(string maliciousPath)
     {
         // Arrange

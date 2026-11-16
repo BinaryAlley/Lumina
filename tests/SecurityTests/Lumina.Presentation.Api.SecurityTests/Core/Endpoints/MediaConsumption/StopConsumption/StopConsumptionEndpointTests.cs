@@ -173,11 +173,11 @@ public class StopConsumptionEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task StopConsumption_WithSqlInjectionInRecordId_ShouldRejectWithoutLeaking(string maliciousRecordId)
     {
         // Arrange
@@ -193,11 +193,11 @@ public class StopConsumptionEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task StopConsumption_WithUnknownPositionKind_ShouldRejectWithoutLeaking(string maliciousPositionKind)
     {
         // Arrange
@@ -218,11 +218,11 @@ public class StopConsumptionEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task StopConsumption_WithOpaquePositionLocation_ShouldStoreItVerbatimWithoutLeaking(string location)
     {
         // Arrange

@@ -123,7 +123,7 @@ public class TrackTests
         track.UpdateMoods([secondMood]);
 
         // Assert
-        // the second call replaces the first set, it is not appended to it
+        // The second call replaces the first set, it is not appended to it.
         Mood storedMood = Assert.Single(track.Moods);
         Assert.Equal(secondMood, storedMood);
         Assert.DoesNotContain(firstMood, track.Moods);
@@ -142,7 +142,7 @@ public class TrackTests
         track.UpdateIsrcs([secondIsrc]);
 
         // Assert
-        // the second call replaces the first set, it is not appended to it
+        // The second call replaces the first set, it is not appended to it.
         Isrc storedIsrc = Assert.Single(track.Isrcs);
         Assert.Equal(secondIsrc, storedIsrc);
         Assert.DoesNotContain(firstIsrc, track.Isrcs);
@@ -161,7 +161,7 @@ public class TrackTests
         track.UpdateContributors([secondContributor]);
 
         // Assert
-        // the second call replaces the first set, it is not appended to it
+        // The second call replaces the first set, it is not appended to it.
         MusicMediaContributor storedContributor = Assert.Single(track.Contributors);
         Assert.Equal(secondContributor, storedContributor);
         Assert.DoesNotContain(firstContributor, track.Contributors);
@@ -180,7 +180,7 @@ public class TrackTests
         track.UpdateRatings([secondRating]);
 
         // Assert
-        // the second call replaces the first set, it is not appended to it
+        // The second call replaces the first set, it is not appended to it.
         AudioRating storedRating = Assert.Single(track.Ratings);
         Assert.Equal(secondRating, storedRating);
     }

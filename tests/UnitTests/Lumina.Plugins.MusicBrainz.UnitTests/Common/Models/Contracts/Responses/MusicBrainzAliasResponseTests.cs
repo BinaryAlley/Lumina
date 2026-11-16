@@ -16,7 +16,7 @@ public class MusicBrainzAliasResponseTests
     public void IsEnded_WhenTheMusicBrainzApiReturnsNull_ShouldDeserializeAsNull()
     {
         // Arrange
-        // the MusicBrainz search API can return a null ended flag for aliases, which used to break deserialization into a non-nullable boolean
+        // The MusicBrainz search API can return a null ended flag for aliases, which used to break deserialization into a non-nullable boolean.
         const string JSON = """{"name":"Rammstein","ended":null}""";
 
         // Act

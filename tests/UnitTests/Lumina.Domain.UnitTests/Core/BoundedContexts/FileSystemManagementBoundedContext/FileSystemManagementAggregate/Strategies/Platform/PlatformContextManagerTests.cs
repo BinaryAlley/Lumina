@@ -104,7 +104,7 @@ public class PlatformContextManagerTests
     public void SetCurrentPlatform_WhenUnsupportedPlatform_ShouldThrowArgumentException()
     {
         // Arrange
-        PlatformType unsupportedPlatform = (PlatformType)999; // An unsupported platform type
+        PlatformType unsupportedPlatform = (PlatformType)999; // An unsupported platform type.
         IOperatingSystemInfo mockOsInfo = Substitute.For<IOperatingSystemInfo>();
         sut = new(_mockPlatformContextFactory, mockOsInfo);
 

@@ -45,8 +45,8 @@ public class CheckPathExistsEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Paths--")] // destructive SQL injection
-    [InlineData("' OR '1'='1")] // basic SQL injection
+    [InlineData("'; DROP TABLE Paths--")] // Destructive SQL injection.
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
     public async Task CheckPathExists_WhenCalledWithInjectionInPath_ShouldRemainSecure(string maliciousPath)
     {
         // Arrange

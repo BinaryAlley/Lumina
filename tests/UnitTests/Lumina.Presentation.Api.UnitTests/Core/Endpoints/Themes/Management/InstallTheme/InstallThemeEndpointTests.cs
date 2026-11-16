@@ -181,7 +181,7 @@ public class InstallThemeEndpointTests
 
     private void ConfigureFormWithArchive(byte[] content, string fileName)
     {
-        // the stream stays open for the duration of the test, since the endpoint reads it through the form file during execution
+        // The stream stays open for the duration of the test, since the endpoint reads it through the form file during execution.
         MemoryStream archiveStream = new(content);
         IFormFile formFile = new FormFile(archiveStream, 0, content.Length, "archive", fileName);
         FormFileCollection files = [formFile];

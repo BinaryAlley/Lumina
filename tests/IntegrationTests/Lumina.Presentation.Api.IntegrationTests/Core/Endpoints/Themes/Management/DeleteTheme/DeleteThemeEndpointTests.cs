@@ -72,12 +72,12 @@ public class DeleteThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        // the theme row is removed from the database
+        // The theme row is removed from the database.
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         Assert.Null(await dbContext.Themes.FirstOrDefaultAsync(theme => theme.ThemeId == themeId));
 
-        // the theme no longer appears in GET /themes
+        // The theme no longer appears in GET /themes.
         HttpResponseMessage listResponse = await _client.GetAsync("/api/v1/themes");
         List<ThemeResponse>? themes = await listResponse.Content.ReadFromJsonAsync<List<ThemeResponse>>(_jsonOptions);
         Assert.NotNull(themes);
@@ -114,11 +114,11 @@ public class DeleteThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         // Arrange
         await ThemeTestHelpers.WaitForBundledThemeAsync(_apiFactory);
 
-        // deleting a bundled theme that is not the last remaining one is allowed, so only the last one is protected
+        // Deleting a bundled theme that is not the last remaining one is allowed, so only the last one is protected.
         HttpResponseMessage firstDeletionResponse = await _client.DeleteAsync("/api/v1/themes/editorial-paper");
         Assert.Equal(HttpStatusCode.NoContent, firstDeletionResponse.StatusCode);
 
-        // Act: the last remaining bundled theme cannot be deleted
+        // Act: the last remaining bundled theme cannot be deleted.
         HttpResponseMessage response = await _client.DeleteAsync("/api/v1/themes/lumina-default");
 
         // Assert
@@ -135,7 +135,7 @@ public class DeleteThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Assert.NotNull(problemDetails["traceId"].GetString());
         Assert.NotEmpty(problemDetails["traceId"].GetString()!);
 
-        // restore the soft-deleted bundled theme, so the following tests start from a clean state
+        // Restore the soft-deleted bundled theme, so the following tests start from a clean state.
         HttpResponseMessage restoreResponse = await _client.PostAsJsonAsync("/api/v1/themes/editorial-paper/restore", new { });
         Assert.Equal(HttpStatusCode.NoContent, restoreResponse.StatusCode);
     }
@@ -218,7 +218,7 @@ public class DeleteThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         foreach (string themeId in _installedThemeIds)
             await themeService.DeleteAsync(themeId, CancellationToken.None);
 
-        // the admin seeding performed by the factory is not idempotent, so the seed data must be cleared between tests
+        // The admin seeding performed by the factory is not idempotent, so the seed data must be cleared between tests.
         await dbContext.Set<RolePermissionEntity>().ExecuteDeleteAsync();
         await dbContext.Set<UserPermissionEntity>().ExecuteDeleteAsync();
         await dbContext.Set<UserRoleEntity>().ExecuteDeleteAsync();

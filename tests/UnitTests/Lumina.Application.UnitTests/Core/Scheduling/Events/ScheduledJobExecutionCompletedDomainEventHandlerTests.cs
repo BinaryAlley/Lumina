@@ -62,8 +62,8 @@ public class ScheduledJobExecutionCompletedDomainEventHandlerTests
     }
 
     [Theory]
-    [InlineData(true, ScheduledJobStatus.Active)] // a cycle run returns the scheduled job to its active status
-    [InlineData(false, ScheduledJobStatus.Completed)] // a one time execution completes the scheduled job
+    [InlineData(true, ScheduledJobStatus.Active)] // A cycle run returns the scheduled job to its active status.
+    [InlineData(false, ScheduledJobStatus.Completed)] // A one time execution completes the scheduled job.
     public async Task HandleAsync_WhenScheduledJobAndExecutionExist_ShouldUpdateBothAndNotify(bool isCycleRun, ScheduledJobStatus expectedStatus)
     {
         // Arrange

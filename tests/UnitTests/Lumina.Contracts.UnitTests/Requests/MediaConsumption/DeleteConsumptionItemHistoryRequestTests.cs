@@ -64,10 +64,10 @@ public class DeleteConsumptionItemHistoryRequestTests
     }
 
     [Theory]
-    [InlineData("None")] // None is not a valid media kind for a consumption record
-    [InlineData("999")] // a numeric value that is not a member name
-    [InlineData("not-a-media-kind")] // a textual value that is not a member name
-    [InlineData("")] // an empty media kind
+    [InlineData("None")] // None is not a valid media kind for a consumption record.
+    [InlineData("999")] // A numeric value that is not a member name.
+    [InlineData("not-a-media-kind")] // A textual value that is not a member name.
+    [InlineData("")] // An empty media kind.
     public void Constructor_WhenMediaKindIsInvalid_ShouldPreserveItForTheValidator(string mediaKind)
     {
         // Act

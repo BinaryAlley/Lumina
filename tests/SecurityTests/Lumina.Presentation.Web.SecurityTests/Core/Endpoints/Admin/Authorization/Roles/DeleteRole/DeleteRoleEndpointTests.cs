@@ -87,8 +87,8 @@ public class DeleteRoleEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Roles--")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Roles--")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task DeleteRole_WithInjectionInRoleId_ShouldRemainSecure(string maliciousRoleId)
     {
         // Arrange

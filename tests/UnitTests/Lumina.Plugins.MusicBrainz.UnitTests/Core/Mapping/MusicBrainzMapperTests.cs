@@ -189,13 +189,13 @@ public class MusicBrainzMapperTests
     }
 
     [Theory]
-    [InlineData("person", MusicArtistType.Person)] // an individual
-    [InlineData("group", MusicArtistType.Group)] // an ensemble
-    [InlineData("orchestra", MusicArtistType.Orchestra)] // an instrumental ensemble
-    [InlineData("choir", MusicArtistType.Choir)] // a vocal ensemble
-    [InlineData("character", MusicArtistType.Character)] // a fictional character
-    [InlineData("other", MusicArtistType.Other)] // a known but uncategorized type
-    [InlineData("PERSON", MusicArtistType.Person)] // the value is normalized
+    [InlineData("person", MusicArtistType.Person)] // An individual.
+    [InlineData("group", MusicArtistType.Group)] // An ensemble.
+    [InlineData("orchestra", MusicArtistType.Orchestra)] // An instrumental ensemble.
+    [InlineData("choir", MusicArtistType.Choir)] // A vocal ensemble.
+    [InlineData("character", MusicArtistType.Character)] // A fictional character.
+    [InlineData("other", MusicArtistType.Other)] // A known but uncategorized type.
+    [InlineData("PERSON", MusicArtistType.Person)] // The value is normalized.
     public void MapArtist_WhenTheTypeIsKnown_ShouldMapIt(string type, MusicArtistType expected)
     {
         // Arrange
@@ -227,7 +227,7 @@ public class MusicBrainzMapperTests
     [InlineData("female", MusicArtistGender.Female)]
     [InlineData("other", MusicArtistGender.Other)]
     [InlineData("not applicable", MusicArtistGender.NotApplicable)]
-    [InlineData("FEMALE", MusicArtistGender.Female)] // the value is normalized
+    [InlineData("FEMALE", MusicArtistGender.Female)] // The value is normalized.
     public void MapArtist_WhenTheGenderIsKnown_ShouldMapIt(string gender, MusicArtistGender expected)
     {
         // Act
@@ -251,7 +251,7 @@ public class MusicBrainzMapperTests
     }
 
     [Theory]
-    [InlineData("executive producer", MediaContributorRole.ExecutiveProducer)] // more specific than producer
+    [InlineData("executive producer", MediaContributorRole.ExecutiveProducer)] // More specific than producer.
     [InlineData("producer", MediaContributorRole.Producer)]
     [InlineData("remixer", MediaContributorRole.Remixer)]
     [InlineData("mix", MediaContributorRole.Mixer)]
@@ -703,13 +703,13 @@ public class MusicBrainzMapperTests
     }
 
     [Theory]
-    [InlineData("1975-11-21", 1975, 11, 21, 1975)] // an exact date is parsed fully
-    [InlineData("1975", null, 0, 0, 1975)] // a bare year yields only the year
-    [InlineData("Spring 1975", null, 0, 0, 1975)] // an embedded year is extracted when the value is not a date
-    [InlineData("not a date", null, 0, 0, null)] // an unparsable value yields nothing
-    [InlineData("2200", null, 0, 0, null)] // a year outside the accepted window yields nothing
-    [InlineData("2100", null, 0, 0, 2100)] // the upper boundary is accepted
-    [InlineData(" 1975-11-21 ", 1975, 11, 21, 1975)] // surrounding white space is trimmed
+    [InlineData("1975-11-21", 1975, 11, 21, 1975)] // An exact date is parsed fully.
+    [InlineData("1975", null, 0, 0, 1975)] // A bare year yields only the year.
+    [InlineData("Spring 1975", null, 0, 0, 1975)] // An embedded year is extracted when the value is not a date.
+    [InlineData("not a date", null, 0, 0, null)] // An unparsable value yields nothing.
+    [InlineData("2200", null, 0, 0, null)] // A year outside the accepted window yields nothing.
+    [InlineData("2100", null, 0, 0, 2100)] // The upper boundary is accepted.
+    [InlineData(" 1975-11-21 ", 1975, 11, 21, 1975)] // Surrounding white space is trimmed.
     public void MapAlbum_WhenTheFirstReleaseDateHasVariousShapes_ShouldParseIt(string firstReleaseDate, int? expectedYear, int expectedMonth, int expectedDay, int? expectedParsedYear)
     {
         // Arrange
@@ -729,10 +729,10 @@ public class MusicBrainzMapperTests
 
     [Theory]
     [InlineData("US", ReleaseCountry.US)]
-    [InlineData("us", ReleaseCountry.US)] // the code is matched case insensitively
-    [InlineData("XE", ReleaseCountry.XE)] // the Europe special code
-    [InlineData("XW", ReleaseCountry.XW)] // the Worldwide special code
-    [InlineData("AN", ReleaseCountry.AN)] // the Netherlands Antilles special code
+    [InlineData("us", ReleaseCountry.US)] // The code is matched case insensitively.
+    [InlineData("XE", ReleaseCountry.XE)] // The Europe special code.
+    [InlineData("XW", ReleaseCountry.XW)] // The Worldwide special code.
+    [InlineData("AN", ReleaseCountry.AN)] // The Netherlands Antilles special code.
     public void MapAlbum_WhenTheReleaseCountryIsKnown_ShouldMapIt(string country, ReleaseCountry expected)
     {
         // Arrange
@@ -747,9 +747,9 @@ public class MusicBrainzMapperTests
     }
 
     [Theory]
-    [InlineData("ZZ")] // a valid shape but not a known code
-    [InlineData("")] // an empty value
-    [InlineData("   ")] // only white space
+    [InlineData("ZZ")] // A valid shape but not a known code.
+    [InlineData("")] // An empty value.
+    [InlineData("   ")] // Only white space.
     public void MapAlbum_WhenTheReleaseCountryIsUnknown_ShouldReturnNullCountry(string country)
     {
         // Arrange
@@ -863,7 +863,7 @@ public class MusicBrainzMapperTests
     [InlineData("8cm cd", MusicMediaFormat.Cm8CD)]
     [InlineData("dat", MusicMediaFormat.DAT)]
     [InlineData("other", MusicMediaFormat.Other)]
-    [InlineData("made-up", MusicMediaFormat.Other)] // an unknown format still maps to Other
+    [InlineData("made-up", MusicMediaFormat.Other)] // An unknown format still maps to Other.
     public void MapAlbum_WhenTheMediaFormatIsKnownOrUnknownButPresent_ShouldMapIt(string format, MusicMediaFormat expected)
     {
         // Arrange
@@ -909,7 +909,7 @@ public class MusicBrainzMapperTests
     [InlineData("super jewel box", MusicReleasePackaging.SuperJewelBox)]
     [InlineData("none", MusicReleasePackaging.None)]
     [InlineData("other", MusicReleasePackaging.Other)]
-    [InlineData("made-up", MusicReleasePackaging.Other)] // an unknown packaging still maps to Other
+    [InlineData("made-up", MusicReleasePackaging.Other)] // An unknown packaging still maps to Other.
     public void MapAlbum_WhenThePackagingIsKnownOrUnknownButPresent_ShouldMapIt(string packaging, MusicReleasePackaging expected)
     {
         // Arrange
@@ -1051,7 +1051,7 @@ public class MusicBrainzMapperTests
         Assert.Null(result.Channels);
         Assert.Null(result.BitDepth);
         Assert.Null(result.AudioCodec);
-        Assert.Null(result.Container); // a metadata provider never supplies the container, which is captured locally from the file
+        Assert.Null(result.Container); // A metadata provider never supplies the container, which is captured locally from the file.
         Assert.Null(result.Bitrate);
         Assert.Equal(recordingId, result.MusicBrainzRecordingId);
         Assert.Null(result.MusicBrainzTrackId);
@@ -1111,10 +1111,10 @@ public class MusicBrainzMapperTests
     }
 
     [Theory]
-    [InlineData(null, null)] // no length at all
-    [InlineData(0L, null)] // a zero length is treated as unknown
-    [InlineData(-100L, null)] // a negative length is treated as unknown
-    [InlineData(1500L, 1)] // milliseconds are truncated to whole seconds
+    [InlineData(null, null)] // No length at all.
+    [InlineData(0L, null)] // A zero length is treated as unknown.
+    [InlineData(-100L, null)] // A negative length is treated as unknown.
+    [InlineData(1500L, 1)] // Milliseconds are truncated to whole seconds.
     [InlineData(215_400L, 215)]
     public void MapTrack_WhenTheRecordingHasALength_ShouldMapTheDurationInSeconds(long? length, int? expectedSeconds)
     {
@@ -1199,7 +1199,7 @@ public class MusicBrainzMapperTests
     }
 
     [Theory]
-    [InlineData(1.0)] // a value only
+    [InlineData(1.0)] // A value only.
     [InlineData(2.5)]
     public void MapArtist_WhenOnlyTheRatingValueIsPresent_ShouldMapItWithANullVoteCount(decimal value)
     {
@@ -1262,16 +1262,16 @@ public class MusicBrainzMapperTests
     }
 
     [Theory]
-    [InlineData("eng", "en", "English")] // a three letter code maps to the neutral culture
+    [InlineData("eng", "en", "English")] // A three letter code maps to the neutral culture.
     [InlineData("deu", "de", "German")]
-    [InlineData("en", "en", "English")] // a two letter code maps too
-    [InlineData("zxx", "zxx", "No linguistic content")] // a special MusicBrainz code
+    [InlineData("en", "en", "English")] // A two letter code maps too.
+    [InlineData("zxx", "zxx", "No linguistic content")] // A special MusicBrainz code.
     [InlineData("mul", "mul", "Multiple languages")]
     [InlineData("und", "und", "Undetermined")]
-    [InlineData("eng/ara", "en", "English")] // only the first code of a multi language value is used
-    [InlineData("/", "/", "/")] // a value with no usable part falls back to the raw code
-    [InlineData("  eng  ", "en", "English")] // surrounding white space is trimmed
-    [InlineData("qqq", "qqq", "qqq")] // an unknown code falls back to the raw code
+    [InlineData("eng/ara", "en", "English")] // Only the first code of a multi language value is used.
+    [InlineData("/", "/", "/")] // A value with no usable part falls back to the raw code.
+    [InlineData("  eng  ", "en", "English")] // Surrounding white space is trimmed.
+    [InlineData("qqq", "qqq", "qqq")] // An unknown code falls back to the raw code.
     public void MapTrack_WhenTheLanguageCodeIsPresent_ShouldMapIt(string language, string expectedCode, string expectedName)
     {
         // Arrange

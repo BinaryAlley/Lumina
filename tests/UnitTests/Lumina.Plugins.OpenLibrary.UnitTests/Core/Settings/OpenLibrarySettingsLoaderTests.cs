@@ -98,11 +98,11 @@ public class OpenLibrarySettingsLoaderTests
     }
 
     [Theory]
-    [InlineData("user\r\n@example.com")] // carriage return and line feed injection
-    [InlineData("user@example.com\r\nX-Injected: value")] // header injection attempt
-    [InlineData("user(comment)@example.com")] // parentheses break the from header
-    [InlineData("user\"quoted\"@example.com")] // quotes break the header value
-    [InlineData("user example@example.com")] // an inner space is not a valid token character
+    [InlineData("user\r\n@example.com")] // Carriage return and line feed injection.
+    [InlineData("user@example.com\r\nX-Injected: value")] // Header injection attempt.
+    [InlineData("user(comment)@example.com")] // Parentheses break the from header.
+    [InlineData("user\"quoted\"@example.com")] // Quotes break the header value.
+    [InlineData("user example@example.com")] // An inner space is not a valid token character.
     public void Apply_WhenContactEmailContainsUnsafeCharacters_ShouldSetItToNull(string storedEmail)
     {
         // Arrange

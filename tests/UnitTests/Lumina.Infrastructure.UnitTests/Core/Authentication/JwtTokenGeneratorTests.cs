@@ -59,17 +59,17 @@ public class JwtTokenGeneratorTests
 
         JwtSecurityToken jwtToken = tokenHandler.ReadJwtToken(token);
 
-        // verify token properties
+        // Verify token properties.
         Assert.Equal(_jwtSettings.Issuer, jwtToken.Issuer);
         Assert.Single(jwtToken.Audiences, _jwtSettings.Audience);
         Assert.Equal(_fixedUtcNow.AddMinutes(_jwtSettings.ExpiryMinutes), jwtToken.ValidTo);
 
-        // verify claims
+        // Verify claims.
         Assert.Contains(jwtToken.Claims, c => c.Type == JwtRegisteredClaimNames.Sub && c.Value == userId);
         Assert.Contains(jwtToken.Claims, c => c.Type == JwtRegisteredClaimNames.UniqueName && c.Value == username);
         Assert.Contains(jwtToken.Claims, c => c.Type == JwtRegisteredClaimNames.Jti && c.Value == userId);
 
-        // verify the token is actually valid
+        // Verify the token is actually valid.
         TokenValidationParameters validationParameters = new()
         {
             ValidateIssuerSigningKey = true,
@@ -80,7 +80,7 @@ public class JwtTokenGeneratorTests
             ValidAudience = _jwtSettings.Audience,
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero,
-            // override the current time to match our fixed test time
+            // Override the current time to match our fixed test time.
             LifetimeValidator = (notBefore, expires, token, parameters) => expires > _fixedUtcNow
         };
 

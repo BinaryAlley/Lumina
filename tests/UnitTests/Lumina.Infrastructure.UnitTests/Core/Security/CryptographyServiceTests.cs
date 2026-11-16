@@ -116,7 +116,7 @@ public class CryptographyServiceTests
     public void Decrypt_WhenInputIsTooShort_ShouldThrowArgumentException()
     {
         // Arrange
-        string shortCiphertext = Convert.ToBase64String(new byte[8]); // less than required 16 bytes
+        string shortCiphertext = Convert.ToBase64String(new byte[8]); // Less than required 16 bytes.
 
         // Act
         Action act = () => _sut.Decrypt(shortCiphertext);
@@ -135,7 +135,7 @@ public class CryptographyServiceTests
 
         // Decode the Base64 string, modify one byte, then re-encode.
         byte[] encryptedBytes = Convert.FromBase64String(encrypted);
-        encryptedBytes[^1] ^= 0xFF; // flip all bits in the last byte
+        encryptedBytes[^1] ^= 0xFF; // Flip all bits in the last byte.
         string corrupted = Convert.ToBase64String(encryptedBytes);
 
         // Act

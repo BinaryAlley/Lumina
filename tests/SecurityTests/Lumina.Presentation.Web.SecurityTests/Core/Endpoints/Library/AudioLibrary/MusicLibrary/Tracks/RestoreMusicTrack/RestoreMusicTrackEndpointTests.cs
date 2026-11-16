@@ -32,8 +32,8 @@ public class RestoreMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task RestoreMusicTrack_WithSQLInjectionInRouteId_ShouldNormalizeTheIdAndNeverRestoreAnotherTrack(string maliciousId)
     {
         // Arrange
@@ -58,8 +58,8 @@ public class RestoreMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task RestoreMusicTrack_WithSQLInjectionInLibraryQueryId_ShouldNormalizeTheLibraryId(string maliciousLibraryId)
     {
         // Arrange

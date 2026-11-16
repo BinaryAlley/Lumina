@@ -64,7 +64,7 @@ public class MediaLibraryScanArtworkEnrichmentJobTests
         _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
         _mockServiceProvider.GetService(typeof(IUnitOfWork)).Returns(_mockUnitOfWork);
 
-        // the job resolves the artwork enricher of the loaded library type from the service scope, so the music enricher must be available
+        // The job resolves the artwork enricher of the loaded library type from the service scope, so the music enricher must be available.
         _mockArtworkEnricher = Substitute.For<IMediaLibraryScanArtworkEnricher>();
         _mockArtworkEnricher.SupportedLibraryType.Returns(LibraryType.Music);
         _mockArtworkEnricher.EnrichAsync(Arg.Any<LibraryId>(), Arg.Any<ScanId>(), Arg.Any<UserId>(), Arg.Any<CancellationToken>())

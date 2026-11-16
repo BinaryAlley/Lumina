@@ -27,9 +27,9 @@ public class TranscodingCachePathsTests : IDisposable
     }
 
     [Theory]
-    [InlineData(null)] // no cache directory is configured
-    [InlineData("")] // an empty cache directory is configured
-    [InlineData("   ")] // a white space cache directory is configured
+    [InlineData(null)] // No cache directory is configured.
+    [InlineData("")] // An empty cache directory is configured.
+    [InlineData("   ")] // A white space cache directory is configured.
     public void GetRootDirectory_WhenNoDirectoryIsConfigured_ShouldReturnTheDefaultDirectoryUnderTheTemporaryDirectory(string? configuredDirectory)
     {
         // Act
@@ -128,13 +128,13 @@ public class TranscodingCachePathsTests : IDisposable
     }
 
     [Theory]
-    [InlineData(null)] // no identifier
-    [InlineData("")] // an empty identifier
-    [InlineData("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde")] // 63 characters
-    [InlineData("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0")] // 65 characters
-    [InlineData("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF")] // uppercase hexadecimal characters
-    [InlineData("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdeg")] // a character that is not hexadecimal
-    [InlineData("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde/")] // a directory separator
+    [InlineData(null)] // No identifier.
+    [InlineData("")] // An empty identifier.
+    [InlineData("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde")] // 63 characters.
+    [InlineData("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0")] // 65 characters.
+    [InlineData("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF")] // Uppercase hexadecimal characters.
+    [InlineData("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdeg")] // A character that is not hexadecimal.
+    [InlineData("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde/")] // A directory separator.
     public void IsValidCacheId_WhenTheValueIsNotAWellFormedIdentifier_ShouldReturnFalse(string? cacheId)
     {
         // Act
@@ -158,10 +158,10 @@ public class TranscodingCachePathsTests : IDisposable
     }
 
     [Theory]
-    [InlineData(null)] // no name
-    [InlineData("")] // an empty name
-    [InlineData("segment.m4s")] // an ordinary file name
-    [InlineData("not-a-cache-entry")] // an ordinary directory name
+    [InlineData(null)] // No name.
+    [InlineData("")] // An empty name.
+    [InlineData("segment.m4s")] // An ordinary file name.
+    [InlineData("not-a-cache-entry")] // An ordinary directory name.
     public void IsCacheEntryName_WhenTheNameIsNotInTheCacheNamespace_ShouldReturnFalse(string? entryName)
     {
         // Act
@@ -172,9 +172,9 @@ public class TranscodingCachePathsTests : IDisposable
     }
 
     [Theory]
-    [InlineData("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")] // a cache identifier
-    [InlineData("tmp-0123456789abcdef")] // a temporary directory
-    [InlineData("del-0123456789abcdef")] // a deletion tombstone
+    [InlineData("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")] // A cache identifier.
+    [InlineData("tmp-0123456789abcdef")] // A temporary directory.
+    [InlineData("del-0123456789abcdef")] // A deletion tombstone.
     public void IsCacheEntryName_WhenTheNameIsInTheCacheNamespace_ShouldReturnTrue(string entryName)
     {
         // Act

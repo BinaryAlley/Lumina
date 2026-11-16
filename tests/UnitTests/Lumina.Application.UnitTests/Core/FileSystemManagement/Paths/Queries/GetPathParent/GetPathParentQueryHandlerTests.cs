@@ -51,7 +51,7 @@ public class GetPathParentQueryHandlerTests
 
         IEnumerable<PathSegment> pathSegments = _pathSegmentFixture.CreateMany();
 
-        // Create PathSegmentResponses based on the PathSegments
+        // Create PathSegmentResponses based on the PathSegments.
         IEnumerable<PathSegmentResponse> pathSegmentResponses = pathSegments.Select(segment => _pathSegmentResponseFixture.Create(path: segment.Name));
 
         _mockPathService.GoUpOneLevel(query.Path!)

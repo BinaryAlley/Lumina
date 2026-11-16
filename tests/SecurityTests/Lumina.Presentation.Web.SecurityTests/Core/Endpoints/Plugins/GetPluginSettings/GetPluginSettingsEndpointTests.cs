@@ -47,8 +47,8 @@ public class GetPluginSettingsEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Plugins--")] // destructive injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Plugins--")] // Destructive injection.
     public async Task GetPluginSettings_WithInjectionInPluginId_ShouldNotLeakOrError(string maliciousPluginId)
     {
         // Arrange
@@ -62,8 +62,8 @@ public class GetPluginSettingsEndpointTests : IClassFixture<LuminaWebFactory>
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        // note: the {pluginId} route parameter is Guid-typed, so the malicious value fails model binding and never
-        // reaches the handler; the Web application reports the binding failure as a 200 response carrying success=false
+        // Note: the {pluginId} route parameter is Guid-typed, so the malicious value fails model binding and never
+        // Reaches the handler; the Web application reports the binding failure as a 200 response carrying success=false.
         using JsonDocument json = JsonDocument.Parse(content);
         Assert.False(json.RootElement.GetProperty("success").GetBoolean());
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);

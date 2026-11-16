@@ -53,9 +53,9 @@ public class ApiStreamResultTests
     }
 
     [Theory]
-    [InlineData("0")] // an empty production reports zero segments
-    [InlineData("1")] // a single segment production
-    [InlineData("42")] // a multi segment production
+    [InlineData("0")] // An empty production reports zero segments.
+    [InlineData("1")] // A single segment production.
+    [InlineData("42")] // A multi segment production.
     public async Task CreateAsync_WhenSegmentCountIsValid_ShouldExposeIt(string segmentCount)
     {
         // Arrange
@@ -70,11 +70,11 @@ public class ApiStreamResultTests
     }
 
     [Theory]
-    [InlineData(null)] // the header is absent
-    [InlineData("")] // the header is empty
-    [InlineData("not-a-number")] // the header is malformed
-    [InlineData("-1")] // a negative count is treated as absent
-    [InlineData("1.5")] // a fractional count is treated as absent
+    [InlineData(null)] // The header is absent.
+    [InlineData("")] // The header is empty.
+    [InlineData("not-a-number")] // The header is malformed.
+    [InlineData("-1")] // A negative count is treated as absent.
+    [InlineData("1.5")] // A fractional count is treated as absent.
     public async Task CreateAsync_WhenSegmentCountIsInvalid_ShouldReturnNull(string? segmentCount)
     {
         // Arrange
@@ -90,9 +90,9 @@ public class ApiStreamResultTests
     }
 
     [Theory]
-    [InlineData("0")] // the first segment starts at the beginning of the track
-    [InlineData("6.5")] // a decimal with a dot is forwarded as the API wrote it
-    [InlineData("6,5")] // a decimal with a comma, which is not the invariant separator, is still forwarded verbatim
+    [InlineData("0")] // The first segment starts at the beginning of the track.
+    [InlineData("6.5")] // A decimal with a dot is forwarded as the API wrote it.
+    [InlineData("6,5")] // A decimal with a comma, which is not the invariant separator, is still forwarded verbatim.
     public async Task CreateAsync_WhenSegmentStartIsPresent_ShouldForwardItVerbatim(string segmentStart)
     {
         // Arrange
@@ -120,8 +120,8 @@ public class ApiStreamResultTests
     }
 
     [Theory]
-    [InlineData("1")] // a one second production
-    [InlineData("300")] // a five minute production
+    [InlineData("1")] // A one second production.
+    [InlineData("300")] // A five minute production.
     public async Task CreateAsync_WhenTrackDurationIsPositive_ShouldExposeIt(string trackDuration)
     {
         // Arrange
@@ -136,10 +136,10 @@ public class ApiStreamResultTests
     }
 
     [Theory]
-    [InlineData(null)] // the header is absent
-    [InlineData("0")] // a zero duration is treated as absent
-    [InlineData("-5")] // a negative duration is treated as absent
-    [InlineData("not-a-number")] // the header is malformed
+    [InlineData(null)] // The header is absent.
+    [InlineData("0")] // A zero duration is treated as absent.
+    [InlineData("-5")] // A negative duration is treated as absent.
+    [InlineData("not-a-number")] // The header is malformed.
     public async Task CreateAsync_WhenTrackDurationIsInvalid_ShouldReturnNull(string? trackDuration)
     {
         // Arrange

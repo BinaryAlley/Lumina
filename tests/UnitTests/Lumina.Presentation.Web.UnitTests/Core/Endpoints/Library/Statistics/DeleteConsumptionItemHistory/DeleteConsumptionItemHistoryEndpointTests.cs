@@ -58,9 +58,9 @@ public class DeleteConsumptionItemHistoryEndpointTests
     }
 
     [Theory]
-    [InlineData(null)] // no user selected, the current user is implied
-    [InlineData("")] // empty user selected
-    [InlineData("   ")] // whitespace user selected
+    [InlineData(null)] // No user selected, the current user is implied.
+    [InlineData("")] // Empty user selected.
+    [InlineData("   ")] // Whitespace user selected.
     public async Task ExecuteAsync_WhenUserIdIsNullOrWhitespace_ShouldDeleteCurrentUserItemHistory(string? userId)
     {
         // Arrange
@@ -81,9 +81,9 @@ public class DeleteConsumptionItemHistoryEndpointTests
     }
 
     [Theory]
-    [InlineData(MediaKind.MusicTrack, "MusicTrack")] // a music track
-    [InlineData(MediaKind.PodcastEpisode, "PodcastEpisode")] // a podcast episode
-    [InlineData(MediaKind.Book, "Book")] // a book
+    [InlineData(MediaKind.MusicTrack, "MusicTrack")] // A music track.
+    [InlineData(MediaKind.PodcastEpisode, "PodcastEpisode")] // A podcast episode.
+    [InlineData(MediaKind.Book, "Book")] // A book.
     public async Task ExecuteAsync_WhenMediaKindIsSet_ShouldUseTheMediaKindNameInTheUpstreamRoute(MediaKind mediaKind, string expectedMediaKind)
     {
         // Arrange

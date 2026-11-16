@@ -59,14 +59,14 @@ public class GetLibraryPathTemplatePartsEndpointTests : IClassFixture<LuminaApiF
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Libraries--")] // destructive SQL injection
-    [InlineData("Music; rm -rf /")] // command injection
-    [InlineData("$(whoami)")] // command substitution injection
-    [InlineData("`whoami`")] // backtick command injection
-    [InlineData("{0}{1}{0}")] // template/placeholder injection
-    [InlineData("..\\..\\..\\Windows\\System32\\config\\SAM")] // windows path traversal
-    [InlineData("%2e%2e%2fetc%2fpasswd")] // encoded path traversal
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Libraries--")] // Destructive SQL injection.
+    [InlineData("Music; rm -rf /")] // Command injection.
+    [InlineData("$(whoami)")] // Command substitution injection.
+    [InlineData("`whoami`")] // Backtick command injection.
+    [InlineData("{0}{1}{0}")] // Template/placeholder injection.
+    [InlineData("..\\..\\..\\Windows\\System32\\config\\SAM")] // Windows path traversal.
+    [InlineData("%2e%2e%2fetc%2fpasswd")] // Encoded path traversal.
     public async Task GetLibraryPathTemplateParts_WithInjectionInLibraryType_ShouldNotLeakOrError(string maliciousLibraryType)
     {
         // Arrange

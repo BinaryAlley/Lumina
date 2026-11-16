@@ -55,9 +55,9 @@ public class StreamMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("artistId")] // injection in the artist Id
-    [InlineData("albumId")] // injection in the album Id
-    [InlineData("trackId")] // injection in the track Id
+    [InlineData("artistId")] // Injection in the artist Id.
+    [InlineData("albumId")] // Injection in the album Id.
+    [InlineData("trackId")] // Injection in the track Id.
     public async Task StreamMusicTrack_WithAnInjectionPayloadInATrackRouteId_ShouldNormalizeTheIdWithoutLeakingData(string routeValue)
     {
         // Arrange

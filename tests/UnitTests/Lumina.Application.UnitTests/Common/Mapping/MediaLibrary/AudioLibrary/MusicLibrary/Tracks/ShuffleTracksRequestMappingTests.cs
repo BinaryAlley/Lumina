@@ -88,9 +88,9 @@ public class ShuffleTracksRequestMappingTests
     }
 
     [Theory]
-    [InlineData("not-a-guid")] // a value that cannot be parsed
-    [InlineData("' OR '1'='1")] // an injection payload
-    [InlineData("'; DROP TABLE Tracks; --")] // a destructive injection payload
+    [InlineData("not-a-guid")] // A value that cannot be parsed.
+    [InlineData("' OR '1'='1")] // An injection payload.
+    [InlineData("'; DROP TABLE Tracks; --")] // A destructive injection payload.
     public void ToQuery_WhenLibraryIdArgumentIsNotParseable_ShouldPassItVerbatim(string libraryId)
     {
         // Arrange

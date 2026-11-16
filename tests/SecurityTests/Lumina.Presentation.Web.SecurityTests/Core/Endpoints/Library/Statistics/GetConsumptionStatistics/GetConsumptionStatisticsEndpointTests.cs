@@ -58,8 +58,8 @@ public class GetConsumptionStatisticsEndpointTests : IClassFixture<LuminaWebFact
     }
 
     [Theory]
-    [InlineData("Movie%2F..%2Fadmin%3Fx%3D1")] // path traversal attempt in the media kind
-    [InlineData("NotAMediaKind")] // undefined enum member
+    [InlineData("Movie%2F..%2Fadmin%3Fx%3D1")] // Path traversal attempt in the media kind.
+    [InlineData("NotAMediaKind")] // Undefined enum member.
     public async Task GetConsumptionStatistics_WithCraftedMediaKind_ShouldRejectRequestAndNotCallApi(string craftedMediaKind)
     {
         // Arrange

@@ -25,7 +25,7 @@ public class CryptographyServiceFixture
     /// <returns>The configured options.</returns>
     public IOptions<EncryptionSettingsDto> CreateEncryptionSettings()
     {
-        // Generate a valid 256-bit (32 byte) key for AES-256
+        // Generate a valid 256-bit (32 byte) key for AES-256.
         byte[] key = new byte[32];
         RandomNumberGenerator.Fill(key);
         string base64Key = Convert.ToBase64String(key);

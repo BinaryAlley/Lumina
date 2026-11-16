@@ -74,18 +74,18 @@ public class GetTrackStreamEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     }
 
     [Theory]
-    [InlineData("libraryId", "'; DROP TABLE Tracks; --")] // destructive injection in the library Id
-    [InlineData("libraryId", "' OR '1'='1")] // boolean based injection in the library Id
-    [InlineData("artistId", "'; DROP TABLE Tracks; --")] // destructive injection in the artist Id
-    [InlineData("artistId", "'; EXEC xp_cmdshell('dir'); --")] // command execution attempt in the artist Id
-    [InlineData("albumId", "' OR '1'='1")] // boolean based injection in the album Id
-    [InlineData("albumId", "'; DROP TABLE Tracks; --")] // destructive injection in the album Id
-    [InlineData("trackId", "' OR '1'='1")] // boolean based injection in the track Id
-    [InlineData("trackId", "'; EXEC xp_cmdshell('dir'); --")] // command execution attempt in the track Id
-    [InlineData("libraryId", "../../etc/passwd")] // path traversal in the library Id
-    [InlineData("artistId", "../../etc/passwd")] // path traversal in the artist Id
-    [InlineData("albumId", "../../etc/passwd")] // path traversal in the album Id
-    [InlineData("trackId", "../../etc/passwd")] // path traversal in the track Id
+    [InlineData("libraryId", "'; DROP TABLE Tracks; --")] // Destructive injection in the library Id.
+    [InlineData("libraryId", "' OR '1'='1")] // Boolean based injection in the library Id.
+    [InlineData("artistId", "'; DROP TABLE Tracks; --")] // Destructive injection in the artist Id.
+    [InlineData("artistId", "'; EXEC xp_cmdshell('dir'); --")] // Command execution attempt in the artist Id.
+    [InlineData("albumId", "' OR '1'='1")] // Boolean based injection in the album Id.
+    [InlineData("albumId", "'; DROP TABLE Tracks; --")] // Destructive injection in the album Id.
+    [InlineData("trackId", "' OR '1'='1")] // Boolean based injection in the track Id.
+    [InlineData("trackId", "'; EXEC xp_cmdshell('dir'); --")] // Command execution attempt in the track Id.
+    [InlineData("libraryId", "../../etc/passwd")] // Path traversal in the library Id.
+    [InlineData("artistId", "../../etc/passwd")] // Path traversal in the artist Id.
+    [InlineData("albumId", "../../etc/passwd")] // Path traversal in the album Id.
+    [InlineData("trackId", "../../etc/passwd")] // Path traversal in the track Id.
     public async Task GetTrackStream_WithAnInjectionPayloadInARouteValue_ShouldRejectItWithoutLeakingData(string routeValue, string payload)
     {
         // Arrange

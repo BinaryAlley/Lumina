@@ -166,7 +166,7 @@ public class AddArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFactor
     public async Task AddArtist_WhenLibraryDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
-        // only an admin reaches the library lookup of a library that does not exist, because a regular user is rejected by the ownership policy before it
+        // Only an admin reaches the library lookup of a library that does not exist, because a regular user is rejected by the ownership policy before it.
         HttpClient adminClient = await _apiFactory.CreateAuthenticatedAdminClientAsync();
         Guid missingLibraryId = Guid.NewGuid();
         AddAlbumRequest album = _addAlbumRequestFixture.Create(contributors: [], ratings: [], tracks: []);

@@ -608,7 +608,7 @@ public class DirectoryProviderServiceTests
         bool overrideExisting = true;
 
 
-        // ensure all relevant directories exist
+        // Ensure all relevant directories exist.
         _mockFileSystem.Directory.Exists(_pathSource).Returns(true);
         _mockFileSystem.Directory.Exists(_pathSourceSubDir).Returns(true);
         _mockFileSystem.Directory.Exists(_pathDestination).Returns(false);
@@ -632,13 +632,13 @@ public class DirectoryProviderServiceTests
         sourceDirectoryInfo.GetDirectories().Returns([mockSubDir]);
         _mockFileSystem.DirectoryInfo.New(_pathSource).Returns(sourceDirectoryInfo);
 
-        // mock subdirectory info
+        // Mock subdirectory info.
         IDirectoryInfo subDirInfo = Substitute.For<IDirectoryInfo>();
         subDirInfo.GetFiles().Returns([]);
         subDirInfo.GetDirectories().Returns([]);
         _mockFileSystem.DirectoryInfo.New(_pathSourceSubDir).Returns(subDirInfo);
 
-        // mock the Path.Combine method for all necessary cases
+        // Mock the Path.Combine method for all necessary cases.
         _mockFileSystem.Path.Combine(Arg.Any<string>(), Arg.Any<string>())
             .Returns(callInfo => Path.Combine(callInfo.ArgAt<string>(0), callInfo.ArgAt<string>(1)));
 

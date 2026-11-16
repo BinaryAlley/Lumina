@@ -132,7 +132,7 @@ public class InstallThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
         await _apiFactory.CreateAndAuthenticateAdminUserAsync(client);
 
         // Act
-        // a multipart upload carrying a 0 byte archive reaches the theme service, which must reject it without crashing
+        // A multipart upload carrying a 0 byte archive reaches the theme service, which must reject it without crashing.
         using MultipartFormDataContent form = CreateMultipartForm([], "pack.zip", "application/zip");
         HttpResponseMessage response = await client.PostAsync("/api/v1/themes", form);
         string content = await response.Content.ReadAsStringAsync();
@@ -187,7 +187,7 @@ public class InstallThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
         {
             ["theme.json"] = VALID_MANIFEST_JSON,
             ["templates/default.html"] = "<html><body>default</body></html>",
-            [@"..\evil.txt"] = "evil" // path traversal entry inside the archive
+            [@"..\evil.txt"] = "evil" // Path traversal entry inside the archive.
         });
 
         // Act

@@ -303,9 +303,9 @@ public class GetConsumptionStatisticsEndpointTests : IClassFixture<Authenticated
     }
 
     [Theory]
-    [InlineData("999")] // a number that is not a member name
-    [InlineData("1")] // a number that is a defined enumeration value, which must still be rejected
-    [InlineData("not-a-media-kind")] // a name that is not a member of the enumeration
+    [InlineData("999")] // A number that is not a member name.
+    [InlineData("1")] // A number that is a defined enumeration value, which must still be rejected.
+    [InlineData("not-a-media-kind")] // A name that is not a member of the enumeration.
     public async Task GetConsumptionStatistics_WhenMediaKindIsNotAMemberName_ShouldReturnValidationProblem(string mediaKind)
     {
         // Arrange
@@ -337,8 +337,8 @@ public class GetConsumptionStatisticsEndpointTests : IClassFixture<Authenticated
     }
 
     [Theory]
-    [InlineData("not-a-date")] // a textual value that is not a date
-    [InlineData("2026-13-45T99:99:99")] // a value with out of range components
+    [InlineData("not-a-date")] // A textual value that is not a date.
+    [InlineData("2026-13-45T99:99:99")] // A value with out of range components.
     public async Task GetConsumptionStatistics_WhenADateBoundIsNotAValidDate_ShouldReturnValidationProblem(string invalidDate)
     {
         // Arrange

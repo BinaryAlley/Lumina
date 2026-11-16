@@ -180,10 +180,10 @@ public class CoverArtArchiveHttpClientTests
     }
 
     [Theory]
-    [InlineData("https://evil.example/index.json")] // an unrelated public host
-    [InlineData("https://localhost/index.json")] // the loopback host name
-    [InlineData("https://127.0.0.1/index.json")] // the IPv4 loopback address
-    [InlineData("https://169.254.169.254/latest/meta-data/")] // the link local cloud metadata endpoint
+    [InlineData("https://evil.example/index.json")] // An unrelated public host.
+    [InlineData("https://localhost/index.json")] // The loopback host name.
+    [InlineData("https://127.0.0.1/index.json")] // The IPv4 loopback address.
+    [InlineData("https://169.254.169.254/latest/meta-data/")] // The link local cloud metadata endpoint.
     public async Task GetReleaseArtworkAsync_WhenTheRedirectPointsAtADisallowedHost_ShouldThrow(string location)
     {
         // Arrange

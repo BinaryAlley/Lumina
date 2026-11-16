@@ -111,7 +111,7 @@ public class OpfReaderSecurityTests
             MetadataDto? result = await provider.GetMetadataAsync(_bookMetadataLookupDtoFixture.Create(path: bookPath), CancellationToken.None);
 
             // Assert
-            // a malformed OPF must be swallowed and must not leak an exception to the caller
+            // A malformed OPF must be swallowed and must not leak an exception to the caller.
             Assert.NotNull(result);
             Assert.Null(((BookMetadataDto)result!).Title);
         }

@@ -47,8 +47,8 @@ public class GetLibraryItemsEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Books--")] // destructive SQL injection
-    [InlineData("' OR '1'='1")] // basic SQL injection
+    [InlineData("'; DROP TABLE Books--")] // Destructive SQL injection.
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
     public async Task GetLibraryItems_WhenCalledWithInjectionInSearchTerm_ShouldRemainSecure(string maliciousSearchTerm)
     {
         // Arrange

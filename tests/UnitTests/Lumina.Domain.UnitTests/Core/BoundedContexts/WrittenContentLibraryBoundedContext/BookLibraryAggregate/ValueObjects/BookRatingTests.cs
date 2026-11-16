@@ -38,8 +38,8 @@ public class BookRatingTests
     }
 
     [Theory]
-    [InlineData(-1)] // negative value
-    [InlineData(-0.5)] // negative fractional value
+    [InlineData(-1)] // Negative value.
+    [InlineData(-0.5)] // Negative fractional value.
     public void Create_WhenValueIsNegative_ShouldReturnError(double value)
     {
         // Act

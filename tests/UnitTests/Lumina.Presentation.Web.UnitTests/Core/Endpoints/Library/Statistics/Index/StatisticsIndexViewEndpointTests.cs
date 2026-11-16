@@ -190,9 +190,9 @@ public class StatisticsIndexViewEndpointTests
     }
 
     [Theory]
-    [InlineData(null)] // no identifier claim at all
-    [InlineData("")] // empty identifier claim
-    [InlineData("not-a-guid")] // identifier claim that is not a GUID
+    [InlineData(null)] // No identifier claim at all.
+    [InlineData("")] // Empty identifier claim.
+    [InlineData("not-a-guid")] // Identifier claim that is not a GUID.
     public async Task ExecuteAsync_WhenNameIdentifierIsMissingOrNotAGuid_ShouldLeaveCurrentUserIdNull(string? nameIdentifier)
     {
         // Arrange

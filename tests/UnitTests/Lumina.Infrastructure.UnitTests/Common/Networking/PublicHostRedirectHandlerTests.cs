@@ -33,13 +33,13 @@ public class PublicHostRedirectHandlerTests
     }
 
     [Theory]
-    [InlineData("http://127.0.0.1/cover.jpg")] // the IPv4 loopback address
-    [InlineData("http://localhost/cover.jpg")] // the loopback host name
-    [InlineData("http://[::1]/cover.jpg")] // the IPv6 loopback address
-    [InlineData("http://169.254.169.254/latest/meta-data/")] // the link local cloud metadata endpoint
-    [InlineData("http://10.0.0.5/cover.jpg")] // a private class A address
-    [InlineData("http://172.16.0.1/cover.jpg")] // a private class B address
-    [InlineData("http://192.168.1.10/cover.jpg")] // a private class C address
+    [InlineData("http://127.0.0.1/cover.jpg")] // The IPv4 loopback address.
+    [InlineData("http://localhost/cover.jpg")] // The loopback host name.
+    [InlineData("http://[::1]/cover.jpg")] // The IPv6 loopback address.
+    [InlineData("http://169.254.169.254/latest/meta-data/")] // The link local cloud metadata endpoint.
+    [InlineData("http://10.0.0.5/cover.jpg")] // A private class A address.
+    [InlineData("http://172.16.0.1/cover.jpg")] // A private class B address.
+    [InlineData("http://192.168.1.10/cover.jpg")] // A private class C address.
     public async Task SendAsync_WhenTheInitialRequestHostIsPrivateOrLocal_ShouldThrowAndNotSendTheRequest(string url)
     {
         // Arrange
@@ -83,12 +83,12 @@ public class PublicHostRedirectHandlerTests
     }
 
     [Theory]
-    [InlineData("http://archive.org/index.json")] // a downgrade of a trusted host to plain HTTP
-    [InlineData("https://127.0.0.1/index.json")] // the IPv4 loopback address
-    [InlineData("https://localhost/index.json")] // the loopback host name
-    [InlineData("https://169.254.169.254/latest/meta-data/")] // the link local cloud metadata endpoint
-    [InlineData("https://10.0.0.5/index.json")] // a private class A address
-    [InlineData("https://192.168.1.10/index.json")] // a private class C address
+    [InlineData("http://archive.org/index.json")] // A downgrade of a trusted host to plain HTTP.
+    [InlineData("https://127.0.0.1/index.json")] // The IPv4 loopback address.
+    [InlineData("https://localhost/index.json")] // The loopback host name.
+    [InlineData("https://169.254.169.254/latest/meta-data/")] // The link local cloud metadata endpoint.
+    [InlineData("https://10.0.0.5/index.json")] // A private class A address.
+    [InlineData("https://192.168.1.10/index.json")] // A private class C address.
     public async Task SendAsync_WhenTheInitialRequestRedirectsToADisallowedTarget_ShouldThrow(string location)
     {
         // Arrange

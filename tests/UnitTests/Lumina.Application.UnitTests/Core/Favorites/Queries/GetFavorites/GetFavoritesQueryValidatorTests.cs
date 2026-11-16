@@ -61,12 +61,12 @@ public class GetFavoritesQueryValidatorTests
     }
 
     [Theory]
-    [InlineData(FavoriteMediaKind.MusicArtist)] // a catalogued music kind
-    [InlineData(FavoriteMediaKind.MusicAlbum)] // a catalogued music kind
-    [InlineData(FavoriteMediaKind.MusicTrack)] // a catalogued music kind
-    [InlineData(FavoriteMediaKind.Book)] // a catalogued written content kind
-    [InlineData(FavoriteMediaKind.Video)] // a planned kind is still a defined enumeration member
-    [InlineData(FavoriteMediaKind.Photo)] // a planned kind is still a defined enumeration member
+    [InlineData(FavoriteMediaKind.MusicArtist)] // A catalogued music kind.
+    [InlineData(FavoriteMediaKind.MusicAlbum)] // A catalogued music kind.
+    [InlineData(FavoriteMediaKind.MusicTrack)] // A catalogued music kind.
+    [InlineData(FavoriteMediaKind.Book)] // A catalogued written content kind.
+    [InlineData(FavoriteMediaKind.Video)] // A planned kind is still a defined enumeration member.
+    [InlineData(FavoriteMediaKind.Photo)] // A planned kind is still a defined enumeration member.
     public void Validate_WhenMediaKindIsDefined_ShouldNotHaveValidationError(FavoriteMediaKind mediaKind)
     {
         // Arrange

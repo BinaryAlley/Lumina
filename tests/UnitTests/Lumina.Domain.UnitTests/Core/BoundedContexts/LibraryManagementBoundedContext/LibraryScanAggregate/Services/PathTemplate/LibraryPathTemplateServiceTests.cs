@@ -219,8 +219,8 @@ public class LibraryPathTemplateServiceTests
     }
 
     [Theory]
-    [InlineData("")] // the relative path is empty
-    [InlineData("   ")] // the relative path is whitespace
+    [InlineData("")] // The relative path is empty.
+    [InlineData("   ")] // The relative path is whitespace.
     public void Parse_WhenRelativePathIsEmpty_ShouldReturnNull(string relativePath)
     {
         // Act

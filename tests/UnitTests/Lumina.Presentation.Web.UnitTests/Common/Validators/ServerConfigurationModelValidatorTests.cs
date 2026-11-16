@@ -33,8 +33,8 @@ public class ServerConfigurationModelValidatorTests
     }
 
     [Theory]
-    [InlineData((ushort)0)] // minimum allowed value
-    [InlineData((ushort)65535)] // maximum allowed value
+    [InlineData((ushort)0)] // Minimum allowed value.
+    [InlineData((ushort)65535)] // Maximum allowed value.
     public void Validate_WhenPortIsAtBoundary_ShouldNotHaveValidationError(ushort port)
     {
         // Arrange
@@ -48,8 +48,8 @@ public class ServerConfigurationModelValidatorTests
     }
 
     [Theory]
-    [InlineData((char)0)] // minimum allowed API version
-    [InlineData((char)255)] // maximum allowed API version
+    [InlineData((char)0)] // Minimum allowed API version.
+    [InlineData((char)255)] // Maximum allowed API version.
     public void Validate_WhenApiVersionIsAtBoundary_ShouldNotHaveValidationError(char apiVersion)
     {
         // Arrange

@@ -115,7 +115,7 @@ public class MusicBrainzAlbumMetadataProviderTests
         Assert.Equal("Other Album", result[1].Title);
         Assert.Equal(1, handler.CallCount);
         Assert.Contains("limit=10", handler.Requests[0].RequestUri!.Query);
-        // the quotes are removed from the built query, and the artist constraint is appended
+        // The quotes are removed from the built query, and the artist constraint is appended.
         string query = Uri.UnescapeDataString(handler.Requests[0].RequestUri!.Query);
         Assert.Contains("releasegroup:\"The Album\"", query);
         Assert.Contains("AND artist:\"The Artist\"", query);
@@ -231,7 +231,7 @@ public class MusicBrainzAlbumMetadataProviderTests
         Assert.NotNull(result);
         Assert.Equal("The Album", result.Title);
         Assert.Equal(s_releaseGroupId, result.MusicBrainzReleaseGroupId);
-        // the search, the detail lookup and the release browse are all used
+        // The search, the detail lookup and the release browse are all used.
         Assert.Equal(3, handler.CallCount);
         Assert.Contains("limit=1", handler.Requests[0].RequestUri!.Query);
     }
@@ -461,7 +461,7 @@ public class MusicBrainzAlbumMetadataProviderTests
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.CatalogNumbers);
-        // every distinct catalog number is kept, while the duplicates are removed.
+        // Every distinct catalog number is kept, while the duplicates are removed.
         Assert.Equal(["EMC 4008", "0C 066-98 485"], result.CatalogNumbers);
         Assert.Equal("EMI", result.Label);
     }

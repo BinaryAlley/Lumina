@@ -95,7 +95,7 @@ public class ApiReachabilityHealthCheckTests
     /// <returns>The created <see cref="HealthCheckContext"/> instance.</returns>
     private static HealthCheckContext CreateHealthCheckContext(IHealthCheck healthCheck)
     {
-        // the ApiReachabilityHealthCheck never reads the registration, so a bare context is sufficient
+        // The ApiReachabilityHealthCheck never reads the registration, so a bare context is sufficient.
         return new HealthCheckContext();
     }
 

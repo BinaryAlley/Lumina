@@ -35,10 +35,10 @@ public class GetTagConsumptionQueryValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the target user Id is empty
-    [InlineData("   ")] // the target user Id is whitespace only
-    [InlineData("not-a-guid")] // the target user Id is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the target user Id is the empty Guid
+    [InlineData("")] // The target user Id is empty.
+    [InlineData("   ")] // The target user Id is whitespace only.
+    [InlineData("not-a-guid")] // The target user Id is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The target user Id is the empty Guid.
     public void Validate_WhenTargetUserIdIsEmptyOrInvalid_ShouldHaveValidationError(string targetUserId)
     {
         // Arrange
@@ -78,10 +78,10 @@ public class GetTagConsumptionQueryValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the library Id is empty
-    [InlineData("   ")] // the library Id is whitespace only
-    [InlineData("not-a-guid")] // the library Id is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the library Id is the empty Guid
+    [InlineData("")] // The library Id is empty.
+    [InlineData("   ")] // The library Id is whitespace only.
+    [InlineData("not-a-guid")] // The library Id is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The library Id is the empty Guid.
     public void Validate_WhenLibraryIdIsEmptyOrInvalid_ShouldHaveValidationError(string libraryId)
     {
         // Arrange
@@ -147,10 +147,10 @@ public class GetTagConsumptionQueryValidatorTests
     }
 
     [Theory]
-    [InlineData(nameof(MediaKind.MusicTrack))] // a kind supported by the current catalogues
-    [InlineData(nameof(MediaKind.Book))] // another kind supported by the current catalogues
-    [InlineData(nameof(MediaKind.Movie))] // a kind without a catalogue, still a defined kind
-    [InlineData(nameof(MediaKind.Photo))] // a kind that every session counts for, still a defined kind
+    [InlineData(nameof(MediaKind.MusicTrack))] // A kind supported by the current catalogues.
+    [InlineData(nameof(MediaKind.Book))] // Another kind supported by the current catalogues.
+    [InlineData(nameof(MediaKind.Movie))] // A kind without a catalogue, still a defined kind.
+    [InlineData(nameof(MediaKind.Photo))] // A kind that every session counts for, still a defined kind.
     public void Validate_WhenMediaKindIsDefined_ShouldNotHaveValidationError(string mediaKind)
     {
         // Arrange
@@ -223,9 +223,9 @@ public class GetTagConsumptionQueryValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // an empty bound
-    [InlineData("not-a-date")] // a textual value that is not a date
-    [InlineData("2026-13-45T99:99:99")] // a value with out of range components
+    [InlineData("")] // An empty bound.
+    [InlineData("not-a-date")] // A textual value that is not a date.
+    [InlineData("2026-13-45T99:99:99")] // A value with out of range components.
     public void Validate_WhenADateRangeBoundIsNotAValidDate_ShouldHaveValidationError(string invalidBound)
     {
         // Arrange

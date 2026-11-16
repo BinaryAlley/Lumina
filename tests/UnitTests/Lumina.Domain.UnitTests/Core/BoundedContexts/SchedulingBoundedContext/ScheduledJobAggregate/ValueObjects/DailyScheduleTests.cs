@@ -29,8 +29,8 @@ public class DailyScheduleTests
     }
 
     [Theory]
-    [InlineData(-1)] // hour below the allowed range
-    [InlineData(24)] // hour above the allowed range
+    [InlineData(-1)] // Hour below the allowed range.
+    [InlineData(24)] // Hour above the allowed range.
     public void Create_WhenHourIsOutOfRange_ShouldReturnError(int hour)
     {
         // Act
@@ -42,8 +42,8 @@ public class DailyScheduleTests
     }
 
     [Theory]
-    [InlineData(-1)] // minute below the allowed range
-    [InlineData(60)] // minute above the allowed range
+    [InlineData(-1)] // Minute below the allowed range.
+    [InlineData(60)] // Minute above the allowed range.
     public void Create_WhenMinuteIsOutOfRange_ShouldReturnError(int minute)
     {
         // Act
@@ -131,8 +131,8 @@ public class DailyScheduleTests
     }
 
     [Theory]
-    [InlineData(9, 30)] // different hour
-    [InlineData(8, 31)] // different minute
+    [InlineData(9, 30)] // Different hour.
+    [InlineData(8, 31)] // Different minute.
     public void Equals_WhenHourOrMinuteDiffer_ShouldReturnFalse(int hour, int minute)
     {
         // Act

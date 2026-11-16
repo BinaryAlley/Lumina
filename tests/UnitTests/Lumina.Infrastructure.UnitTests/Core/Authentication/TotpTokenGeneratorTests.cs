@@ -56,10 +56,10 @@ public class TotpTokenGeneratorTests
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    [InlineData("123456")] // Valid format but wrong token
-    [InlineData("abcdef")] // Invalid format
-    [InlineData("12345")] // Too short
-    [InlineData("1234567")] // Too long
+    [InlineData("123456")] // Valid format but wrong token.
+    [InlineData("abcdef")] // Invalid format.
+    [InlineData("12345")] // Too short.
+    [InlineData("1234567")] // Too long.
     public void ValidateToken_WhenTokenIsInvalid_ShouldReturnFalse(string invalidToken)
     {
         // Arrange
@@ -95,6 +95,6 @@ public class TotpTokenGeneratorTests
         byte[] secret = _sut.GenerateSecret();
 
         // Assert
-        Assert.Equal(20, secret.Length); // standard TOTP secret length
+        Assert.Equal(20, secret.Length); // Standard TOTP secret length.
     }
 }

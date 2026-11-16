@@ -75,8 +75,8 @@ public class ThemeEngineOptionsDtoValidatorTests
     }
 
     [Theory]
-    [InlineData(0L)] // zero, not positive
-    [InlineData(-1L)] // negative
+    [InlineData(0L)] // Zero, not positive.
+    [InlineData(-1L)] // Negative.
     public void Validate_WhenMaxArchiveBytesIsNotPositive_ShouldHaveValidationError(long maxArchiveBytes)
     {
         // Arrange
@@ -91,8 +91,8 @@ public class ThemeEngineOptionsDtoValidatorTests
     }
 
     [Theory]
-    [InlineData(0L)] // zero, not positive
-    [InlineData(-1L)] // negative
+    [InlineData(0L)] // Zero, not positive.
+    [InlineData(-1L)] // Negative.
     public void Validate_WhenMaxExpandedBytesIsNotPositive_ShouldHaveValidationError(long maxExpandedBytes)
     {
         // Arrange
@@ -107,8 +107,8 @@ public class ThemeEngineOptionsDtoValidatorTests
     }
 
     [Theory]
-    [InlineData(0L)] // zero, not positive
-    [InlineData(-1L)] // negative
+    [InlineData(0L)] // Zero, not positive.
+    [InlineData(-1L)] // Negative.
     public void Validate_WhenMaxSingleFileBytesIsNotPositive_ShouldHaveValidationError(long maxSingleFileBytes)
     {
         // Arrange
@@ -123,8 +123,8 @@ public class ThemeEngineOptionsDtoValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // zero, not positive
-    [InlineData(-1)] // negative
+    [InlineData(0)] // Zero, not positive.
+    [InlineData(-1)] // Negative.
     public void Validate_WhenMaxEntriesIsNotPositive_ShouldHaveValidationError(int maxEntries)
     {
         // Arrange

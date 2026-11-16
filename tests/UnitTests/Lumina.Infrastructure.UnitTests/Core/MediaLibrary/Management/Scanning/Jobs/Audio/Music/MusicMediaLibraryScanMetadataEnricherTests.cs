@@ -103,7 +103,7 @@ public class MusicMediaLibraryScanMetadataEnricherTests
         _userId = _userIdFixture.Create();
         _libraryId = _libraryIdFixture.Create();
 
-        // the configured providers are registered under the plugin Ids they are configured with, the way the host registers plugin provided services
+        // The configured providers are registered under the plugin Ids they are configured with, the way the host registers plugin provided services.
         Guid pluginAId = Guid.NewGuid();
         Guid pluginBId = Guid.NewGuid();
         _mockMetadataConfigurationRepository.GetByLibraryIdAsync(_libraryId.Value, Arg.Any<CancellationToken>())
@@ -153,7 +153,7 @@ public class MusicMediaLibraryScanMetadataEnricherTests
         await _sut.EnrichAsync(_libraryId, _scanId, _userId, CancellationToken.None);
 
         // Assert
-        // the total is the sum of the artists, the albums and the tracks, and the final update reaches it
+        // The total is the sum of the artists, the albums and the tracks, and the final update reaches it.
         await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanJobProgressChangedDomainEvent>(domainEvent =>
             domainEvent.MediaLibraryScanCompositeId.ScanId == _scanId
             && domainEvent.Progress.CompletedItems == 0
@@ -215,7 +215,7 @@ public class MusicMediaLibraryScanMetadataEnricherTests
         ArtistEntity artist = _artistEntityFixture.Create(libraryId: _libraryId.Value);
         _mockArtistRepository.GetArtistsNeedingMetadataAsync(_libraryId.Value, Arg.Any<string?>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(Result<IReadOnlyList<ArtistEntity>>.Success([artist]), Result<IReadOnlyList<ArtistEntity>>.Success([]));
-        // a genre without a name is usable as metadata, but makes the domain conversion of the whole metadata fail
+        // A genre without a name is usable as metadata, but makes the domain conversion of the whole metadata fail.
         _mockProviderA.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())
             .Returns((MetadataDto?)CreateApplicableArtistMetadata("Local Artist", genres: [_genreDtoFixture.Create(includeName: false)]));
         _mockProviderB.GetMetadataAsync(Arg.Any<MetadataLookupDto>(), Arg.Any<CancellationToken>())

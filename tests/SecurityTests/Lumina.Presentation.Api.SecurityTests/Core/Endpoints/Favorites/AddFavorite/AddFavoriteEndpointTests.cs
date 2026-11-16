@@ -81,12 +81,12 @@ public class AddFavoriteEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE Favorites--")] // destructive injection
-    [InlineData("1; DELETE FROM Favorites")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
-    [InlineData("Ünïcödé-💥")] // non ascii input
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE Favorites--")] // Destructive injection.
+    [InlineData("1; DELETE FROM Favorites")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
+    [InlineData("Ünïcödé-💥")] // Non ascii input.
     public async Task AddFavorite_WithInjectionInMediaKind_ShouldRejectWithoutLeakingOrChangingData(string maliciousMediaKind)
     {
         // Arrange
@@ -102,12 +102,12 @@ public class AddFavoriteEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE Favorites--")] // destructive injection
-    [InlineData("1; DELETE FROM Favorites")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
-    [InlineData("Ünïcödé-💥")] // non ascii input
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE Favorites--")] // Destructive injection.
+    [InlineData("1; DELETE FROM Favorites")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
+    [InlineData("Ünïcödé-💥")] // Non ascii input.
     public async Task AddFavorite_WithInjectionInMediaItemId_ShouldRejectWithoutLeakingOrChangingData(string maliciousMediaItemId)
     {
         // Arrange

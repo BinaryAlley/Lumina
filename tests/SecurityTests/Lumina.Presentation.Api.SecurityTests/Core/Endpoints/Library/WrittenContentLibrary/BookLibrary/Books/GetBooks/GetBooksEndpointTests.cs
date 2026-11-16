@@ -57,8 +57,8 @@ public class GetBooksEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Books; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Books; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task GetBooks_WhenSearchTermContainsSqlInjection_ShouldNotCorruptOrDeleteData(string maliciousSearchTerm)
     {
         // Arrange
@@ -77,7 +77,7 @@ public class GetBooksEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(maliciousSearchTerm, content, StringComparison.Ordinal);
 
-        // the injected statement must never be executed: the Books table and the seeded rows must still be there
+        // The injected statement must never be executed: the Books table and the seeded rows must still be there.
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         Assert.Equal(1, await dbContext.Books.CountAsync(book => book.LibraryId == libraryId));
@@ -116,8 +116,8 @@ public class GetBooksEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Books; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Books; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task GetBooks_WithSQLInjectionInRouteId_ShouldNotCorruptOrLeakData(string maliciousLibraryId)
     {
         // Arrange
@@ -148,6 +148,6 @@ public class GetBooksEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     /// </summary>
     public void Dispose()
     {
-        // nothing to clean up: each test removes its own seeded rows
+        // Nothing to clean up: each test removes its own seeded rows.
     }
 }

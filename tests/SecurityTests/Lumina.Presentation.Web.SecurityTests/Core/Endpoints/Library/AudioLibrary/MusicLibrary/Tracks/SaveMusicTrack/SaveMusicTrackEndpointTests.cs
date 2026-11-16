@@ -43,8 +43,8 @@ public class SaveMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task SaveMusicTrack_WithSQLInjectionInRouteId_ShouldNormalizeTheIdAndNeverCallAnotherTrack(string maliciousId)
     {
         // Arrange
@@ -72,8 +72,8 @@ public class SaveMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task SaveMusicTrack_WithSQLInjectionInLibraryQueryId_ShouldNormalizeTheLibraryId(string maliciousLibraryId)
     {
         // Arrange
@@ -99,8 +99,8 @@ public class SaveMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task SaveMusicTrack_WithSQLInjectionInPostedTitle_ShouldNotLeakOrExecuteIt(string maliciousTitle)
     {
         // Arrange
@@ -130,8 +130,8 @@ public class SaveMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("C:\\Windows\\System32\\drivers\\etc\\hosts")] // Windows sensitive file
-    [InlineData("/etc/passwd")] // Unix sensitive file
+    [InlineData("C:\\Windows\\System32\\drivers\\etc\\hosts")] // Windows sensitive file.
+    [InlineData("/etc/passwd")] // Unix sensitive file.
     public async Task SaveMusicTrack_WhenPostedBodyAttemptsToSetTheFilePath_ShouldNotForwardAFilePathToTheApi(string attemptedPath)
     {
         // Arrange

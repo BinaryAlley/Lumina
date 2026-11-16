@@ -403,7 +403,7 @@ public class DataSeedServiceTests
         Guid userId = Guid.NewGuid();
         RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
         UserEntity adminUser = _userEntityFixture.Create();
-        // Use the adminUser.Id instead of the randomly generated userId
+        // Use the adminUser.Id instead of the randomly generated userId.
         userId = adminUser.Id;
 
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();

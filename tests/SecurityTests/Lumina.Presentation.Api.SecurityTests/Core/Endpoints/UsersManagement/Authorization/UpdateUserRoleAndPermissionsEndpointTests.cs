@@ -144,8 +144,8 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<LuminaApi
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE UserRoles; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE UserRoles; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateUserRoleAndPermissions_WithInjectionInUserIdRouteSegment_ShouldNotLeakOrExecuteSql(string maliciousUserId)
     {
         // Arrange
@@ -161,10 +161,10 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<LuminaApi
         HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/auth/users/{Uri.EscapeDataString(maliciousUserId)}/role-and-permissions", request);
 
         // Assert
-        // note: the {userId} route parameter is Guid-typed, so the malicious value fails model binding before it reaches the handler
-        // note: observed status is 500 because FastEndpoints, combined with DontCatchExceptions(), turns the binding failure into a
-        // 500 response instead of 400/422 (pre-existing production bug, not fixed here), and that body leaks the binding exception details
-        // note: what matters is that the injection never reaches the database, so no SQL engine error (SqliteException) may surface
+        // Note: the {userId} route parameter is Guid-typed, so the malicious value fails model binding before it reaches the handler.
+        // Note: observed status is 500 because FastEndpoints, combined with DontCatchExceptions(), turns the binding failure into a
+        // 500 response instead of 400/422 (pre-existing production bug, not fixed here), and that body leaks the binding exception details.
+        // Note: what matters is that the injection never reaches the database, so no SQL engine error (SqliteException) may surface.
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
@@ -174,12 +174,12 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<LuminaApi
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE UserPermissions; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE UserPermissions; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateUserRoleAndPermissions_WithInjectionInPermissionsBody_ShouldNotLeakOrExecuteSql(string maliciousPermissionId)
     {
         // Arrange
-        // authenticate as an admin and seed the target user, so a well-formed body would reach the handler and be authorized
+        // Authenticate as an admin and seed the target user, so a well-formed body would reach the handler and be authorized.
         HttpClient client = _apiFactory.CreateClient();
         _adminUserId = await _apiFactory.CreateAndAuthenticateAdminUserAsync(client);
         UserEntity targetUser = await SeedTargetUserAsync();

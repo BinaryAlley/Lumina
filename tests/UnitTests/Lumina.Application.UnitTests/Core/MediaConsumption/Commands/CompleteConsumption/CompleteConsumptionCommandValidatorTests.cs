@@ -34,10 +34,10 @@ public class CompleteConsumptionCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the consumption record Id is empty
-    [InlineData("   ")] // the consumption record Id is whitespace only
-    [InlineData("not-a-guid")] // the consumption record Id is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the consumption record Id is the empty Guid
+    [InlineData("")] // The consumption record Id is empty.
+    [InlineData("   ")] // The consumption record Id is whitespace only.
+    [InlineData("not-a-guid")] // The consumption record Id is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The consumption record Id is the empty Guid.
     public void Validate_WhenConsumptionRecordIdIsEmptyOrInvalid_ShouldHaveValidationError(string consumptionRecordId)
     {
         // Arrange
@@ -182,8 +182,8 @@ public class CompleteConsumptionCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(-1)] // a negative offset cannot describe a position within a media item
-    [InlineData(-0.5)] // a fractional negative offset is rejected the same way
+    [InlineData(-1)] // A negative offset cannot describe a position within a media item.
+    [InlineData(-0.5)] // A fractional negative offset is rejected the same way.
     public void Validate_WhenPositionKindIsTimeOffsetAndOffsetIsNegative_ShouldHaveValidationError(double timeOffsetInSeconds)
     {
         // Arrange
@@ -199,9 +199,9 @@ public class CompleteConsumptionCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(double.NaN)] // not a number is not a position
-    [InlineData(double.PositiveInfinity)] // an infinite offset is not a position
-    [InlineData(double.NegativeInfinity)] // a negative infinite offset is not a position either
+    [InlineData(double.NaN)] // Not a number is not a position.
+    [InlineData(double.PositiveInfinity)] // An infinite offset is not a position.
+    [InlineData(double.NegativeInfinity)] // A negative infinite offset is not a position either.
     public void Validate_WhenPositionKindIsTimeOffsetAndOffsetIsNotFinite_ShouldHaveValidationError(double timeOffsetInSeconds)
     {
         // Arrange
@@ -340,8 +340,8 @@ public class CompleteConsumptionCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(-0.1)] // a fraction below zero is not a fraction of the media item
-    [InlineData(1.1)] // a fraction above one is not a fraction of the media item
+    [InlineData(-0.1)] // A fraction below zero is not a fraction of the media item.
+    [InlineData(1.1)] // A fraction above one is not a fraction of the media item.
     public void Validate_WhenProgressFractionIsOutsideItsRange_ShouldHaveValidationError(double progressFraction)
     {
         // Arrange
@@ -355,9 +355,9 @@ public class CompleteConsumptionCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(double.NaN)] // not a number is not a fraction
-    [InlineData(double.PositiveInfinity)] // an infinite fraction is not a fraction
-    [InlineData(double.NegativeInfinity)] // a negative infinite fraction is not a fraction
+    [InlineData(double.NaN)] // Not a number is not a fraction.
+    [InlineData(double.PositiveInfinity)] // An infinite fraction is not a fraction.
+    [InlineData(double.NegativeInfinity)] // A negative infinite fraction is not a fraction.
     public void Validate_WhenProgressFractionIsNotFinite_ShouldHaveValidationError(double progressFraction)
     {
         // Arrange
@@ -371,9 +371,9 @@ public class CompleteConsumptionCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // the start of the media item is a valid fraction
-    [InlineData(0.5)] // a fraction in between the boundaries is valid
-    [InlineData(1)] // the end of the media item is a valid fraction
+    [InlineData(0)] // The start of the media item is a valid fraction.
+    [InlineData(0.5)] // A fraction in between the boundaries is valid.
+    [InlineData(1)] // The end of the media item is a valid fraction.
     public void Validate_WhenProgressFractionIsWithinItsRange_ShouldNotHaveValidationError(double progressFraction)
     {
         // Arrange
@@ -400,8 +400,8 @@ public class CompleteConsumptionCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(-1)] // a negative duration cannot describe consumed time
-    [InlineData(-0.5)] // a fractional negative duration is rejected the same way
+    [InlineData(-1)] // A negative duration cannot describe consumed time.
+    [InlineData(-0.5)] // A fractional negative duration is rejected the same way.
     public void Validate_WhenConsumedDurationIsNegative_ShouldHaveValidationError(double consumedDurationInSeconds)
     {
         // Arrange
@@ -415,9 +415,9 @@ public class CompleteConsumptionCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(double.NaN)] // not a number is not a duration
-    [InlineData(double.PositiveInfinity)] // an infinite duration is not a duration
-    [InlineData(double.NegativeInfinity)] // a negative infinite duration is not a duration
+    [InlineData(double.NaN)] // Not a number is not a duration.
+    [InlineData(double.PositiveInfinity)] // An infinite duration is not a duration.
+    [InlineData(double.NegativeInfinity)] // A negative infinite duration is not a duration.
     public void Validate_WhenConsumedDurationIsNotFinite_ShouldHaveValidationError(double consumedDurationInSeconds)
     {
         // Arrange
@@ -444,8 +444,8 @@ public class CompleteConsumptionCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // a session that consumed no time is valid
-    [InlineData(2_678_400)] // exactly the maximum accepted duration is valid
+    [InlineData(0)] // A session that consumed no time is valid.
+    [InlineData(2_678_400)] // Exactly the maximum accepted duration is valid.
     public void Validate_WhenConsumedDurationIsWithinItsRange_ShouldNotHaveValidationError(double consumedDurationInSeconds)
     {
         // Arrange
@@ -486,8 +486,8 @@ public class CompleteConsumptionCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // no pages read is still a valid count
-    [InlineData(42)] // a positive count is valid
+    [InlineData(0)] // No pages read is still a valid count.
+    [InlineData(42)] // A positive count is valid.
     public void Validate_WhenConsecutivePagesReadIsNotNegative_ShouldNotHaveValidationError(int consecutivePagesRead)
     {
         // Arrange

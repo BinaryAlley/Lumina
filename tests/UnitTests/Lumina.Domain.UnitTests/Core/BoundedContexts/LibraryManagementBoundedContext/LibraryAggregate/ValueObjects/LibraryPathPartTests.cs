@@ -41,9 +41,9 @@ public class LibraryPathPartTests
     }
 
     [Theory]
-    [InlineData(null)] // the representation is absent
-    [InlineData("")] // the representation is empty
-    [InlineData("   ")] // the representation is whitespace
+    [InlineData(null)] // The representation is absent.
+    [InlineData("")] // The representation is empty.
+    [InlineData("   ")] // The representation is whitespace.
     public void Create_WhenKindIsNotSeparatorAndRepresentationIsEmpty_ShouldReturnLiteralCannotBeEmptyError(string? representation)
     {
         // Act
@@ -78,8 +78,8 @@ public class LibraryPathPartTests
     }
 
     [Theory]
-    [InlineData("no placeholder")] // the mask carries no value placeholder
-    [InlineData("{0} {0}")] // the mask carries more than one value placeholder
+    [InlineData("no placeholder")] // The mask carries no value placeholder.
+    [InlineData("{0} {0}")] // The mask carries more than one value placeholder.
     public void Create_WhenTypedPartDoesNotContainExactlyOnePlaceholder_ShouldReturnError(string representation)
     {
         // Act

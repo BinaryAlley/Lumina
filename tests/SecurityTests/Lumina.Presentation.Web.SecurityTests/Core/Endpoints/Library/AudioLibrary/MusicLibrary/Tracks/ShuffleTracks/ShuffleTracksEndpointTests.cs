@@ -63,8 +63,8 @@ public class ShuffleTracksEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task ShuffleTracks_WithInjectionInLibraryId_ShouldRejectTheRequestWithoutCallingTheApi(string payload)
     {
         // Arrange
@@ -81,8 +81,8 @@ public class ShuffleTracksEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task ShuffleTracks_WithInjectionInCount_ShouldRejectTheRequestWithoutCallingTheApi(string payload)
     {
         // Arrange
@@ -99,8 +99,8 @@ public class ShuffleTracksEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task ShuffleTracks_WithInjectionInExcludedTrackIds_ShouldRejectTheRequestWithoutCallingTheApi(string payload)
     {
         // Arrange

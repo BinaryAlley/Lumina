@@ -37,8 +37,8 @@ public class Id3TagReaderTests : IDisposable
     }
 
     [Theory]
-    [InlineData("")] // an empty path
-    [InlineData("   ")] // a white space path
+    [InlineData("")] // An empty path.
+    [InlineData("   ")] // A white space path.
     public void Read_WhenPathIsEmptyOrWhiteSpace_ShouldReturnNull(string path)
     {
         // Act

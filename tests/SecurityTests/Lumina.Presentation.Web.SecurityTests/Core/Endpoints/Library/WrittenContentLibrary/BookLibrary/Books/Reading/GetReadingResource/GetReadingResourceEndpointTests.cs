@@ -47,8 +47,8 @@ public class GetReadingResourceEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("../../etc/passwd")] // directory traversal
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("../../etc/passwd")] // Directory traversal.
     public async Task GetReadingResource_WhenCalledWithMaliciousResourceKey_ShouldRemainSecure(string maliciousResourceKey)
     {
         // Arrange

@@ -58,8 +58,8 @@ public class GetReadingAvailabilityEndpointTests : IClassFixture<LuminaApiFactor
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Books--")] // destructive injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Books--")] // Destructive injection.
     public async Task GetReadingAvailability_WithSQLInjectionInBookId_ShouldNotLeakDatabaseDetails(string maliciousBookId)
     {
         // Arrange

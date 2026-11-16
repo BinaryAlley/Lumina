@@ -35,10 +35,10 @@ public class DeleteConsumptionItemHistoryCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the target user Id is empty
-    [InlineData("   ")] // the target user Id is whitespace only
-    [InlineData("not-a-guid")] // the target user Id is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the target user Id is the empty Guid
+    [InlineData("")] // The target user Id is empty.
+    [InlineData("   ")] // The target user Id is whitespace only.
+    [InlineData("not-a-guid")] // The target user Id is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The target user Id is the empty Guid.
     public void Validate_WhenTargetUserIdIsEmptyOrInvalid_ShouldHaveValidationError(string targetUserId)
     {
         // Arrange
@@ -78,11 +78,11 @@ public class DeleteConsumptionItemHistoryCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the media kind is empty
-    [InlineData("   ")] // the media kind is whitespace only
-    [InlineData("not-a-media-kind")] // the media kind is not a member name
-    [InlineData("999")] // the media kind is numeric, which must not be accepted as a member name
-    [InlineData("None")] // None is not a valid media kind for a consumption record
+    [InlineData("")] // The media kind is empty.
+    [InlineData("   ")] // The media kind is whitespace only.
+    [InlineData("not-a-media-kind")] // The media kind is not a member name.
+    [InlineData("999")] // The media kind is numeric, which must not be accepted as a member name.
+    [InlineData("None")] // None is not a valid media kind for a consumption record.
     public void Validate_WhenMediaKindIsInvalid_ShouldHaveValidationError(string mediaKind)
     {
         // Arrange
@@ -96,11 +96,11 @@ public class DeleteConsumptionItemHistoryCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(nameof(MediaKind.MusicTrack))] // a kind supported by the current catalogues
-    [InlineData(nameof(MediaKind.Book))] // another kind supported by the current catalogues
-    [InlineData(nameof(MediaKind.Movie))] // a kind without a catalogue, still a defined kind
-    [InlineData(nameof(MediaKind.Photo))] // a kind that every session counts for, still a defined kind
-    [InlineData("musicTrack")] // member names are matched case-insensitively
+    [InlineData(nameof(MediaKind.MusicTrack))] // A kind supported by the current catalogues.
+    [InlineData(nameof(MediaKind.Book))] // Another kind supported by the current catalogues.
+    [InlineData(nameof(MediaKind.Movie))] // A kind without a catalogue, still a defined kind.
+    [InlineData(nameof(MediaKind.Photo))] // A kind that every session counts for, still a defined kind.
+    [InlineData("musicTrack")] // Member names are matched case-insensitively.
     public void Validate_WhenMediaKindIsDefined_ShouldNotHaveValidationError(string mediaKind)
     {
         // Arrange
@@ -127,10 +127,10 @@ public class DeleteConsumptionItemHistoryCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the media item Id is empty
-    [InlineData("   ")] // the media item Id is whitespace only
-    [InlineData("not-a-guid")] // the media item Id is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the media item Id is the empty Guid
+    [InlineData("")] // The media item Id is empty.
+    [InlineData("   ")] // The media item Id is whitespace only.
+    [InlineData("not-a-guid")] // The media item Id is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The media item Id is the empty Guid.
     public void Validate_WhenMediaItemIdIsEmptyOrInvalid_ShouldHaveValidationError(string mediaItemId)
     {
         // Arrange
@@ -170,10 +170,10 @@ public class DeleteConsumptionItemHistoryCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the library Id is empty
-    [InlineData("   ")] // the library Id is whitespace only
-    [InlineData("not-a-guid")] // the library Id is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the library Id is the empty Guid
+    [InlineData("")] // The library Id is empty.
+    [InlineData("   ")] // The library Id is whitespace only.
+    [InlineData("not-a-guid")] // The library Id is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The library Id is the empty Guid.
     public void Validate_WhenLibraryIdIsEmptyOrInvalid_ShouldHaveValidationError(string libraryId)
     {
         // Arrange

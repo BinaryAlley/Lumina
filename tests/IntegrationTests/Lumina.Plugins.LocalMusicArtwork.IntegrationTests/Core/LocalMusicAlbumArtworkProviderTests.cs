@@ -217,10 +217,10 @@ public class LocalMusicAlbumArtworkProviderTests : IDisposable
     }
 
     [Theory]
-    [InlineData(null)] // a null path contributes no artwork
-    [InlineData("")] // an empty path contributes no artwork
-    [InlineData("   ")] // a white space path contributes no artwork
-    [InlineData("track.flac")] // a path without a directory part contributes no artwork
+    [InlineData(null)] // A null path contributes no artwork.
+    [InlineData("")] // An empty path contributes no artwork.
+    [InlineData("   ")] // A white space path contributes no artwork.
+    [InlineData("track.flac")] // A path without a directory part contributes no artwork.
     public async Task GetArtworkAsync_WhenTheTrackPathDoesNotPointToADirectory_ShouldReturnEmpty(string? trackPath)
     {
         // Arrange

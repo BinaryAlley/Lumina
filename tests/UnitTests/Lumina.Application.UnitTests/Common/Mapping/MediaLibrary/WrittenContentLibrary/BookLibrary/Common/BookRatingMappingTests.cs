@@ -92,19 +92,19 @@ public class BookRatingMappingTests
 
         List<BookRatingEntity> resultList = [.. results];
 
-        // complete rating
+        // Complete rating.
         Assert.Equal(bookRatings[0].Value, resultList[0].Value);
         Assert.Equal(bookRatings[0].MaxValue, resultList[0].MaxValue);
         Assert.Equal(bookRatings[0].Source.Value, resultList[0].Source);
         Assert.Equal(bookRatings[0].VoteCount.Value, resultList[0].VoteCount);
 
-        // rating without source
+        // Rating without source.
         Assert.Equal(bookRatings[1].Value, resultList[1].Value);
         Assert.Equal(bookRatings[1].MaxValue, resultList[1].MaxValue);
         Assert.Null(resultList[1].Source);
         Assert.Equal(bookRatings[1].VoteCount.Value, resultList[1].VoteCount);
 
-        // rating without vote count
+        // Rating without vote count.
         Assert.Equal(bookRatings[2].Value, resultList[2].Value);
         Assert.Equal(bookRatings[2].MaxValue, resultList[2].MaxValue);
         Assert.Equal(bookRatings[2].Source.Value, resultList[2].Source);

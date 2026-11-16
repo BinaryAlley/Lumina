@@ -65,9 +65,9 @@ public class ScheduledJobTests
     }
 
     [Theory]
-    [InlineData(null)] // null name
-    [InlineData("")] // empty name
-    [InlineData("   ")] // whitespace name
+    [InlineData(null)] // Null name.
+    [InlineData("")] // Empty name.
+    [InlineData("   ")] // Whitespace name.
     public void Create_WhenNameIsEmptyOrWhitespace_ShouldReturnError(string? name)
     {
         // Act
@@ -124,9 +124,9 @@ public class ScheduledJobTests
     }
 
     [Theory]
-    [InlineData(ScheduledJobStatus.Active)] // cannot add an already active scheduled job
-    [InlineData(ScheduledJobStatus.Running)] // cannot add a running scheduled job
-    [InlineData(ScheduledJobStatus.Completed)] // cannot add a completed scheduled job
+    [InlineData(ScheduledJobStatus.Active)] // Cannot add an already active scheduled job.
+    [InlineData(ScheduledJobStatus.Running)] // Cannot add a running scheduled job.
+    [InlineData(ScheduledJobStatus.Completed)] // Cannot add a completed scheduled job.
     public void Add_WhenStatusIsNotAdded_ShouldReturnError(ScheduledJobStatus status)
     {
         // Arrange
@@ -159,8 +159,8 @@ public class ScheduledJobTests
     }
 
     [Theory]
-    [InlineData(ScheduledJobStatus.Active)] // cannot start an already active execution cycle
-    [InlineData(ScheduledJobStatus.Running)] // cannot start a running execution cycle
+    [InlineData(ScheduledJobStatus.Active)] // Cannot start an already active execution cycle.
+    [InlineData(ScheduledJobStatus.Running)] // Cannot start a running execution cycle.
     public void StartCycle_WhenCycleAlreadyStarted_ShouldReturnError(ScheduledJobStatus status)
     {
         // Arrange
@@ -217,8 +217,8 @@ public class ScheduledJobTests
     }
 
     [Theory]
-    [InlineData(ScheduledJobStatus.Added)] // cannot stop a cycle that was never started
-    [InlineData(ScheduledJobStatus.Completed)] // cannot stop a finished one time execution
+    [InlineData(ScheduledJobStatus.Added)] // Cannot stop a cycle that was never started.
+    [InlineData(ScheduledJobStatus.Completed)] // Cannot stop a finished one time execution.
     public void StopCycle_WhenCycleWasNeverStarted_ShouldReturnError(ScheduledJobStatus status)
     {
         // Arrange
@@ -285,8 +285,8 @@ public class ScheduledJobTests
     }
 
     [Theory]
-    [InlineData(true)] // cycle run
-    [InlineData(false)] // one time run
+    [InlineData(true)] // Cycle run.
+    [InlineData(false)] // One time run.
     public void MarkExecutionStarted_WhenStatusIsNotRunning_ShouldTransitionToRunningAndRaiseExecutionStartedEvent(bool isCycleRun)
     {
         // Arrange
@@ -326,8 +326,8 @@ public class ScheduledJobTests
     }
 
     [Theory]
-    [InlineData(true)] // a cycle run returns the scheduled job to its active status
-    [InlineData(false)] // a one time execution completes the scheduled job
+    [InlineData(true)] // A cycle run returns the scheduled job to its active status.
+    [InlineData(false)] // A one time execution completes the scheduled job.
     public void MarkExecutionCompleted_WhenStatusIsRunning_ShouldTransitionStatusAndRaiseExecutionCompletedEvent(bool isCycleRun)
     {
         // Arrange
@@ -352,9 +352,9 @@ public class ScheduledJobTests
     }
 
     [Theory]
-    [InlineData(ScheduledJobStatus.Added)] // cannot complete an execution that never started
-    [InlineData(ScheduledJobStatus.Active)] // cannot complete an execution that never started
-    [InlineData(ScheduledJobStatus.Completed)] // cannot complete an already completed execution
+    [InlineData(ScheduledJobStatus.Added)] // Cannot complete an execution that never started.
+    [InlineData(ScheduledJobStatus.Active)] // Cannot complete an execution that never started.
+    [InlineData(ScheduledJobStatus.Completed)] // Cannot complete an already completed execution.
     public void MarkExecutionCompleted_WhenStatusIsNotRunning_ShouldReturnError(ScheduledJobStatus status)
     {
         // Arrange

@@ -33,10 +33,10 @@ public class GetConsumptionRecordQueryValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the consumption record Id is empty
-    [InlineData("   ")] // the consumption record Id is whitespace only
-    [InlineData("not-a-guid")] // the consumption record Id is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the consumption record Id is the empty Guid
+    [InlineData("")] // The consumption record Id is empty.
+    [InlineData("   ")] // The consumption record Id is whitespace only.
+    [InlineData("not-a-guid")] // The consumption record Id is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The consumption record Id is the empty Guid.
     public void Validate_WhenConsumptionRecordIdIsEmptyOrInvalid_ShouldHaveValidationError(string consumptionRecordId)
     {
         // Arrange

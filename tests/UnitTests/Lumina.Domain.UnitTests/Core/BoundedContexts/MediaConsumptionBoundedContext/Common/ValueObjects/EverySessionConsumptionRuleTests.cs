@@ -27,9 +27,9 @@ public class EverySessionConsumptionRuleTests
     }
 
     [Theory]
-    [InlineData(ConsumptionStatus.InProgress)] // a session that is still running
-    [InlineData(ConsumptionStatus.Completed)] // a session that reached its completion
-    [InlineData(ConsumptionStatus.Stopped)] // a session that ended before completion
+    [InlineData(ConsumptionStatus.InProgress)] // A session that is still running.
+    [InlineData(ConsumptionStatus.Completed)] // A session that reached its completion.
+    [InlineData(ConsumptionStatus.Stopped)] // A session that ended before completion.
     public void Counts_WhenSessionHasZeroDurationAndZeroPages_ShouldReturnTrue(ConsumptionStatus status)
     {
         // Act
@@ -40,9 +40,9 @@ public class EverySessionConsumptionRuleTests
     }
 
     [Theory]
-    [InlineData(ConsumptionStatus.InProgress)] // a session that is still running
-    [InlineData(ConsumptionStatus.Completed)] // a session that reached its completion
-    [InlineData(ConsumptionStatus.Stopped)] // a session that ended before completion
+    [InlineData(ConsumptionStatus.InProgress)] // A session that is still running.
+    [InlineData(ConsumptionStatus.Completed)] // A session that reached its completion.
+    [InlineData(ConsumptionStatus.Stopped)] // A session that ended before completion.
     public void Counts_WhenSessionHasLargeDurationAndLargePageCount_ShouldReturnTrue(ConsumptionStatus status)
     {
         // Act

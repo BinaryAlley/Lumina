@@ -66,7 +66,7 @@ public class IsbnDtoMappingTests
         Assert.False(result.IsFailure);
         Assert.NotNull(result.Value);
         Assert.Equal(dto.Value, result.Value.Value);
-        Assert.Equal(IsbnFormat.Isbn13, result.Value.Format); // default format
+        Assert.Equal(IsbnFormat.Isbn13, result.Value.Format); // Default format.
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public class IsbnDtoMappingTests
         Assert.Equal(dtos[1].Format!.Value, resultList[1].Value.Format);
 
         Assert.Equal(dtos[2].Value, resultList[2].Value.Value);
-        Assert.Equal(IsbnFormat.Isbn13, resultList[2].Value.Format); // default format
+        Assert.Equal(IsbnFormat.Isbn13, resultList[2].Value.Format); // Default format.
     }
 
     [Fact]

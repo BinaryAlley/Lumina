@@ -123,7 +123,7 @@ public class HandlersCallTheirValidatorsTests
         int offset = 0;
         while (offset < il.Length)
         {
-            // read the opcode, handling the 0xFE prefix used by two-byte opcodes
+            // Read the opcode, handling the 0xFE prefix used by two-byte opcodes.
             short opCodeValue = il[offset];
             int opCodeSize = 1;
             if (opCodeValue == 0xFE && offset + 1 < il.Length)
@@ -152,15 +152,15 @@ public class HandlersCallTheirValidatorsTests
                 }
                 catch (ArgumentException)
                 {
-                    // the token is not a valid method token, skip it
+                    // The token is not a valid method token, skip it.
                 }
                 catch (BadImageFormatException)
                 {
-                    // the token references corrupt metadata, skip it
+                    // The token references corrupt metadata, skip it.
                 }
                 catch (InvalidOperationException)
                 {
-                    // the token cannot be resolved as a method, skip it
+                    // The token cannot be resolved as a method, skip it.
                 }
             }
 

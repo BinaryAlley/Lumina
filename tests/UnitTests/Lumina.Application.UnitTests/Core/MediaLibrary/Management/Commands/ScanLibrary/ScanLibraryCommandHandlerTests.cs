@@ -63,7 +63,7 @@ public class ScanLibraryCommandHandlerTests
         _mockValidator = Substitute.For<IValidator<ScanLibraryCommand>>();
         _userId = Guid.NewGuid();
 
-        // default stubs: the current user is authenticated and the ownership policy allows the scan
+        // Default stubs: the current user is authenticated and the ownership policy allows the scan.
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(true);

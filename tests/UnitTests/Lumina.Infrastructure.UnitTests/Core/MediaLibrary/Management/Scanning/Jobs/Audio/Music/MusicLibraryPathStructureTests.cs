@@ -26,8 +26,8 @@ public class MusicLibraryPathStructureTests
     }
 
     [Theory]
-    [InlineData('\\', @"C:\Music\Queen\A Night at the Opera", @"C:\Music\Queen\A Night at the Opera\Bohemian Rhapsody.flac")] // Windows separated path
-    [InlineData('/', "/music/queen/a-night-at-the-opera", "/music/queen/a-night-at-the-opera/bohemian-rhapsody.flac")] // Unix separated path
+    [InlineData('\\', @"C:\Music\Queen\A Night at the Opera", @"C:\Music\Queen\A Night at the Opera\Bohemian Rhapsody.flac")] // Windows separated path.
+    [InlineData('/', "/music/queen/a-night-at-the-opera", "/music/queen/a-night-at-the-opera/bohemian-rhapsody.flac")] // Unix separated path.
     public void GetAlbumDirectory_WhenTheTrackIsInTheAlbumDirectory_ShouldReturnTheTrackDirectory(char separator, string albumDirectory, string trackPath)
     {
         // Arrange
@@ -41,14 +41,14 @@ public class MusicLibraryPathStructureTests
     }
 
     [Theory]
-    [InlineData('\\', "Disc 1")] // canonical disc directory name, Windows separated path
-    [InlineData('\\', "disc 2")] // lowercase disc directory name, Windows separated path
-    [InlineData('\\', "CD3")] // compact disc directory name, Windows separated path
-    [InlineData('\\', "disk4")] // disk directory name, Windows separated path
-    [InlineData('/', "Disc 1")] // canonical disc directory name, Unix separated path
-    [InlineData('/', "disc 2")] // lowercase disc directory name, Unix separated path
-    [InlineData('/', "CD3")] // compact disc directory name, Unix separated path
-    [InlineData('/', "disk4")] // disk directory name, Unix separated path
+    [InlineData('\\', "Disc 1")] // Canonical disc directory name, Windows separated path.
+    [InlineData('\\', "disc 2")] // Lowercase disc directory name, Windows separated path.
+    [InlineData('\\', "CD3")] // Compact disc directory name, Windows separated path.
+    [InlineData('\\', "disk4")] // Disk directory name, Windows separated path.
+    [InlineData('/', "Disc 1")] // Canonical disc directory name, Unix separated path.
+    [InlineData('/', "disc 2")] // Lowercase disc directory name, Unix separated path.
+    [InlineData('/', "CD3")] // Compact disc directory name, Unix separated path.
+    [InlineData('/', "disk4")] // Disk directory name, Unix separated path.
     public void GetAlbumDirectory_WhenTheTrackIsInADiscDirectory_ShouldReturnTheParentAlbumDirectory(char separator, string discDirectoryName)
     {
         // Arrange
@@ -64,8 +64,8 @@ public class MusicLibraryPathStructureTests
     }
 
     [Theory]
-    [InlineData('\\')] // Windows separated path
-    [InlineData('/')] // Unix separated path
+    [InlineData('\\')] // Windows separated path.
+    [InlineData('/')] // Unix separated path.
     public void GetAlbumDirectory_WhenTheDirectoryIsNotADiscDirectory_ShouldReturnTheTrackDirectory(char separator)
     {
         // Arrange
@@ -93,8 +93,8 @@ public class MusicLibraryPathStructureTests
     }
 
     [Theory]
-    [InlineData('\\')] // Windows separated path
-    [InlineData('/')] // Unix separated path
+    [InlineData('\\')] // Windows separated path.
+    [InlineData('/')] // Unix separated path.
     public void GetAlbumDirectory_WhenThePathHasNoDirectory_ShouldReturnTheProvidedPath(char separator)
     {
         // Arrange
@@ -109,10 +109,10 @@ public class MusicLibraryPathStructureTests
     }
 
     [Theory]
-    [InlineData('\\', "Album")] // canonical release type directory, Windows separated path
-    [InlineData('\\', "album")] // lowercase release type directory, Windows separated path
-    [InlineData('/', "Album")] // canonical release type directory, Unix separated path
-    [InlineData('/', "album")] // lowercase release type directory, Unix separated path
+    [InlineData('\\', "Album")] // Canonical release type directory, Windows separated path.
+    [InlineData('\\', "album")] // Lowercase release type directory, Windows separated path.
+    [InlineData('/', "Album")] // Canonical release type directory, Unix separated path.
+    [InlineData('/', "album")] // Lowercase release type directory, Unix separated path.
     public void GetReleaseTypeDirectoryName_WhenTheParentOfTheAlbumDirectoryIsAReleaseType_ShouldReturnIt(char separator, string releaseTypeDirectoryName)
     {
         // Arrange
@@ -127,8 +127,8 @@ public class MusicLibraryPathStructureTests
     }
 
     [Theory]
-    [InlineData('\\')] // Windows separated path
-    [InlineData('/')] // Unix separated path
+    [InlineData('\\')] // Windows separated path.
+    [InlineData('/')] // Unix separated path.
     public void GetReleaseTypeDirectoryName_WhenTheAlbumIsMultiDisc_ShouldReturnTheReleaseTypeDirectory(char separator)
     {
         // Arrange
@@ -143,8 +143,8 @@ public class MusicLibraryPathStructureTests
     }
 
     [Theory]
-    [InlineData('\\')] // Windows separated path
-    [InlineData('/')] // Unix separated path
+    [InlineData('\\')] // Windows separated path.
+    [InlineData('/')] // Unix separated path.
     public void GetReleaseTypeDirectoryName_WhenTheParentOfTheAlbumDirectoryIsNotAReleaseType_ShouldReturnNull(char separator)
     {
         // Arrange
@@ -159,10 +159,10 @@ public class MusicLibraryPathStructureTests
     }
 
     [Theory]
-    [InlineData('\\', "Live")] // release type name used as the artist directory name, Windows separated path
-    [InlineData('/', "Live")] // release type name used as the artist directory name, Unix separated path
-    [InlineData('\\', "42")] // numeric artist directory name, Windows separated path
-    [InlineData('/', "42")] // numeric artist directory name, Unix separated path
+    [InlineData('\\', "Live")] // Release type name used as the artist directory name, Windows separated path.
+    [InlineData('/', "Live")] // Release type name used as the artist directory name, Unix separated path.
+    [InlineData('\\', "42")] // Numeric artist directory name, Windows separated path.
+    [InlineData('/', "42")] // Numeric artist directory name, Unix separated path.
     public void GetReleaseTypeDirectoryName_WhenTheArtistDirectoryIsNamedLikeAReleaseType_ShouldReturnNull(char separator, string artistName)
     {
         // Arrange
@@ -178,8 +178,8 @@ public class MusicLibraryPathStructureTests
     }
 
     [Theory]
-    [InlineData('\\')] // Windows separated path
-    [InlineData('/')] // Unix separated path
+    [InlineData('\\')] // Windows separated path.
+    [InlineData('/')] // Unix separated path.
     public void GetReleaseTypeDirectoryName_WhenAReleaseTypeDirectoryDiffersFromTheArtistDirectory_ShouldReturnIt(char separator)
     {
         // Arrange

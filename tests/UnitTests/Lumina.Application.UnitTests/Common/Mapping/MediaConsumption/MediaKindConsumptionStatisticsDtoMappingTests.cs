@@ -43,8 +43,8 @@ public class MediaKindConsumptionStatisticsDtoMappingTests
     }
 
     [Theory]
-    [InlineData(1_500, 1.5)] // half a second survives the conversion
-    [InlineData(2_000, 2)] // a whole number of seconds stays whole
+    [InlineData(1_500, 1.5)] // Half a second survives the conversion.
+    [InlineData(2_000, 2)] // A whole number of seconds stays whole.
     public void ToResponse_WhenDurationIsInMilliseconds_ShouldConvertToSeconds(long consumedDurationMilliseconds, double expectedSeconds)
     {
         // Arrange

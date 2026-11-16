@@ -48,7 +48,7 @@ public class GetEnabledLibrariesQueryHandlerTests
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _userId = Guid.NewGuid();
 
-        // default stubs: the current user is authenticated and is an admin
+        // Default stubs: the current user is authenticated and is an admin.
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(true);
 

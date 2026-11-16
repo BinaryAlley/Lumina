@@ -149,15 +149,15 @@ public class GetResumePointEndpointTests
     }
 
     [Theory]
-    [InlineData("Book", "Book")] // canonical member name
-    [InlineData("book", "Book")] // lowercase member name
-    [InlineData("BOOK", "Book")] // uppercase member name
-    [InlineData("MusicTrack", "MusicTrack")] // another canonical member name
-    [InlineData("musicTrack", "MusicTrack")] // mixed case member name
-    [InlineData("TvEpisode", "TvEpisode")] // another canonical member name
-    [InlineData("tvEpisode", "TvEpisode")] // another mixed case member name
-    [InlineData("PodcastEpisode", "PodcastEpisode")] // another canonical member name
-    [InlineData("podcastepisode", "PodcastEpisode")] // another lowercase member name
+    [InlineData("Book", "Book")] // Canonical member name.
+    [InlineData("book", "Book")] // Lowercase member name.
+    [InlineData("BOOK", "Book")] // Uppercase member name.
+    [InlineData("MusicTrack", "MusicTrack")] // Another canonical member name.
+    [InlineData("musicTrack", "MusicTrack")] // Mixed case member name.
+    [InlineData("TvEpisode", "TvEpisode")] // Another canonical member name.
+    [InlineData("tvEpisode", "TvEpisode")] // Another mixed case member name.
+    [InlineData("PodcastEpisode", "PodcastEpisode")] // Another canonical member name.
+    [InlineData("podcastepisode", "PodcastEpisode")] // Another lowercase member name.
     public async Task ExecuteAsync_WhenMediaKindNameIsValid_ShouldForwardTheCanonicalMemberName(string routeMediaKind, string expectedMediaKind)
     {
         // Arrange
@@ -175,14 +175,14 @@ public class GetResumePointEndpointTests
     }
 
     [Theory]
-    [InlineData("1")] // numeric enum value
-    [InlineData("0")] // numeric enum value, the None member
-    [InlineData("NotAMediaKind")] // undefined member name
-    [InlineData("MusicTrack,Book")] // comma separated member names
-    [InlineData("Music Track")] // member name with a space
-    [InlineData("MusicTrack/../..")] // path traversal attempt
-    [InlineData("..")] // dot segment
-    [InlineData("MusicTrack%2F..")] // encoded slash traversal attempt
+    [InlineData("1")] // Numeric enum value.
+    [InlineData("0")] // Numeric enum value, the None member.
+    [InlineData("NotAMediaKind")] // Undefined member name.
+    [InlineData("MusicTrack,Book")] // Comma separated member names.
+    [InlineData("Music Track")] // Member name with a space.
+    [InlineData("MusicTrack/../..")] // Path traversal attempt.
+    [InlineData("..")] // Dot segment.
+    [InlineData("MusicTrack%2F..")] // Encoded slash traversal attempt.
     public async Task ExecuteAsync_WhenMediaKindNameIsRejected_ShouldForwardTheInvalidPlaceholder(string routeMediaKind)
     {
         // Arrange
@@ -249,9 +249,9 @@ public class GetResumePointEndpointTests
     }
 
     [Theory]
-    [InlineData("MediaResumePointNotFound")] // the user has no resume point for the media item
-    [InlineData("BookNotFound")] // the book of the resume point no longer exists
-    [InlineData("TrackNotFound")] // the track of the resume point no longer exists
+    [InlineData("MediaResumePointNotFound")] // The user has no resume point for the media item.
+    [InlineData("BookNotFound")] // The book of the resume point no longer exists.
+    [InlineData("TrackNotFound")] // The track of the resume point no longer exists.
     public async Task ExecuteAsync_WhenApiReportsAnAbsentResumePoint_ShouldReturnSuccessWithNullData(string detail)
     {
         // Arrange
@@ -289,8 +289,8 @@ public class GetResumePointEndpointTests
     }
 
     [Theory]
-    [InlineData(HttpStatusCode.Forbidden)] // authorization failure reported by the API
-    [InlineData(HttpStatusCode.InternalServerError)] // unexpected API failure
+    [InlineData(HttpStatusCode.Forbidden)] // Authorization failure reported by the API.
+    [InlineData(HttpStatusCode.InternalServerError)] // Unexpected API failure.
     public async Task ExecuteAsync_WhenApiReturnsAnErrorOtherThanAnAbsentResumePoint_ShouldRethrow(HttpStatusCode httpStatusCode)
     {
         // Arrange

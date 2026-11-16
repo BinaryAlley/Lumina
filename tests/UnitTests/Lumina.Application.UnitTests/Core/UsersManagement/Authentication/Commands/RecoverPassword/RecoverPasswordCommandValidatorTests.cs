@@ -104,12 +104,12 @@ public class RecoverPasswordCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("12345")] // Too short
-    [InlineData("1234567")] // Too long
-    [InlineData("abcdef")] // Contains letters
-    [InlineData("12345a")] // Contains letters
-    [InlineData("12.345")] // Contains special characters
-    [InlineData("12 345")] // Contains whitespace
+    [InlineData("12345")] // Too short.
+    [InlineData("1234567")] // Too long.
+    [InlineData("abcdef")] // Contains letters.
+    [InlineData("12345a")] // Contains letters.
+    [InlineData("12.345")] // Contains special characters.
+    [InlineData("12 345")] // Contains whitespace.
     public void Validate_WhenTotpCodeIsInvalid_ShouldHaveValidationError(string totpCode)
     {
         // Arrange

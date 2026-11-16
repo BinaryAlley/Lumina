@@ -125,7 +125,7 @@ public class BooksMediaLibraryItemDeletionStrategyTests
         Result<Success> result = await _sut.DeleteItemAsync(libraryId.Value, book.Path, CancellationToken.None);
 
         // Assert
-        // a failing artwork deletion must not prevent the book from being removed, so the deletion is only logged
+        // A failing artwork deletion must not prevent the book from being removed, so the deletion is only logged.
         Assert.True(result.IsSuccess);
         await _mockBookRepository.Received(1).DeleteByIdAsync(book.Id, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());

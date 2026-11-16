@@ -142,7 +142,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Assert.NotNull(trackResponse);
         Assert.Equal(trackId, trackResponse!.Id);
         Assert.Equal(libraryId, trackResponse.LibraryId);
-        // the file system path is preserved by the update, it is set only when the track is created
+        // The file system path is preserved by the update, it is set only when the track is created.
         Assert.Equal(originalPath, trackResponse.Path);
         Assert.Equal("Somebody to Love", trackResponse.Metadata!.Title);
 
@@ -191,7 +191,7 @@ public class UpdateTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         string content = await response.Content.ReadAsStringAsync();
         TrackResponse? trackResponse = JsonSerializer.Deserialize<TrackResponse>(content, _jsonOptions);
         Assert.NotNull(trackResponse);
-        // the posted file system path is ignored, because a track path is set only when the track is created by the scanner
+        // The posted file system path is ignored, because a track path is set only when the track is created by the scanner.
         Assert.Equal(originalPath, trackResponse!.Path);
         Assert.NotEqual(attemptedPath, trackResponse.Path);
         Assert.Equal("Somebody to Love", trackResponse.Metadata!.Title);

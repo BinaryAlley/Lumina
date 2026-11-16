@@ -37,8 +37,8 @@ public class FavoriteMediaKindTests
             nameof(FavoriteMediaKind.MusicAlbum),
             nameof(FavoriteMediaKind.MusicTrack),
             nameof(FavoriteMediaKind.Book),
-            nameof(FavoriteMediaKind.Video), // planned: video libraries are not catalogued yet
-            nameof(FavoriteMediaKind.Photo) // planned: photo libraries are not catalogued yet
+            nameof(FavoriteMediaKind.Video), // Planned: video libraries are not catalogued yet.
+            nameof(FavoriteMediaKind.Photo) // Planned: photo libraries are not catalogued yet.
         ];
         Assert.Equal(expectedNames, names);
     }
@@ -57,8 +57,8 @@ public class FavoriteMediaKindTests
             FavoriteMediaKind.MusicAlbum,
             FavoriteMediaKind.MusicTrack,
             FavoriteMediaKind.Book,
-            FavoriteMediaKind.Video, // planned: video libraries are not catalogued yet
-            FavoriteMediaKind.Photo // planned: photo libraries are not catalogued yet
+            FavoriteMediaKind.Video, // Planned: video libraries are not catalogued yet.
+            FavoriteMediaKind.Photo // Planned: photo libraries are not catalogued yet.
         ];
         int[] expectedUnderlyingValues = [0, 1, 2, 3, 4, 5, 6];
         Assert.Equal(expectedValues, values);

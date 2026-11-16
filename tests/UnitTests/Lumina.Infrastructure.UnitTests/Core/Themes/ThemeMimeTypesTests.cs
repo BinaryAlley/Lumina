@@ -31,7 +31,7 @@ public class ThemeMimeTypesTests
     public void GetMimeType_WhenExtensionIsKnown_ShouldReturnMappedContentType(string filePath, string expectedContentType)
     {
         // Arrange
-        // filePath and expectedContentType are provided by the test data
+        // filePath and expectedContentType are provided by the test data.
 
         // Act
         string result = ThemeMimeTypes.GetMimeType(filePath);

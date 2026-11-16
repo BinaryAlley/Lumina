@@ -35,9 +35,9 @@ public class MusicArtistAliasDtoMappingTests
     }
 
     [Theory]
-    [InlineData(null)] // missing name
-    [InlineData("")] // empty name
-    [InlineData("   ")] // whitespace name
+    [InlineData(null)] // Missing name.
+    [InlineData("")] // Empty name.
+    [InlineData("   ")] // Whitespace name.
     public void ToDomainValueObject_WhenNameIsNullOrWhitespace_ShouldReturnError(string? name)
     {
         // Arrange

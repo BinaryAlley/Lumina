@@ -42,9 +42,9 @@ public class IsbnTests
     }
 
     [Theory]
-    [InlineData(null)] // null ISBN value
-    [InlineData("")] // empty ISBN value
-    [InlineData("   ")] // whitespace ISBN value
+    [InlineData(null)] // Null ISBN value.
+    [InlineData("")] // Empty ISBN value.
+    [InlineData("   ")] // Whitespace ISBN value.
     public void Create_WhenValueIsNullOrWhitespace_ShouldReturnError(string? value)
     {
         // Act
@@ -100,8 +100,8 @@ public class IsbnTests
     }
 
     [Theory]
-    [InlineData("0-306-40615-2")] // valid ISBN-10 with hyphens
-    [InlineData("0306406152")] // valid ISBN-10 without hyphens
+    [InlineData("0-306-40615-2")] // Valid ISBN-10 with hyphens.
+    [InlineData("0306406152")] // Valid ISBN-10 without hyphens.
     public void IsValidIsbn10_WhenValueIsValid_ShouldReturnTrue(string isbn)
     {
         // Act
@@ -112,11 +112,11 @@ public class IsbnTests
     }
 
     [Theory]
-    [InlineData("0-306-40615-3")] // invalid check digit
-    [InlineData("030640615")] // too short
-    [InlineData("03064061523")] // too long
-    [InlineData("")] // empty value
-    [InlineData("ISBN 0-306-40615-2")] // ISBN prefix is not stripped by the checksum computation
+    [InlineData("0-306-40615-3")] // Invalid check digit.
+    [InlineData("030640615")] // Too short.
+    [InlineData("03064061523")] // Too long.
+    [InlineData("")] // Empty value.
+    [InlineData("ISBN 0-306-40615-2")] // ISBN prefix is not stripped by the checksum computation.
     public void IsValidIsbn10_WhenValueIsInvalid_ShouldReturnFalse(string isbn)
     {
         // Act
@@ -127,9 +127,9 @@ public class IsbnTests
     }
 
     [Theory]
-    [InlineData("978-0-306-40615-7")] // valid ISBN-13 with hyphens
-    [InlineData("9780306406157")] // valid ISBN-13 without hyphens
-    [InlineData("979-0-306-40615-6")] // valid ISBN-13 with 979 prefix
+    [InlineData("978-0-306-40615-7")] // Valid ISBN-13 with hyphens.
+    [InlineData("9780306406157")] // Valid ISBN-13 without hyphens.
+    [InlineData("979-0-306-40615-6")] // Valid ISBN-13 with 979 prefix.
     public void IsValidIsbn13_WhenValueIsValid_ShouldReturnTrue(string isbn)
     {
         // Act
@@ -140,11 +140,11 @@ public class IsbnTests
     }
 
     [Theory]
-    [InlineData("978-0-306-40615-8")] // invalid check digit
-    [InlineData("978030640615")] // too short
-    [InlineData("97803064061578")] // too long
-    [InlineData("")] // empty value
-    [InlineData("ISBN 978-0-306-40615-7")] // ISBN prefix is not stripped by the checksum computation
+    [InlineData("978-0-306-40615-8")] // Invalid check digit.
+    [InlineData("978030640615")] // Too short.
+    [InlineData("97803064061578")] // Too long.
+    [InlineData("")] // Empty value.
+    [InlineData("ISBN 978-0-306-40615-7")] // ISBN prefix is not stripped by the checksum computation.
     public void IsValidIsbn13_WhenValueIsInvalid_ShouldReturnFalse(string isbn)
     {
         // Act

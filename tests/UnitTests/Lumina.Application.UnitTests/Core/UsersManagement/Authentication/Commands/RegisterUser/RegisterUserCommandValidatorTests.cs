@@ -160,12 +160,12 @@ public class RegisterUserCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("password123")] // missing uppercase and special character
-    [InlineData("PASSWORD123")] // missing special character
-    [InlineData("Password123")] // missing special character
-    [InlineData("Password!@#")] // missing number
-    [InlineData("Pass1!")] // too short
-    [InlineData("password")] // missing uppercase, number, and special character
+    [InlineData("password123")] // Missing uppercase and special character.
+    [InlineData("PASSWORD123")] // Missing special character.
+    [InlineData("Password123")] // Missing special character.
+    [InlineData("Password!@#")] // Missing number.
+    [InlineData("Pass1!")] // Too short.
+    [InlineData("password")] // Missing uppercase, number, and special character.
     public void Validate_WhenPasswordDoesNotMatchPattern_ShouldHaveValidationError(string password)
     {
         // Arrange
@@ -180,10 +180,10 @@ public class RegisterUserCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("Password1!")] // valid password
-    [InlineData("Complex1@Password")] // valid password
-    [InlineData("MyP@ssw0rd")] // valid password
-    [InlineData("Abcd123!@#")] // valid password
+    [InlineData("Password1!")] // Valid password.
+    [InlineData("Complex1@Password")] // Valid password.
+    [InlineData("MyP@ssw0rd")] // Valid password.
+    [InlineData("Abcd123!@#")] // Valid password.
     public void Validate_WhenPasswordMatchesPattern_ShouldNotHaveValidationError(string password)
     {
         // Arrange
@@ -219,9 +219,9 @@ public class RegisterUserCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("a")] // too short
-    [InlineData("ab")] // too short
-    [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")] // too long (256 chars)
+    [InlineData("a")] // Too short.
+    [InlineData("ab")] // Too short.
+    [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")] // Too long (256 chars).
     public void Validate_WhenUsernameHasInvalidLength_ShouldHaveValidationError(string username)
     {
         // Arrange
@@ -236,16 +236,16 @@ public class RegisterUserCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(".username")] // starts with special character
-    [InlineData("username.")] // ends with special character
-    [InlineData("_username")] // starts with special character
-    [InlineData("username_")] // ends with special character
-    [InlineData("-username")] // starts with special character
-    [InlineData("username-")] // ends with special character
-    [InlineData("user name")] // contains space
-    [InlineData("user@name")] // contains invalid special char
-    [InlineData("user#name")] // contains invalid special char
-    [InlineData("user$name")] // contains invalid special char
+    [InlineData(".username")] // Starts with special character.
+    [InlineData("username.")] // Ends with special character.
+    [InlineData("_username")] // Starts with special character.
+    [InlineData("username_")] // Ends with special character.
+    [InlineData("-username")] // Starts with special character.
+    [InlineData("username-")] // Ends with special character.
+    [InlineData("user name")] // Contains space.
+    [InlineData("user@name")] // Contains invalid special char.
+    [InlineData("user#name")] // Contains invalid special char.
+    [InlineData("user$name")] // Contains invalid special char.
     public void Validate_WhenUsernameHasInvalidFormat_ShouldHaveValidationError(string username)
     {
         // Arrange
@@ -260,13 +260,13 @@ public class RegisterUserCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("user123")] // basic alphanumeric
-    [InlineData("user.name")] // with dot
-    [InlineData("user_name")] // with underscore
-    [InlineData("user-name")] // with hyphen
-    [InlineData("User.Name123")] // mixed case with special chars and numbers
-    [InlineData("a1b")] // minimum length
-    [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")] // maximum length (255 chars)
+    [InlineData("user123")] // Basic alphanumeric.
+    [InlineData("user.name")] // With dot.
+    [InlineData("user_name")] // With underscore.
+    [InlineData("user-name")] // With hyphen.
+    [InlineData("User.Name123")] // Mixed case with special chars and numbers.
+    [InlineData("a1b")] // Minimum length.
+    [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")] // Maximum length (255 chars).
     public void Validate_WhenUsernameHasValidFormat_ShouldNotHaveValidationError(string username)
     {
         // Arrange

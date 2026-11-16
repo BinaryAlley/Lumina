@@ -82,7 +82,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
         Assert.Equal(themeId, result!.ThemeId);
         Assert.True(result.IsCurrent);
 
-        // the newly active theme is returned by GET /themes/current
+        // The newly active theme is returned by GET /themes/current.
         HttpResponseMessage currentResponse = await _client.GetAsync("/api/v1/themes/current");
         ThemeResponse? current = await currentResponse.Content.ReadFromJsonAsync<ThemeResponse>(_jsonOptions);
         Assert.NotNull(current);
@@ -222,7 +222,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
             }
         }
 
-        // restore the bundled default theme as the active one, so the following tests start from a clean state
+        // Restore the bundled default theme as the active one, so the following tests start from a clean state.
         ThemeEntity? bundledTheme = await dbContext.Themes.FirstOrDefaultAsync(t => t.ThemeId == "lumina-default");
         if (bundledTheme is not null)
             bundledTheme.IsCurrent = true;
@@ -233,7 +233,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
         foreach (string themeId in _installedThemeIds)
             await themeService.DeleteAsync(themeId, CancellationToken.None);
 
-        // the admin seeding performed by the factory is not idempotent, so the seed data must be cleared between tests
+        // The admin seeding performed by the factory is not idempotent, so the seed data must be cleared between tests.
         await dbContext.Set<RolePermissionEntity>().ExecuteDeleteAsync();
         await dbContext.Set<UserPermissionEntity>().ExecuteDeleteAsync();
         await dbContext.Set<UserRoleEntity>().ExecuteDeleteAsync();

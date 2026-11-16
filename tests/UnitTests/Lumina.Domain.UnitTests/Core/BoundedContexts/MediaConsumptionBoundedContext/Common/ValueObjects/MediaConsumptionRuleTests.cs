@@ -17,14 +17,14 @@ namespace Lumina.Domain.UnitTests.Core.BoundedContexts.MediaConsumptionBoundedCo
 public class MediaConsumptionRuleTests
 {
     [Theory]
-    [InlineData(MediaKind.MusicTrack, typeof(MusicTrackConsumptionRule))] // duration based rule of a music track
-    [InlineData(MediaKind.PodcastEpisode, typeof(PodcastEpisodeConsumptionRule))] // duration based rule of a podcast episode
-    [InlineData(MediaKind.Audiobook, typeof(AudiobookConsumptionRule))] // duration based rule of an audiobook
-    [InlineData(MediaKind.Movie, typeof(MovieConsumptionRule))] // duration based rule of a movie
-    [InlineData(MediaKind.TvEpisode, typeof(TvEpisodeConsumptionRule))] // duration based rule of a TV episode
-    [InlineData(MediaKind.Book, typeof(BookConsumptionRule))] // page based rule of a book
-    [InlineData(MediaKind.Photo, typeof(PhotoConsumptionRule))] // every session rule of a photo
-    [InlineData(MediaKind.Video, typeof(VideoConsumptionRule))] // duration based rule of a video
+    [InlineData(MediaKind.MusicTrack, typeof(MusicTrackConsumptionRule))] // Duration based rule of a music track.
+    [InlineData(MediaKind.PodcastEpisode, typeof(PodcastEpisodeConsumptionRule))] // Duration based rule of a podcast episode.
+    [InlineData(MediaKind.Audiobook, typeof(AudiobookConsumptionRule))] // Duration based rule of an audiobook.
+    [InlineData(MediaKind.Movie, typeof(MovieConsumptionRule))] // Duration based rule of a movie.
+    [InlineData(MediaKind.TvEpisode, typeof(TvEpisodeConsumptionRule))] // Duration based rule of a TV episode.
+    [InlineData(MediaKind.Book, typeof(BookConsumptionRule))] // Page based rule of a book.
+    [InlineData(MediaKind.Photo, typeof(PhotoConsumptionRule))] // Every session rule of a photo.
+    [InlineData(MediaKind.Video, typeof(VideoConsumptionRule))] // Duration based rule of a video.
     public void For_WhenMediaKindHasARule_ShouldReturnTheRuleOfThatKind(MediaKind mediaKind, Type expectedType)
     {
         // Act
@@ -37,8 +37,8 @@ public class MediaConsumptionRuleTests
     }
 
     [Theory]
-    [InlineData(MediaKind.None)] // the default value, which is not a valid kind for a media item
-    [InlineData((MediaKind)999)] // a value outside the declared enumeration members
+    [InlineData(MediaKind.None)] // The default value, which is not a valid kind for a media item.
+    [InlineData((MediaKind)999)] // A value outside the declared enumeration members.
     public void For_WhenMediaKindHasNoRule_ShouldReturnNoValue(MediaKind mediaKind)
     {
         // Act
@@ -63,8 +63,8 @@ public class MediaConsumptionRuleTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie)] // a duration based rule that resumes from a time offset
-    [InlineData(MediaKind.Book)] // a page based rule that resumes from a location
+    [InlineData(MediaKind.Movie)] // A duration based rule that resumes from a time offset.
+    [InlineData(MediaKind.Book)] // A page based rule that resumes from a location.
     public void CanResume_WhenRuleHasAPositionKind_ShouldReturnTrue(MediaKind mediaKind)
     {
         // Act

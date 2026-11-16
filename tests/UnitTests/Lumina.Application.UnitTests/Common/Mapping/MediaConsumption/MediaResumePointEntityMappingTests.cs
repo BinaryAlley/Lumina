@@ -276,8 +276,8 @@ public class MediaResumePointEntityMappingTests
     }
 
     [Theory]
-    [InlineData("")] // an empty location is not a usable position
-    [InlineData("   ")] // a whitespace only location is not a usable position
+    [InlineData("")] // An empty location is not a usable position.
+    [InlineData("   ")] // A whitespace only location is not a usable position.
     public void ToDomainEntity_WhenLocationPositionHasABlankLocation_ShouldReturnInvalidMediaPosition(string location)
     {
         // Arrange
@@ -329,8 +329,8 @@ public class MediaResumePointEntityMappingTests
     }
 
     [Theory]
-    [InlineData(MediaKind.MusicTrack, MediaPositionKind.Location, "chapter-1")] // music tracks are resumed from a time offset
-    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset, null)] // books are resumed from a location
+    [InlineData(MediaKind.MusicTrack, MediaPositionKind.Location, "chapter-1")] // Music tracks are resumed from a time offset.
+    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset, null)] // Books are resumed from a location.
     public void ToDomainEntity_WhenPositionKindDoesNotMatchTheMediaKindRule_ShouldReturnInvalidMediaPosition(MediaKind mediaKind, MediaPositionKind positionKind, string? location)
     {
         // Arrange

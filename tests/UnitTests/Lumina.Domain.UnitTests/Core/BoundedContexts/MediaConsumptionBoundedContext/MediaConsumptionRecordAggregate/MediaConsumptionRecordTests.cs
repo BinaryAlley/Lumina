@@ -111,8 +111,8 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(MediaKind.None)] // the default value, which is not a valid kind for a media item
-    [InlineData((MediaKind)999)] // a value outside the declared enumeration members
+    [InlineData(MediaKind.None)] // The default value, which is not a valid kind for a media item.
+    [InlineData((MediaKind)999)] // A value outside the declared enumeration members.
     public void Start_WhenMediaKindIsUnsupported_ShouldReturnUnsupportedMediaKindError(MediaKind mediaKind)
     {
         // Act
@@ -130,11 +130,11 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(double.NaN)] // a value that is not a number
-    [InlineData(double.PositiveInfinity)] // a value beyond every finite fraction
-    [InlineData(double.NegativeInfinity)] // a value below every finite fraction
-    [InlineData(-0.01)] // a value below the zero lower boundary
-    [InlineData(1.01)] // a value above the one upper boundary
+    [InlineData(double.NaN)] // A value that is not a number.
+    [InlineData(double.PositiveInfinity)] // A value beyond every finite fraction.
+    [InlineData(double.NegativeInfinity)] // A value below every finite fraction.
+    [InlineData(-0.01)] // A value below the zero lower boundary.
+    [InlineData(1.01)] // A value above the one upper boundary.
     public void Start_WhenProgressFractionIsInvalid_ShouldReturnInvalidProgressFractionError(double lastProgressFraction)
     {
         // Act
@@ -152,8 +152,8 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(0.0)] // the lower boundary of the progress fraction
-    [InlineData(1.0)] // the upper boundary of the progress fraction
+    [InlineData(0.0)] // The lower boundary of the progress fraction.
+    [InlineData(1.0)] // The upper boundary of the progress fraction.
     public void Start_WhenProgressFractionIsAtABoundary_ShouldCreateRecord(double lastProgressFraction)
     {
         // Act
@@ -171,9 +171,9 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie, MediaPositionKind.Location)] // a movie resumes from a time offset, not from a location
-    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset)] // a book resumes from a location, not from a time offset
-    [InlineData(MediaKind.Photo, MediaPositionKind.TimeOffset)] // a photo cannot be resumed, so it accepts no position at all
+    [InlineData(MediaKind.Movie, MediaPositionKind.Location)] // A movie resumes from a time offset, not from a location.
+    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset)] // A book resumes from a location, not from a time offset.
+    [InlineData(MediaKind.Photo, MediaPositionKind.TimeOffset)] // A photo cannot be resumed, so it accepts no position at all.
     public void Start_WhenPositionDoesNotMatchTheMediaKindRule_ShouldReturnInvalidMediaPositionError(MediaKind mediaKind, MediaPositionKind positionKind)
     {
         // Arrange
@@ -194,8 +194,8 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie, MediaPositionKind.TimeOffset)] // a movie resumes from a time offset
-    [InlineData(MediaKind.Book, MediaPositionKind.Location)] // a book resumes from a location
+    [InlineData(MediaKind.Movie, MediaPositionKind.TimeOffset)] // A movie resumes from a time offset.
+    [InlineData(MediaKind.Book, MediaPositionKind.Location)] // A book resumes from a location.
     public void Start_WhenPositionMatchesTheMediaKindRule_ShouldStoreThePosition(MediaKind mediaKind, MediaPositionKind positionKind)
     {
         // Arrange
@@ -284,13 +284,13 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(MediaKind.MusicTrack)] // a duration based kind that is started explicitly
-    [InlineData(MediaKind.PodcastEpisode)] // a duration based kind that is started explicitly
-    [InlineData(MediaKind.Audiobook)] // a duration based kind that is started explicitly
-    [InlineData(MediaKind.Movie)] // a duration based kind that is started explicitly
-    [InlineData(MediaKind.TvEpisode)] // a duration based kind that is started explicitly
-    [InlineData(MediaKind.Book)] // a page based kind that is started explicitly
-    [InlineData(MediaKind.Video)] // a duration based kind that is started explicitly
+    [InlineData(MediaKind.MusicTrack)] // A duration based kind that is started explicitly.
+    [InlineData(MediaKind.PodcastEpisode)] // A duration based kind that is started explicitly.
+    [InlineData(MediaKind.Audiobook)] // A duration based kind that is started explicitly.
+    [InlineData(MediaKind.Movie)] // A duration based kind that is started explicitly.
+    [InlineData(MediaKind.TvEpisode)] // A duration based kind that is started explicitly.
+    [InlineData(MediaKind.Book)] // A page based kind that is started explicitly.
+    [InlineData(MediaKind.Video)] // A duration based kind that is started explicitly.
     public void StartCompleted_WhenMediaKindIsNotOneShot_ShouldReturnMediaKindCannotStartCompletedError(MediaKind mediaKind)
     {
         // Act
@@ -306,8 +306,8 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(MediaKind.None)] // the default value, which is not a valid kind for a media item
-    [InlineData((MediaKind)999)] // a value outside the declared enumeration members
+    [InlineData(MediaKind.None)] // The default value, which is not a valid kind for a media item.
+    [InlineData((MediaKind)999)] // A value outside the declared enumeration members.
     public void StartCompleted_WhenMediaKindIsUnsupported_ShouldReturnUnsupportedMediaKindError(MediaKind mediaKind)
     {
         // Act
@@ -374,8 +374,8 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(ConsumptionStatus.Completed)] // a session that reached its completion
-    [InlineData(ConsumptionStatus.Stopped)] // a session that ended before completing
+    [InlineData(ConsumptionStatus.Completed)] // A session that reached its completion.
+    [InlineData(ConsumptionStatus.Stopped)] // A session that ended before completing.
     public void Reconstitute_WhenCalledWithTerminalData_ShouldPreserveAllPropertiesAndDeriveTimestamps(ConsumptionStatus status)
     {
         // Arrange
@@ -448,8 +448,8 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(MediaKind.None)] // the default value, which is not a valid kind for a media item
-    [InlineData((MediaKind)999)] // a value outside the declared enumeration members
+    [InlineData(MediaKind.None)] // The default value, which is not a valid kind for a media item.
+    [InlineData((MediaKind)999)] // A value outside the declared enumeration members.
     public void Reconstitute_WhenMediaKindIsUnsupported_ShouldReturnUnsupportedMediaKindError(MediaKind mediaKind)
     {
         // Arrange
@@ -477,11 +477,11 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(double.NaN)] // a value that is not a number
-    [InlineData(double.PositiveInfinity)] // a value beyond every finite fraction
-    [InlineData(double.NegativeInfinity)] // a value below every finite fraction
-    [InlineData(-0.01)] // a value below the zero lower boundary
-    [InlineData(1.01)] // a value above the one upper boundary
+    [InlineData(double.NaN)] // A value that is not a number.
+    [InlineData(double.PositiveInfinity)] // A value beyond every finite fraction.
+    [InlineData(double.NegativeInfinity)] // A value below every finite fraction.
+    [InlineData(-0.01)] // A value below the zero lower boundary.
+    [InlineData(1.01)] // A value above the one upper boundary.
     public void Reconstitute_WhenProgressFractionIsInvalid_ShouldReturnInvalidProgressFractionError(double lastProgressFraction)
     {
         // Arrange
@@ -509,9 +509,9 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie)] // a duration based kind does not count pages
-    [InlineData(MediaKind.Photo)] // a one-shot kind does not count pages
-    [InlineData(MediaKind.MusicTrack)] // a duration based kind does not count pages
+    [InlineData(MediaKind.Movie)] // A duration based kind does not count pages.
+    [InlineData(MediaKind.Photo)] // A one-shot kind does not count pages.
+    [InlineData(MediaKind.MusicTrack)] // A duration based kind does not count pages.
     public void Reconstitute_WhenConsecutivePagesReadIsPositiveForANonPageBasedKind_ShouldReturnConsecutivePagesReadIsOnlySupportedForPageBasedMediaError(MediaKind mediaKind)
     {
         // Arrange
@@ -572,8 +572,8 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie)] // a duration based kind accepts a zero page count
-    [InlineData(MediaKind.Photo)] // a one-shot kind accepts a zero page count
+    [InlineData(MediaKind.Movie)] // A duration based kind accepts a zero page count.
+    [InlineData(MediaKind.Photo)] // A one-shot kind accepts a zero page count.
     public void Reconstitute_WhenConsecutivePagesReadIsZeroForANonPageBasedKind_ShouldCreateRecord(MediaKind mediaKind)
     {
         // Arrange
@@ -604,9 +604,9 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie, MediaPositionKind.Location)] // a movie resumes from a time offset, not from a location
-    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset)] // a book resumes from a location, not from a time offset
-    [InlineData(MediaKind.Photo, MediaPositionKind.Location)] // a photo cannot be resumed, so it accepts no position at all
+    [InlineData(MediaKind.Movie, MediaPositionKind.Location)] // A movie resumes from a time offset, not from a location.
+    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset)] // A book resumes from a location, not from a time offset.
+    [InlineData(MediaKind.Photo, MediaPositionKind.Location)] // A photo cannot be resumed, so it accepts no position at all.
     public void Reconstitute_WhenPositionDoesNotMatchTheMediaKindRule_ShouldReturnInvalidMediaPositionError(MediaKind mediaKind, MediaPositionKind positionKind)
     {
         // Arrange
@@ -667,8 +667,8 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(ConsumptionStatus.Completed)] // a completed session must record when it ended
-    [InlineData(ConsumptionStatus.Stopped)] // a stopped session must record when it ended
+    [InlineData(ConsumptionStatus.Completed)] // A completed session must record when it ended.
+    [InlineData(ConsumptionStatus.Stopped)] // A stopped session must record when it ended.
     public void Reconstitute_WhenTerminalStatusHasNoEndTime_ShouldReturnEndedConsumptionMustHaveEndTimeError(ConsumptionStatus status)
     {
         // Arrange
@@ -727,8 +727,8 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(ConsumptionStatus.Completed)] // a completed session cannot end before its last activity
-    [InlineData(ConsumptionStatus.Stopped)] // a stopped session cannot end before its last activity
+    [InlineData(ConsumptionStatus.Completed)] // A completed session cannot end before its last activity.
+    [InlineData(ConsumptionStatus.Stopped)] // A stopped session cannot end before its last activity.
     public void Reconstitute_WhenEndTimePrecedesLastActivity_ShouldReturnEndedConsumptionCannotPrecedeLastActivityError(ConsumptionStatus status)
     {
         // Arrange
@@ -758,8 +758,8 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(ConsumptionStatus.Completed)] // a completed session may end exactly at its last activity
-    [InlineData(ConsumptionStatus.Stopped)] // a stopped session may end exactly at its last activity
+    [InlineData(ConsumptionStatus.Completed)] // A completed session may end exactly at its last activity.
+    [InlineData(ConsumptionStatus.Stopped)] // A stopped session may end exactly at its last activity.
     public void Reconstitute_WhenEndTimeEqualsLastActivity_ShouldCreateRecord(ConsumptionStatus status)
     {
         // Arrange
@@ -852,8 +852,8 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(ConsumptionStatus.Completed)] // a completed session accepted no further progress
-    [InlineData(ConsumptionStatus.Stopped)] // a stopped session accepted no further progress
+    [InlineData(ConsumptionStatus.Completed)] // A completed session accepted no further progress.
+    [InlineData(ConsumptionStatus.Stopped)] // A stopped session accepted no further progress.
     public void ReportProgress_WhenStatusIsNotInProgress_ShouldReturnConsumptionIsNotInProgressError(ConsumptionStatus status)
     {
         // Arrange
@@ -885,11 +885,11 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(double.NaN)] // a value that is not a number
-    [InlineData(double.PositiveInfinity)] // a value beyond every finite fraction
-    [InlineData(double.NegativeInfinity)] // a value below every finite fraction
-    [InlineData(-0.01)] // a value below the zero lower boundary
-    [InlineData(1.01)] // a value above the one upper boundary
+    [InlineData(double.NaN)] // A value that is not a number.
+    [InlineData(double.PositiveInfinity)] // A value beyond every finite fraction.
+    [InlineData(double.NegativeInfinity)] // A value below every finite fraction.
+    [InlineData(-0.01)] // A value below the zero lower boundary.
+    [InlineData(1.01)] // A value above the one upper boundary.
     public void ReportProgress_WhenProgressFractionIsInvalid_ShouldReturnInvalidProgressFractionError(double lastProgressFraction)
     {
         // Arrange
@@ -943,8 +943,8 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie)] // a duration based kind does not count pages
-    [InlineData(MediaKind.Photo)] // a one-shot kind does not count pages
+    [InlineData(MediaKind.Movie)] // A duration based kind does not count pages.
+    [InlineData(MediaKind.Photo)] // A one-shot kind does not count pages.
     public void ReportProgress_WhenConsecutivePagesReadIsPositiveForANonPageBasedKind_ShouldReturnConsecutivePagesReadIsOnlySupportedForPageBasedMediaError(MediaKind mediaKind)
     {
         // Arrange
@@ -987,9 +987,9 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie, MediaPositionKind.Location)] // a movie resumes from a time offset, not from a location
-    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset)] // a book resumes from a location, not from a time offset
-    [InlineData(MediaKind.Photo, MediaPositionKind.TimeOffset)] // a photo cannot be resumed, so it accepts no position at all
+    [InlineData(MediaKind.Movie, MediaPositionKind.Location)] // A movie resumes from a time offset, not from a location.
+    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset)] // A book resumes from a location, not from a time offset.
+    [InlineData(MediaKind.Photo, MediaPositionKind.TimeOffset)] // A photo cannot be resumed, so it accepts no position at all.
     public void ReportProgress_WhenPositionDoesNotMatchTheMediaKindRule_ShouldReturnInvalidMediaPositionError(MediaKind mediaKind, MediaPositionKind positionKind)
     {
         // Arrange
@@ -1219,8 +1219,8 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie)] // a duration based kind does not count pages
-    [InlineData(MediaKind.Photo)] // a one-shot kind does not count pages
+    [InlineData(MediaKind.Movie)] // A duration based kind does not count pages.
+    [InlineData(MediaKind.Photo)] // A one-shot kind does not count pages.
     public void Complete_WhenConsecutivePagesReadIsPositiveForANonPageBasedKind_ShouldReturnConsecutivePagesReadIsOnlySupportedForPageBasedMediaError(MediaKind mediaKind)
     {
         // Arrange
@@ -1242,8 +1242,8 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(ConsumptionStatus.Completed)] // an already completed session cannot complete again
-    [InlineData(ConsumptionStatus.Stopped)] // an already stopped session cannot complete
+    [InlineData(ConsumptionStatus.Completed)] // An already completed session cannot complete again.
+    [InlineData(ConsumptionStatus.Stopped)] // An already stopped session cannot complete.
     public void Complete_WhenStatusIsTerminal_ShouldReturnConsumptionIsAlreadyTerminalError(ConsumptionStatus status)
     {
         // Arrange
@@ -1271,11 +1271,11 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(double.NaN)] // a value that is not a number
-    [InlineData(double.PositiveInfinity)] // a value beyond every finite fraction
-    [InlineData(double.NegativeInfinity)] // a value below every finite fraction
-    [InlineData(-0.01)] // a value below the zero lower boundary
-    [InlineData(1.01)] // a value above the one upper boundary
+    [InlineData(double.NaN)] // A value that is not a number.
+    [InlineData(double.PositiveInfinity)] // A value beyond every finite fraction.
+    [InlineData(double.NegativeInfinity)] // A value below every finite fraction.
+    [InlineData(-0.01)] // A value below the zero lower boundary.
+    [InlineData(1.01)] // A value above the one upper boundary.
     public void Complete_WhenProgressFractionIsInvalid_ShouldReturnInvalidProgressFractionError(double lastProgressFraction)
     {
         // Arrange
@@ -1330,9 +1330,9 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie, MediaPositionKind.Location)] // a movie resumes from a time offset, not from a location
-    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset)] // a book resumes from a location, not from a time offset
-    [InlineData(MediaKind.Photo, MediaPositionKind.Location)] // a photo cannot be resumed, so it accepts no position at all
+    [InlineData(MediaKind.Movie, MediaPositionKind.Location)] // A movie resumes from a time offset, not from a location.
+    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset)] // A book resumes from a location, not from a time offset.
+    [InlineData(MediaKind.Photo, MediaPositionKind.Location)] // A photo cannot be resumed, so it accepts no position at all.
     public void Complete_WhenPositionDoesNotMatchTheMediaKindRule_ShouldReturnInvalidMediaPositionError(MediaKind mediaKind, MediaPositionKind positionKind)
     {
         // Arrange
@@ -1512,8 +1512,8 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie)] // a duration based kind does not count pages
-    [InlineData(MediaKind.Photo)] // a one-shot kind does not count pages
+    [InlineData(MediaKind.Movie)] // A duration based kind does not count pages.
+    [InlineData(MediaKind.Photo)] // A one-shot kind does not count pages.
     public void Stop_WhenConsecutivePagesReadIsPositiveForANonPageBasedKind_ShouldReturnConsecutivePagesReadIsOnlySupportedForPageBasedMediaError(MediaKind mediaKind)
     {
         // Arrange
@@ -1535,8 +1535,8 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(ConsumptionStatus.Completed)] // an already completed session cannot stop
-    [InlineData(ConsumptionStatus.Stopped)] // an already stopped session cannot stop again
+    [InlineData(ConsumptionStatus.Completed)] // An already completed session cannot stop.
+    [InlineData(ConsumptionStatus.Stopped)] // An already stopped session cannot stop again.
     public void Stop_WhenStatusIsTerminal_ShouldReturnConsumptionIsAlreadyTerminalError(ConsumptionStatus status)
     {
         // Arrange
@@ -1564,11 +1564,11 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(double.NaN)] // a value that is not a number
-    [InlineData(double.PositiveInfinity)] // a value beyond every finite fraction
-    [InlineData(double.NegativeInfinity)] // a value below every finite fraction
-    [InlineData(-0.01)] // a value below the zero lower boundary
-    [InlineData(1.01)] // a value above the one upper boundary
+    [InlineData(double.NaN)] // A value that is not a number.
+    [InlineData(double.PositiveInfinity)] // A value beyond every finite fraction.
+    [InlineData(double.NegativeInfinity)] // A value below every finite fraction.
+    [InlineData(-0.01)] // A value below the zero lower boundary.
+    [InlineData(1.01)] // A value above the one upper boundary.
     public void Stop_WhenProgressFractionIsInvalid_ShouldReturnInvalidProgressFractionError(double lastProgressFraction)
     {
         // Arrange
@@ -1623,9 +1623,9 @@ public class MediaConsumptionRecordTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie, MediaPositionKind.Location)] // a movie resumes from a time offset, not from a location
-    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset)] // a book resumes from a location, not from a time offset
-    [InlineData(MediaKind.Photo, MediaPositionKind.Location)] // a photo cannot be resumed, so it accepts no position at all
+    [InlineData(MediaKind.Movie, MediaPositionKind.Location)] // A movie resumes from a time offset, not from a location.
+    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset)] // A book resumes from a location, not from a time offset.
+    [InlineData(MediaKind.Photo, MediaPositionKind.Location)] // A photo cannot be resumed, so it accepts no position at all.
     public void Stop_WhenPositionDoesNotMatchTheMediaKindRule_ShouldReturnInvalidMediaPositionError(MediaKind mediaKind, MediaPositionKind positionKind)
     {
         // Arrange

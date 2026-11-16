@@ -47,7 +47,7 @@ public class ThumbnailServiceTests
         int quality = 80;
         FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
 
-        // Create a small valid JPEG image
+        // Create a small valid JPEG image.
         byte[] imageBytes;
         using (Image<Rgba32> image = new(10, 10))
         {
@@ -170,12 +170,12 @@ public class ThumbnailServiceTests
     }
 
     [Theory]
-    [InlineData(ImageType.JPEG2000)] // resolution adjustment switch branch for JPEG2000
-    [InlineData(ImageType.JPEG_CANON)] // resolution adjustment switch branch for Canon JPEG
-    [InlineData(ImageType.JPEG_UNKNOWN)] // resolution adjustment switch branch for unknown JPEG
-    [InlineData(ImageType.TIFF)] // resolution adjustment switch branch for TIFF
-    [InlineData(ImageType.WEBP)] // resolution adjustment switch branch for WEBP
-    [InlineData(ImageType.TGA)] // resolution adjustment switch branch for TGA
+    [InlineData(ImageType.JPEG2000)] // Resolution adjustment switch branch for JPEG2000.
+    [InlineData(ImageType.JPEG_CANON)] // Resolution adjustment switch branch for Canon JPEG.
+    [InlineData(ImageType.JPEG_UNKNOWN)] // Resolution adjustment switch branch for unknown JPEG.
+    [InlineData(ImageType.TIFF)] // Resolution adjustment switch branch for TIFF.
+    [InlineData(ImageType.WEBP)] // Resolution adjustment switch branch for WEBP.
+    [InlineData(ImageType.TGA)] // Resolution adjustment switch branch for TGA.
     public async Task GetThumbnailAsync_WithAdditionalSupportedImageTypes_ShouldReturnAdjustedThumbnail(ImageType imageType)
     {
         // Arrange
@@ -204,11 +204,11 @@ public class ThumbnailServiceTests
     }
 
     [Theory]
-    [InlineData(ImageType.SVG)] // SVG is not resized, original bytes are returned
-    [InlineData(ImageType.PICT)] // PICT is not resized, original bytes are returned
-    [InlineData(ImageType.ICO)] // ICO is not resized, original bytes are returned
-    [InlineData(ImageType.PSD)] // PSD is not resized, original bytes are returned
-    [InlineData(ImageType.AVIF)] // AVIF is not resized, original bytes are returned
+    [InlineData(ImageType.SVG)] // SVG is not resized, original bytes are returned.
+    [InlineData(ImageType.PICT)] // PICT is not resized, original bytes are returned.
+    [InlineData(ImageType.ICO)] // ICO is not resized, original bytes are returned.
+    [InlineData(ImageType.PSD)] // PSD is not resized, original bytes are returned.
+    [InlineData(ImageType.AVIF)] // AVIF is not resized, original bytes are returned.
     public async Task GetThumbnailAsync_WithUnsupportedNonNoneImageType_ShouldReturnOriginalBytes(ImageType imageType)
     {
         // Arrange

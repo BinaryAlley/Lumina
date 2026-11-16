@@ -191,8 +191,8 @@ public class GetTrackSegmentQueryHandlerTests
 
     public static TheoryData<PlaybackDeliveryShape, int> NonSegmentDeliveryCases => new()
     {
-        { PlaybackDeliveryShape.ByteRangeSeekable, 6 }, // a byte range delivery has no indexable segment
-        { PlaybackDeliveryShape.TimeAddressedSegments, 0 } // a time addressed delivery without a positive segment duration has nothing to index
+        { PlaybackDeliveryShape.ByteRangeSeekable, 6 }, // A byte range delivery has no indexable segment.
+        { PlaybackDeliveryShape.TimeAddressedSegments, 0 } // A time addressed delivery without a positive segment duration has nothing to index.
     };
 
     [Theory]

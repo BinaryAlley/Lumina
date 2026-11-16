@@ -250,9 +250,9 @@ public class GetTagConsumptionEndpointTests : IClassFixture<AuthenticatedLuminaA
     }
 
     [Theory]
-    [InlineData("999")] // a number that is not a member name
-    [InlineData("1")] // a number that is a defined enumeration value, which must still be rejected
-    [InlineData("not-a-media-kind")] // a name that is not a member of the enumeration
+    [InlineData("999")] // A number that is not a member name.
+    [InlineData("1")] // A number that is a defined enumeration value, which must still be rejected.
+    [InlineData("not-a-media-kind")] // A name that is not a member of the enumeration.
     public async Task GetTagConsumption_WhenMediaKindIsNotAMemberName_ShouldReturnValidationProblem(string mediaKind)
     {
         // Arrange

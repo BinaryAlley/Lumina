@@ -76,7 +76,7 @@ public class LibraryDeletedDomainEventHandlerTests
         IOptions<MediaSettingsDto> mediaSettingsOptions = Substitute.For<IOptions<MediaSettingsDto>>();
         mediaSettingsOptions.Value.Returns(mediaSettings);
 
-        // default stubs: all path combinations succeed, segments are sanitized to their input, the library directories exist and they are deleted successfully
+        // Default stubs: all path combinations succeed, segments are sanitized to their input, the library directories exist and they are deleted successfully.
         _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>())
             .Returns(callInfo => Result.From(string.Concat(callInfo.ArgAt<string>(0), callInfo.ArgAt<string>(1))));
         _mockPathService.SanitizeCompositeSegment(Arg.Any<string>(), Arg.Any<string>())

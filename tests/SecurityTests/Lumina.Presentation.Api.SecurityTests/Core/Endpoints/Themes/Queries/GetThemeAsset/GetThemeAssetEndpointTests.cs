@@ -74,12 +74,12 @@ public class GetThemeAssetEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
     }
 
     [Theory]
-    [InlineData("..%2F..%2Fevil.txt")] // encoded slash path traversal
-    [InlineData("%2e%2e%2f%2e%2e%2fevil.txt")] // encoded dot-slash path traversal
-    [InlineData("..%5C..%5Cevil.txt")] // encoded backslash path traversal
-    [InlineData("assets%2F..%2F..%2Fevil.txt")] // traversal hiding behind the assets prefix
-    [InlineData("C:%5Cwindows%5Csystem32%5Cdrivers%5Cetc%5Chosts")] // absolute windows path
-    [InlineData("..%2F..%2F..%2F..%2Fdecoy-secret.txt")] // deep traversal targeting a decoy file outside the pack
+    [InlineData("..%2F..%2Fevil.txt")] // Encoded slash path traversal.
+    [InlineData("%2e%2e%2f%2e%2e%2fevil.txt")] // Encoded dot-slash path traversal.
+    [InlineData("..%5C..%5Cevil.txt")] // Encoded backslash path traversal.
+    [InlineData("assets%2F..%2F..%2Fevil.txt")] // Traversal hiding behind the assets prefix.
+    [InlineData("C:%5Cwindows%5Csystem32%5Cdrivers%5Cetc%5Chosts")] // Absolute windows path.
+    [InlineData("..%2F..%2F..%2F..%2Fdecoy-secret.txt")] // Deep traversal targeting a decoy file outside the pack.
     public async Task GetThemeAsset_WithEncodedPathTraversalInAssetPath_ShouldReturnPackageInvalid(string maliciousAssetPath)
     {
         // Arrange
@@ -123,10 +123,10 @@ public class GetThemeAssetEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
     }
 
     [Theory]
-    [InlineData("..%2F..%2Fevil")] // encoded slash traversal
-    [InlineData("%2e%2e%2f%2e%2e%2fevil")] // encoded dot-slash traversal
-    [InlineData("..%5Cevil")] // encoded backslash traversal
-    [InlineData("..%2F")] // encoded trailing slash traversal
+    [InlineData("..%2F..%2Fevil")] // Encoded slash traversal.
+    [InlineData("%2e%2e%2f%2e%2e%2fevil")] // Encoded dot-slash traversal.
+    [InlineData("..%5Cevil")] // Encoded backslash traversal.
+    [InlineData("..%2F")] // Encoded trailing slash traversal.
     public async Task GetThemeAsset_WithPathTraversalInThemeId_ShouldReturnCleanNotFoundProblemDetails(string maliciousThemeId)
     {
         // Arrange

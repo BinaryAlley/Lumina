@@ -155,8 +155,8 @@ public class UpdatePlaybackStateEndpointTests : IClassFixture<AuthenticatedLumin
     }
 
     [Theory]
-    [InlineData(-0.01)] // just below the minimum
-    [InlineData(1.01)] // just above the maximum
+    [InlineData(-0.01)] // Just below the minimum.
+    [InlineData(1.01)] // Just above the maximum.
     public async Task UpdatePlaybackState_WhenVolumeIsOutOfRange_ShouldReturnValidationError(double volume)
     {
         // Arrange

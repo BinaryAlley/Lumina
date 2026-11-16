@@ -21,8 +21,8 @@ public class ShuffleTracksQueryValidatorTests
     private readonly ShuffleTracksQueryValidator _validator = new();
 
     [Theory]
-    [InlineData(1)] // the smallest allowed selection
-    [InlineData(500)] // the largest allowed selection
+    [InlineData(1)] // The smallest allowed selection.
+    [InlineData(500)] // The largest allowed selection.
     public void Validate_WhenQueryIsValid_ShouldNotHaveValidationError(int count)
     {
         // Arrange
@@ -43,12 +43,12 @@ public class ShuffleTracksQueryValidatorTests
     }
 
     [Theory]
-    [InlineData(null)] // missing route value
-    [InlineData("")] // empty route value
-    [InlineData("   ")] // whitespace route value
-    [InlineData("not-a-guid")] // non-Guid route value
-    [InlineData("' OR '1'='1")] // injection payload that is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // empty Guid route value
+    [InlineData(null)] // Missing route value.
+    [InlineData("")] // Empty route value.
+    [InlineData("   ")] // Whitespace route value.
+    [InlineData("not-a-guid")] // Non-Guid route value.
+    [InlineData("' OR '1'='1")] // Injection payload that is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // Empty Guid route value.
     public void Validate_WhenLibraryIdIsEmptyOrInvalid_ShouldHaveValidationError(string? libraryId)
     {
         // Arrange
@@ -62,9 +62,9 @@ public class ShuffleTracksQueryValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // no track is requested
-    [InlineData(-1)] // a negative selection size
-    [InlineData(-500)] // a large negative selection size
+    [InlineData(0)] // No track is requested.
+    [InlineData(-1)] // A negative selection size.
+    [InlineData(-500)] // A large negative selection size.
     public void Validate_WhenCountIsNotPositive_ShouldHaveValidationError(int count)
     {
         // Arrange
@@ -79,9 +79,9 @@ public class ShuffleTracksQueryValidatorTests
     }
 
     [Theory]
-    [InlineData(501)] // one more than the documented maximum
-    [InlineData(1000)] // well above the documented maximum
-    [InlineData(int.MaxValue)] // the largest possible value
+    [InlineData(501)] // One more than the documented maximum.
+    [InlineData(1000)] // Well above the documented maximum.
+    [InlineData(int.MaxValue)] // The largest possible value.
     public void Validate_WhenCountExceedsMaximum_ShouldHaveValidationError(int count)
     {
         // Arrange

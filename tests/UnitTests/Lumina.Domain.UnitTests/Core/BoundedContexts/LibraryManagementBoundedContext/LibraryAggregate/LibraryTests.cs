@@ -179,9 +179,9 @@ public class LibraryTests
     }
 
     [Theory]
-    [InlineData(null)] // null content location
-    [InlineData("")] // empty content location
-    [InlineData("   ")] // whitespace content location
+    [InlineData(null)] // Null content location.
+    [InlineData("")] // Empty content location.
+    [InlineData("   ")] // Whitespace content location.
     public void Create_WhenContentLocationIsInvalid_ShouldReturnError(string? contentLocation)
     {
         // Act

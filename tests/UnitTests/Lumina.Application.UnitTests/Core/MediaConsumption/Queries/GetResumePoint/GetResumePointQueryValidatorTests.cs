@@ -34,11 +34,11 @@ public class GetResumePointQueryValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the media kind is empty
-    [InlineData("   ")] // the media kind is whitespace only
-    [InlineData("not-a-media-kind")] // the media kind is not the name of a defined kind
-    [InlineData("99999")] // a numeric value that is not the name of a defined kind
-    [InlineData("1")] // a numeric value that parses to the defined MusicTrack member, which the old Enum.TryParse and Enum.IsDefined logic accepted
+    [InlineData("")] // The media kind is empty.
+    [InlineData("   ")] // The media kind is whitespace only.
+    [InlineData("not-a-media-kind")] // The media kind is not the name of a defined kind.
+    [InlineData("99999")] // A numeric value that is not the name of a defined kind.
+    [InlineData("1")] // A numeric value that parses to the defined MusicTrack member, which the old Enum.TryParse and Enum.IsDefined logic accepted.
     public void Validate_WhenMediaKindIsNotTheNameOfADefinedKind_ShouldHaveValidationError(string mediaKind)
     {
         // Arrange
@@ -52,10 +52,10 @@ public class GetResumePointQueryValidatorTests
     }
 
     [Theory]
-    [InlineData(nameof(MediaKind.MusicTrack))] // a kind supported by the current catalogues
-    [InlineData(nameof(MediaKind.Book))] // another kind supported by the current catalogues
-    [InlineData(nameof(MediaKind.Movie))] // a kind without a catalogue, still a defined kind
-    [InlineData(nameof(MediaKind.Photo))] // a kind that cannot be resumed, still a defined kind
+    [InlineData(nameof(MediaKind.MusicTrack))] // A kind supported by the current catalogues.
+    [InlineData(nameof(MediaKind.Book))] // Another kind supported by the current catalogues.
+    [InlineData(nameof(MediaKind.Movie))] // A kind without a catalogue, still a defined kind.
+    [InlineData(nameof(MediaKind.Photo))] // A kind that cannot be resumed, still a defined kind.
     public void Validate_WhenMediaKindIsTheNameOfADefinedKind_ShouldNotHaveValidationError(string mediaKind)
     {
         // Arrange
@@ -69,9 +69,9 @@ public class GetResumePointQueryValidatorTests
     }
 
     [Theory]
-    [InlineData("musictrack")] // the name of a defined kind, in lower case
-    [InlineData("MUSICTRACK")] // the name of a defined kind, in upper case
-    [InlineData("musicTrack")] // the name of a defined kind, in mixed case
+    [InlineData("musictrack")] // The name of a defined kind, in lower case.
+    [InlineData("MUSICTRACK")] // The name of a defined kind, in upper case.
+    [InlineData("musicTrack")] // The name of a defined kind, in mixed case.
     public void Validate_WhenMediaKindIsTheNameOfADefinedKindInAnotherCase_ShouldNotHaveValidationError(string mediaKind)
     {
         // Arrange
@@ -98,10 +98,10 @@ public class GetResumePointQueryValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the media item Id is empty
-    [InlineData("   ")] // the media item Id is whitespace only
-    [InlineData("not-a-guid")] // the media item Id is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the media item Id is the empty Guid
+    [InlineData("")] // The media item Id is empty.
+    [InlineData("   ")] // The media item Id is whitespace only.
+    [InlineData("not-a-guid")] // The media item Id is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The media item Id is the empty Guid.
     public void Validate_WhenMediaItemIdIsEmptyOrInvalid_ShouldHaveValidationError(string mediaItemId)
     {
         // Arrange

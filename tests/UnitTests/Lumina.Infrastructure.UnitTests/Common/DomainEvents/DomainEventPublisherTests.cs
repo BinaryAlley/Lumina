@@ -102,7 +102,7 @@ public class DomainEventPublisherTests
         await publisher.PublishAsync(domainEvent, CancellationToken.None);
 
         // Assert
-        // reaching this point without an exception means the publish was a no-op, as expected
+        // Reaching this point without an exception means the publish was a no-op, as expected.
     }
 
     [Fact]

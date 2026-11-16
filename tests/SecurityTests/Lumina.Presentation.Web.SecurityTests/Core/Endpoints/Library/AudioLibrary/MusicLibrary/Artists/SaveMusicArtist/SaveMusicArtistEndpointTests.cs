@@ -37,8 +37,8 @@ public class SaveMusicArtistEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Artists; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Artists; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task SaveMusicArtist_WithSQLInjectionInRouteId_ShouldNormalizeTheIdAndNeverCallAnotherArtist(string maliciousId)
     {
         // Arrange
@@ -66,8 +66,8 @@ public class SaveMusicArtistEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Artists; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Artists; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task SaveMusicArtist_WithSQLInjectionInLibraryQueryId_ShouldNormalizeTheLibraryId(string maliciousLibraryId)
     {
         // Arrange
@@ -91,8 +91,8 @@ public class SaveMusicArtistEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Artists; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Artists; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task SaveMusicArtist_WithSQLInjectionInPostedName_ShouldNotLeakOrExecuteIt(string maliciousName)
     {
         // Arrange

@@ -78,10 +78,10 @@ public class AddFavoriteEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Theory]
-    [InlineData(FavoriteMediaKind.MusicArtist)] // a favorite of an artist of a music library
-    [InlineData(FavoriteMediaKind.MusicAlbum)] // a favorite of an album of a music library
-    [InlineData(FavoriteMediaKind.MusicTrack)] // a favorite of a track of a music library
-    [InlineData(FavoriteMediaKind.Book)] // a favorite of a book of a book library
+    [InlineData(FavoriteMediaKind.MusicArtist)] // A favorite of an artist of a music library.
+    [InlineData(FavoriteMediaKind.MusicAlbum)] // A favorite of an album of a music library.
+    [InlineData(FavoriteMediaKind.MusicTrack)] // A favorite of a track of a music library.
+    [InlineData(FavoriteMediaKind.Book)] // A favorite of a book of a book library.
     public async Task AddFavorite_WhenMediaItemExists_ShouldReturnTheFavoriteAndStoreOneRowForTheCaller(FavoriteMediaKind mediaKind)
     {
         // Arrange
@@ -138,10 +138,10 @@ public class AddFavoriteEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Theory]
-    [InlineData(FavoriteMediaKind.MusicArtist, "ArtistNotFound")] // a missing artist is reported with the artist detail
-    [InlineData(FavoriteMediaKind.MusicAlbum, "AlbumNotFound")] // a missing album is reported with the album detail
-    [InlineData(FavoriteMediaKind.MusicTrack, "TrackNotFound")] // a missing track is reported with the track detail
-    [InlineData(FavoriteMediaKind.Book, "BookNotFound")] // a missing book is reported with the book detail
+    [InlineData(FavoriteMediaKind.MusicArtist, "ArtistNotFound")] // A missing artist is reported with the artist detail.
+    [InlineData(FavoriteMediaKind.MusicAlbum, "AlbumNotFound")] // A missing album is reported with the album detail.
+    [InlineData(FavoriteMediaKind.MusicTrack, "TrackNotFound")] // A missing track is reported with the track detail.
+    [InlineData(FavoriteMediaKind.Book, "BookNotFound")] // A missing book is reported with the book detail.
     public async Task AddFavorite_WhenMediaItemDoesNotExist_ShouldReturnNotFoundWithTheKindSpecificDetail(FavoriteMediaKind mediaKind, string expectedDetail)
     {
         // Arrange
@@ -161,8 +161,8 @@ public class AddFavoriteEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     }
 
     [Theory]
-    [InlineData(FavoriteMediaKind.Video)] // video libraries are not catalogued yet
-    [InlineData(FavoriteMediaKind.Photo)] // photo libraries are not catalogued yet
+    [InlineData(FavoriteMediaKind.Video)] // Video libraries are not catalogued yet.
+    [InlineData(FavoriteMediaKind.Photo)] // Photo libraries are not catalogued yet.
     public async Task AddFavorite_WhenMediaKindIsPlanned_ShouldReturnValidationProblem(FavoriteMediaKind mediaKind)
     {
         // Arrange

@@ -35,10 +35,10 @@ public class GetAllUsersConsumptionStatisticsQueryValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the library Id is empty
-    [InlineData("   ")] // the library Id is whitespace only
-    [InlineData("not-a-guid")] // the library Id is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the library Id is the empty Guid
+    [InlineData("")] // The library Id is empty.
+    [InlineData("   ")] // The library Id is whitespace only.
+    [InlineData("not-a-guid")] // The library Id is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The library Id is the empty Guid.
     public void Validate_WhenLibraryIdIsEmptyOrInvalid_ShouldHaveValidationError(string libraryId)
     {
         // Arrange
@@ -104,10 +104,10 @@ public class GetAllUsersConsumptionStatisticsQueryValidatorTests
     }
 
     [Theory]
-    [InlineData(nameof(MediaKind.MusicTrack))] // a kind supported by the current catalogues
-    [InlineData(nameof(MediaKind.Book))] // another kind supported by the current catalogues
-    [InlineData(nameof(MediaKind.Movie))] // a kind without a catalogue, still a defined kind
-    [InlineData(nameof(MediaKind.Photo))] // a kind that every session counts for, still a defined kind
+    [InlineData(nameof(MediaKind.MusicTrack))] // A kind supported by the current catalogues.
+    [InlineData(nameof(MediaKind.Book))] // Another kind supported by the current catalogues.
+    [InlineData(nameof(MediaKind.Movie))] // A kind without a catalogue, still a defined kind.
+    [InlineData(nameof(MediaKind.Photo))] // A kind that every session counts for, still a defined kind.
     public void Validate_WhenMediaKindIsDefined_ShouldNotHaveValidationError(string mediaKind)
     {
         // Arrange
@@ -180,9 +180,9 @@ public class GetAllUsersConsumptionStatisticsQueryValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // an empty bound
-    [InlineData("not-a-date")] // a textual value that is not a date
-    [InlineData("2026-13-45T99:99:99")] // a value with out of range components
+    [InlineData("")] // An empty bound.
+    [InlineData("not-a-date")] // A textual value that is not a date.
+    [InlineData("2026-13-45T99:99:99")] // A value with out of range components.
     public void Validate_WhenADateRangeBoundIsNotAValidDate_ShouldHaveValidationError(string invalidBound)
     {
         // Arrange

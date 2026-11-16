@@ -21,13 +21,13 @@ public class PlaybackFormatCatalogTests
         // Arrange
         (string Container, string Codec)[] expectedPairs =
         [
-            ("MP4", "AAC"), // the preferred container of the preferred codec
-            ("AAC", "AAC"), // the second container of the preferred codec
-            ("OGG", "OPUS"), // the preferred lossy codec after AAC
-            ("MP3", "MP3"), // the compatibility codec
-            ("OGG", "VORBIS"), // the second lossy codec in OGG
-            ("FLAC", "FLAC"), // the lossless codec
-            ("WAV", "PCM") // the uncompressed codec
+            ("MP4", "AAC"), // The preferred container of the preferred codec.
+            ("AAC", "AAC"), // The second container of the preferred codec.
+            ("OGG", "OPUS"), // The preferred lossy codec after AAC.
+            ("MP3", "MP3"), // The compatibility codec.
+            ("OGG", "VORBIS"), // The second lossy codec in OGG.
+            ("FLAC", "FLAC"), // The lossless codec.
+            ("WAV", "PCM") // The uncompressed codec.
         ];
 
         // Act
@@ -80,7 +80,7 @@ public class PlaybackFormatCatalogTests
             Assert.True(result.TryGetValue(expectedEntry.Key, out IReadOnlyList<string>? containers));
             Assert.Equal(expectedEntry.Value, containers);
         }
-        Assert.Equal(["MP4", "AAC"], result["AAC"]); // the preferred codec has two producible containers, in preference order
+        Assert.Equal(["MP4", "AAC"], result["AAC"]); // The preferred codec has two producible containers, in preference order.
         Assert.Equal(["OGG"], result["OPUS"]);
         Assert.Equal(["OGG"], result["VORBIS"]);
         Assert.Equal(["MP3"], result["MP3"]);
@@ -130,9 +130,9 @@ public class PlaybackFormatCatalogTests
     }
 
     [Theory]
-    [InlineData("mp4/aac", "MP4", "AAC")] // the canonical pair in lower case
-    [InlineData("Mp4/Aac", "MP4", "AAC")] // the canonical pair in mixed case
-    [InlineData("aac/aac", "AAC", "AAC")] // the second format in the catalog, in lower case
+    [InlineData("mp4/aac", "MP4", "AAC")] // The canonical pair in lower case.
+    [InlineData("Mp4/Aac", "MP4", "AAC")] // The canonical pair in mixed case.
+    [InlineData("aac/aac", "AAC", "AAC")] // The second format in the catalog, in lower case.
     public void FormatsByPair_WhenLookedUpWithDifferentCasing_ShouldReturnTheCatalogFormat(string pairKey, string expectedContainer, string expectedCodec)
     {
         // Act
@@ -167,11 +167,11 @@ public class PlaybackFormatCatalogTests
     }
 
     [Theory]
-    [InlineData(null, null, "/")] // both parts are absent
-    [InlineData("", "", "/")] // both parts are empty
-    [InlineData("   ", "   ", "/")] // both parts are white space
-    [InlineData(null, "aac", "/AAC")] // only the container is absent
-    [InlineData("mp4", null, "MP4/")] // only the codec is absent
+    [InlineData(null, null, "/")] // Both parts are absent.
+    [InlineData("", "", "/")] // Both parts are empty.
+    [InlineData("   ", "   ", "/")] // Both parts are white space.
+    [InlineData(null, "aac", "/AAC")] // Only the container is absent.
+    [InlineData("mp4", null, "MP4/")] // Only the codec is absent.
     public void BuildPairKey_WhenAContainerOrCodecIsNullOrEmpty_ShouldProduceTheSlashSeparatedFormWithoutThrowing(string? container, string? codec, string expectedKey)
     {
         // Act

@@ -25,7 +25,7 @@ public class DataAccessLayerServicesTests
     {
         // Arrange
         ServiceCollection services = new();
-        string basePath = Path.GetTempPath(); // use a real existing path
+        string basePath = Path.GetTempPath(); // Use a real existing path.
 
         // Act
         DataAccessLayerServices.AddDataAccessLayerServices(services);

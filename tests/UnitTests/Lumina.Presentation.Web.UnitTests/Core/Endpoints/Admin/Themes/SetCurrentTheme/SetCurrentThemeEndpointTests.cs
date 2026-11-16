@@ -62,9 +62,9 @@ public class SetCurrentThemeEndpointTests
     }
 
     [Theory]
-    [InlineData(null)] // missing theme id
-    [InlineData("")] // empty theme id
-    [InlineData("   ")] // whitespace theme id
+    [InlineData(null)] // Missing theme id.
+    [InlineData("")] // Empty theme id.
+    [InlineData("   ")] // Whitespace theme id.
     public async Task ExecuteAsync_WhenThemeIdIsBlank_ShouldReturnProblemWithBadRequest(string? themeId)
     {
         // Act

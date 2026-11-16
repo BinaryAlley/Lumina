@@ -598,10 +598,10 @@ public class UnixPathStrategyTests
     }
 
     [Theory]
-    [InlineData("/media/books", "/media/books/book.epub")] // direct child
-    [InlineData("/media", "/media/books/book.epub")] // nested descendant
-    [InlineData("/media/books/", "/media/books/book.epub")] // trailing separator on the parent
-    [InlineData("/media/books", "/media/books/sub/../book.epub")] // relative segments that stay inside
+    [InlineData("/media/books", "/media/books/book.epub")] // Direct child.
+    [InlineData("/media", "/media/books/book.epub")] // Nested descendant.
+    [InlineData("/media/books/", "/media/books/book.epub")] // Trailing separator on the parent.
+    [InlineData("/media/books", "/media/books/sub/../book.epub")] // Relative segments that stay inside.
     public void IsPathWithin_WithContainedPaths_ShouldReturnTrue(string parentPath, string path)
     {
         // Arrange
@@ -616,12 +616,12 @@ public class UnixPathStrategyTests
     }
 
     [Theory]
-    [InlineData("/media/books", "/media/book.epub")] // sibling directory
-    [InlineData("/media/books", "/Media/Books/book.epub")] // Unix paths are case-sensitive
-    [InlineData("/media/books", "/media/other/book.epub")] // sibling directory
-    [InlineData("/media/books", "/media/books/../other/book.epub")] // relative segment that escapes the parent
-    [InlineData("/media/books", "/etc/passwd")] // unrelated location
-    [InlineData("/media", "/media")] // the parent itself is not inside itself
+    [InlineData("/media/books", "/media/book.epub")] // Sibling directory.
+    [InlineData("/media/books", "/Media/Books/book.epub")] // Unix paths are case-sensitive.
+    [InlineData("/media/books", "/media/other/book.epub")] // Sibling directory.
+    [InlineData("/media/books", "/media/books/../other/book.epub")] // Relative segment that escapes the parent.
+    [InlineData("/media/books", "/etc/passwd")] // Unrelated location.
+    [InlineData("/media", "/media")] // The parent itself is not inside itself.
     public void IsPathWithin_WithPathsOutsideTheParent_ShouldReturnFalse(string parentPath, string path)
     {
         // Arrange

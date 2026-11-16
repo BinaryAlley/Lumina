@@ -185,11 +185,11 @@ public class GetUserGenreConsumptionEndpointTests : IClassFixture<LuminaApiFacto
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task GetUserGenreConsumption_WithInjectionInUserIdRouteValue_ShouldRejectWithoutLeakingData(string maliciousUserId)
     {
         // Arrange
@@ -211,11 +211,11 @@ public class GetUserGenreConsumptionEndpointTests : IClassFixture<LuminaApiFacto
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task GetUserGenreConsumption_WithInjectionInLibraryId_ShouldRejectWithoutLeakingData(string maliciousLibraryId)
     {
         // Arrange
@@ -238,8 +238,8 @@ public class GetUserGenreConsumptionEndpointTests : IClassFixture<LuminaApiFacto
     }
 
     [Theory]
-    [InlineData("999")] // out of range numeric value
-    [InlineData("not-a-media-kind")] // textual value that is not an enum member
+    [InlineData("999")] // Out of range numeric value.
+    [InlineData("not-a-media-kind")] // Textual value that is not an enum member.
     public async Task GetUserGenreConsumption_WithUnsupportedMediaKind_ShouldNotReturnDataOrLeakInternals(string mediaKind)
     {
         // Arrange
@@ -258,11 +258,11 @@ public class GetUserGenreConsumptionEndpointTests : IClassFixture<LuminaApiFacto
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task GetUserGenreConsumption_WithInjectionInFromUtc_ShouldRejectWithoutLeakingData(string maliciousFromUtc)
     {
         // Arrange
@@ -286,11 +286,11 @@ public class GetUserGenreConsumptionEndpointTests : IClassFixture<LuminaApiFacto
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task GetUserGenreConsumption_WithInjectionInToUtc_ShouldRejectWithoutLeakingData(string maliciousToUtc)
     {
         // Arrange

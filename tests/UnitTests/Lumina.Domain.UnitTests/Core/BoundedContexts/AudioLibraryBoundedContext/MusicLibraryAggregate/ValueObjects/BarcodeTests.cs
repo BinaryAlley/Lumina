@@ -50,9 +50,9 @@ public class BarcodeTests
     }
 
     [Theory]
-    [InlineData(null)] // null barcode value
-    [InlineData("")] // empty barcode value
-    [InlineData("   ")] // whitespace barcode value
+    [InlineData(null)] // Null barcode value.
+    [InlineData("")] // Empty barcode value.
+    [InlineData("   ")] // Whitespace barcode value.
     public void Create_WhenValueIsNullOrWhitespace_ShouldReturnBarcodeValueCannotBeEmptyError(string? value)
     {
         // Act
@@ -64,11 +64,11 @@ public class BarcodeTests
     }
 
     [Theory]
-    [InlineData("12345678901")] // eleven digits, one too few
-    [InlineData("12345678901234")] // fourteen digits, one too many
-    [InlineData("12345678901A")] // contains a letter
-    [InlineData("1234-56789012")] // contains a separator
-    [InlineData("1234567890.2")] // contains a decimal separator
+    [InlineData("12345678901")] // Eleven digits, one too few.
+    [InlineData("12345678901234")] // Fourteen digits, one too many.
+    [InlineData("12345678901A")] // Contains a letter.
+    [InlineData("1234-56789012")] // Contains a separator.
+    [InlineData("1234567890.2")] // Contains a decimal separator.
     public void Create_WhenValueHasInvalidFormat_ShouldReturnInvalidFormatForBarcodeError(string value)
     {
         // Act

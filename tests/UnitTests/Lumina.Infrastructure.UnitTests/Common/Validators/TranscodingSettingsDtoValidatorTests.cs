@@ -78,9 +78,9 @@ public class TranscodingSettingsDtoValidatorTests : IDisposable
     }
 
     [Theory]
-    [InlineData(null)] // a missing ffmpeg path
-    [InlineData("")] // an empty ffmpeg path
-    [InlineData("   ")] // a whitespace ffmpeg path
+    [InlineData(null)] // A missing ffmpeg path.
+    [InlineData("")] // An empty ffmpeg path.
+    [InlineData("   ")] // A whitespace ffmpeg path.
     public void Validate_WhenFfmpegPathIsEmpty_ShouldHaveFfmpegPathCannotBeEmptyError(string? ffmpegPath)
     {
         // Arrange
@@ -94,8 +94,8 @@ public class TranscodingSettingsDtoValidatorTests : IDisposable
     }
 
     [Theory]
-    [InlineData(0)] // a job count of zero disables normalization
-    [InlineData(-1)] // a negative job count disables normalization
+    [InlineData(0)] // A job count of zero disables normalization.
+    [InlineData(-1)] // A negative job count disables normalization.
     public void Validate_WhenMaxConcurrentJobsIsNotPositive_ShouldHaveMaxConcurrentJobsMustBePositiveError(int maxConcurrentJobs)
     {
         // Arrange
@@ -136,8 +136,8 @@ public class TranscodingSettingsDtoValidatorTests : IDisposable
     }
 
     [Theory]
-    [InlineData(0)] // a per-user job count of zero never admits a normalization
-    [InlineData(-1)] // a negative per-user job count never admits a normalization
+    [InlineData(0)] // A per-user job count of zero never admits a normalization.
+    [InlineData(-1)] // A negative per-user job count never admits a normalization.
     public void Validate_WhenMaxConcurrentJobsPerUserIsNotPositive_ShouldHaveMaxConcurrentJobsPerUserMustBePositiveError(int maxConcurrentJobsPerUser)
     {
         // Arrange
@@ -178,8 +178,8 @@ public class TranscodingSettingsDtoValidatorTests : IDisposable
     }
 
     [Theory]
-    [InlineData(0)] // a cache with no capacity cannot hold a normalized track
-    [InlineData(-1)] // a negative cache size is not a capacity
+    [InlineData(0)] // A cache with no capacity cannot hold a normalized track.
+    [InlineData(-1)] // A negative cache size is not a capacity.
     public void Validate_WhenMaxCacheBytesIsNotPositive_ShouldHaveMaxCacheBytesMustBePositiveError(long maxCacheBytes)
     {
         // Arrange
@@ -193,8 +193,8 @@ public class TranscodingSettingsDtoValidatorTests : IDisposable
     }
 
     [Theory]
-    [InlineData(0)] // a job timeout of zero stops every job immediately
-    [InlineData(-1)] // a negative job timeout stops every job immediately
+    [InlineData(0)] // A job timeout of zero stops every job immediately.
+    [InlineData(-1)] // A negative job timeout stops every job immediately.
     public void Validate_WhenJobTimeoutSecondsIsNotPositive_ShouldHaveJobTimeoutMustBePositiveError(int jobTimeoutSeconds)
     {
         // Arrange
@@ -235,8 +235,8 @@ public class TranscodingSettingsDtoValidatorTests : IDisposable
     }
 
     [Theory]
-    [InlineData(0)] // an eviction grace of zero protects nothing
-    [InlineData(-1)] // a negative eviction grace protects nothing
+    [InlineData(0)] // An eviction grace of zero protects nothing.
+    [InlineData(-1)] // A negative eviction grace protects nothing.
     public void Validate_WhenEvictionGraceSecondsIsNotPositive_ShouldHaveEvictionGraceSecondsMustBePositiveError(int evictionGraceSeconds)
     {
         // Arrange
@@ -386,8 +386,8 @@ public class TranscodingSettingsDtoValidatorTests : IDisposable
     }
 
     [Theory]
-    [InlineData(null)] // no configured directory, so the default temporary directory is used
-    [InlineData("   ")] // a whitespace directory, so the default temporary directory is used
+    [InlineData(null)] // No configured directory, so the default temporary directory is used.
+    [InlineData("   ")] // A whitespace directory, so the default temporary directory is used.
     public void Validate_WhenCacheDirectoryIsNotConfigured_ShouldOnlyValidateTheDefaultDirectory(string? cacheDirectory)
     {
         // Arrange

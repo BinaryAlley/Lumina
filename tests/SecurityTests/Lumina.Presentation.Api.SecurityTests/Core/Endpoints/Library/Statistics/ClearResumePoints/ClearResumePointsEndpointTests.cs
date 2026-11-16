@@ -147,11 +147,11 @@ public class ClearResumePointsEndpointTests : IClassFixture<LuminaApiFactory>, I
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaResumePoints--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaResumePoints")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaResumePoints--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaResumePoints")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task ClearResumePoints_WithInjectionInLibraryIdQueryParameter_ShouldRejectWithoutDeletingRows(string maliciousLibraryId)
     {
         // Arrange

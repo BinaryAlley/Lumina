@@ -73,7 +73,7 @@ public class GetReadingResourceQueryHandlerTests
         _mockValidator = Substitute.For<IValidator<GetReadingResourceQuery>>();
         _userId = Guid.NewGuid();
 
-        // default stubs: the current user is authenticated and the library ownership policy allows access
+        // Default stubs: the current user is authenticated and the library ownership policy allows access.
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(true);

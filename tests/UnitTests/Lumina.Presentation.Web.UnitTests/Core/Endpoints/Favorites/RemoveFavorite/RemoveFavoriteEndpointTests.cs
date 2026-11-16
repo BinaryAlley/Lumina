@@ -56,13 +56,13 @@ public class RemoveFavoriteEndpointTests
     }
 
     [Theory]
-    [InlineData("MusicArtist", "MusicArtist")] // canonical member name
-    [InlineData("MusicAlbum", "MusicAlbum")] // another canonical member name
-    [InlineData("MusicTrack", "MusicTrack")] // another canonical member name
-    [InlineData("Book", "Book")] // another canonical member name
-    [InlineData("musictrack", "MusicTrack")] // lowercase member name
-    [InlineData("MUSICTRACK", "MusicTrack")] // uppercase member name
-    [InlineData("musicTrack", "MusicTrack")] // mixed case member name
+    [InlineData("MusicArtist", "MusicArtist")] // Canonical member name.
+    [InlineData("MusicAlbum", "MusicAlbum")] // Another canonical member name.
+    [InlineData("MusicTrack", "MusicTrack")] // Another canonical member name.
+    [InlineData("Book", "Book")] // Another canonical member name.
+    [InlineData("musictrack", "MusicTrack")] // Lowercase member name.
+    [InlineData("MUSICTRACK", "MusicTrack")] // Uppercase member name.
+    [InlineData("musicTrack", "MusicTrack")] // Mixed case member name.
     public async Task ExecuteAsync_WhenMediaKindNameIsValid_ShouldForwardTheCanonicalMemberName(string routeMediaKind, string expectedMediaKind)
     {
         // Arrange
@@ -78,16 +78,16 @@ public class RemoveFavoriteEndpointTests
     }
 
     [Theory]
-    [InlineData("1")] // numeric enum value
-    [InlineData("0")] // numeric enum value
-    [InlineData("NotAFavoriteMediaKind")] // undefined member name
-    [InlineData("None")] // the default value is not a kind that can be favorited
-    [InlineData("none")] // the default value, matched case insensitively
-    [InlineData("MusicTrack,Book")] // comma separated member names
-    [InlineData("Music Track")] // member name with a space
-    [InlineData("MusicTrack/../..")] // path traversal attempt
-    [InlineData("..")] // dot segment
-    [InlineData("MusicTrack%2F..")] // encoded slash traversal attempt
+    [InlineData("1")] // Numeric enum value.
+    [InlineData("0")] // Numeric enum value.
+    [InlineData("NotAFavoriteMediaKind")] // Undefined member name.
+    [InlineData("None")] // The default value is not a kind that can be favorited.
+    [InlineData("none")] // The default value, matched case insensitively.
+    [InlineData("MusicTrack,Book")] // Comma separated member names.
+    [InlineData("Music Track")] // Member name with a space.
+    [InlineData("MusicTrack/../..")] // Path traversal attempt.
+    [InlineData("..")] // Dot segment.
+    [InlineData("MusicTrack%2F..")] // Encoded slash traversal attempt.
     public async Task ExecuteAsync_WhenMediaKindNameIsRejected_ShouldForwardTheInvalidPlaceholder(string routeMediaKind)
     {
         // Arrange

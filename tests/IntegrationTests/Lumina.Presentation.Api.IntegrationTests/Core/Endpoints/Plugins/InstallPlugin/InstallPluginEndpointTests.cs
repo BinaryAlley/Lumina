@@ -176,7 +176,7 @@ public class InstallPluginEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     public async Task InstallPlugin_WhenCalledWithoutArchive_ShouldReturnValidationProblem()
     {
         // Arrange
-        // a multipart form without any file part, only a regular form field, so the archive is missing
+        // A multipart form without any file part, only a regular form field, so the archive is missing.
         using MultipartFormDataContent multipartContent = [];
         multipartContent.Add(new StringContent("value"), "field");
 
@@ -275,7 +275,7 @@ public class InstallPluginEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        // the admin seeding performed by the factory is not idempotent, so the seed data must be cleared between tests
+        // The admin seeding performed by the factory is not idempotent, so the seed data must be cleared between tests.
         await dbContext.Set<RolePermissionEntity>().ExecuteDeleteAsync();
         await dbContext.Set<UserPermissionEntity>().ExecuteDeleteAsync();
         await dbContext.Set<UserRoleEntity>().ExecuteDeleteAsync();

@@ -66,8 +66,8 @@ public class IsrcEntityMappingTests
     }
 
     [Theory]
-    [InlineData("")] // empty value
-    [InlineData("   ")] // whitespace value
+    [InlineData("")] // Empty value.
+    [InlineData("   ")] // Whitespace value.
     public void ToDomainValueObject_WhenValueIsWhitespace_ShouldReturnError(string value)
     {
         // Arrange

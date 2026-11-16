@@ -145,8 +145,8 @@ public class GetFavoritesEndpointTests
     }
 
     [Theory]
-    [InlineData(2, 50, "users/me/favorites?currentPage=2&perPage=50")] // both the page and the size are supplied
-    [InlineData(-1, 0, "users/me/favorites?currentPage=-1&perPage=0")] // out of range values are preserved, so the API reports its own validation
+    [InlineData(2, 50, "users/me/favorites?currentPage=2&perPage=50")] // Both the page and the size are supplied.
+    [InlineData(-1, 0, "users/me/favorites?currentPage=-1&perPage=0")] // Out of range values are preserved, so the API reports its own validation.
     public async Task ExecuteAsync_WhenPaginationValuesAreSupplied_ShouldForwardTheNormalizedQueryString(int currentPage, int perPage, string expectedEndpoint)
     {
         // Arrange
@@ -167,10 +167,10 @@ public class GetFavoritesEndpointTests
     }
 
     [Theory]
-    [InlineData(FavoriteMediaKind.MusicArtist, "users/me/favorites?currentPage=1&perPage=200&mediaKind=MusicArtist")] // artist favorites
-    [InlineData(FavoriteMediaKind.MusicAlbum, "users/me/favorites?currentPage=1&perPage=200&mediaKind=MusicAlbum")] // album favorites
-    [InlineData(FavoriteMediaKind.MusicTrack, "users/me/favorites?currentPage=1&perPage=200&mediaKind=MusicTrack")] // track favorites
-    [InlineData(FavoriteMediaKind.Book, "users/me/favorites?currentPage=1&perPage=200&mediaKind=Book")] // book favorites
+    [InlineData(FavoriteMediaKind.MusicArtist, "users/me/favorites?currentPage=1&perPage=200&mediaKind=MusicArtist")] // Artist favorites.
+    [InlineData(FavoriteMediaKind.MusicAlbum, "users/me/favorites?currentPage=1&perPage=200&mediaKind=MusicAlbum")] // Album favorites.
+    [InlineData(FavoriteMediaKind.MusicTrack, "users/me/favorites?currentPage=1&perPage=200&mediaKind=MusicTrack")] // Track favorites.
+    [InlineData(FavoriteMediaKind.Book, "users/me/favorites?currentPage=1&perPage=200&mediaKind=Book")] // Book favorites.
     public async Task ExecuteAsync_WhenMediaKindIsSupplied_ShouldAppendTheCanonicalKindToTheQueryString(FavoriteMediaKind mediaKind, string expectedEndpoint)
     {
         // Arrange

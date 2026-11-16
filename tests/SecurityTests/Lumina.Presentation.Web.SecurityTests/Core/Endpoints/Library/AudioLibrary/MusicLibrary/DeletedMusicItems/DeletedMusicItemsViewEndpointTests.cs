@@ -44,8 +44,8 @@ public class DeletedMusicItemsViewEndpointTests : IClassFixture<LuminaWebFactory
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Libraries; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Libraries; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task DeletedMusicItemsView_WithSQLInjectionInLibraryQueryId_ShouldNeverForwardTheMaliciousIdToTheApi(string maliciousLibraryId)
     {
         // Arrange

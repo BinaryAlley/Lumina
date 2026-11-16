@@ -60,12 +60,12 @@ public class GetPluginSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Plugins--")] // destructive injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Plugins--")] // Destructive injection.
     public async Task GetPluginSettings_WithSQLInjectionInPluginId_ShouldNotLeakOrError(string maliciousPluginId)
     {
         // Arrange
-        // authenticate with an admin user and seed a plugin, so a valid pluginId would reach the handler
+        // Authenticate with an admin user and seed a plugin, so a valid pluginId would reach the handler.
         HttpClient client = _apiFactory.CreateClient();
         await _apiFactory.CreateAndAuthenticateAdminUserAsync(client);
         await SeedPluginAsync();
@@ -74,10 +74,10 @@ public class GetPluginSettingsEndpointTests : IClassFixture<LuminaApiFactory>
         HttpResponseMessage response = await client.GetAsync($"/api/v1/plugins/{Uri.EscapeDataString(maliciousPluginId)}/settings");
 
         // Assert
-        // note: the {pluginId} route parameter is Guid-typed, so the malicious value fails model binding before it reaches the handler
-        // note: observed status is 500 because FastEndpoints, combined with DontCatchExceptions(), turns the binding
-        // ValidationFailureException into a 500 response instead of 400/422 (pre-existing production bug, not fixed here)
-        // note: that 500 body leaks the ValidationFailureException details, so no DoesNotContain("Exception") is asserted here
+        // Note: the {pluginId} route parameter is Guid-typed, so the malicious value fails model binding before it reaches the handler.
+        // Note: observed status is 500 because FastEndpoints, combined with DontCatchExceptions(), turns the binding
+        // ValidationFailureException into a 500 response instead of 400/422 (pre-existing production bug, not fixed here).
+        // Note: that 500 body leaks the ValidationFailureException details, so no DoesNotContain("Exception") is asserted here.
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);

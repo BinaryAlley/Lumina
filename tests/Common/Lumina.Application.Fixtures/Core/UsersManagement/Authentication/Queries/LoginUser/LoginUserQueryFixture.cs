@@ -40,7 +40,7 @@ public class LoginUserQueryFixture
             .RuleFor(x => x.Password, resolvedPassword);
 
         if (shouldIncludeTotpCode)
-            faker.RuleFor(x => x.TotpCode, f => totpCode ?? f.Random.Replace("######")); // generates 6 random digits when no code is pinned
+            faker.RuleFor(x => x.TotpCode, f => totpCode ?? f.Random.Replace("######")); // Generates 6 random digits when no code is pinned.
         return faker.Generate();
     }
 

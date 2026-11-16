@@ -73,9 +73,9 @@ public class HomeIndexEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("/de-de")] // German culture
-    [InlineData("/fr-fr")] // French culture
-    [InlineData("/ja-jp")] // Japanese culture
+    [InlineData("/de-de")] // German culture.
+    [InlineData("/fr-fr")] // French culture.
+    [InlineData("/ja-jp")] // Japanese culture.
     public async Task Home_WhenCalledByAuthenticatedUserWithLocalizedCulture_ShouldReturnHomePage(string culturePath)
     {
         // Arrange

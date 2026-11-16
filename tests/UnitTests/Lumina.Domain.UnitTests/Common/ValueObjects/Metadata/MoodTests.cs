@@ -28,9 +28,9 @@ public class MoodTests
     }
 
     [Theory]
-    [InlineData(null)] // null mood name
-    [InlineData("")] // empty mood name
-    [InlineData("   ")] // whitespace mood name
+    [InlineData(null)] // Null mood name.
+    [InlineData("")] // Empty mood name.
+    [InlineData("   ")] // Whitespace mood name.
     public void Create_WhenNameIsNullOrWhitespace_ShouldReturnError(string? name)
     {
         // Act

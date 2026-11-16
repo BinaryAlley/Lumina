@@ -45,15 +45,15 @@ public class GetPathRootEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Paths--")] // destructive SQL injection
-    [InlineData("' OR '1'='1")] // basic SQL injection
+    [InlineData("'; DROP TABLE Paths--")] // Destructive SQL injection.
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
     public async Task GetPathRoot_WhenCalledWithInjectionInPath_ShouldRemainSecure(string maliciousPath)
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
         string expectedEndpoint = $"path/get-path-root?path={Uri.EscapeDataString(maliciousPath)}";
-        // a deterministic path keeps the content assertions independent of randomized fixture data, which could
-        // otherwise contain one of the forbidden substrings by coincidence
+        // A deterministic path keeps the content assertions independent of randomized fixture data, which could
+        // otherwise contain one of the forbidden substrings by coincidence.
         _apiFactory.ApiClientStub.RegisterGetResponse(expectedEndpoint, _pathSegmentDtoFixture.Create(path: "/documents/reports/final-report.pdf"));
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage getRequest = new(HttpMethod.Get, $"/path/api-get-path-root?path={Uri.EscapeDataString(maliciousPath)}");

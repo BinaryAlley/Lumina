@@ -56,10 +56,10 @@ public class GetFavoritesEndpointTests : IClassFixture<LuminaWebFactory>, IDispo
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Favorites--")] // destructive injection
-    [InlineData("../../admin")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // script injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Favorites--")] // Destructive injection.
+    [InlineData("../../admin")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Script injection.
     public async Task GetFavorites_WithInjectionPayloadInMediaKind_ShouldRejectItAndNotCallTheApi(string payload)
     {
         // Arrange
@@ -85,10 +85,10 @@ public class GetFavoritesEndpointTests : IClassFixture<LuminaWebFactory>, IDispo
     }
 
     [Theory]
-    [InlineData("currentPage", "' OR '1'='1")] // basic SQL injection in the page number
-    [InlineData("currentPage", "1;DROP TABLE Favorites")] // destructive injection in the page number
-    [InlineData("perPage", "' OR '1'='1")] // basic SQL injection in the page size
-    [InlineData("perPage", "../../admin")] // path traversal in the page size
+    [InlineData("currentPage", "' OR '1'='1")] // Basic SQL injection in the page number.
+    [InlineData("currentPage", "1;DROP TABLE Favorites")] // Destructive injection in the page number.
+    [InlineData("perPage", "' OR '1'='1")] // Basic SQL injection in the page size.
+    [InlineData("perPage", "../../admin")] // Path traversal in the page size.
     public async Task GetFavorites_WithInjectionPayloadInPagination_ShouldRejectItAndNotCallTheApi(string parameterName, string payload)
     {
         // Arrange

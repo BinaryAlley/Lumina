@@ -42,9 +42,9 @@ public class MediaContributorNameTests
     }
 
     [Theory]
-    [InlineData(null)] // null display name
-    [InlineData("")] // empty display name
-    [InlineData("   ")] // whitespace display name
+    [InlineData(null)] // Null display name.
+    [InlineData("")] // Empty display name.
+    [InlineData("   ")] // Whitespace display name.
     public void Create_WhenDisplayNameIsNullOrWhitespace_ShouldReturnError(string? displayName)
     {
         // Act

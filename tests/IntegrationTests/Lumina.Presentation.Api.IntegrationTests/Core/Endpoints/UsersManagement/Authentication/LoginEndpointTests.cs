@@ -310,7 +310,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
         UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
         user.TotpSecret = null;
         user.TempPassword = Uri.EscapeDataString(_hashService.HashString("TempPass123!"));
-        user.TempPasswordCreated = DateTime.UtcNow.AddMinutes(-16); // expired (> 15 minutes old)
+        user.TempPasswordCreated = DateTime.UtcNow.AddMinutes(-16); // Expired (> 15 minutes old).
 
         dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync();

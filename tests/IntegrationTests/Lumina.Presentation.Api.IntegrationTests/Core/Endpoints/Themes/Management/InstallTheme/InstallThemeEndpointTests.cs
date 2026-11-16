@@ -86,13 +86,13 @@ public class InstallThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         Assert.Equal(ThemeInstallSource.Uploaded, result.InstallSource);
         Assert.Null(result.IsCurrent);
 
-        // the installed theme is listed by GET /themes
+        // The installed theme is listed by GET /themes.
         HttpResponseMessage listResponse = await _client.GetAsync("/api/v1/themes");
         List<ThemeResponse>? themes = await listResponse.Content.ReadFromJsonAsync<List<ThemeResponse>>(_jsonOptions);
         Assert.NotNull(themes);
         Assert.Contains(themes!, theme => theme.ThemeId == themeId);
 
-        // the installed theme is persisted in the database
+        // The installed theme is persisted in the database.
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         Assert.NotNull(await dbContext.Themes.FirstOrDefaultAsync(theme => theme.ThemeId == themeId));
@@ -131,7 +131,7 @@ public class InstallThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     public async Task InstallTheme_WhenCalledWithoutArchive_ShouldReturnValidationProblem()
     {
         // Arrange
-        // a multipart form without any file part, only a regular form field, so the archive is missing
+        // A multipart form without any file part, only a regular form field, so the archive is missing.
         using MultipartFormDataContent multipartContent = [];
         multipartContent.Add(new StringContent("value"), "field");
 
@@ -224,7 +224,7 @@ public class InstallThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         foreach (string themeId in _installedThemeIds)
             await themeService.DeleteAsync(themeId, CancellationToken.None);
 
-        // the admin seeding performed by the factory is not idempotent, so the seed data must be cleared between tests
+        // The admin seeding performed by the factory is not idempotent, so the seed data must be cleared between tests.
         await dbContext.Set<RolePermissionEntity>().ExecuteDeleteAsync();
         await dbContext.Set<UserPermissionEntity>().ExecuteDeleteAsync();
         await dbContext.Set<UserRoleEntity>().ExecuteDeleteAsync();

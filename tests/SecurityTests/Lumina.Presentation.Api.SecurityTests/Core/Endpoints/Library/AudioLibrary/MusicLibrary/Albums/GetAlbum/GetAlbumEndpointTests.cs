@@ -73,9 +73,9 @@ public class GetAlbumEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Albums; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // command execution attempt
+    [InlineData("'; DROP TABLE Albums; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // Command execution attempt.
     public async Task GetAlbum_WithSQLInjectionInLibraryId_ShouldNotCorruptOrLeakData(string maliciousLibraryId)
     {
         // Arrange
@@ -97,9 +97,9 @@ public class GetAlbumEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Albums; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // command execution attempt
+    [InlineData("'; DROP TABLE Albums; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // Command execution attempt.
     public async Task GetAlbum_WithSQLInjectionInArtistId_ShouldNotCorruptOrLeakData(string maliciousArtistId)
     {
         // Arrange
@@ -121,9 +121,9 @@ public class GetAlbumEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Albums; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // command execution attempt
+    [InlineData("'; DROP TABLE Albums; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // Command execution attempt.
     public async Task GetAlbum_WithSQLInjectionInAlbumId_ShouldNotCorruptOrLeakData(string maliciousAlbumId)
     {
         // Arrange

@@ -89,10 +89,10 @@ public class MusicBrainzSettingsProviderTests
     }
 
     [Theory]
-    [InlineData("not-a-url")] // a value that is not an URI at all
-    [InlineData("ftp://mirror.example/")] // an absolute URI with an unsupported scheme
-    [InlineData("relative/path")] // a relative URI
-    [InlineData("   ")] // only white space
+    [InlineData("not-a-url")] // A value that is not an URI at all.
+    [InlineData("ftp://mirror.example/")] // An absolute URI with an unsupported scheme.
+    [InlineData("relative/path")] // A relative URI.
+    [InlineData("   ")] // Only white space.
     public async Task GetAsync_WhenThePersistedBaseUrlIsInvalid_ShouldKeepTheDefaultBaseUrl(string baseUrl)
     {
         // Arrange
@@ -109,15 +109,15 @@ public class MusicBrainzSettingsProviderTests
     }
 
     [Theory]
-    [InlineData("http://127.0.0.1/ws/2/")] // IPv4 loopback
-    [InlineData("http://localhost/ws/2/")] // loopback host name
-    [InlineData("http://[::1]/ws/2/")] // IPv6 loopback
-    [InlineData("http://169.254.169.254/latest/meta-data/")] // link local cloud metadata endpoint
-    [InlineData("http://10.0.0.5/ws/2/")] // private class A range
-    [InlineData("http://172.16.0.1/ws/2/")] // private class B range
-    [InlineData("http://192.168.1.10/ws/2/")] // private class C range
-    [InlineData("http://0.0.0.0/ws/2/")] // unspecified address
-    [InlineData("http://[fc00::1]/ws/2/")] // IPv6 unique local range
+    [InlineData("http://127.0.0.1/ws/2/")] // IPv4 loopback.
+    [InlineData("http://localhost/ws/2/")] // Loopback host name.
+    [InlineData("http://[::1]/ws/2/")] // IPv6 loopback.
+    [InlineData("http://169.254.169.254/latest/meta-data/")] // Link local cloud metadata endpoint.
+    [InlineData("http://10.0.0.5/ws/2/")] // Private class A range.
+    [InlineData("http://172.16.0.1/ws/2/")] // Private class B range.
+    [InlineData("http://192.168.1.10/ws/2/")] // Private class C range.
+    [InlineData("http://0.0.0.0/ws/2/")] // Unspecified address.
+    [InlineData("http://[fc00::1]/ws/2/")] // IPv6 unique local range.
     public async Task GetAsync_WhenThePersistedBaseUrlPointsAtALocalOrPrivateHost_ShouldKeepTheDefaultBaseUrl(string baseUrl)
     {
         // Arrange
@@ -134,9 +134,9 @@ public class MusicBrainzSettingsProviderTests
     }
 
     [Theory]
-    [InlineData("http://192.168.1.10/ws/2/")] // private class C range, a typical self hosted mirror
-    [InlineData("http://localhost/ws/2/")] // loopback host name
-    [InlineData("http://[fc00::1]/ws/2/")] // IPv6 unique local range
+    [InlineData("http://192.168.1.10/ws/2/")] // Private class C range, a typical self hosted mirror.
+    [InlineData("http://localhost/ws/2/")] // Loopback host name.
+    [InlineData("http://[fc00::1]/ws/2/")] // IPv6 unique local range.
     public async Task GetAsync_WhenPrivateBaseUrlsAreExplicitlyAllowed_ShouldApplyThem(string baseUrl)
     {
         // Arrange
@@ -157,11 +157,11 @@ public class MusicBrainzSettingsProviderTests
     }
 
     [Theory]
-    [InlineData("user\r\n@example.com")] // carriage return and line feed injection
-    [InlineData("user@example.com\r\nX-Injected: value")] // header injection attempt
-    [InlineData("user(comment)@example.com")] // parentheses break the user agent comment
-    [InlineData("user\"quoted\"@example.com")] // quotes break the header value
-    [InlineData("user example@example.com")] // an inner space is not a valid token character
+    [InlineData("user\r\n@example.com")] // Carriage return and line feed injection.
+    [InlineData("user@example.com\r\nX-Injected: value")] // Header injection attempt.
+    [InlineData("user(comment)@example.com")] // Parentheses break the user agent comment.
+    [InlineData("user\"quoted\"@example.com")] // Quotes break the header value.
+    [InlineData("user example@example.com")] // An inner space is not a valid token character.
     public async Task GetAsync_WhenThePersistedContactEmailContainsUnsafeCharacters_ShouldDropIt(string storedEmail)
     {
         // Arrange
@@ -210,9 +210,9 @@ public class MusicBrainzSettingsProviderTests
     }
 
     [Theory]
-    [InlineData("", null)] // an empty value clears the email
-    [InlineData("   ", null)] // a white space value clears the email
-    [InlineData("  user@example.com  ", "user@example.com")] // a value with surrounding white space is trimmed
+    [InlineData("", null)] // An empty value clears the email.
+    [InlineData("   ", null)] // A white space value clears the email.
+    [InlineData("  user@example.com  ", "user@example.com")] // A value with surrounding white space is trimmed.
     public async Task GetAsync_WhenThePersistedContactEmailIsPresent_ShouldSetOrClearIt(string storedEmail, string? expectedEmail)
     {
         // Arrange
@@ -230,9 +230,9 @@ public class MusicBrainzSettingsProviderTests
 
     [Theory]
     [InlineData("42", 42)]
-    [InlineData("0", 1)] // a limit of zero is clamped to one
-    [InlineData("-5", 1)] // a negative limit is clamped to one
-    [InlineData("not-a-number", 10)] // an unparsable value keeps the default
+    [InlineData("0", 1)] // A limit of zero is clamped to one.
+    [InlineData("-5", 1)] // A negative limit is clamped to one.
+    [InlineData("not-a-number", 10)] // An unparsable value keeps the default.
     public async Task GetAsync_WhenThePersistedSearchResultLimitIsPresent_ShouldParseAndClampIt(string storedLimit, int expectedLimit)
     {
         // Arrange
@@ -250,9 +250,9 @@ public class MusicBrainzSettingsProviderTests
 
     [Theory]
     [InlineData("30", 30)]
-    [InlineData("0", 1)] // a limit of zero is clamped to one
-    [InlineData("-5", 1)] // a negative limit is clamped to one
-    [InlineData("not-a-number", 25)] // an unparsable value keeps the default
+    [InlineData("0", 1)] // A limit of zero is clamped to one.
+    [InlineData("-5", 1)] // A negative limit is clamped to one.
+    [InlineData("not-a-number", 25)] // An unparsable value keeps the default.
     public async Task GetAsync_WhenThePersistedReleaseLookupLimitIsPresent_ShouldParseAndClampIt(string storedLimit, int expectedLimit)
     {
         // Arrange
@@ -270,9 +270,9 @@ public class MusicBrainzSettingsProviderTests
 
     [Theory]
     [InlineData("2.5", 2.5)]
-    [InlineData("0", 0)] // an interval of zero is allowed
-    [InlineData("-3", 0)] // a negative interval is clamped to zero
-    [InlineData("not-a-number", 1)] // an unparsable value keeps the default
+    [InlineData("0", 0)] // An interval of zero is allowed.
+    [InlineData("-3", 0)] // A negative interval is clamped to zero.
+    [InlineData("not-a-number", 1)] // An unparsable value keeps the default.
     public async Task GetAsync_WhenThePersistedMinimumRequestIntervalIsPresent_ShouldParseAndClampIt(string storedInterval, double expectedSeconds)
     {
         // Arrange

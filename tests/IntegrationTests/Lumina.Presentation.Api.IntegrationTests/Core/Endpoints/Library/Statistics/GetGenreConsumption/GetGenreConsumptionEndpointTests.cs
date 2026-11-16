@@ -262,8 +262,8 @@ public class GetGenreConsumptionEndpointTests : IClassFixture<AuthenticatedLumin
     }
 
     [Theory]
-    [InlineData("999")] // a number that is not a member name
-    [InlineData("not-a-media-kind")] // a name that is not a member of the enumeration
+    [InlineData("999")] // A number that is not a member name.
+    [InlineData("not-a-media-kind")] // A name that is not a member of the enumeration.
     public async Task GetGenreConsumption_WhenMediaKindIsNotAMemberName_ShouldReturnValidationProblem(string mediaKind)
     {
         // Arrange

@@ -115,18 +115,18 @@ public class GetReadingResourceEndpointTests
     }
 
     [Theory]
-    [InlineData("image/png", "image/png")] // a non-svg image is inert content
-    [InlineData("image/svg+xml", "application/octet-stream")] // an svg can be executed, so it is served as an opaque download
-    [InlineData("audio/mpeg", "audio/mpeg")] // audio is inert content
-    [InlineData("video/mp4", "video/mp4")] // video is inert content
-    [InlineData("font/woff2", "font/woff2")] // fonts are inert content
-    [InlineData("application/font-woff", "application/font-woff")] // legacy woff font media type
-    [InlineData("application/font-woff2", "application/font-woff2")] // legacy woff2 font media type
-    [InlineData("application/vnd.ms-opentype", "application/vnd.ms-opentype")] // opentype font media type
-    [InlineData("application/x-font-ttf", "application/x-font-ttf")] // ttf font media type
-    [InlineData("application/x-font-opentype", "application/x-font-opentype")] // otf font media type
-    [InlineData("text/css", "text/css")] // stylesheets are inert content
-    [InlineData("text/html", "application/octet-stream")] // an html document can be executed, so it is served as an opaque download
+    [InlineData("image/png", "image/png")] // A non-svg image is inert content.
+    [InlineData("image/svg+xml", "application/octet-stream")] // An svg can be executed, so it is served as an opaque download.
+    [InlineData("audio/mpeg", "audio/mpeg")] // Audio is inert content.
+    [InlineData("video/mp4", "video/mp4")] // Video is inert content.
+    [InlineData("font/woff2", "font/woff2")] // Fonts are inert content.
+    [InlineData("application/font-woff", "application/font-woff")] // Legacy woff font media type.
+    [InlineData("application/font-woff2", "application/font-woff2")] // Legacy woff2 font media type.
+    [InlineData("application/vnd.ms-opentype", "application/vnd.ms-opentype")] // Opentype font media type.
+    [InlineData("application/x-font-ttf", "application/x-font-ttf")] // Ttf font media type.
+    [InlineData("application/x-font-opentype", "application/x-font-opentype")] // Otf font media type.
+    [InlineData("text/css", "text/css")] // Stylesheets are inert content.
+    [InlineData("text/html", "application/octet-stream")] // An html document can be executed, so it is served as an opaque download.
     public async Task ExecuteAsync_WhenServingAResource_ShouldUseTheSafeContentType(string mimeType, string expectedContentType)
     {
         // Arrange

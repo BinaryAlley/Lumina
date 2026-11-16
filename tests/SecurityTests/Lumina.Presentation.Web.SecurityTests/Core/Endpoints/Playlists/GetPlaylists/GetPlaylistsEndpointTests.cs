@@ -87,10 +87,10 @@ public class GetPlaylistsEndpointTests : IClassFixture<LuminaWebFactory>, IDispo
     }
 
     [Theory]
-    [InlineData("other-user-id")] // a plain identifier of another user
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Playlists--")] // destructive injection
-    [InlineData("../../admin")] // path traversal
+    [InlineData("other-user-id")] // A plain identifier of another user.
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Playlists--")] // Destructive injection.
+    [InlineData("../../admin")] // Path traversal.
     public async Task GetPlaylists_WithAnotherUserIdInTheQueryString_ShouldKeepTheUsersMeScope(string payload)
     {
         // Arrange

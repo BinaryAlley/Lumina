@@ -79,7 +79,7 @@ public class RestoreThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        // the theme is available again and appears in the list
+        // The theme is available again and appears in the list.
         using IServiceScope verificationScope = _apiFactory.Services.CreateScope();
         LuminaDbContext verificationContext = verificationScope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         ThemeEntity? restoredTheme = await verificationContext.Themes.FirstOrDefaultAsync(candidate => candidate.ThemeId == "editorial-paper");
@@ -218,7 +218,7 @@ public class RestoreThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         foreach (string themeId in _installedThemeIds)
             await themeService.DeleteAsync(themeId, CancellationToken.None);
 
-        // the admin seeding performed by the factory is not idempotent, so the seed data must be cleared between tests
+        // The admin seeding performed by the factory is not idempotent, so the seed data must be cleared between tests.
         await dbContext.Set<RolePermissionEntity>().ExecuteDeleteAsync();
         await dbContext.Set<UserPermissionEntity>().ExecuteDeleteAsync();
         await dbContext.Set<UserRoleEntity>().ExecuteDeleteAsync();

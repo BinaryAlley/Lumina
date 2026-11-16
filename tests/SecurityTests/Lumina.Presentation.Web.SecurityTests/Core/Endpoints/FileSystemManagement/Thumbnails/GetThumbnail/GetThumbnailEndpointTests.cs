@@ -46,9 +46,9 @@ public class GetThumbnailEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Thumbnails--")] // destructive SQL injection
-    [InlineData("..\\..\\appsettings.json")] // path traversal
-    [InlineData("' OR '1'='1")] // basic SQL injection
+    [InlineData("'; DROP TABLE Thumbnails--")] // Destructive SQL injection.
+    [InlineData("..\\..\\appsettings.json")] // Path traversal.
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
     public async Task GetThumbnail_WhenCalledWithInjectionInPath_ShouldRemainSecure(string maliciousPath)
     {
         // Arrange

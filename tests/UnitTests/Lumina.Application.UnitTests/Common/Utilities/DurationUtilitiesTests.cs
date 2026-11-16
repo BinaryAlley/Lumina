@@ -23,9 +23,9 @@ public class DurationUtilitiesTests
     }
 
     [Theory]
-    [InlineData(1, 0.001)] // a single millisecond is preserved
-    [InlineData(1_500, 1.5)] // whole milliseconds convert to fractional seconds
-    [InlineData(60_000, 60)] // a full minute converts exactly
+    [InlineData(1, 0.001)] // A single millisecond is preserved.
+    [InlineData(1_500, 1.5)] // Whole milliseconds convert to fractional seconds.
+    [InlineData(60_000, 60)] // A full minute converts exactly.
     public void ToClampedTimeSpan_WhenMillisecondsIsWithinTheRepresentableRange_ShouldConvertToTheEquivalentSeconds(long milliseconds, double expectedTotalSeconds)
     {
         // Act
@@ -36,8 +36,8 @@ public class DurationUtilitiesTests
     }
 
     [Theory]
-    [InlineData(-1)] // a single negative millisecond
-    [InlineData(-1_500)] // negative fractional seconds
+    [InlineData(-1)] // A single negative millisecond.
+    [InlineData(-1_500)] // Negative fractional seconds.
     public void ToClampedTimeSpan_WhenMillisecondsIsNegative_ShouldReturnTheEquivalentNegativeDuration(long milliseconds)
     {
         // Act

@@ -59,7 +59,7 @@ public class LoginViewEndpointTests
         // Arrange
         ISession session = Substitute.For<ISession>();
         byte[] pendingBytes = Encoding.UTF8.GetBytes("true");
-#pragma warning disable CS8601 // possible null reference assignment in the NSubstitute out-argument stub
+#pragma warning disable CS8601 // Possible null reference assignment in the NSubstitute out-argument stub.
         session.TryGetValue(HttpContextItemKeys.PENDING_SUPER_ADMIN_SETUP, out Arg.Any<byte[]>()).Returns(callInfo =>
         {
             callInfo[1] = pendingBytes;

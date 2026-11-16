@@ -34,9 +34,9 @@ public class UpdatePlaybackStateCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(-0.01)] // just below the minimum
-    [InlineData(-1.0)] // well below the minimum
-    [InlineData(double.MinValue)] // far below the minimum
+    [InlineData(-0.01)] // Just below the minimum.
+    [InlineData(-1.0)] // Well below the minimum.
+    [InlineData(double.MinValue)] // Far below the minimum.
     public void Validate_WhenVolumeIsBelowZero_ShouldHaveRangeError(double volume)
     {
         // Arrange
@@ -50,9 +50,9 @@ public class UpdatePlaybackStateCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(1.01)] // just above the maximum
-    [InlineData(2.0)] // well above the maximum
-    [InlineData(double.MaxValue)] // far above the maximum
+    [InlineData(1.01)] // Just above the maximum.
+    [InlineData(2.0)] // Well above the maximum.
+    [InlineData(double.MaxValue)] // Far above the maximum.
     public void Validate_WhenVolumeIsAboveOne_ShouldHaveRangeError(double volume)
     {
         // Arrange
@@ -66,9 +66,9 @@ public class UpdatePlaybackStateCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0.0)] // the minimum
-    [InlineData(0.5)] // a middle value
-    [InlineData(1.0)] // the maximum
+    [InlineData(0.0)] // The minimum.
+    [InlineData(0.5)] // A middle value.
+    [InlineData(1.0)] // The maximum.
     public void Validate_WhenVolumeIsInRange_ShouldNotHaveRangeError(double volume)
     {
         // Arrange

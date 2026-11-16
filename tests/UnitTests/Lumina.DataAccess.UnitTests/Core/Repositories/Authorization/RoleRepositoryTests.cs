@@ -53,7 +53,7 @@ public class RoleRepositoryTests
         Assert.False(result.IsFailure);
         Assert.Equal(Result.Created, result.Value);
 
-        // Check if the role was added to the context's ChangeTracker
+        // Check if the role was added to the context's ChangeTracker.
         EntityEntry<RoleEntity>? addedRole = _mockContext.ChangeTracker.Entries<RoleEntity>()
             .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == role.Id);
         Assert.NotNull(addedRole);

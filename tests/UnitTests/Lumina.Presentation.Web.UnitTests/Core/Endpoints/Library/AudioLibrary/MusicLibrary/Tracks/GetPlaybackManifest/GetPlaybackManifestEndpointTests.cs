@@ -83,8 +83,8 @@ public class GetPlaybackManifestEndpointTests
     }
 
     [Theory]
-    [InlineData(true)] // a null template means the delivery has no segment route
-    [InlineData(false)] // an empty template means the delivery has no segment route
+    [InlineData(true)] // A null template means the delivery has no segment route.
+    [InlineData(false)] // An empty template means the delivery has no segment route.
     public async Task ExecuteAsync_WhenSegmentPathTemplateIsEmpty_ShouldClearTheDeliveryIdAndTheTemplate(bool useNullTemplate)
     {
         // Arrange
@@ -153,10 +153,10 @@ public class GetPlaybackManifestEndpointTests
     }
 
     [Theory]
-    [InlineData("mp3/mp3", "?capabilities=mp3%2Fmp3")] // the capabilities are forwarded and URL-escaped
-    [InlineData("flac/flac,mp3/mp3", "?capabilities=flac%2Fflac%2Cmp3%2Fmp3")] // a capability list is forwarded as one escaped value
-    [InlineData("   ", "")] // whitespace only capabilities are not forwarded
-    [InlineData(null, "")] // absent capabilities are not forwarded
+    [InlineData("mp3/mp3", "?capabilities=mp3%2Fmp3")] // The capabilities are forwarded and URL-escaped.
+    [InlineData("flac/flac,mp3/mp3", "?capabilities=flac%2Fflac%2Cmp3%2Fmp3")] // A capability list is forwarded as one escaped value.
+    [InlineData("   ", "")] // Whitespace only capabilities are not forwarded.
+    [InlineData(null, "")] // Absent capabilities are not forwarded.
     public async Task ExecuteAsync_WhenCapabilitiesAreProvided_ShouldForwardThemOnlyWhenTheyAreNotEmpty(string? capabilities, string expectedSuffix)
     {
         // Arrange
@@ -211,9 +211,9 @@ public class GetPlaybackManifestEndpointTests
     }
 
     [Theory]
-    [InlineData("/lumina", "/lumina")] // a plain absolute path base is prefixed
-    [InlineData("//evil", "")] // a protocol relative path base would point the stream at another origin
-    [InlineData("/a?b", "")] // a path base with a query would truncate the built path
+    [InlineData("/lumina", "/lumina")] // A plain absolute path base is prefixed.
+    [InlineData("//evil", "")] // A protocol relative path base would point the stream at another origin.
+    [InlineData("/a?b", "")] // A path base with a query would truncate the built path.
     public async Task ExecuteAsync_WhenPathBaseIsPresent_ShouldUseItOnlyWhenItIsSafe(string pathBase, string expectedPrefix)
     {
         // Arrange

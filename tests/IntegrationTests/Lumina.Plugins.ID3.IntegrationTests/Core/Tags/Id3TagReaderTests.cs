@@ -255,9 +255,9 @@ public class Id3TagReaderTests : IDisposable
     }
 
     [Theory]
-    [InlineData("2011-03-14", 2011)] // a full date yields its year
-    [InlineData("2011", 2011)] // a bare year is matched by the year pattern
-    [InlineData("released in 1999 remastered", 1999)] // a year embedded in free form text is still matched
+    [InlineData("2011-03-14", 2011)] // A full date yields its year.
+    [InlineData("2011", 2011)] // A bare year is matched by the year pattern.
+    [InlineData("released in 1999 remastered", 1999)] // A year embedded in free form text is still matched.
     public void Read_WhenTheReleaseDateIsPresent_ShouldParseTheYear(string releaseDate, int expectedYear)
     {
         // Arrange

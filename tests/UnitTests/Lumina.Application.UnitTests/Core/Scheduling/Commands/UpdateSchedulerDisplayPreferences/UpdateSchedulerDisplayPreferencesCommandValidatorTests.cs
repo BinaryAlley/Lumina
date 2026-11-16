@@ -20,9 +20,9 @@ public class UpdateSchedulerDisplayPreferencesCommandValidatorTests
     private readonly UpdateSchedulerDisplayPreferencesCommandFixture _updateSchedulerDisplayPreferencesCommandFixture = new();
 
     [Theory]
-    [InlineData(0)] // display time span of zero
-    [InlineData(-1)] // negative display time span
-    [InlineData(-100)] // negative display time span far from zero
+    [InlineData(0)] // Display time span of zero.
+    [InlineData(-1)] // Negative display time span.
+    [InlineData(-100)] // Negative display time span far from zero.
     public void Validate_WhenDisplayTimeSpanIsNotPositive_ShouldHaveValidationError(int displayTimeSpan)
     {
         // Arrange
@@ -36,9 +36,9 @@ public class UpdateSchedulerDisplayPreferencesCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(1)] // minimal positive display time span
-    [InlineData(10)] // default display time span
-    [InlineData(1440)] // a day expressed in minutes
+    [InlineData(1)] // Minimal positive display time span.
+    [InlineData(10)] // Default display time span.
+    [InlineData(1440)] // A day expressed in minutes.
     public void Validate_WhenDisplayTimeSpanIsPositive_ShouldNotHaveValidationError(int displayTimeSpan)
     {
         // Arrange

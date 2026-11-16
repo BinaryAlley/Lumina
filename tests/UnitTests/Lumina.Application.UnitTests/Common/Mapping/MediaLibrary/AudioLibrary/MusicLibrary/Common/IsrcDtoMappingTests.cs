@@ -50,9 +50,9 @@ public class IsrcDtoMappingTests
     }
 
     [Theory]
-    [InlineData(null)] // missing value
-    [InlineData("")] // empty value
-    [InlineData("   ")] // whitespace value
+    [InlineData(null)] // Missing value.
+    [InlineData("")] // Empty value.
+    [InlineData("   ")] // Whitespace value.
     public void ToDomainValueObject_WhenValueIsNullOrWhitespace_ShouldReturnError(string? value)
     {
         // Arrange
@@ -67,11 +67,11 @@ public class IsrcDtoMappingTests
     }
 
     [Theory]
-    [InlineData("invalid")] // not an ISRC at all
-    [InlineData("GBUM7102960")] // too short
-    [InlineData("GBUM71029604X")] // too long
-    [InlineData("1BUM71029604")] // country code is not two letters
-    [InlineData("GBUM7102960A")] // designation code is not all digits
+    [InlineData("invalid")] // Not an ISRC at all.
+    [InlineData("GBUM7102960")] // Too short.
+    [InlineData("GBUM71029604X")] // Too long.
+    [InlineData("1BUM71029604")] // Country code is not two letters.
+    [InlineData("GBUM7102960A")] // Designation code is not all digits.
     public void ToDomainValueObject_WhenValueIsMalformed_ShouldReturnError(string value)
     {
         // Arrange

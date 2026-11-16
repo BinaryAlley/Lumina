@@ -21,8 +21,8 @@ public class DirectoryMappingTests
     private readonly DirectoryFixture _directoryFixture = new();
 
     [Theory]
-    [InlineData(true)] // hidden directory
-    [InlineData(false)] // visible directory
+    [InlineData(true)] // Hidden directory.
+    [InlineData(false)] // Visible directory.
     public void ToFileSystemTreeNodeResponse_WhenMappingDirectory_ShouldMapCorrectly(bool isHidden)
     {
         // Arrange
@@ -86,8 +86,8 @@ public class DirectoryMappingTests
     }
 
     [Theory]
-    [InlineData(true)] // hidden directory
-    [InlineData(false)] // visible directory
+    [InlineData(true)] // Hidden directory.
+    [InlineData(false)] // Visible directory.
     public void ToResponse_WhenMappingDirectory_ShouldMapCorrectly(bool isHidden)
     {
         // Arrange

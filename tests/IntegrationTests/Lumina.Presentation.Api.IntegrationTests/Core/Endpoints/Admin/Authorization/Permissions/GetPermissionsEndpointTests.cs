@@ -79,7 +79,7 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     public async Task GetPermissions_WhenCalledWithNonAdminAccount_ShouldReturnForbiddenResult()
     {
         // Act
-        _client = await _apiFactory.CreateAuthenticatedClientAsync(); // authenticated user, but not admin
+        _client = await _apiFactory.CreateAuthenticatedClientAsync(); // Authenticated user, but not admin.
         HttpResponseMessage response = await _client.GetAsync("/api/v1/auth/permissions");
 
         // Assert
@@ -122,11 +122,11 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        // clear junction tables first
+        // Clear junction tables first.
         await dbContext.Set<RolePermissionEntity>().ExecuteDeleteAsync();
         await dbContext.Set<UserPermissionEntity>().ExecuteDeleteAsync();
 
-        // then clear main tables
+        // Then clear main tables.
         await dbContext.Set<UserEntity>().ExecuteDeleteAsync();
         await dbContext.Set<RoleEntity>().ExecuteDeleteAsync();
         await dbContext.Set<PermissionEntity>().ExecuteDeleteAsync();

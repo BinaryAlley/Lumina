@@ -77,24 +77,24 @@ public class GetTrackSegmentEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     }
 
     [Theory]
-    [InlineData("libraryId", "'; DROP TABLE Tracks; --")] // destructive injection in the library Id
-    [InlineData("libraryId", "' OR '1'='1")] // boolean based injection in the library Id
-    [InlineData("artistId", "'; DROP TABLE Tracks; --")] // destructive injection in the artist Id
-    [InlineData("artistId", "'; EXEC xp_cmdshell('dir'); --")] // command execution attempt in the artist Id
-    [InlineData("albumId", "' OR '1'='1")] // boolean based injection in the album Id
-    [InlineData("albumId", "'; DROP TABLE Tracks; --")] // destructive injection in the album Id
-    [InlineData("trackId", "' OR '1'='1")] // boolean based injection in the track Id
-    [InlineData("trackId", "'; EXEC xp_cmdshell('dir'); --")] // command execution attempt in the track Id
-    [InlineData("deliveryId", "'; DROP TABLE Tracks; --")] // destructive injection in the delivery handle
-    [InlineData("deliveryId", "' OR '1'='1")] // boolean based injection in the delivery handle
-    [InlineData("segmentIndex", "'; DROP TABLE Tracks; --")] // destructive injection in the segment index
-    [InlineData("segmentIndex", "' OR '1'='1")] // boolean based injection in the segment index
-    [InlineData("libraryId", "../../etc/passwd")] // path traversal in the library Id
-    [InlineData("artistId", "../../etc/passwd")] // path traversal in the artist Id
-    [InlineData("albumId", "../../etc/passwd")] // path traversal in the album Id
-    [InlineData("trackId", "../../etc/passwd")] // path traversal in the track Id
-    [InlineData("deliveryId", "../../etc/passwd")] // path traversal in the delivery handle
-    [InlineData("segmentIndex", "../../etc/passwd")] // path traversal in the segment index
+    [InlineData("libraryId", "'; DROP TABLE Tracks; --")] // Destructive injection in the library Id.
+    [InlineData("libraryId", "' OR '1'='1")] // Boolean based injection in the library Id.
+    [InlineData("artistId", "'; DROP TABLE Tracks; --")] // Destructive injection in the artist Id.
+    [InlineData("artistId", "'; EXEC xp_cmdshell('dir'); --")] // Command execution attempt in the artist Id.
+    [InlineData("albumId", "' OR '1'='1")] // Boolean based injection in the album Id.
+    [InlineData("albumId", "'; DROP TABLE Tracks; --")] // Destructive injection in the album Id.
+    [InlineData("trackId", "' OR '1'='1")] // Boolean based injection in the track Id.
+    [InlineData("trackId", "'; EXEC xp_cmdshell('dir'); --")] // Command execution attempt in the track Id.
+    [InlineData("deliveryId", "'; DROP TABLE Tracks; --")] // Destructive injection in the delivery handle.
+    [InlineData("deliveryId", "' OR '1'='1")] // Boolean based injection in the delivery handle.
+    [InlineData("segmentIndex", "'; DROP TABLE Tracks; --")] // Destructive injection in the segment index.
+    [InlineData("segmentIndex", "' OR '1'='1")] // Boolean based injection in the segment index.
+    [InlineData("libraryId", "../../etc/passwd")] // Path traversal in the library Id.
+    [InlineData("artistId", "../../etc/passwd")] // Path traversal in the artist Id.
+    [InlineData("albumId", "../../etc/passwd")] // Path traversal in the album Id.
+    [InlineData("trackId", "../../etc/passwd")] // Path traversal in the track Id.
+    [InlineData("deliveryId", "../../etc/passwd")] // Path traversal in the delivery handle.
+    [InlineData("segmentIndex", "../../etc/passwd")] // Path traversal in the segment index.
     public async Task GetTrackSegment_WithAnInjectionPayloadInARouteValue_ShouldNotFailOrLeakData(string routeValue, string payload)
     {
         // Arrange

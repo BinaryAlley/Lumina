@@ -70,10 +70,10 @@ public class GetThemeTemplateEndpointTests : IClassFixture<LuminaApiFactory>, ID
     }
 
     [Theory]
-    [InlineData("..%2F..%2Fevil.html")] // encoded slash path traversal
-    [InlineData("%2e%2e%2f%2e%2e%2fevil.html")] // encoded dot-slash path traversal
-    [InlineData("..%5C..%5Cevil.html")] // encoded backslash path traversal
-    [InlineData("..%2F..%2F..%2F..%2Fdecoy-secret.txt")] // deep traversal targeting a decoy file outside the pack
+    [InlineData("..%2F..%2Fevil.html")] // Encoded slash path traversal.
+    [InlineData("%2e%2e%2f%2e%2e%2fevil.html")] // Encoded dot-slash path traversal.
+    [InlineData("..%5C..%5Cevil.html")] // Encoded backslash path traversal.
+    [InlineData("..%2F..%2F..%2F..%2Fdecoy-secret.txt")] // Deep traversal targeting a decoy file outside the pack.
     public async Task GetThemeTemplate_WithEncodedPathTraversalInPageKey_ShouldOnlyServeInPackTemplates(string maliciousPageKey)
     {
         // Arrange
@@ -120,10 +120,10 @@ public class GetThemeTemplateEndpointTests : IClassFixture<LuminaApiFactory>, ID
     }
 
     [Theory]
-    [InlineData("..%2F..%2Fevil")] // encoded slash traversal
-    [InlineData("%2e%2e%2f%2e%2e%2fevil")] // encoded dot-slash traversal
-    [InlineData("..%5Cevil")] // encoded backslash traversal
-    [InlineData("..%2F")] // encoded trailing slash traversal
+    [InlineData("..%2F..%2Fevil")] // Encoded slash traversal.
+    [InlineData("%2e%2e%2f%2e%2e%2fevil")] // Encoded dot-slash traversal.
+    [InlineData("..%5Cevil")] // Encoded backslash traversal.
+    [InlineData("..%2F")] // Encoded trailing slash traversal.
     public async Task GetThemeTemplate_WithPathTraversalInThemeId_ShouldReturnCleanNotFoundProblemDetails(string maliciousThemeId)
     {
         // Arrange

@@ -47,14 +47,14 @@ public class CalibreArtworkProviderSecurityTests
     }
 
     [Theory]
-    [InlineData("../cover.jpg")] // parent directory escape
-    [InlineData("../../cover.jpg")] // multiple parent directory escape
-    [InlineData("sub/cover.jpg")] // forward slash path traversal
-    [InlineData("sub\\cover.jpg")] // backslash path traversal
-    [InlineData(@"C:\Windows\System32\drivers\etc\hosts")] // absolute Windows path
-    [InlineData("/etc/passwd")] // absolute Unix path
-    [InlineData("http://evil.example/cover.jpg")] // remote URL
-    [InlineData("file:///etc/passwd")] // file URI
+    [InlineData("../cover.jpg")] // Parent directory escape.
+    [InlineData("../../cover.jpg")] // Multiple parent directory escape.
+    [InlineData("sub/cover.jpg")] // Forward slash path traversal.
+    [InlineData("sub\\cover.jpg")] // Backslash path traversal.
+    [InlineData(@"C:\Windows\System32\drivers\etc\hosts")] // Absolute Windows path.
+    [InlineData("/etc/passwd")] // Absolute Unix path.
+    [InlineData("http://evil.example/cover.jpg")] // Remote URL.
+    [InlineData("file:///etc/passwd")] // File URI.
     public async Task GetArtworkAsync_WhenCoverHrefEscapesTheBookDirectory_ShouldReturnNull(string coverHref)
     {
         // Arrange

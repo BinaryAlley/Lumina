@@ -113,7 +113,7 @@ public class MusicBrainzArtistMetadataProviderTests
         Assert.Equal("The Artist", result[0].Name);
         Assert.Equal("Other Artist", result[1].Name);
         Assert.Equal(1, handler.CallCount);
-        // the name is trimmed and the configured search result limit is used
+        // The name is trimmed and the configured search result limit is used.
         Assert.Contains("limit=10", handler.Requests[0].RequestUri!.Query);
         Assert.Contains("query=The%20Artist", handler.Requests[0].RequestUri!.Query);
     }
@@ -227,7 +227,7 @@ public class MusicBrainzArtistMetadataProviderTests
         Assert.Equal("The Artist", result.Name);
         Assert.Equal(MusicArtistType.Group, result.Type);
         Assert.Null(result.MusicBrainzArtistId);
-        // the search is used, and the per identifier lookup must not be requested
+        // The search is used, and the per identifier lookup must not be requested.
         Assert.Equal(1, handler.CallCount);
     }
 

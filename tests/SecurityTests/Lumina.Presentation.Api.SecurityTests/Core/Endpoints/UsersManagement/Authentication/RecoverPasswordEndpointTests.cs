@@ -88,8 +88,8 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Users--")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Users--")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task RecoverPassword_WithSQLInjectionInUsername_ShouldNotCorruptOrDeleteData(string maliciousUsername)
     {
         // Arrange

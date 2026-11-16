@@ -126,8 +126,8 @@ public class ReadingContentSanitizerTests
     }
 
     [Theory]
-    [InlineData(true)] // preserve styles
-    [InlineData(false)] // strip styles
+    [InlineData(true)] // Preserve styles.
+    [InlineData(false)] // Strip styles.
     public void Sanitize_WhenHtmlContainsActiveContent_ShouldStripItRegardlessOfTheStylePreference(bool shouldPreserveStyles)
     {
         // Arrange
@@ -145,9 +145,9 @@ public class ReadingContentSanitizerTests
     }
 
     [Theory]
-    [InlineData(null)] // null input
-    [InlineData("")] // empty input
-    [InlineData("   ")] // whitespace input
+    [InlineData(null)] // Null input.
+    [InlineData("")] // Empty input.
+    [InlineData("   ")] // Whitespace input.
     public void Sanitize_WhenInputIsBlank_ShouldReturnEmptyString(string? html)
     {
         // Act

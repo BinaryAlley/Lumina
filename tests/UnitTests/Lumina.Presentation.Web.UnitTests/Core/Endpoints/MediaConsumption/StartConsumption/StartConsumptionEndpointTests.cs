@@ -168,12 +168,12 @@ public class StartConsumptionEndpointTests
     }
 
     [Theory]
-    [InlineData("MusicTrack", "MusicTrack")] // canonical member name
-    [InlineData("musictrack", "MusicTrack")] // lowercase member name
-    [InlineData("MUSICTRACK", "MusicTrack")] // uppercase member name
-    [InlineData("tvEpisode", "TvEpisode")] // mixed case member name
-    [InlineData("Book", "Book")] // another canonical member name
-    [InlineData("podcastepisode", "PodcastEpisode")] // another lowercase member name
+    [InlineData("MusicTrack", "MusicTrack")] // Canonical member name.
+    [InlineData("musictrack", "MusicTrack")] // Lowercase member name.
+    [InlineData("MUSICTRACK", "MusicTrack")] // Uppercase member name.
+    [InlineData("tvEpisode", "TvEpisode")] // Mixed case member name.
+    [InlineData("Book", "Book")] // Another canonical member name.
+    [InlineData("podcastepisode", "PodcastEpisode")] // Another lowercase member name.
     public async Task ExecuteAsync_WhenMediaKindNameIsValid_ShouldForwardTheCanonicalMemberName(string routeMediaKind, string expectedMediaKind)
     {
         // Arrange
@@ -193,14 +193,14 @@ public class StartConsumptionEndpointTests
     }
 
     [Theory]
-    [InlineData("1")] // numeric enum value
-    [InlineData("0")] // numeric enum value, the None member
-    [InlineData("NotAMediaKind")] // undefined member name
-    [InlineData("MusicTrack,Book")] // comma separated member names
-    [InlineData("Music Track")] // member name with a space
-    [InlineData("MusicTrack/../..")] // path traversal attempt
-    [InlineData("..")] // dot segment
-    [InlineData("MusicTrack%2F..")] // encoded slash traversal attempt
+    [InlineData("1")] // Numeric enum value.
+    [InlineData("0")] // Numeric enum value, the None member.
+    [InlineData("NotAMediaKind")] // Undefined member name.
+    [InlineData("MusicTrack,Book")] // Comma separated member names.
+    [InlineData("Music Track")] // Member name with a space.
+    [InlineData("MusicTrack/../..")] // Path traversal attempt.
+    [InlineData("..")] // Dot segment.
+    [InlineData("MusicTrack%2F..")] // Encoded slash traversal attempt.
     public async Task ExecuteAsync_WhenMediaKindNameIsRejected_ShouldForwardTheInvalidPlaceholder(string routeMediaKind)
     {
         // Arrange

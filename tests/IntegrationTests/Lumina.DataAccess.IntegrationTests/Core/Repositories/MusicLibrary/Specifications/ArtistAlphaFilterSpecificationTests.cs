@@ -193,9 +193,9 @@ public class ArtistAlphaFilterSpecificationTests : IDisposable
     }
 
     [Theory]
-    [InlineData("a", "Alpha")] // the first letter of the alphabet
-    [InlineData("b", "Bravo")] // a letter in the middle of the alphabet
-    [InlineData("c", "Charlie")] // another letter in the middle of the alphabet
+    [InlineData("a", "Alpha")] // The first letter of the alphabet.
+    [InlineData("b", "Bravo")] // A letter in the middle of the alphabet.
+    [InlineData("c", "Charlie")] // Another letter in the middle of the alphabet.
     public void ToExpression_WhenAlphaKeyIsALetter_ShouldMatchOnlyTheNamesStartingWithIt(string alphaKey, string matchingName)
     {
         // Arrange

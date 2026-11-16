@@ -82,11 +82,11 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("admin'--")] // comment injection
-    [InlineData("' UNION SELECT * FROM Users--")] // union injection
-    [InlineData("'; DROP TABLE Users--")] // destructive injection
-    [InlineData("{{7*7}}")] // template injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("admin'--")] // Comment injection.
+    [InlineData("' UNION SELECT * FROM Users--")] // Union injection.
+    [InlineData("'; DROP TABLE Users--")] // Destructive injection.
+    [InlineData("{{7*7}}")] // Template injection.
     public async Task ChangePassword_WithInjectionAttemptInNewPassword_ShouldRemainSecure(string maliciousNewPassword)
     {
         // Arrange

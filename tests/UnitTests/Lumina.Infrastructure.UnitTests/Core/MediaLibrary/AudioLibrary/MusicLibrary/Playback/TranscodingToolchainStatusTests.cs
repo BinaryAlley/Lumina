@@ -74,8 +74,8 @@ public class TranscodingToolchainStatusTests
     }
 
     [Theory]
-    [InlineData("AAC")] // an encoder name in upper case
-    [InlineData("Aac")] // an encoder name in mixed case
+    [InlineData("AAC")] // An encoder name in upper case.
+    [InlineData("Aac")] // An encoder name in mixed case.
     public void RecordMissingEncoders_WhenTheNameDiffersInCase_ShouldReportTheEncoderUnavailable(string missingEncoderName)
     {
         // Act

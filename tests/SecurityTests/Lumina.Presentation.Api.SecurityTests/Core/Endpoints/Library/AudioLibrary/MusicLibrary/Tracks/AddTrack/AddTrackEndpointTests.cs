@@ -169,8 +169,8 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task AddTrack_WithSQLInjectionInPath_ShouldNotCorruptOrDeleteData(string maliciousPath)
     {
         // Arrange
@@ -198,8 +198,8 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task AddTrack_WithSQLInjectionInBody_ShouldNotCorruptOrDeleteData(string maliciousTitle)
     {
         // Arrange
@@ -228,8 +228,8 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tags; --")] // destructive injection in a tag and genre name
-    [InlineData("' OR '1'='1")] // boolean-based injection in a tag and genre name
+    [InlineData("'; DROP TABLE Tags; --")] // Destructive injection in a tag and genre name.
+    [InlineData("' OR '1'='1")] // Boolean-based injection in a tag and genre name.
     public async Task AddTrack_WithSQLInjectionInTagAndGenreNames_ShouldNotCorruptOrLeakData(string maliciousName)
     {
         // Arrange
@@ -279,8 +279,8 @@ public class AddTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task AddTrack_WithSQLInjectionInRouteId_ShouldNotCorruptOrLeakData(string maliciousLibraryId)
     {
         // Arrange
