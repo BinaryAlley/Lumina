@@ -28,7 +28,7 @@ public sealed class MovieId : EntityId<Guid>
     public static MovieId CreateUnique()
     {
         // TODO: enforce invariants.
-        return new MovieId(Guid.NewGuid());
+        return new MovieId(Guid.CreateVersion7());
     }
 
     /// <summary>

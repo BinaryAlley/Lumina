@@ -26,7 +26,7 @@ public sealed class EpisodeId : EntityId<Guid>
     public static EpisodeId CreateUnique()
     {
         // TODO: enforce invariants.
-        return new EpisodeId(Guid.NewGuid());
+        return new EpisodeId(Guid.CreateVersion7());
     }
 
     /// <summary>

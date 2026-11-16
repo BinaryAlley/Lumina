@@ -626,7 +626,7 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
     {
         return new MusicArtworkEntity
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.CreateVersion7(),
             OwnerType = ownerType,
             OwnerId = ownerId,
             ArtworkType = artworkType,
@@ -659,7 +659,7 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
             return scanJobProgressResult.Errors;
 
         await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(
-            Guid.NewGuid(), libraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+            Guid.CreateVersion7(), libraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
         return Result.Success;
     }

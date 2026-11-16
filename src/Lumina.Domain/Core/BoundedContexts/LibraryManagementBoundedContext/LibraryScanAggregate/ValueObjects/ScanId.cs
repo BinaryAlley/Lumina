@@ -27,7 +27,7 @@ public sealed class ScanId : EntityId<Guid>
     /// <returns>The created <see cref="ScanId"/> instance.</returns>
     public static ScanId CreateUnique()
     {
-        return new ScanId(Guid.NewGuid());
+        return new ScanId(Guid.CreateVersion7());
     }
 
     /// <summary>

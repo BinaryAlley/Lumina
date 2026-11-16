@@ -27,7 +27,7 @@ public sealed class PlaylistEntryId : EntityId<Guid>
     /// <returns>The created <see cref="PlaylistEntryId"/> instance.</returns>
     public static PlaylistEntryId CreateUnique()
     {
-        return new PlaylistEntryId(Guid.NewGuid());
+        return new PlaylistEntryId(Guid.CreateVersion7());
     }
 
     /// <summary>

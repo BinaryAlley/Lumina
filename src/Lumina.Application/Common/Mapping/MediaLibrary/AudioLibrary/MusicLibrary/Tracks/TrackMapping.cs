@@ -72,7 +72,7 @@ public static class TrackMapping
             MusicBrainzWorkId = domainEntity.Work.HasValue ? domainEntity.Work.Value.MusicBrainzWorkId.Value : null,
             Contributors = [.. domainEntity.Contributors.Select(contributor => new TrackContributorEntity
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 TrackId = domainEntity.Id.Value,
                 MediaContributorId = contributor.ContributorId.Value,
                 Role = contributor.Role,

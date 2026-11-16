@@ -61,6 +61,7 @@ internal sealed class PlaybackDeliveryHandleService : IPlaybackDeliveryHandleSer
             EnforceGlobalLimit();
 
             // The handle is a random opaque value, not a derived one, so it cannot be computed from the track or the file by a caller.
+            // It stays a version 4 GUID on purpose: version 7 embeds the creation time and leaves fewer random bits for an unguessable handle.
             string deliveryId = Guid.NewGuid().ToString("N");
             DateTimeOffset expiresAtUtc = now.Add(s_deliveryLifetime);
             _deliveries[deliveryId] = new StoredDelivery(delivery, signature, expiresAtUtc);

@@ -87,7 +87,7 @@ internal sealed class MediaContributorRepository : IMediaContributorRepository
 
         MediaContributorEntity contributor = new()
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.CreateVersion7(),
             DisplayName = displayName,
             LegalName = legalName,
             CreatedOnUtc = DateTime.UtcNow,

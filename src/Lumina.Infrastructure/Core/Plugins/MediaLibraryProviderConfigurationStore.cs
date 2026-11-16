@@ -291,7 +291,7 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
             // columns are left at their defaults because the persistence layer stamps them when the row is saved.
             LibraryBookReaderConfigurationEntity configuration = new()
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 LibraryId = libraryId,
                 PluginId = pluginId,
                 IsEnabled = false,
@@ -333,7 +333,7 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
             // columns are left at their defaults because the persistence layer stamps them when the row is saved.
             LibraryBookReaderConfigurationEntity configuration = new()
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 LibraryId = libraryId,
                 PluginId = pluginId,
                 IsEnabled = false,
@@ -384,7 +384,7 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
             // the audit columns are left at their defaults because the persistence layer stamps them when the row is saved.
             LibraryMetadataProviderConfigurationEntity configuration = new()
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 LibraryId = libraryId,
                 PluginId = pluginId,
                 IsEnabled = false,
@@ -437,7 +437,7 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
             // audit columns are left at their defaults because the persistence layer stamps them when the row is saved.
             LibraryArtworkProviderConfigurationEntity configuration = new()
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 LibraryId = libraryId,
                 PluginId = pluginId,
                 IsEnabled = false,
@@ -479,7 +479,7 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
             // the audit columns are left at their defaults because the persistence layer stamps them when the row is saved.
             LibraryMetadataProviderConfigurationEntity configuration = new()
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 LibraryId = libraryId,
                 PluginId = pluginId,
                 IsEnabled = false,
@@ -521,7 +521,7 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
             // audit columns are left at their defaults because the persistence layer stamps them when the row is saved.
             LibraryArtworkProviderConfigurationEntity configuration = new()
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 LibraryId = libraryId,
                 PluginId = pluginId,
                 IsEnabled = false,
@@ -578,7 +578,7 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
             bool isEnabled = enabledStatesByPluginId.GetValueOrDefault(pluginId) ?? storedConfiguration?.IsEnabled ?? false;
             LibraryMetadataProviderConfigurationEntity configuration = storedConfiguration ?? new LibraryMetadataProviderConfigurationEntity
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 LibraryId = libraryId,
                 PluginId = pluginId,
                 IsEnabled = isEnabled,
@@ -636,7 +636,7 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
             bool isEnabled = enabledStatesByPluginId.GetValueOrDefault(pluginId) ?? storedConfiguration?.IsEnabled ?? false;
             LibraryArtworkProviderConfigurationEntity configuration = storedConfiguration ?? new LibraryArtworkProviderConfigurationEntity
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 LibraryId = libraryId,
                 PluginId = pluginId,
                 IsEnabled = isEnabled,
@@ -693,7 +693,7 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
             bool isEnabled = enabledStatesByPluginId.GetValueOrDefault(pluginId) ?? storedConfiguration?.IsEnabled ?? false;
             LibraryBookReaderConfigurationEntity configuration = storedConfiguration ?? new LibraryBookReaderConfigurationEntity
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 LibraryId = libraryId,
                 PluginId = pluginId,
                 IsEnabled = isEnabled,

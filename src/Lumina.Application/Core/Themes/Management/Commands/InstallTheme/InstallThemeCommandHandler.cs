@@ -118,7 +118,7 @@ public class InstallThemeCommandHandler : ICommandHandler<InstallThemeCommand, R
         {
             themeEntity = new ThemeEntity
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 ThemeId = manifest.Id,
                 Name = manifest.Name,
                 Description = manifest.Description,

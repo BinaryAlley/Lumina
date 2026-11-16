@@ -34,6 +34,7 @@ This project enforces many style rules via `.editorconfig` as build errors, so t
 - **`<inheritdoc/>`**: avoid on classes implementing interface members. Developers usually work in the implementing class and should see documentation there directly, without having to open the interface.
 - **Boolean naming**: boolean fields, properties, and methods returning booleans must start with a verb implying true/false: `is`, `are`, `should`, `has`, `was`, `can`, etc.
 - **Error handling**: rule violations return `Result<T>`. Never throw exceptions unless explicitly justified (e.g. startup/configuration code). Flag any `throw` outside that context.
+- **Identifier generation**: persisted entity and domain event identifiers are created with `Guid.CreateVersion7()`, never `Guid.NewGuid()`, so inserts stay time ordered. Entity Framework Core keys configured with `ValueGeneratedOnAdd` receive the same generator through `LuminaDbContext`. Version 4 remains correct only for opaque security handles, temporary file or cache names, fixed sentinel identifiers such as the SYSTEM audit user, stable derived identifiers such as the SHA-256 plugin identifier, and the SQL bulk insert paths recorded in [ADR-0020](../architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0020.md).
 
 ## Review priority
 

@@ -27,7 +27,7 @@ public sealed class FavoriteId : EntityId<Guid>
     /// <returns>The created <see cref="FavoriteId"/> instance.</returns>
     public static FavoriteId CreateUnique()
     {
-        return new FavoriteId(Guid.NewGuid());
+        return new FavoriteId(Guid.CreateVersion7());
     }
 
     /// <summary>

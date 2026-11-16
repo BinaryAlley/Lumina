@@ -167,7 +167,7 @@ internal sealed class MusicArtworkRepository : IMusicArtworkRepository
         {
             _luminaDbContext.MusicArtwork.Add(new MusicArtworkEntity
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 OwnerType = ownerType,
                 OwnerId = ownerId,
                 ArtworkType = ArtworkType.Cover,

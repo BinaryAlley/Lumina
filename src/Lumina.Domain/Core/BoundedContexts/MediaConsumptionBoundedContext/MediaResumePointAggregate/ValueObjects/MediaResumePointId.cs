@@ -27,7 +27,7 @@ public sealed class MediaResumePointId : EntityId<Guid>
     /// <returns>The created <see cref="MediaResumePointId"/> instance.</returns>
     public static MediaResumePointId CreateUnique()
     {
-        return new MediaResumePointId(Guid.NewGuid());
+        return new MediaResumePointId(Guid.CreateVersion7());
     }
 
     /// <summary>

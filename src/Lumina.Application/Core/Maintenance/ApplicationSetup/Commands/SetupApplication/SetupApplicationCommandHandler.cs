@@ -97,7 +97,7 @@ public class SetupApplicationCommandHandler : ICommandHandler<SetupApplicationCo
             return Errors.Authorization.AdminAccountAlreadyCreated;
         // No users are present, register the admin one.
         string? totpSecret = null;
-        Guid id = Guid.NewGuid();
+        Guid id = Guid.CreateVersion7();
         UserEntity user = new()
         {
             Id = id,
@@ -158,7 +158,7 @@ public class SetupApplicationCommandHandler : ICommandHandler<SetupApplicationCo
             return getScheduledJobsResult.Errors;
         foreach (ScheduledJobEntity scheduledJob in getScheduledJobsResult.Value.Data)
             if (scheduledJob.Status == ScheduledJobStatus.Active)
-                _domainEventsQueue.Enqueue(new ScheduledJobCycleStartedDomainEvent(Guid.NewGuid(), ScheduledJobId.Create(scheduledJob.Id), DateTime.UtcNow));
+                _domainEventsQueue.Enqueue(new ScheduledJobCycleStartedDomainEvent(Guid.CreateVersion7(), ScheduledJobId.Create(scheduledJob.Id), DateTime.UtcNow));
 
         // TODO: insert the default admin profile preferences when they are implemented.
         // If 2FA was enabled during registration, the TOTP secret needs to be delivered to the client unhashed, so it can be displayed.

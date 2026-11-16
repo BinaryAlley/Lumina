@@ -27,7 +27,7 @@ public sealed class UserSettingsId : EntityId<Guid>
     /// <returns>The created <see cref="UserSettingsId"/> instance.</returns>
     public static UserSettingsId CreateUnique()
     {
-        return new UserSettingsId(Guid.NewGuid());
+        return new UserSettingsId(Guid.CreateVersion7());
     }
 
     /// <summary>

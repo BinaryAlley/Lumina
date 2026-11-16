@@ -125,6 +125,7 @@
     <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0017.md" />
     <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0018.md" />
     <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0019.md" />
+    <File Path="../docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0020.md" />
   </Folder>
   <Folder Name="/docs/technical/domain/">
     <File Path="../docs/technical/domain/Aggregates.AudioLibrary.md" />

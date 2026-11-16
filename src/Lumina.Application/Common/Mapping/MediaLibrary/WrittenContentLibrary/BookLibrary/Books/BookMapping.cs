@@ -60,7 +60,7 @@ public static class BookMapping
             ISBNs = [.. domainEntity.ISBNs.ToRepositoryEntities()],
             Contributors = [.. domainEntity.Contributors.Select(contributor => new BookContributorEntity
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 BookId = domainEntity.Id.Value,
                 MediaContributorId = contributor.ContributorId.Value,
                 Role = contributor.Role,
@@ -115,6 +115,6 @@ public static class BookMapping
         entity.BarnesAndNobleId = domainEntity.BarnesAndNobleId.HasValue ? domainEntity.BarnesAndNobleId.Value : null;
         entity.AppleBooksId = domainEntity.AppleBooksId.HasValue ? domainEntity.AppleBooksId.Value : null;
         entity.UpdatedOnUtc = DateTime.UtcNow;
-        entity.UpdatedBy = Guid.NewGuid();
+        entity.UpdatedBy = Guid.CreateVersion7();
     }
 }

@@ -184,7 +184,7 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
             Guid ownerUserId = scheduledJobs[0].OwnerUserId;
             ScheduledJobEntity technicalDataCleanupJob = new()
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 Name = "Technical data cleanup at startup",
                 TaskType = ScheduledTaskType.TechnicalDataCleanup,
                 ScheduleType = ScheduleType.OnceAtStartup,

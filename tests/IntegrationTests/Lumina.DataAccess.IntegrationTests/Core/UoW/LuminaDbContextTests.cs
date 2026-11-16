@@ -1,13 +1,18 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Lumina.Application.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Lumina.DataAccess.Common.ValueGeneration;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
@@ -114,6 +119,44 @@ public class LuminaDbContextTests : IDisposable
         Assert.Contains("Playlists", tableNames);
         Assert.Contains("PlaylistEntries", tableNames);
         Assert.Contains("Favorites", tableNames);
+    }
+
+    [Fact]
+    public void OnModelCreating_WhenApplied_ShouldUseTimeOrderedGeneratorsForPersistedGuidIdentifiers()
+    {
+        // Arrange
+        List<IProperty> generatedGuidProperties = [.. _context.Model.GetEntityTypes()
+            .SelectMany(entityType => entityType.GetProperties())
+            .Where(property => property.ClrType == typeof(Guid) && property.ValueGenerated == ValueGenerated.OnAdd)];
+
+        // Act
+        Assert.All(generatedGuidProperties, property => Assert.NotNull(property.GetValueGeneratorFactory()));
+        List<Type> generatorTypes = [.. generatedGuidProperties.Select(property => property.GetValueGeneratorFactory()!(property, property.DeclaringType).GetType())];
+
+        // Assert
+        Assert.Contains(generatedGuidProperties, property => property.DeclaringType.ClrType == typeof(PermissionEntity) && property.Name == nameof(PermissionEntity.Id));
+        Assert.Contains(generatedGuidProperties, property => property.DeclaringType.ClrType == typeof(AudioRatingEntity) && property.Name == "Id");
+        Assert.All(generatorTypes, generatorType => Assert.Equal(typeof(GuidV7ValueGenerator), generatorType));
+    }
+
+    [Fact]
+    public async Task SaveChangesAsync_WhenAPermissionHasNoId_ShouldAssignAVersion7Identifier()
+    {
+        // Arrange
+        _context.Database.EnsureCreated();
+        PermissionEntity permission = new()
+        {
+            PermissionName = AuthorizationPermission.CanViewUsers,
+            CreatedBy = Guid.CreateVersion7(),
+            CreatedOnUtc = DateTime.UtcNow
+        };
+        _context.Permissions.Add(permission);
+
+        // Act
+        await _context.SaveChangesAsync();
+
+        // Assert
+        Assert.Equal(7, permission.Id.Version);
     }
 
     [Fact]

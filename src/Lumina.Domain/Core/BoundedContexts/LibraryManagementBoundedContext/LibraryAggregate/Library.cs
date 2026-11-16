@@ -289,7 +289,7 @@ public class Library : AggregateRoot<LibraryId>
     /// </summary>
     public void Save()
     {
-        _domainEvents.Add(new LibrarySavedDomainEvent(Guid.NewGuid(), this, DateTime.UtcNow));
+        _domainEvents.Add(new LibrarySavedDomainEvent(Guid.CreateVersion7(), this, DateTime.UtcNow));
     }
 
     /// <summary>
@@ -312,7 +312,7 @@ public class Library : AggregateRoot<LibraryId>
         
         // Only add the delete event if it has not been added already.
         if (!_domainEvents.Any(domainEvent => domainEvent is LibraryDeletedDomainEvent))
-            _domainEvents.Add(new LibraryDeletedDomainEvent(Guid.NewGuid(), this, DateTime.UtcNow));
+            _domainEvents.Add(new LibraryDeletedDomainEvent(Guid.CreateVersion7(), this, DateTime.UtcNow));
 
         // TODO: perhaps trigger events for removing content related to the removed library (media metadata, etc.).
         return Result.Deleted;

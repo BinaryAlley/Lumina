@@ -11,7 +11,10 @@ using Lumina.Application.Common.DataAccess.Entities.Plugins;
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Entities.Themes;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Lumina.DataAccess.Common.ValueGeneration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using System;
 #endregion
 
 namespace Lumina.DataAccess.Core.UoW;
@@ -209,6 +212,14 @@ public class LuminaDbContext : DbContext
     {
         // Find all the entity configurations in the assembly and apply them.
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(LuminaDbContext).Assembly);
+
+        // The relational provider seeds its Guid value generators from Guid.NewGuid, so replace them with a time ordered generator for every
+        // identifier that the persistence layer assigns itself. This covers real keys, such as PermissionEntity.Id, and the shadow keys of
+        // owned collections, such as AlbumReleaseTypes.Id.
+        foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes())
+            foreach (IMutableProperty property in entityType.GetProperties())
+                if (property.ClrType == typeof(Guid) && property.ValueGenerated == ValueGenerated.OnAdd)
+                    property.SetValueGeneratorFactory((generatedProperty, declaringType) => new GuidV7ValueGenerator());
 
         base.OnModelCreating(modelBuilder);
     }

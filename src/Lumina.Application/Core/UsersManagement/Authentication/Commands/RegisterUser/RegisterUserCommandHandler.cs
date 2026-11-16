@@ -82,7 +82,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
 
         // Build the account, hashing the password and URI escaping it the same way as the stored form.
         string? totpSecret = null;
-        Guid id = Guid.NewGuid();
+        Guid id = Guid.CreateVersion7();
         UserEntity user = new()
         {
             Id = id,

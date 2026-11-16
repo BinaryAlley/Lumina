@@ -229,7 +229,7 @@ public class DataSeedService : IDataSeedService
     {
         return new ScheduledJobEntity
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.CreateVersion7(),
             Name = name,
             TaskType = taskType,
             ScheduleType = scheduleType,

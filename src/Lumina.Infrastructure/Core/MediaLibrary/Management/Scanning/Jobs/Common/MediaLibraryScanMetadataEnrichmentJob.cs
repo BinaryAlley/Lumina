@@ -76,11 +76,11 @@ internal sealed class MediaLibraryScanMetadataEnrichmentJob : MediaLibraryScanJo
                 await metadataEnricher.EnrichAsync(LibraryId, ScanId, UserId, cancellationToken).ConfigureAwait(false);
 
                 // Increment the number of completed jobs progress.
-                await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.CreateVersion7(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                 Status = LibraryScanJobStatus.Completed;
                 // When this job has no linked children, it is the last job in the directed acyclic job graph, and the scan is completed.
                 if (Children.Count == 0)
-                    await domainEventPublisher.PublishAsync(new LibraryScanFinishedDomainEvent(Guid.NewGuid(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    await domainEventPublisher.PublishAsync(new LibraryScanFinishedDomainEvent(Guid.CreateVersion7(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
                 // Call each linked child with the obtained payload.
                 foreach (IMediaLibraryScanJob child in Children)

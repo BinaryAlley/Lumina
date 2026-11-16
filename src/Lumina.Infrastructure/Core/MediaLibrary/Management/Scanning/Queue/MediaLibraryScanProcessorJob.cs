@@ -146,7 +146,7 @@ internal sealed class MediaLibraryScanProcessorJob : BackgroundService
 
             // The file system discovery job is the only top level job of the scan job graph, and every job awaits its children, so awaiting it
             // completes the entire scan. The next queued scan is only dequeued once this call returns.
-            await rootJob.ExecuteAsync(Guid.NewGuid(), new { }, linkedSource.Token).ConfigureAwait(false);
+            await rootJob.ExecuteAsync(Guid.CreateVersion7(), new { }, linkedSource.Token).ConfigureAwait(false);
 
             _logger.LogInformation("Completed the media library scan '{ScanId}' of the media library '{LibraryId}'.", compositeId.ScanId.Value, libraryScan.LibraryId.Value);
         }

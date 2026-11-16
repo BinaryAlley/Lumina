@@ -108,7 +108,7 @@ public sealed class Playlist : AggregateRoot<PlaylistId>
             Optional<DateTime>.None());
 
         playlist._domainEvents.Add(new PlaylistCreatedDomainEvent(
-            Guid.NewGuid(),
+            Guid.CreateVersion7(),
             playlist.Id,
             userId,
             name,
@@ -168,7 +168,7 @@ public sealed class Playlist : AggregateRoot<PlaylistId>
         Description = description;
         DateTime occurredOnUtc = DateTime.UtcNow;
         _domainEvents.Add(new PlaylistDetailsUpdatedDomainEvent(
-            Guid.NewGuid(),
+            Guid.CreateVersion7(),
             Id,
             UserId,
             name,
@@ -189,7 +189,7 @@ public sealed class Playlist : AggregateRoot<PlaylistId>
         _domainEvents.Clear();
         IsDeleted = true;
         _domainEvents.Add(new PlaylistDeletedDomainEvent(
-            Guid.NewGuid(),
+            Guid.CreateVersion7(),
             Id,
             UserId,
             DateTime.UtcNow));
