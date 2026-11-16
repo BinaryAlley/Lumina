@@ -62,7 +62,7 @@ public class GetLibraryScanProgressQueryHandlerTests
         _mockValidator = Substitute.For<IValidator<GetLibraryScanProgressQuery>>();
         _userId = Guid.NewGuid();
 
-        // default stubs: the current user is authenticated, the ownership policy allows access, and the scan has progress
+        // Default stubs: the current user is authenticated, the ownership policy allows access, and the scan has progress.
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(true);

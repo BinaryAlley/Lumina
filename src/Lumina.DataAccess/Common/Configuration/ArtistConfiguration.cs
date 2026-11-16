@@ -24,7 +24,7 @@ public class ArtistConfiguration : IEntityTypeConfiguration<ArtistEntity>
         builder.ToTable("Artists");
         builder.HasKey(artist => artist.Id);
         builder.Property(artist => artist.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
 
         builder.Property(artist => artist.LibraryId)
@@ -143,8 +143,8 @@ public class ArtistConfiguration : IEntityTypeConfiguration<ArtistEntity>
                 .HasMaxLength(20);
         });
 
-        // since Tag and Genre are Domain ValueObjects (no identity), but we also don't want to have duplicates,
-        // we need to configure them as many-to-many relationships, where the tag/genre itself is the primary key
+        // Since Tag and Genre are Domain ValueObjects (no identity), but we also don't want to have duplicates,
+        // we need to configure them as many-to-many relationships, where the tag/genre itself is the primary key.
         builder.HasMany(artist => artist.Tags)
             .WithMany()
             .UsingEntity<Dictionary<string, object>>(

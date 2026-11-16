@@ -64,8 +64,8 @@ public class UpdateBookEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Books; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Books; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateBook_WithSQLInjectionInBody_ShouldNotCorruptOrLeakData(string maliciousTitle)
     {
         // Arrange
@@ -91,8 +91,8 @@ public class UpdateBookEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Books; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Books; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateBook_WithSQLInjectionInRouteId_ShouldNeverCorruptOrLeakData(string maliciousBookId)
     {
         // Arrange

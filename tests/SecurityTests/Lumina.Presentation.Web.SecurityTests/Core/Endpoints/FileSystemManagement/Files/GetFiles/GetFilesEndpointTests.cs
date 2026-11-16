@@ -44,8 +44,8 @@ public class GetFilesEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Files--")] // destructive SQL injection
-    [InlineData("' OR '1'='1")] // basic SQL injection
+    [InlineData("'; DROP TABLE Files--")] // Destructive SQL injection.
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
     public async Task GetFiles_WhenCalledWithInjectionInPath_ShouldRemainSecure(string maliciousPath)
     {
         // Arrange

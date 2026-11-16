@@ -28,9 +28,9 @@ public class IntervalScheduleTests
     }
 
     [Theory]
-    [InlineData(0)] // interval of zero
-    [InlineData(-1)] // negative interval
-    [InlineData(-100)] // negative interval far from zero
+    [InlineData(0)] // Interval of zero.
+    [InlineData(-1)] // Negative interval.
+    [InlineData(-100)] // Negative interval far from zero.
     public void Create_WhenIntervalIsNotPositive_ShouldReturnError(int intervalMinutes)
     {
         // Act

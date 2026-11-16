@@ -117,7 +117,7 @@ public class UpdateLibraryCommandValidatorTests
     {
         // Arrange
         UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
-        command = command with { LibraryType = "0" }; // Book
+        command = command with { LibraryType = "0" }; // Book.
 
         // Act
         List<Error> result = _validator.TestValidate(command);

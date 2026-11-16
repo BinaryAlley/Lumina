@@ -160,12 +160,12 @@ public class SetupApplicationCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("password123")] // Missing uppercase and special character
-    [InlineData("PASSWORD123")] // Missing special character
-    [InlineData("Password123")] // Missing special character
-    [InlineData("Password!@#")] // Missing number
-    [InlineData("Pass1!")] // Too short
-    [InlineData("password")] // Missing uppercase, number, and special character
+    [InlineData("password123")] // Missing uppercase and special character.
+    [InlineData("PASSWORD123")] // Missing special character.
+    [InlineData("Password123")] // Missing special character.
+    [InlineData("Password!@#")] // Missing number.
+    [InlineData("Pass1!")] // Too short.
+    [InlineData("password")] // Missing uppercase, number, and special character.
     public void Validate_WhenPasswordDoesNotMatchPattern_ShouldHaveValidationError(string password)
     {
         // Arrange
@@ -180,10 +180,10 @@ public class SetupApplicationCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("Password1!")] // Valid password
-    [InlineData("Complex1@Password")] // Valid password
-    [InlineData("MyP@ssw0rd")] // Valid password
-    [InlineData("Abcd123!@#")] // Valid password
+    [InlineData("Password1!")] // Valid password.
+    [InlineData("Complex1@Password")] // Valid password.
+    [InlineData("MyP@ssw0rd")] // Valid password.
+    [InlineData("Abcd123!@#")] // Valid password.
     public void Validate_WhenPasswordMatchesPattern_ShouldNotHaveValidationError(string password)
     {
         // Arrange

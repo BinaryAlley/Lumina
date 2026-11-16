@@ -18,7 +18,7 @@ namespace Lumina.Presentation.Web.Core.Themes;
 /// </summary>
 public sealed class ThemeTemplateEngine
 {
-    // bound template nesting and rendered output, so a single theme cannot exhaust the server memory
+    // Bound template nesting and rendered output, so a single theme cannot exhaust the server memory.
     private const int MAX_NESTING_DEPTH = 32;
     private const int MAX_RENDERED_CHARACTERS = 4 * 1024 * 1024;
 
@@ -42,9 +42,9 @@ public sealed class ThemeTemplateEngine
         if (parseResult.IsFailure)
             return parseResult.Errors;
 
-        // the reserved top-level 'scripts' section holds the script of the page and is rendered separately, mirroring the
+        // The reserved top-level 'scripts' section holds the script of the page and is rendered separately, mirroring the
         // 'Scripts' section of a Razor view, so that the layout can host it in the scripts container of the navigator;
-        // every other top-level node is the content of the page section
+        // every other top-level node is the content of the page section.
         List<ThemeTemplateNodeDto> contentNodes = [];
         ThemeSectionNodeDto? scriptsSection = null;
         foreach (ThemeTemplateNodeDto node in parseResult.Value)

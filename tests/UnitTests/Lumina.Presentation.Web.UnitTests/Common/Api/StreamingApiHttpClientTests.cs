@@ -111,9 +111,9 @@ public class StreamingApiHttpClientTests
     }
 
     [Theory]
-    [InlineData(false, null)] // there is no HTTP context at all
-    [InlineData(true, null)] // the HTTP context has no token claim
-    [InlineData(true, "")] // the token claim is empty
+    [InlineData(false, null)] // There is no HTTP context at all.
+    [InlineData(true, null)] // The HTTP context has no token claim.
+    [InlineData(true, "")] // The token claim is empty.
     public async Task GetStreamAsync_WhenTokenIsUnavailable_ShouldNotSendAnAuthorizationHeader(bool hasHttpContext, string? token)
     {
         // Arrange
@@ -181,8 +181,8 @@ public class StreamingApiHttpClientTests
     }
 
     [Theory]
-    [InlineData(HttpStatusCode.NotModified)] // a conditional request that the entity tag did not invalidate
-    [InlineData(HttpStatusCode.RequestedRangeNotSatisfiable)] // a ranged request that cannot be satisfied
+    [InlineData(HttpStatusCode.NotModified)] // A conditional request that the entity tag did not invalidate.
+    [InlineData(HttpStatusCode.RequestedRangeNotSatisfiable)] // A ranged request that cannot be satisfied.
     public async Task GetStreamAsync_WhenApiReturnsANonSuccessThatIsAValidOutcome_ShouldPassTheResponseThrough(HttpStatusCode statusCode)
     {
         // Arrange
@@ -197,9 +197,9 @@ public class StreamingApiHttpClientTests
     }
 
     [Theory]
-    [InlineData(HttpStatusCode.BadRequest)] // a malformed request
-    [InlineData(HttpStatusCode.NotFound)] // the track does not exist
-    [InlineData(HttpStatusCode.InternalServerError)] // the API failed
+    [InlineData(HttpStatusCode.BadRequest)] // A malformed request.
+    [InlineData(HttpStatusCode.NotFound)] // The track does not exist.
+    [InlineData(HttpStatusCode.InternalServerError)] // The API failed.
     public async Task GetStreamAsync_WhenApiReturnsAnotherNonSuccess_ShouldThrowApiExceptionWithTheProblemDetails(HttpStatusCode statusCode)
     {
         // Arrange

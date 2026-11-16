@@ -36,8 +36,8 @@ public class MusicAreaEntityMappingTests
     }
 
     [Theory]
-    [InlineData("")] // empty name
-    [InlineData("   ")] // whitespace name
+    [InlineData("")] // Empty name.
+    [InlineData("   ")] // Whitespace name.
     public void ToDomainValueObject_WhenNameIsEmpty_ShouldReturnError(string name)
     {
         // Arrange

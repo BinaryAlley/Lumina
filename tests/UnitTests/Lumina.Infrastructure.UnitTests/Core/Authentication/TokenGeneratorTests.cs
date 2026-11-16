@@ -57,7 +57,7 @@ public class TokenGeneratorTests
         string token = _sut.GenerateToken();
 
         // Assert
-        // 32 bytes in Base64 without padding should be 43 characters
+        // 32 bytes in Base64 without padding should be 43 characters.
         Assert.Equal(43, token.Length);
     }
 }

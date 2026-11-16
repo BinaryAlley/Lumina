@@ -73,9 +73,9 @@ public class CoverArtArchiveMapperTests
     }
 
     [Theory]
-    [InlineData(null)] // a null URL
-    [InlineData("")] // an empty URL
-    [InlineData("   ")] // a white space URL
+    [InlineData(null)] // A null URL.
+    [InlineData("")] // An empty URL.
+    [InlineData("   ")] // A white space URL.
     public void MapArtwork_WhenTheImageUrlIsMissing_ShouldSkipIt(string? imageUrl)
     {
         // Arrange
@@ -90,9 +90,9 @@ public class CoverArtArchiveMapperTests
     }
 
     [Theory]
-    [InlineData("not-a-url")] // a value that is not an URI at all
-    [InlineData("/release/11111111-1111-1111-1111-111111111111/1.jpg")] // a relative URI
-    [InlineData("coverartarchive.org/release/1.jpg")] // a host without a scheme
+    [InlineData("not-a-url")] // A value that is not an URI at all.
+    [InlineData("/release/11111111-1111-1111-1111-111111111111/1.jpg")] // A relative URI.
+    [InlineData("coverartarchive.org/release/1.jpg")] // A host without a scheme.
     public void MapArtwork_WhenTheImageUrlIsNotAnAbsoluteUri_ShouldSkipIt(string imageUrl)
     {
         // Arrange
@@ -107,14 +107,14 @@ public class CoverArtArchiveMapperTests
     }
 
     [Theory]
-    [InlineData("http://localhost/release/1.jpg")] // the loopback host name
-    [InlineData("http://127.0.0.1/release/1.jpg")] // the IPv4 loopback address
-    [InlineData("http://169.254.169.254/latest/meta-data/")] // the link local cloud metadata endpoint
-    [InlineData("http://10.0.0.5/release/1.jpg")] // a private class A address
-    [InlineData("http://192.168.1.10/release/1.jpg")] // a private class C address
-    [InlineData("https://evil.example/release/1.jpg")] // an unrelated public host
-    [InlineData("https://coverartarchive.org.evil.example/1.jpg")] // the trusted host used as a prefix of an attacker controlled host
-    [InlineData("https://archive.org.evil.example/1.jpg")] // the Internet Archive host used as a prefix of an attacker controlled host
+    [InlineData("http://localhost/release/1.jpg")] // The loopback host name.
+    [InlineData("http://127.0.0.1/release/1.jpg")] // The IPv4 loopback address.
+    [InlineData("http://169.254.169.254/latest/meta-data/")] // The link local cloud metadata endpoint.
+    [InlineData("http://10.0.0.5/release/1.jpg")] // A private class A address.
+    [InlineData("http://192.168.1.10/release/1.jpg")] // A private class C address.
+    [InlineData("https://evil.example/release/1.jpg")] // An unrelated public host.
+    [InlineData("https://coverartarchive.org.evil.example/1.jpg")] // The trusted host used as a prefix of an attacker controlled host.
+    [InlineData("https://archive.org.evil.example/1.jpg")] // The Internet Archive host used as a prefix of an attacker controlled host.
     public void MapArtwork_WhenTheImageUrlPointsAtAnUntrustedHost_ShouldSkipIt(string imageUrl)
     {
         // Arrange
@@ -129,9 +129,9 @@ public class CoverArtArchiveMapperTests
     }
 
     [Theory]
-    [InlineData("file:///etc/passwd")] // a local file URI
-    [InlineData("ftp://coverartarchive.org/1.jpg")] // an unsupported scheme on a trusted host
-    [InlineData("data:image/png;base64,SGVsbG8=")] // an inline data URI
+    [InlineData("file:///etc/passwd")] // A local file URI.
+    [InlineData("ftp://coverartarchive.org/1.jpg")] // An unsupported scheme on a trusted host.
+    [InlineData("data:image/png;base64,SGVsbG8=")] // An inline data URI.
     public void MapArtwork_WhenTheImageUrlUsesAnUnsupportedScheme_ShouldSkipIt(string imageUrl)
     {
         // Arrange
@@ -178,20 +178,20 @@ public class CoverArtArchiveMapperTests
     }
 
     [Theory]
-    [InlineData("front", ArtworkType.Cover)] // the front cover type, lower cased
-    [InlineData("Front", ArtworkType.Cover)] // the front cover type
-    [InlineData("BACK", ArtworkType.Back)] // the back cover type, upper cased
-    [InlineData("Booklet", ArtworkType.Booklet)] // a booklet page
-    [InlineData("Medium", ArtworkType.Medium)] // a medium label
-    [InlineData("Tray", ArtworkType.Tray)] // the tray artwork
-    [InlineData("Spine", ArtworkType.Spine)] // the spine artwork
-    [InlineData("Obi", ArtworkType.Obi)] // the obi strip
-    [InlineData("Sticker", ArtworkType.Sticker)] // the sticker
-    [InlineData("Poster", ArtworkType.Poster)] // the poster
-    [InlineData("Liner", ArtworkType.Liner)] // the liner notes
-    [InlineData("Watermark", ArtworkType.Watermark)] // a watermark
-    [InlineData("  Booklet  ", ArtworkType.Booklet)] // a type with surrounding white space
-    [InlineData("SomeUnknownType", ArtworkType.Other)] // an unknown type is kept as generic artwork
+    [InlineData("front", ArtworkType.Cover)] // The front cover type, lower cased.
+    [InlineData("Front", ArtworkType.Cover)] // The front cover type.
+    [InlineData("BACK", ArtworkType.Back)] // The back cover type, upper cased.
+    [InlineData("Booklet", ArtworkType.Booklet)] // A booklet page.
+    [InlineData("Medium", ArtworkType.Medium)] // A medium label.
+    [InlineData("Tray", ArtworkType.Tray)] // The tray artwork.
+    [InlineData("Spine", ArtworkType.Spine)] // The spine artwork.
+    [InlineData("Obi", ArtworkType.Obi)] // The obi strip.
+    [InlineData("Sticker", ArtworkType.Sticker)] // The sticker.
+    [InlineData("Poster", ArtworkType.Poster)] // The poster.
+    [InlineData("Liner", ArtworkType.Liner)] // The liner notes.
+    [InlineData("Watermark", ArtworkType.Watermark)] // A watermark.
+    [InlineData("  Booklet  ", ArtworkType.Booklet)] // A type with surrounding white space.
+    [InlineData("SomeUnknownType", ArtworkType.Other)] // An unknown type is kept as generic artwork.
     public void MapArtwork_WhenTheImageIsTaggedWithAType_ShouldMapItToTheExpectedArtworkType(string type, ArtworkType expectedArtworkType)
     {
         // Arrange
@@ -254,9 +254,9 @@ public class CoverArtArchiveMapperTests
     }
 
     [Theory]
-    [InlineData(null)] // a null element inside the types collection
-    [InlineData("")] // an empty element inside the types collection
-    [InlineData("   ")] // a white space element inside the types collection
+    [InlineData(null)] // A null element inside the types collection.
+    [InlineData("")] // An empty element inside the types collection.
+    [InlineData("   ")] // A white space element inside the types collection.
     public void MapArtwork_WhenTheTypesCollectionContainsNullOrEmptyElements_ShouldSkipThem(string? type)
     {
         // Arrange

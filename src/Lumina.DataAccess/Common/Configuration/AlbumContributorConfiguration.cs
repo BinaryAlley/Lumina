@@ -20,7 +20,7 @@ public class AlbumContributorConfiguration : IEntityTypeConfiguration<AlbumContr
         builder.ToTable("AlbumContributors");
         builder.HasKey(albumContributor => albumContributor.Id);
         builder.Property(albumContributor => albumContributor.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
 
         builder.Property(albumContributor => albumContributor.AlbumId)
@@ -35,7 +35,7 @@ public class AlbumContributorConfiguration : IEntityTypeConfiguration<AlbumContr
             .IsRequired()
             .HasColumnOrder(3);
 
-        // audit
+        // Audit.
         builder.Property(albumContributor => albumContributor.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(4);

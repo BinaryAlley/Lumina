@@ -34,7 +34,7 @@ internal class MediaLibrariesScanCancellationTracker : IMediaLibrariesScanCancel
         if (_runningScans.TryGetValue(mediaLibraryScanCompositeId, out CancellationTokenSource? scan))
         {
             scan.Cancel();
-            // remove and dispose after cancellation
+            // Remove and dispose after cancellation.
             if (_runningScans.TryRemove(mediaLibraryScanCompositeId, out CancellationTokenSource? removedScan))
                 removedScan?.Dispose();
         }
@@ -61,7 +61,7 @@ internal class MediaLibrariesScanCancellationTracker : IMediaLibrariesScanCancel
         if (_runningScans.TryGetValue(mediaLibraryScanCompositeId, out CancellationTokenSource? scan))
         {
             scan.Cancel();
-            // remove and dispose after cancellation
+            // Remove and dispose after cancellation.
             if (_runningScans.TryRemove(mediaLibraryScanCompositeId, out CancellationTokenSource? removedScan))
                 removedScan?.Dispose();
         }

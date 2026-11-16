@@ -21,8 +21,8 @@ public class FileMappingTests
     private readonly FileFixture _fileFixture = new();
 
     [Theory]
-    [InlineData(true)] // hidden file
-    [InlineData(false)] // visible file
+    [InlineData(true)] // Hidden file.
+    [InlineData(false)] // Visible file.
     public void ToFileSystemTreeNodeResponse_WhenMappingFile_ShouldMapCorrectly(bool isHidden)
     {
         // Arrange
@@ -73,8 +73,8 @@ public class FileMappingTests
     }
 
     [Theory]
-    [InlineData(true)] // hidden file
-    [InlineData(false)] // visible file
+    [InlineData(true)] // Hidden file.
+    [InlineData(false)] // Visible file.
     public void ToResponse_WhenMappingFile_ShouldMapCorrectly(bool isHidden)
     {
         // Arrange

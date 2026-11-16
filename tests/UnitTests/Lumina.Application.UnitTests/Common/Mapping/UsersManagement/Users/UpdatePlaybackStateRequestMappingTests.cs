@@ -47,8 +47,8 @@ public class UpdatePlaybackStateRequestMappingTests
     }
 
     [Theory]
-    [InlineData(0.0, false)] // the minimum volume, not muted
-    [InlineData(1.0, true)] // the maximum volume, muted
+    [InlineData(0.0, false)] // The minimum volume, not muted.
+    [InlineData(1.0, true)] // The maximum volume, muted.
     public void ToCommand_WhenMappingBoundaryValues_ShouldMapThemExactly(double volume, bool isMuted)
     {
         // Arrange

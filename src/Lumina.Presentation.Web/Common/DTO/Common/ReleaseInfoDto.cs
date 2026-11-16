@@ -39,7 +39,7 @@ public class ReleaseInfoDto
     public ReleaseCountry? ReleaseCountry { get; set; }
 
     /// <summary>
-    /// Gets the optional release version or edition. (e.g. "Original", "Director's Cut", "2.0")
+    /// Gets the optional release version or edition. (e.g. "Original", "Director's Cut", "2.0").
     /// </summary>
     public string? ReleaseVersion { get; set; }
 }

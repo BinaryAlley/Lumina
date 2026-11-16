@@ -72,9 +72,9 @@ public class CalibreArtworkProviderTests
     }
 
     [Theory]
-    [InlineData("../cover.jpg")] // parent directory escape
-    [InlineData("sub/cover.jpg")] // path with a separator
-    [InlineData("sub\\cover.jpg")] // path with a backslash separator
+    [InlineData("../cover.jpg")] // Parent directory escape.
+    [InlineData("sub/cover.jpg")] // Path with a separator.
+    [InlineData("sub\\cover.jpg")] // Path with a backslash separator.
     public async Task GetArtworkAsync_WhenCoverHrefContainsPathTraversalOrSeparators_ShouldReturnNull(string coverHref)
     {
         // Arrange

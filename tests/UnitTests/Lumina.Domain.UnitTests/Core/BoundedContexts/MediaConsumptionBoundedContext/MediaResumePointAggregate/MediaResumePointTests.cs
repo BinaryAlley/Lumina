@@ -103,8 +103,8 @@ public class MediaResumePointTests
     }
 
     [Theory]
-    [InlineData(MediaKind.None)] // the default value, which is not a valid kind for a media item
-    [InlineData((MediaKind)999)] // a value outside the declared enumeration members
+    [InlineData(MediaKind.None)] // The default value, which is not a valid kind for a media item.
+    [InlineData((MediaKind)999)] // A value outside the declared enumeration members.
     public void Create_WhenMediaKindIsUnsupported_ShouldReturnUnsupportedMediaKindError(MediaKind mediaKind)
     {
         // Arrange
@@ -168,11 +168,11 @@ public class MediaResumePointTests
     }
 
     [Theory]
-    [InlineData(double.NaN)] // a value that is not a number
-    [InlineData(double.PositiveInfinity)] // a value beyond every finite fraction
-    [InlineData(double.NegativeInfinity)] // a value below every finite fraction
-    [InlineData(-0.01)] // a value below the zero lower boundary
-    [InlineData(1.01)] // a value above the one upper boundary
+    [InlineData(double.NaN)] // A value that is not a number.
+    [InlineData(double.PositiveInfinity)] // A value beyond every finite fraction.
+    [InlineData(double.NegativeInfinity)] // A value below every finite fraction.
+    [InlineData(-0.01)] // A value below the zero lower boundary.
+    [InlineData(1.01)] // A value above the one upper boundary.
     public void Create_WhenProgressFractionIsInvalid_ShouldReturnInvalidProgressFractionError(double lastProgressFraction)
     {
         // Arrange
@@ -194,8 +194,8 @@ public class MediaResumePointTests
     }
 
     [Theory]
-    [InlineData(0.0)] // the lower boundary of the progress fraction
-    [InlineData(1.0)] // the upper boundary of the progress fraction
+    [InlineData(0.0)] // The lower boundary of the progress fraction.
+    [InlineData(1.0)] // The upper boundary of the progress fraction.
     public void Create_WhenProgressFractionIsAtABoundary_ShouldCreateResumePoint(double lastProgressFraction)
     {
         // Arrange
@@ -217,8 +217,8 @@ public class MediaResumePointTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie, MediaPositionKind.Location)] // a movie resumes from a time offset, not from a location
-    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset)] // a book resumes from a location, not from a time offset
+    [InlineData(MediaKind.Movie, MediaPositionKind.Location)] // A movie resumes from a time offset, not from a location.
+    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset)] // A book resumes from a location, not from a time offset.
     public void Create_WhenPositionDoesNotMatchTheMediaKindRule_ShouldReturnInvalidMediaPositionError(MediaKind mediaKind, MediaPositionKind positionKind)
     {
         // Arrange
@@ -240,8 +240,8 @@ public class MediaResumePointTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie, MediaPositionKind.TimeOffset)] // a movie resumes from a time offset
-    [InlineData(MediaKind.Book, MediaPositionKind.Location)] // a book resumes from a location
+    [InlineData(MediaKind.Movie, MediaPositionKind.TimeOffset)] // A movie resumes from a time offset.
+    [InlineData(MediaKind.Book, MediaPositionKind.Location)] // A book resumes from a location.
     public void Create_WhenPositionMatchesTheMediaKindRule_ShouldStoreThePosition(MediaKind mediaKind, MediaPositionKind positionKind)
     {
         // Arrange
@@ -336,8 +336,8 @@ public class MediaResumePointTests
     }
 
     [Theory]
-    [InlineData(MediaKind.None)] // the default value, which is not a valid kind for a media item
-    [InlineData((MediaKind)999)] // a value outside the declared enumeration members
+    [InlineData(MediaKind.None)] // The default value, which is not a valid kind for a media item.
+    [InlineData((MediaKind)999)] // A value outside the declared enumeration members.
     public void Reconstitute_WhenMediaKindIsUnsupported_ShouldReturnUnsupportedMediaKindError(MediaKind mediaKind)
     {
         // Arrange
@@ -386,11 +386,11 @@ public class MediaResumePointTests
     }
 
     [Theory]
-    [InlineData(double.NaN)] // a value that is not a number
-    [InlineData(double.PositiveInfinity)] // a value beyond every finite fraction
-    [InlineData(double.NegativeInfinity)] // a value below every finite fraction
-    [InlineData(-0.01)] // a value below the zero lower boundary
-    [InlineData(1.01)] // a value above the one upper boundary
+    [InlineData(double.NaN)] // A value that is not a number.
+    [InlineData(double.PositiveInfinity)] // A value beyond every finite fraction.
+    [InlineData(double.NegativeInfinity)] // A value below every finite fraction.
+    [InlineData(-0.01)] // A value below the zero lower boundary.
+    [InlineData(1.01)] // A value above the one upper boundary.
     public void Reconstitute_WhenProgressFractionIsInvalid_ShouldReturnInvalidProgressFractionError(double lastProgressFraction)
     {
         // Arrange
@@ -415,8 +415,8 @@ public class MediaResumePointTests
     }
 
     [Theory]
-    [InlineData(0.0)] // the lower boundary of the progress fraction
-    [InlineData(1.0)] // the upper boundary of the progress fraction
+    [InlineData(0.0)] // The lower boundary of the progress fraction.
+    [InlineData(1.0)] // The upper boundary of the progress fraction.
     public void Reconstitute_WhenProgressFractionIsAtABoundary_ShouldReconstituteResumePoint(double lastProgressFraction)
     {
         // Arrange
@@ -441,8 +441,8 @@ public class MediaResumePointTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie, MediaPositionKind.Location)] // a movie resumes from a time offset, not from a location
-    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset)] // a book resumes from a location, not from a time offset
+    [InlineData(MediaKind.Movie, MediaPositionKind.Location)] // A movie resumes from a time offset, not from a location.
+    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset)] // A book resumes from a location, not from a time offset.
     public void Reconstitute_WhenPositionDoesNotMatchTheMediaKindRule_ShouldReturnInvalidMediaPositionError(MediaKind mediaKind, MediaPositionKind positionKind)
     {
         // Arrange
@@ -467,8 +467,8 @@ public class MediaResumePointTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie, MediaPositionKind.TimeOffset)] // a movie resumes from a time offset
-    [InlineData(MediaKind.Book, MediaPositionKind.Location)] // a book resumes from a location
+    [InlineData(MediaKind.Movie, MediaPositionKind.TimeOffset)] // A movie resumes from a time offset.
+    [InlineData(MediaKind.Book, MediaPositionKind.Location)] // A book resumes from a location.
     public void Reconstitute_WhenPositionMatchesTheMediaKindRule_ShouldStoreThePosition(MediaKind mediaKind, MediaPositionKind positionKind)
     {
         // Arrange
@@ -493,8 +493,8 @@ public class MediaResumePointTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie, MediaPositionKind.TimeOffset)] // a movie resumes from a time offset
-    [InlineData(MediaKind.Book, MediaPositionKind.Location)] // a book resumes from a location
+    [InlineData(MediaKind.Movie, MediaPositionKind.TimeOffset)] // A movie resumes from a time offset.
+    [InlineData(MediaKind.Book, MediaPositionKind.Location)] // A book resumes from a location.
     public void Advance_WhenCalledWithAValidPosition_ShouldReplaceTheResumePointState(MediaKind mediaKind, MediaPositionKind positionKind)
     {
         // Arrange
@@ -525,8 +525,8 @@ public class MediaResumePointTests
     }
 
     [Theory]
-    [InlineData(0.0)] // the lower boundary of the progress fraction
-    [InlineData(1.0)] // the upper boundary of the progress fraction
+    [InlineData(0.0)] // The lower boundary of the progress fraction.
+    [InlineData(1.0)] // The upper boundary of the progress fraction.
     public void Advance_WhenProgressFractionIsAtABoundary_ShouldAdvanceResumePoint(double progressFraction)
     {
         // Arrange
@@ -549,11 +549,11 @@ public class MediaResumePointTests
     }
 
     [Theory]
-    [InlineData(double.NaN)] // a value that is not a number
-    [InlineData(double.PositiveInfinity)] // a value beyond every finite fraction
-    [InlineData(double.NegativeInfinity)] // a value below every finite fraction
-    [InlineData(-0.01)] // a value below the zero lower boundary
-    [InlineData(1.01)] // a value above the one upper boundary
+    [InlineData(double.NaN)] // A value that is not a number.
+    [InlineData(double.PositiveInfinity)] // A value beyond every finite fraction.
+    [InlineData(double.NegativeInfinity)] // A value below every finite fraction.
+    [InlineData(-0.01)] // A value below the zero lower boundary.
+    [InlineData(1.01)] // A value above the one upper boundary.
     public void Advance_WhenProgressFractionIsInvalid_ShouldReturnInvalidProgressFractionErrorAndLeaveTheResumePointUnchanged(double progressFraction)
     {
         // Arrange
@@ -586,8 +586,8 @@ public class MediaResumePointTests
     }
 
     [Theory]
-    [InlineData(MediaKind.Movie, MediaPositionKind.Location)] // a movie resumes from a time offset, not from a location
-    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset)] // a book resumes from a location, not from a time offset
+    [InlineData(MediaKind.Movie, MediaPositionKind.Location)] // A movie resumes from a time offset, not from a location.
+    [InlineData(MediaKind.Book, MediaPositionKind.TimeOffset)] // A book resumes from a location, not from a time offset.
     public void Advance_WhenPositionDoesNotMatchTheMediaKindRule_ShouldReturnInvalidMediaPositionErrorAndLeaveTheResumePointUnchanged(MediaKind mediaKind, MediaPositionKind positionKind)
     {
         // Arrange

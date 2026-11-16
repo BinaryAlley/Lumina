@@ -92,8 +92,8 @@ public class TrackNormalizationServiceTests : IDisposable
     }
 
     [Theory]
-    [InlineData(true)] // the source file length no longer matches the declared delivery
-    [InlineData(false)] // the source file modification time no longer matches the declared delivery
+    [InlineData(true)] // The source file length no longer matches the declared delivery.
+    [InlineData(false)] // The source file modification time no longer matches the declared delivery.
     public async Task GetOrCreateNormalizedTrackAsync_WhenTheSourceFileChangedSinceTheDeliveryWasDeclared_ShouldReturnPlaybackDeliveryChangedError(bool isLengthChanged)
     {
         // Arrange

@@ -33,10 +33,10 @@ public class DeleteConsumptionRecordCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the consumption record Id is empty
-    [InlineData("   ")] // the consumption record Id is whitespace only
-    [InlineData("not-a-guid")] // the consumption record Id is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the consumption record Id is the empty Guid
+    [InlineData("")] // The consumption record Id is empty.
+    [InlineData("   ")] // The consumption record Id is whitespace only.
+    [InlineData("not-a-guid")] // The consumption record Id is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The consumption record Id is the empty Guid.
     public void Validate_WhenConsumptionRecordIdIsEmptyOrInvalid_ShouldHaveValidationError(string consumptionRecordId)
     {
         // Arrange
@@ -76,10 +76,10 @@ public class DeleteConsumptionRecordCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the target user Id is empty
-    [InlineData("   ")] // the target user Id is whitespace only
-    [InlineData("not-a-guid")] // the target user Id is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the target user Id is the empty Guid
+    [InlineData("")] // The target user Id is empty.
+    [InlineData("   ")] // The target user Id is whitespace only.
+    [InlineData("not-a-guid")] // The target user Id is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The target user Id is the empty Guid.
     public void Validate_WhenTargetUserIdIsEmptyOrInvalid_ShouldHaveValidationError(string targetUserId)
     {
         // Arrange

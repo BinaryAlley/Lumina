@@ -1504,7 +1504,7 @@ html.audio-player-initializing .audio-player-container {
 }
 
 .audio-player-container.expanded {
-    height: calc(100% - 22px); /* expanded height, less the height of the menu bar */
+    height: calc(100% - 22px); /* Expanded height, less the height of the menu bar. */
 }
 
 .audio-player-bar {

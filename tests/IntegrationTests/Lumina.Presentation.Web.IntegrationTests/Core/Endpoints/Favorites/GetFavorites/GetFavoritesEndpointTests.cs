@@ -90,10 +90,10 @@ public class GetFavoritesEndpointTests : IClassFixture<LuminaWebFactory>, IDispo
     }
 
     [Theory]
-    [InlineData("", "users/me/favorites?currentPage=1&perPage=200")] // neither the page nor the size is supplied
-    [InlineData("?currentPage=3", "users/me/favorites?currentPage=3&perPage=200")] // only the page is supplied
-    [InlineData("?perPage=25", "users/me/favorites?currentPage=1&perPage=25")] // only the size is supplied
-    [InlineData("?currentPage=2&perPage=50", "users/me/favorites?currentPage=2&perPage=50")] // both the page and the size are supplied
+    [InlineData("", "users/me/favorites?currentPage=1&perPage=200")] // Neither the page nor the size is supplied.
+    [InlineData("?currentPage=3", "users/me/favorites?currentPage=3&perPage=200")] // Only the page is supplied.
+    [InlineData("?perPage=25", "users/me/favorites?currentPage=1&perPage=25")] // Only the size is supplied.
+    [InlineData("?currentPage=2&perPage=50", "users/me/favorites?currentPage=2&perPage=50")] // Both the page and the size are supplied.
     public async Task GetFavorites_WhenCalledWithPagination_ShouldForwardTheDocumentedUpstreamUrl(string queryString, string expectedUpstreamEndpoint)
     {
         // Arrange

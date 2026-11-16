@@ -813,11 +813,11 @@ public class WindowsPathStrategyTests
     }
 
     [Theory]
-    [InlineData(@"C:\Media\Books", @"C:\Media\Books\book.epub")] // direct child
-    [InlineData(@"C:\Media", @"C:\Media\Books\book.epub")] // nested descendant
-    [InlineData(@"C:\Media\Books\", @"C:\Media\Books\book.epub")] // trailing separator on the parent
-    [InlineData(@"C:\Media\Books", @"c:\media\books\book.epub")] // Windows paths are case-insensitive
-    [InlineData(@"C:\Media\Books", @"C:\Media\Books\Sub\..\book.epub")] // relative segments that stay inside
+    [InlineData(@"C:\Media\Books", @"C:\Media\Books\book.epub")] // Direct child.
+    [InlineData(@"C:\Media", @"C:\Media\Books\book.epub")] // Nested descendant.
+    [InlineData(@"C:\Media\Books\", @"C:\Media\Books\book.epub")] // Trailing separator on the parent.
+    [InlineData(@"C:\Media\Books", @"c:\media\books\book.epub")] // Windows paths are case-insensitive.
+    [InlineData(@"C:\Media\Books", @"C:\Media\Books\Sub\..\book.epub")] // Relative segments that stay inside.
     public void IsPathWithin_WithContainedPaths_ShouldReturnTrue(string parentPath, string path)
     {
         // Arrange
@@ -832,13 +832,13 @@ public class WindowsPathStrategyTests
     }
 
     [Theory]
-    [InlineData(@"C:\Media\Books", @"C:\Media\book.epub")] // sibling directory
-    [InlineData(@"C:\Media\Books", @"D:\Media\Books\book.epub")] // different drive
-    [InlineData(@"C:\Media\Books", @"C:\Media\BookShelf\book.epub")] // a sibling whose name shares the prefix
-    [InlineData(@"C:\Media\Books", @"C:\Media\Other\book.epub")] // sibling directory
-    [InlineData(@"C:\Media\Books", @"C:\Media\Books\..\Other\book.epub")] // relative segment that escapes the parent
-    [InlineData(@"C:\Media\Books", @"C:\Windows\System32\config\SAM")] // unrelated location
-    [InlineData(@"C:\Media", @"C:\Media")] // the parent itself is not inside itself
+    [InlineData(@"C:\Media\Books", @"C:\Media\book.epub")] // Sibling directory.
+    [InlineData(@"C:\Media\Books", @"D:\Media\Books\book.epub")] // Different drive.
+    [InlineData(@"C:\Media\Books", @"C:\Media\BookShelf\book.epub")] // A sibling whose name shares the prefix.
+    [InlineData(@"C:\Media\Books", @"C:\Media\Other\book.epub")] // Sibling directory.
+    [InlineData(@"C:\Media\Books", @"C:\Media\Books\..\Other\book.epub")] // Relative segment that escapes the parent.
+    [InlineData(@"C:\Media\Books", @"C:\Windows\System32\config\SAM")] // Unrelated location.
+    [InlineData(@"C:\Media", @"C:\Media")] // The parent itself is not inside itself.
     public void IsPathWithin_WithPathsOutsideTheParent_ShouldReturnFalse(string parentPath, string path)
     {
         // Arrange

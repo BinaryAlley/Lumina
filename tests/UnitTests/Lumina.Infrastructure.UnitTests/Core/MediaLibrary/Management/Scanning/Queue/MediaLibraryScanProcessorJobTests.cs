@@ -84,7 +84,7 @@ public class MediaLibraryScanProcessorJobTests : IDisposable
         RegisterScan(firstScanId, LibraryScanJobStatus.Pending);
         RegisterScan(secondScanId, LibraryScanJobStatus.Pending);
         TaskCompletionSource<bool> releaseFirstScan = new(TaskCreationOptions.RunContinuationsAsynchronously);
-        // ExecutionStarted is signaled before the callback runs, and resumes the test on another thread, so the test waits for the callback itself to record the scan
+        // ExecutionStarted is signaled before the callback runs, and resumes the test on another thread, so the test waits for the callback itself to record the scan.
         TaskCompletionSource firstScanRecorded = new(TaskCreationOptions.RunContinuationsAsynchronously);
         List<Guid> startedScanIds = [];
         FakeMediaLibraryScanDiscoveryJob firstRootJob = _mediaLibraryScanDiscoveryJobFixture.Create(onExecute: async _ =>

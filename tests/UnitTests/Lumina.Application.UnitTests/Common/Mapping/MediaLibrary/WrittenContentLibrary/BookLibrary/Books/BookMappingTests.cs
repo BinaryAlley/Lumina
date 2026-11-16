@@ -133,7 +133,7 @@ public class BookMappingTests
         entity.ApplyMetadataToEntity(book);
 
         // Assert
-        // the identity and the collection columns are not part of the metadata application
+        // The identity and the collection columns are not part of the metadata application.
         Assert.Equal(entityId, entity.Id);
         Assert.Equal(libraryId, entity.LibraryId);
         Assert.Equal(path, entity.Path);

@@ -111,8 +111,8 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Books; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Books; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task AddBook_WithSQLInjectionInPath_ShouldNotCorruptOrDeleteData(string maliciousPath)
     {
         // Arrange
@@ -133,23 +133,23 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         HttpResponseMessage response = await client.PostAsJsonAsync($"/api/v1/libraries/{libraryId}/books", request);
 
         // Assert
-        // the malicious path passes the authenticated handler, reaches the parameterized insert, and is persisted
-        // verbatim: if it were concatenated into raw SQL, the insert would fail and the book would not be created
+        // The malicious path passes the authenticated handler, reaches the parameterized insert, and is persisted
+        // verbatim: if it were concatenated into raw SQL, the insert would fail and the book would not be created.
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.DoesNotContain("SqliteException", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         Assert.Equal(1, await dbContext.Libraries.CountAsync(library => library.Id == libraryId));
-        // the single book in the library is the one inserted by this request, with the malicious path stored as data
+        // The single book in the library is the one inserted by this request, with the malicious path stored as data.
         Assert.Equal(1, await dbContext.Books.CountAsync(book => book.LibraryId == libraryId));
 
         await _apiFactory.RemoveTestUserAsync(username);
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Books; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Books; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task AddBook_WithSQLInjectionInBody_ShouldNotCorruptOrDeleteData(string maliciousTitle)
     {
         // Arrange
@@ -170,8 +170,8 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         HttpResponseMessage response = await client.PostAsJsonAsync($"/api/v1/libraries/{libraryId}/books", request);
 
         // Assert
-        // the malicious title passes the authenticated handler, reaches the parameterized insert, and is persisted
-        // verbatim: if it were concatenated into raw SQL, the insert would fail and the book would not be created
+        // The malicious title passes the authenticated handler, reaches the parameterized insert, and is persisted
+        // verbatim: if it were concatenated into raw SQL, the insert would fail and the book would not be created.
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.DoesNotContain("SqliteException", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
 
@@ -184,8 +184,8 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tags; --")] // destructive injection in a tag and genre name
-    [InlineData("' OR '1'='1")] // boolean-based injection in a tag and genre name
+    [InlineData("'; DROP TABLE Tags; --")] // Destructive injection in a tag and genre name.
+    [InlineData("' OR '1'='1")] // Boolean-based injection in a tag and genre name.
     public async Task AddBook_WithSQLInjectionInTagAndGenreNames_ShouldNotCorruptOrLeakData(string maliciousName)
     {
         // Arrange
@@ -246,8 +246,8 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Books; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Books; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task AddBook_WithSQLInjectionInRouteId_ShouldNotCorruptOrLeakData(string maliciousLibraryId)
     {
         // Arrange
@@ -279,6 +279,6 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     /// </summary>
     public void Dispose()
     {
-        // nothing to clean up: each test removes its own seeded rows
+        // Nothing to clean up: each test removes its own seeded rows.
     }
 }

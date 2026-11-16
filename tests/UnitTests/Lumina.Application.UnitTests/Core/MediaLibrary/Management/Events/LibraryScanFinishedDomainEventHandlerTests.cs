@@ -53,7 +53,7 @@ public class LibraryScanFinishedDomainEventHandlerTests
         _mockMediaLibrariesScanCancellationTracker = Substitute.For<IMediaLibrariesScanCancellationTracker>();
         _mockDebouncedLibraryScanProgressNotifier = Substitute.For<IMediaLibraryScanProgressNotifier>();
 
-        // default stubs: the library scan update succeeds
+        // Default stubs: the library scan update succeeds.
         _mockLibraryScanRepository.UpdateAsync(Arg.Any<LibraryScanEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
 

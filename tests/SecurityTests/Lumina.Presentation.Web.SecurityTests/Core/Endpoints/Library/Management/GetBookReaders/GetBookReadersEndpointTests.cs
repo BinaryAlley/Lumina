@@ -43,8 +43,8 @@ public class GetBookReadersEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Libraries--")] // destructive injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Libraries--")] // Destructive injection.
     public async Task GetBookReaders_WhenCalledWithInjectionInLibraryId_ShouldRemainSecure(string maliciousLibraryId)
     {
         // Arrange

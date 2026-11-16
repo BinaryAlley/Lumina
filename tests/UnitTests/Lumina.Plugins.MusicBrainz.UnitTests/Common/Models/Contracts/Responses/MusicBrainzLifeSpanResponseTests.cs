@@ -16,7 +16,7 @@ public class MusicBrainzLifeSpanResponseTests
     public void IsEnded_WhenTheMusicBrainzApiReturnsNull_ShouldDeserializeAsNull()
     {
         // Arrange
-        // the MusicBrainz search API returns a null ended flag for artists whose end status is unknown, which used to break deserialization into a non-nullable boolean
+        // The MusicBrainz search API returns a null ended flag for artists whose end status is unknown, which used to break deserialization into a non-nullable boolean.
         const string JSON = """{"begin":"1994-01","ended":null}""";
 
         // Act

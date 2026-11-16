@@ -31,8 +31,8 @@ public class DeleteMusicArtistEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Artists; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Artists; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task DeleteMusicArtist_WithSQLInjectionInRouteId_ShouldNormalizeTheIdAndNeverDeleteAnotherArtist(string maliciousId)
     {
         // Arrange

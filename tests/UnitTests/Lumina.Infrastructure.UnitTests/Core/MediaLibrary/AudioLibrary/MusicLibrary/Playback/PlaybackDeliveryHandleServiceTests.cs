@@ -143,10 +143,10 @@ public class PlaybackDeliveryHandleServiceTests
     }
 
     [Theory]
-    [InlineData(null)] // an absent handle cannot address a delivery
-    [InlineData("")] // an empty handle cannot address a delivery
-    [InlineData("   ")] // a whitespace handle cannot address a delivery
-    [InlineData("0123456789abcdef0123456789abcdef")] // a well formed handle that was never issued
+    [InlineData(null)] // An absent handle cannot address a delivery.
+    [InlineData("")] // An empty handle cannot address a delivery.
+    [InlineData("   ")] // A whitespace handle cannot address a delivery.
+    [InlineData("0123456789abcdef0123456789abcdef")] // A well formed handle that was never issued.
     public void GetDelivery_WhenTheHandleIsMissingOrUnknown_ShouldReturnPlaybackDeliveryNotFoundError(string? deliveryId)
     {
         // Act

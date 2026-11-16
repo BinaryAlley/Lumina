@@ -177,42 +177,42 @@ public class LibraryConsumptionSettingsTests
     }
 
     [Theory]
-    [InlineData(LibraryType.Book, true, 100)] // written content
-    [InlineData(LibraryType.EBook, true, 100)] // written content
-    [InlineData(LibraryType.ComicBook, true, 100)] // written content
-    [InlineData(LibraryType.Magazine, true, 100)] // written content
-    [InlineData(LibraryType.Newspaper, true, 100)] // written content
-    [InlineData(LibraryType.Manga, true, 100)] // written content
-    [InlineData(LibraryType.GraphicNovel, true, 100)] // written content
-    [InlineData(LibraryType.AcademicPaper, true, 100)] // written content
-    [InlineData(LibraryType.SheetMusic, true, 100)] // written content
-    [InlineData(LibraryType.TvShow, true, 90)] // video
-    [InlineData(LibraryType.Movie, true, 90)] // video
-    [InlineData(LibraryType.Documentary, true, 90)] // video
-    [InlineData(LibraryType.Anime, true, 90)] // video
-    [InlineData(LibraryType.ConcertVideo, true, 90)] // video
-    [InlineData(LibraryType.TutorialVideo, true, 90)] // video
-    [InlineData(LibraryType.HomeVideo, true, 90)] // video
-    [InlineData(LibraryType.YouTubeVideo, true, 90)] // video
-    [InlineData(LibraryType.MusicVideo, true, 90)] // video
-    [InlineData(LibraryType.LiveRecordingVideo, true, 90)] // video
-    [InlineData(LibraryType.InterviewVideo, true, 90)] // video
-    [InlineData(LibraryType.CoverSongVideo, true, 90)] // video
-    [InlineData(LibraryType.Audiobook, true, 95)] // audiobooks and podcasts
-    [InlineData(LibraryType.PodcastAudio, true, 95)] // audiobooks and podcasts
-    [InlineData(LibraryType.PodcastVideo, true, 95)] // audiobooks and podcasts
-    [InlineData(LibraryType.Music, false, null)] // music audio and photos
-    [InlineData(LibraryType.Remix, false, null)] // music audio and photos
-    [InlineData(LibraryType.SoundEffect, false, null)] // music audio and photos
-    [InlineData(LibraryType.LiveRecordingAudio, false, null)] // music audio and photos
-    [InlineData(LibraryType.InterviewAudio, false, null)] // music audio and photos
-    [InlineData(LibraryType.CoverSongAudio, false, null)] // music audio and photos
-    [InlineData(LibraryType.Photo, false, null)] // music audio and photos
-    [InlineData(LibraryType.Playlist, false, null)] // library types that are not media libraries
-    [InlineData(LibraryType.Collection, false, null)] // library types that are not media libraries
-    [InlineData(LibraryType.Subtitles, false, null)] // library types that are not media libraries
-    [InlineData(LibraryType.Lyrics, false, null)] // library types that are not media libraries
-    [InlineData(LibraryType.Other, false, null)] // library types that are not media libraries
+    [InlineData(LibraryType.Book, true, 100)] // Written content.
+    [InlineData(LibraryType.EBook, true, 100)] // Written content.
+    [InlineData(LibraryType.ComicBook, true, 100)] // Written content.
+    [InlineData(LibraryType.Magazine, true, 100)] // Written content.
+    [InlineData(LibraryType.Newspaper, true, 100)] // Written content.
+    [InlineData(LibraryType.Manga, true, 100)] // Written content.
+    [InlineData(LibraryType.GraphicNovel, true, 100)] // Written content.
+    [InlineData(LibraryType.AcademicPaper, true, 100)] // Written content.
+    [InlineData(LibraryType.SheetMusic, true, 100)] // Written content.
+    [InlineData(LibraryType.TvShow, true, 90)] // Video.
+    [InlineData(LibraryType.Movie, true, 90)] // Video.
+    [InlineData(LibraryType.Documentary, true, 90)] // Video.
+    [InlineData(LibraryType.Anime, true, 90)] // Video.
+    [InlineData(LibraryType.ConcertVideo, true, 90)] // Video.
+    [InlineData(LibraryType.TutorialVideo, true, 90)] // Video.
+    [InlineData(LibraryType.HomeVideo, true, 90)] // Video.
+    [InlineData(LibraryType.YouTubeVideo, true, 90)] // Video.
+    [InlineData(LibraryType.MusicVideo, true, 90)] // Video.
+    [InlineData(LibraryType.LiveRecordingVideo, true, 90)] // Video.
+    [InlineData(LibraryType.InterviewVideo, true, 90)] // Video.
+    [InlineData(LibraryType.CoverSongVideo, true, 90)] // Video.
+    [InlineData(LibraryType.Audiobook, true, 95)] // Audiobooks and podcasts.
+    [InlineData(LibraryType.PodcastAudio, true, 95)] // Audiobooks and podcasts.
+    [InlineData(LibraryType.PodcastVideo, true, 95)] // Audiobooks and podcasts.
+    [InlineData(LibraryType.Music, false, null)] // Music audio and photos.
+    [InlineData(LibraryType.Remix, false, null)] // Music audio and photos.
+    [InlineData(LibraryType.SoundEffect, false, null)] // Music audio and photos.
+    [InlineData(LibraryType.LiveRecordingAudio, false, null)] // Music audio and photos.
+    [InlineData(LibraryType.InterviewAudio, false, null)] // Music audio and photos.
+    [InlineData(LibraryType.CoverSongAudio, false, null)] // Music audio and photos.
+    [InlineData(LibraryType.Photo, false, null)] // Music audio and photos.
+    [InlineData(LibraryType.Playlist, false, null)] // Library types that are not media libraries.
+    [InlineData(LibraryType.Collection, false, null)] // Library types that are not media libraries.
+    [InlineData(LibraryType.Subtitles, false, null)] // Library types that are not media libraries.
+    [InlineData(LibraryType.Lyrics, false, null)] // Library types that are not media libraries.
+    [InlineData(LibraryType.Other, false, null)] // Library types that are not media libraries.
     public void CreateDefault_WhenLibraryTypeIsKnown_ShouldReturnTheTypeDefaults(
         LibraryType libraryType,
         bool expectedShouldTrackConsumptionProgress,
@@ -244,15 +244,15 @@ public class LibraryConsumptionSettingsTests
     }
 
     [Theory]
-    [InlineData(MediaKind.None, false, null)] // no media kind
-    [InlineData(MediaKind.MusicTrack, false, null)] // music tracks
-    [InlineData(MediaKind.PodcastEpisode, true, 95)] // audiobooks and podcast episodes
-    [InlineData(MediaKind.Audiobook, true, 95)] // audiobooks and podcast episodes
-    [InlineData(MediaKind.Movie, true, 90)] // video
-    [InlineData(MediaKind.TvEpisode, true, 90)] // video
-    [InlineData(MediaKind.Book, true, 100)] // written content
-    [InlineData(MediaKind.Photo, false, null)] // photos
-    [InlineData(MediaKind.Video, true, 90)] // video
+    [InlineData(MediaKind.None, false, null)] // No media kind.
+    [InlineData(MediaKind.MusicTrack, false, null)] // Music tracks.
+    [InlineData(MediaKind.PodcastEpisode, true, 95)] // Audiobooks and podcast episodes.
+    [InlineData(MediaKind.Audiobook, true, 95)] // Audiobooks and podcast episodes.
+    [InlineData(MediaKind.Movie, true, 90)] // Video.
+    [InlineData(MediaKind.TvEpisode, true, 90)] // Video.
+    [InlineData(MediaKind.Book, true, 100)] // Written content.
+    [InlineData(MediaKind.Photo, false, null)] // Photos.
+    [InlineData(MediaKind.Video, true, 90)] // Video.
     public void CreateDefault_WhenMediaKindIsKnown_ShouldReturnTheKindDefaults(
         MediaKind mediaKind,
         bool expectedShouldTrackConsumptionProgress,

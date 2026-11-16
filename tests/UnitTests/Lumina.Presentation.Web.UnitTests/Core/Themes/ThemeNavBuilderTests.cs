@@ -244,7 +244,7 @@ public class ThemeNavBuilderTests
         // Assert
         ThemeNavSectionDto toolsSection = FindSection(result, "Localized-Tools", isMobile: false)!;
         Assert.Contains(toolsSection.Items, entry => entry.Label == "Localized-Settings" && entry.Url == "http://localhost/en-us/tools/settings");
-        // the desktop tools section hosts the language submenu while the mobile menu has a dedicated language section
+        // The desktop tools section hosts the language submenu while the mobile menu has a dedicated language section.
         Assert.Contains(toolsSection.Items, entry => entry.Label == "Localized-Language" && entry.Children.Count == 10);
     }
 

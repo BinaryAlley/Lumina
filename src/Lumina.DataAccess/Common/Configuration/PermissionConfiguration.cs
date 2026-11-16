@@ -29,7 +29,7 @@ public class PermissionConfiguration : IEntityTypeConfiguration<PermissionEntity
             .HasMaxLength(100)
             .HasColumnOrder(1);
 
-        // audit
+        // Audit.
         builder.Property(permission => permission.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(3);

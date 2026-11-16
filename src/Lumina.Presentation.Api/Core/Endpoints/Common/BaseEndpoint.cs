@@ -25,16 +25,16 @@ public abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TRe
     /// <param name="errors">The error to handle.</param>
     protected IResult Problem(List<Error> errors)
     {
-        if (errors.Count is 0) // if there are no custom errors given, return a generic problem
+        if (errors.Count is 0) // If there are no custom errors given, return a generic problem.
             return Results.Problem();
-        // try to make the problem type more specific
+        // Try to make the problem type more specific.
         if (errors.All(error => error.Type == ErrorType.Validation))
             return ValidationProblem(errors);
-        // here we could handle custom error types, for instance: if (errors.All(error => error.NumericType == 23)), where 23 could be "domain errors"
+        // Here we could handle custom error types, for instance: if (errors.All(error => error.NumericType == 23)), where 23 could be "domain errors".
 
-        // share the list of errors within the scope of this HTTP request
+        // Share the list of errors within the scope of this HTTP request.
         HttpContext.Items[HttpContextItemKeys.ERRORS] = errors;
-        // get a HTTP error status code for the selected domain error type
+        // Get a HTTP error status code for the selected domain error type.
         return Problem(errors.First());
     }
 
@@ -52,7 +52,7 @@ public abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TRe
             : error.Type switch
             {
                 ErrorType.Validation => StatusCodes.Status400BadRequest,
-                ErrorType.Unauthorized => StatusCodes.Status403Forbidden, // DO NOT return Status401Unauthorized, that actually means lack of valid authentication credentials (not logged in)
+                ErrorType.Unauthorized => StatusCodes.Status403Forbidden, // DO NOT return Status401Unauthorized, that actually means lack of valid authentication credentials (not logged in).
                 ErrorType.Failure => StatusCodes.Status403Forbidden,
                 ErrorType.Forbidden => StatusCodes.Status403Forbidden,
                 ErrorType.NotFound => StatusCodes.Status404NotFound,
@@ -62,7 +62,7 @@ public abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TRe
 
         extensionsDictionary["traceId"] = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
 
-        // return the HTTP error status and the domain error message
+        // Return the HTTP error status and the domain error message.
         return Results.Problem(
             detail: error.Description,
             instance: HttpContext.Request.Path,
@@ -81,7 +81,7 @@ public abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TRe
         Dictionary<string, string[]> errorsDictionary = [];
         Dictionary<string, object?> extensionsDictionary = [];
 
-        // populate the errors dictionary with error codes and their descriptions
+        // Populate the errors dictionary with error codes and their descriptions.
         foreach (Error error in errors)
             if (!errorsDictionary.TryGetValue(error.Code, out string[]? value))
                 errorsDictionary.Add(error.Code, [error.Description]);
@@ -89,10 +89,10 @@ public abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TRe
                 if (!errorsDictionary[error.Code].Contains(error.Description))
                     errorsDictionary[error.Code] = [.. value, error.Description];
 
-        // add trace identifier to the extensions dictionary for tracing purposes
+        // Add trace identifier to the extensions dictionary for tracing purposes.
         extensionsDictionary["traceId"] = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
 
-        // return a validation problem result with the constructed error details
+        // Return a validation problem result with the constructed error details.
         return Results.ValidationProblem(
             errorsDictionary,
             detail: "OneOrMoreValidationErrorsOccurred", 

@@ -62,12 +62,12 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<LuminaApiFactory>,
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE PlaylistEntries--")] // destructive injection
-    [InlineData("1; DELETE FROM Playlists")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
-    [InlineData("Ünïcödé-💥")] // non ascii input
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE PlaylistEntries--")] // Destructive injection.
+    [InlineData("1; DELETE FROM Playlists")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
+    [InlineData("Ünïcödé-💥")] // Non ascii input.
     public async Task RemovePlaylistEntry_WithInjectionInPlaylistId_ShouldRejectWithoutLeakingOrDeletingData(string maliciousPlaylistId)
     {
         // Arrange
@@ -85,12 +85,12 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<LuminaApiFactory>,
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE PlaylistEntries--")] // destructive injection
-    [InlineData("1; DELETE FROM Playlists")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
-    [InlineData("Ünïcödé-💥")] // non ascii input
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE PlaylistEntries--")] // Destructive injection.
+    [InlineData("1; DELETE FROM Playlists")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
+    [InlineData("Ünïcödé-💥")] // Non ascii input.
     public async Task RemovePlaylistEntry_WithInjectionInPlaylistEntryId_ShouldRejectWithoutLeakingOrDeletingData(string maliciousEntryId)
     {
         // Arrange

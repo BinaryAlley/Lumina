@@ -24,7 +24,7 @@ public class UpdateUserRoleAndPermissionsCommandValidator : AbstractValidator<Up
             .Must(id => id != Guid.Empty)
             .WithError(DomainErrors.Users.UserIdCannotBeEmpty);
 
-        // validate each permission Id when the list is provided
+        // Validate each permission Id when the list is provided.
         RuleForEach(command => command.Permissions)
             .NotEmpty()
             .WithError(ApplicationErrors.Authorization.PermissionIdCannotBeEmpty)

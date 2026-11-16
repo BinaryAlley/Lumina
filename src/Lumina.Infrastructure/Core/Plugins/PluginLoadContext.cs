@@ -33,7 +33,7 @@ internal sealed class PluginLoadContext : AssemblyLoadContext
         if (assemblyName.Name is null)
             return null;
 
-        // try to resolve the assembly from the default context first, so that the plugin shares the host and framework assemblies
+        // Try to resolve the assembly from the default context first, so that the plugin shares the host and framework assemblies.
         try
         {
             return AssemblyLoadContext.Default.LoadFromAssemblyName(assemblyName);
@@ -42,7 +42,7 @@ internal sealed class PluginLoadContext : AssemblyLoadContext
         {
         }
 
-        // fall back to resolving the assembly from the plugin directory
+        // Fall back to resolving the assembly from the plugin directory.
         string dependencyPath = Path.Combine(_pluginDirectory, assemblyName.Name + ".dll");
         if (File.Exists(dependencyPath))
             return LoadFromAssemblyPath(dependencyPath);

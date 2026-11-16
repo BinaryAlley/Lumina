@@ -22,7 +22,7 @@ namespace Lumina.DataAccess.Core.Repositories.Libraries;
 /// </summary>
 internal sealed class DirectoryScanFingerprintRepository : IDirectoryScanFingerprintRepository
 {
-    private const int UPSERT_BATCH_SIZE = 500; // keeps the number of bound parameters of a single UPSERT statement well under the SQLite parameter limit
+    private const int UPSERT_BATCH_SIZE = 500; // Keeps the number of bound parameters of a single UPSERT statement well under the SQLite parameter limit.
     private readonly LuminaDbContext _luminaDbContext;
 
     /// <summary>
@@ -63,14 +63,14 @@ internal sealed class DirectoryScanFingerprintRepository : IDirectoryScanFingerp
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpsertRangeAsync(IReadOnlyCollection<DirectoryScanFingerprintEntity> entities, CancellationToken cancellationToken)
     {
-        // nothing to upsert for an empty collection
+        // Nothing to upsert for an empty collection.
         if (entities.Count == 0)
             return Result.Updated;
 
         await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
         await using DbTransaction transaction = await connection.BeginTransactionAsync(cancellationToken);
         List<DirectoryScanFingerprintEntity> remainingEntities = [.. entities];
-        // upsert the entities in batches, to keep the number of bound parameters of a single UPSERT statement under the SQLite parameter limit
+        // Upsert the entities in batches, to keep the number of bound parameters of a single UPSERT statement under the SQLite parameter limit.
         while (remainingEntities.Count > 0)
         {
             cancellationToken.ThrowIfCancellationRequested();

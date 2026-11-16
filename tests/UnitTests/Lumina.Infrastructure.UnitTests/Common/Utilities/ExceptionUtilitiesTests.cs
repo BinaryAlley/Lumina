@@ -96,8 +96,8 @@ public class ExceptionUtilitiesTests
         List<Exception> result = [.. exception.GetInnerExceptions()];
 
         // Assert
-        // the aggregate exception itself, its inner exceptions and their inners are traversed, and the first inner exception
-        // is also reachable through the regular InnerException chain, so it is yielded twice
+        // The aggregate exception itself, its inner exceptions and their inners are traversed, and the first inner exception
+        // is also reachable through the regular InnerException chain, so it is yielded twice.
         Assert.Equal(6, result.Count);
         Assert.Contains(result, inner => inner is AggregateException);
         Assert.Equal(2, result.Count(inner => inner.Message == "first-inner"));

@@ -147,7 +147,7 @@ public class UserRepositoryTests
         _mockContext.Users.Add(existingUser);
         await _mockContext.SaveChangesAsync();
 
-        // Create updated user with same Id but different properties
+        // Create updated user with same Id but different properties.
         UserEntity updatedUser = _userEntityFixture.Create(id: existingUser.Id, username: existingUser.Username, password: "NewPassword123");
         updatedUser.TempPassword = "TempPass456";
         updatedUser.TotpSecret = "NewSecret";

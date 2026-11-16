@@ -111,8 +111,8 @@ public class TranscodingCacheCoordinatorTests : IDisposable
     }
 
     [Theory]
-    [InlineData(0)] // a zero sized output
-    [InlineData(-1)] // a negative sized output
+    [InlineData(0)] // A zero sized output.
+    [InlineData(-1)] // A negative sized output.
     public void TryReserve_WhenTheRequestedSizeIsNotPositive_ShouldReturnFalse(int requestedBytes)
     {
         // Act
@@ -124,8 +124,8 @@ public class TranscodingCacheCoordinatorTests : IDisposable
     }
 
     [Theory]
-    [InlineData(0)] // a zero maximum cache size
-    [InlineData(-1)] // a negative maximum cache size
+    [InlineData(0)] // A zero maximum cache size.
+    [InlineData(-1)] // A negative maximum cache size.
     public void TryReserve_WhenTheMaximumCacheSizeIsNotPositive_ShouldReturnFalse(int maxCacheBytes)
     {
         // Act

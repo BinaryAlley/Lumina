@@ -49,8 +49,8 @@ public class GetAlbumTracksEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task GetAlbumTracks_WithSQLInjectionInArtistId_ShouldNormalizeTheIdWithoutLeakingData(string maliciousId)
     {
         // Arrange
@@ -77,8 +77,8 @@ public class GetAlbumTracksEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task GetAlbumTracks_WithSQLInjectionInAlbumId_ShouldNormalizeTheIdWithoutLeakingData(string maliciousId)
     {
         // Arrange

@@ -22,11 +22,11 @@ public class GetArtistsLiteQueryValidatorTests
     private readonly GetArtistsLiteQueryValidator _validator = new();
 
     [Theory]
-    [InlineData(null)] // missing route value
-    [InlineData("")] // empty route value
-    [InlineData("   ")] // whitespace route value, which both the not empty rule and the format rule reject
-    [InlineData("not-a-library-guid")] // non-Guid route value
-    [InlineData("00000000-0000-0000-0000-000000000000")] // empty Guid route value
+    [InlineData(null)] // Missing route value.
+    [InlineData("")] // Empty route value.
+    [InlineData("   ")] // Whitespace route value, which both the not empty rule and the format rule reject.
+    [InlineData("not-a-library-guid")] // Non-Guid route value.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // Empty Guid route value.
     public void Validate_WhenLibraryIdIsEmptyOrInvalid_ShouldHaveValidationError(string? libraryId)
     {
         // Arrange
@@ -66,8 +66,8 @@ public class GetArtistsLiteQueryValidatorTests
     }
 
     [Theory]
-    [InlineData("AB")] // more than one character
-    [InlineData("1")] // a digit, which is not a letter, the number bucket, or the symbol bucket
+    [InlineData("AB")] // More than one character.
+    [InlineData("1")] // A digit, which is not a letter, the number bucket, or the symbol bucket.
     public void Validate_WhenFilterAlphaKeyIsNotASingleLetterOrSpecialKey_ShouldHaveValidationError(string filterAlphaKey)
     {
         // Arrange
@@ -81,10 +81,10 @@ public class GetArtistsLiteQueryValidatorTests
     }
 
     [Theory]
-    [InlineData("Q")] // a single letter
-    [InlineData("q")] // a single lower case letter
-    [InlineData("#")] // the number bucket
-    [InlineData("*")] // the symbol bucket
+    [InlineData("Q")] // A single letter.
+    [InlineData("q")] // A single lower case letter.
+    [InlineData("#")] // The number bucket.
+    [InlineData("*")] // The symbol bucket.
     public void Validate_WhenFilterAlphaKeyIsASingleLetterOrSpecialKey_ShouldNotHaveValidationError(string filterAlphaKey)
     {
         // Arrange
@@ -111,8 +111,8 @@ public class GetArtistsLiteQueryValidatorTests
     }
 
     [Theory]
-    [InlineData(LibraryItemAlphaKeys.NUMBER)] // the number bucket constant
-    [InlineData(LibraryItemAlphaKeys.SYMBOL)] // the symbol bucket constant
+    [InlineData(LibraryItemAlphaKeys.NUMBER)] // The number bucket constant.
+    [InlineData(LibraryItemAlphaKeys.SYMBOL)] // The symbol bucket constant.
     public void Validate_WhenFilterAlphaKeyIsTheSpecialConstant_ShouldNotHaveValidationError(string filterAlphaKey)
     {
         // Arrange
@@ -126,58 +126,58 @@ public class GetArtistsLiteQueryValidatorTests
     }
 
     [Theory]
-    [InlineData("A")] // upper case A
-    [InlineData("B")] // upper case B
-    [InlineData("C")] // upper case C
-    [InlineData("D")] // upper case D
-    [InlineData("E")] // upper case E
-    [InlineData("F")] // upper case F
-    [InlineData("G")] // upper case G
-    [InlineData("H")] // upper case H
-    [InlineData("I")] // upper case I
-    [InlineData("J")] // upper case J
-    [InlineData("K")] // upper case K
-    [InlineData("L")] // upper case L
-    [InlineData("M")] // upper case M
-    [InlineData("N")] // upper case N
-    [InlineData("O")] // upper case O
-    [InlineData("P")] // upper case P
-    [InlineData("Q")] // upper case Q
-    [InlineData("R")] // upper case R
-    [InlineData("S")] // upper case S
-    [InlineData("T")] // upper case T
-    [InlineData("U")] // upper case U
-    [InlineData("V")] // upper case V
-    [InlineData("W")] // upper case W
-    [InlineData("X")] // upper case X
-    [InlineData("Y")] // upper case Y
-    [InlineData("Z")] // upper case Z
-    [InlineData("a")] // lower case a
-    [InlineData("b")] // lower case b
-    [InlineData("c")] // lower case c
-    [InlineData("d")] // lower case d
-    [InlineData("e")] // lower case e
-    [InlineData("f")] // lower case f
-    [InlineData("g")] // lower case g
-    [InlineData("h")] // lower case h
-    [InlineData("i")] // lower case i
-    [InlineData("j")] // lower case j
-    [InlineData("k")] // lower case k
-    [InlineData("l")] // lower case l
-    [InlineData("m")] // lower case m
-    [InlineData("n")] // lower case n
-    [InlineData("o")] // lower case o
-    [InlineData("p")] // lower case p
-    [InlineData("q")] // lower case q
-    [InlineData("r")] // lower case r
-    [InlineData("s")] // lower case s
-    [InlineData("t")] // lower case t
-    [InlineData("u")] // lower case u
-    [InlineData("v")] // lower case v
-    [InlineData("w")] // lower case w
-    [InlineData("x")] // lower case x
-    [InlineData("y")] // lower case y
-    [InlineData("z")] // lower case z
+    [InlineData("A")] // Upper case A.
+    [InlineData("B")] // Upper case B.
+    [InlineData("C")] // Upper case C.
+    [InlineData("D")] // Upper case D.
+    [InlineData("E")] // Upper case E.
+    [InlineData("F")] // Upper case F.
+    [InlineData("G")] // Upper case G.
+    [InlineData("H")] // Upper case H.
+    [InlineData("I")] // Upper case I.
+    [InlineData("J")] // Upper case J.
+    [InlineData("K")] // Upper case K.
+    [InlineData("L")] // Upper case L.
+    [InlineData("M")] // Upper case M.
+    [InlineData("N")] // Upper case N.
+    [InlineData("O")] // Upper case O.
+    [InlineData("P")] // Upper case P.
+    [InlineData("Q")] // Upper case Q.
+    [InlineData("R")] // Upper case R.
+    [InlineData("S")] // Upper case S.
+    [InlineData("T")] // Upper case T.
+    [InlineData("U")] // Upper case U.
+    [InlineData("V")] // Upper case V.
+    [InlineData("W")] // Upper case W.
+    [InlineData("X")] // Upper case X.
+    [InlineData("Y")] // Upper case Y.
+    [InlineData("Z")] // Upper case Z.
+    [InlineData("a")] // Lower case a.
+    [InlineData("b")] // Lower case b.
+    [InlineData("c")] // Lower case c.
+    [InlineData("d")] // Lower case d.
+    [InlineData("e")] // Lower case e.
+    [InlineData("f")] // Lower case f.
+    [InlineData("g")] // Lower case g.
+    [InlineData("h")] // Lower case h.
+    [InlineData("i")] // Lower case i.
+    [InlineData("j")] // Lower case j.
+    [InlineData("k")] // Lower case k.
+    [InlineData("l")] // Lower case l.
+    [InlineData("m")] // Lower case m.
+    [InlineData("n")] // Lower case n.
+    [InlineData("o")] // Lower case o.
+    [InlineData("p")] // Lower case p.
+    [InlineData("q")] // Lower case q.
+    [InlineData("r")] // Lower case r.
+    [InlineData("s")] // Lower case s.
+    [InlineData("t")] // Lower case t.
+    [InlineData("u")] // Lower case u.
+    [InlineData("v")] // Lower case v.
+    [InlineData("w")] // Lower case w.
+    [InlineData("x")] // Lower case x.
+    [InlineData("y")] // Lower case y.
+    [InlineData("z")] // Lower case z.
     public void Validate_WhenFilterAlphaKeyIsAnySingleAsciiLetter_ShouldNotHaveValidationError(string filterAlphaKey)
     {
         // Arrange
@@ -191,19 +191,19 @@ public class GetArtistsLiteQueryValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // empty string, which is not a single letter or a special key
-    [InlineData("AB")] // two letters
-    [InlineData("ABC")] // several letters
-    [InlineData("1")] // a digit, which is not a letter, a number bucket or a symbol bucket
-    [InlineData("9")] // another digit
-    [InlineData("_")] // an underscore, which is not an ASCII letter
-    [InlineData("é")] // a non-ASCII letter
-    [InlineData("#!")] // the number bucket followed by another character
-    [InlineData("**")] // two symbol buckets, which is not the exact symbol constant
-    [InlineData("#A")] // the number bucket followed by a letter
-    [InlineData("*A")] // the symbol bucket followed by a letter
-    [InlineData(" A")] // a leading space followed by a letter
-    [InlineData("A ")] // a letter followed by a trailing space
+    [InlineData("")] // Empty string, which is not a single letter or a special key.
+    [InlineData("AB")] // Two letters.
+    [InlineData("ABC")] // Several letters.
+    [InlineData("1")] // A digit, which is not a letter, a number bucket or a symbol bucket.
+    [InlineData("9")] // Another digit.
+    [InlineData("_")] // An underscore, which is not an ASCII letter.
+    [InlineData("é")] // A non-ASCII letter.
+    [InlineData("#!")] // The number bucket followed by another character.
+    [InlineData("**")] // Two symbol buckets, which is not the exact symbol constant.
+    [InlineData("#A")] // The number bucket followed by a letter.
+    [InlineData("*A")] // The symbol bucket followed by a letter.
+    [InlineData(" A")] // A leading space followed by a letter.
+    [InlineData("A ")] // A letter followed by a trailing space.
     public void Validate_WhenFilterAlphaKeyIsNotAValidAlphaKey_ShouldHaveValidationError(string filterAlphaKey)
     {
         // Arrange

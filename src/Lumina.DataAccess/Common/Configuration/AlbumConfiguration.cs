@@ -142,8 +142,8 @@ public class AlbumConfiguration : IEntityTypeConfiguration<AlbumEntity>
             .HasForeignKey(album => album.ArtistId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // since Tag and Genre are Domain ValueObjects (no identity), but we also don't want to have duplicates,
-        // we need to configure them as many-to-many relationships, where the tag/genre itself is the primary key
+        // Since Tag and Genre are Domain ValueObjects (no identity), but we also don't want to have duplicates,
+        // we need to configure them as many-to-many relationships, where the tag/genre itself is the primary key.
         builder.HasMany(album => album.Tags)
             .WithMany()
             .UsingEntity<Dictionary<string, object>>(

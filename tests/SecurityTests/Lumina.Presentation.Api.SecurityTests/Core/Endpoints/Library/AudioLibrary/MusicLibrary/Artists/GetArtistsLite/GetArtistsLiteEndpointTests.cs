@@ -70,8 +70,8 @@ public class GetArtistsLiteEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Artists; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Artists; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task GetArtistsLite_WhenSearchTermContainsSqlInjection_ShouldNotCorruptOrDeleteData(string maliciousSearchTerm)
     {
         // Arrange
@@ -89,7 +89,7 @@ public class GetArtistsLiteEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(maliciousSearchTerm, content, StringComparison.Ordinal);
 
-        // the injected statement must never be executed: the Artists table and the seeded rows must still be there
+        // The injected statement must never be executed: the Artists table and the seeded rows must still be there.
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         Assert.Equal(1, await dbContext.Artists.CountAsync(artist => artist.LibraryId == libraryId));
@@ -97,9 +97,9 @@ public class GetArtistsLiteEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Artists; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // command execution attempt
+    [InlineData("'; DROP TABLE Artists; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // Command execution attempt.
     public async Task GetArtistsLite_WithSQLInjectionInRouteId_ShouldNotCorruptOrLeakData(string maliciousLibraryId)
     {
         // Arrange

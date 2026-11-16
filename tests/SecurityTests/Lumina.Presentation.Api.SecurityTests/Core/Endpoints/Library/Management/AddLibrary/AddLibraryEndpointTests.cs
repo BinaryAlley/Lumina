@@ -73,8 +73,8 @@ public class AddLibraryEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Libraries--")] // destructive injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Libraries--")] // Destructive injection.
     public async Task AddLibrary_WithSQLInjectionInTitle_ShouldNotLeakOrError(string maliciousTitle)
     {
         // Arrange
@@ -96,7 +96,7 @@ public class AddLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         HttpResponseMessage response = await client.PostAsJsonAsync("/api/v1/libraries", request);
 
         // Assert
-        // the malicious title passes the authenticated handler, reaches the parameterized data access, and is persisted verbatim
+        // The malicious title passes the authenticated handler, reaches the parameterized data access, and is persisted verbatim.
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
@@ -113,10 +113,10 @@ public class AddLibraryEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData(-1)] // just below the allowed range
-    [InlineData(101)] // just above the allowed range
-    [InlineData(int.MinValue)] // lowest possible value
-    [InlineData(int.MaxValue)] // highest possible value
+    [InlineData(-1)] // Just below the allowed range.
+    [InlineData(101)] // Just above the allowed range.
+    [InlineData(int.MinValue)] // Lowest possible value.
+    [InlineData(int.MaxValue)] // Highest possible value.
     public async Task AddLibrary_WhenThresholdIsOutsideAllowedRange_ShouldRejectTheRequestWithoutPersisting(int completionThresholdPercentage)
     {
         // Arrange

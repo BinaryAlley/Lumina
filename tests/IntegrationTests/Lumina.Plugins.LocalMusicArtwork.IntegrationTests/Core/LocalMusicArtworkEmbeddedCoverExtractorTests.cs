@@ -68,9 +68,9 @@ public class LocalMusicArtworkEmbeddedCoverExtractorTests : IDisposable
     }
 
     [Theory]
-    [InlineData(null)] // a null path contributes no cover
-    [InlineData("")] // an empty path contributes no cover
-    [InlineData("   ")] // a white space path contributes no cover
+    [InlineData(null)] // A null path contributes no cover.
+    [InlineData("")] // An empty path contributes no cover.
+    [InlineData("   ")] // A white space path contributes no cover.
     public void Extract_WhenTheTrackPathIsNullOrEmpty_ShouldReturnNull(string? trackPath)
     {
         // Act
@@ -101,11 +101,11 @@ public class LocalMusicArtworkEmbeddedCoverExtractorTests : IDisposable
     [InlineData("image/x-ms-bmp", ".bmp")]
     [InlineData("image/gif", ".gif")]
     [InlineData("image/tiff", ".tiff")]
-    [InlineData("IMAGE/PNG", ".png")] // the MIME type is matched without regard to casing
-    [InlineData("  image/png  ", ".png")] // the MIME type is trimmed before it is matched
-    [InlineData("application/octet-stream", ".jpg")] // an unknown MIME type falls back to the JPEG extension
-    [InlineData("", ".jpg")] // an empty MIME type falls back to the JPEG extension
-    [InlineData(null, ".jpg")] // a missing MIME type falls back to the JPEG extension
+    [InlineData("IMAGE/PNG", ".png")] // The MIME type is matched without regard to casing.
+    [InlineData("  image/png  ", ".png")] // The MIME type is trimmed before it is matched.
+    [InlineData("application/octet-stream", ".jpg")] // An unknown MIME type falls back to the JPEG extension.
+    [InlineData("", ".jpg")] // An empty MIME type falls back to the JPEG extension.
+    [InlineData(null, ".jpg")] // A missing MIME type falls back to the JPEG extension.
     public void Extract_WhenTheMimeTypeIsProvided_ShouldUseTheMatchingFileExtension(string? mimeType, string expectedExtension)
     {
         // Arrange

@@ -38,25 +38,25 @@ public class FileSystemStructureFixture
     /// <returns>The path to the root directory of the created file system structure.</returns>
     public string CreateFileSystemStructure()
     {
-        // create the root directory
+        // Create the root directory.
         Directory.CreateDirectory(_rootPath);
         string currentPath = _rootPath;
         for (int i = 1; i <= 3; i++)
         {
-            // create a nested subdirectory
+            // Create a nested subdirectory.
             currentPath = Path.Combine(currentPath, $"NestedDirectory_{i}");
             Directory.CreateDirectory(currentPath);
 
-            // create two text files in the current directory
+            // Create two text files in the current directory.
             for (int j = 1; j <= 2; j++)
             {
                 string filePath = Path.Combine(currentPath, $"TestFile_{j}.txt");
                 File.WriteAllText(filePath, _faker.Lorem.Paragraph());
-                // make the first file in each directory hidden
+                // Make the first file in each directory hidden.
                 if (j == 1)
                     SetHidden(filePath);
             }
-            // make the second nested directory hidden
+            // Make the second nested directory hidden.
             if (i == 2)
                 currentPath = SetHidden(currentPath);
         }
@@ -69,10 +69,10 @@ public class FileSystemStructureFixture
     /// <returns><see langword="true"/> when hidden elements can be created, otherwise <see langword="false"/>.</returns>
     private static bool DetectHiddenAttributeSupport()
     {
-        // on Unix-like systems the fixture hides elements with the dot-prefix convention, which the file system always supports
+        // On Unix-like systems the fixture hides elements with the dot-prefix convention, which the file system always supports.
         if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
             return true;
-        // on Windows the fixture relies on the hidden file attribute, which some file systems (for example network drives) do not persist
+        // On Windows the fixture relies on the hidden file attribute, which some file systems (for example network drives) do not persist.
         string probePath = Path.Combine(AppContext.BaseDirectory, "lumina_hidden_attribute_probe_" + Guid.NewGuid());
         try
         {
@@ -111,7 +111,7 @@ public class FileSystemStructureFixture
             File.SetAttributes(path, File.GetAttributes(path) | FileAttributes.Hidden);
         else if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
         {
-            // On Unix-like systems, rename the file/directory to start with a dot
+            // On Unix-like systems, rename the file/directory to start with a dot.
             string directory = Path.GetDirectoryName(path)!;
             string name = Path.GetFileName(path);
             string newPath = Path.Combine(directory, "." + name);

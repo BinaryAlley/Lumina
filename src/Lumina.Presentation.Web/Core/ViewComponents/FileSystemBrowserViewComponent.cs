@@ -35,7 +35,7 @@ public class FileSystemBrowserViewComponent : ViewComponent
     public async Task<IViewComponentResult> InvokeAsync()
     {
         ThemeFileSystemBrowserConfigurationDto configuration = new(
-            ClientBasePath: "http://localhost:5012/", // TODO: take from appsettings or environment
+            ClientBasePath: "http://localhost:5012/", // TODO: take from appsettings or environment.
             Path: RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? @"/" : @"C:\Users\",
             ViewMode: FileSystemViewMode.List.ToString().ToLower(),
             IconSize: FileSystemIconSize.Large.ToString().ToLower());

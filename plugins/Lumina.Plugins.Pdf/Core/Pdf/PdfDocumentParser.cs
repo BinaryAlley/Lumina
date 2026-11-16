@@ -248,7 +248,7 @@ internal static class PdfDocumentParser
         }
         catch (Exception)
         {
-            // The bookmarks of a malformed PDF are best effort, so the table of contents is skipped instead of failing the book; the pages themselves are still readable
+            // The bookmarks of a malformed PDF are best effort, so the table of contents is skipped instead of failing the book; the pages themselves are still readable.
             return [];
         }
     }

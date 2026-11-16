@@ -19,26 +19,26 @@ public class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermissi
     {
         builder.ToTable("RolePermissions");
 
-        // composite primary key
+        // Composite primary key.
         builder.HasKey(rolePermission => new { rolePermission.RoleId, rolePermission.PermissionId });
         
-        builder.Ignore(rolePermission => rolePermission.Id); // Id is only needed as a generic constraint for the repository, but this entity uses a composite key as Id
+        builder.Ignore(rolePermission => rolePermission.Id); // Id is only needed as a generic constraint for the repository, but this entity uses a composite key as Id.
 
-        // foreign key: Role
+        // Foreign key: Role.
         builder.HasOne(rolePermission => rolePermission.Role)
             .WithMany(user => user.RolePermissions)
             .HasForeignKey(rolePermission => rolePermission.RoleId)
             .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade); // deleting a Role deletes associated RolePermission
+            .OnDelete(DeleteBehavior.Cascade); // Deleting a Role deletes associated RolePermission.
 
-        // foreign key: Permission
+        // Foreign key: Permission.
         builder.HasOne(rolePermission => rolePermission.Permission)
             .WithMany(role => role.RolePermissions)
             .HasForeignKey(rolePermission => rolePermission.PermissionId)
             .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade); // deleting a Permission deletes associated RolePermission
+            .OnDelete(DeleteBehavior.Cascade); // Deleting a Permission deletes associated RolePermission.
 
-        // audit
+        // Audit.
         builder.Property(rolePermission => rolePermission.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(1);
@@ -55,7 +55,7 @@ public class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermissi
             .HasDefaultValue(null)
             .HasColumnOrder(4);
 
-        // indexes
+        // Indexes.
         builder.HasIndex(userRole => new { userRole.RoleId, userRole.PermissionId })
             .IsUnique();
     }

@@ -107,7 +107,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.NotNull(bookResponse);
 
-        // metadata checks
+        // Metadata checks.
         Assert.Equal(bookRequest.Metadata!.Title, bookResponse!.Metadata.Title);
         Assert.Equal(bookRequest.Metadata.OriginalTitle, bookResponse.Metadata.OriginalTitle);
         Assert.Equal(bookRequest.Metadata.Description, bookResponse.Metadata.Description);
@@ -121,29 +121,29 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         Assert.Equal(bookRequest.Metadata.ReleaseInfo.ReleaseCountry, bookResponse.Metadata.ReleaseInfo.ReleaseCountry);
         Assert.Equal(bookRequest.Metadata.ReleaseInfo.ReleaseVersion, bookResponse.Metadata.ReleaseInfo.ReleaseVersion);
 
-        // language checks
+        // Language checks.
         Assert.Equal(bookRequest.Metadata.Language!.LanguageCode, bookResponse.Metadata.Language!.LanguageCode);
         Assert.Equal(bookRequest.Metadata.Language.LanguageName, bookResponse.Metadata.Language.LanguageName);
         Assert.Equal(bookRequest.Metadata.Language.NativeName, bookResponse.Metadata.Language.NativeName);
 
-        // original language checks
+        // Original language checks.
         Assert.Equal(bookRequest.Metadata.OriginalLanguage!.LanguageCode, bookResponse.Metadata.OriginalLanguage!.LanguageCode);
         Assert.Equal(bookRequest.Metadata.OriginalLanguage.LanguageName, bookResponse.Metadata.OriginalLanguage.LanguageName);
         Assert.Equal(bookRequest.Metadata.OriginalLanguage.NativeName, bookResponse.Metadata.OriginalLanguage.NativeName);
 
-        // genres checks
+        // Genres checks.
         Assert.Equal(bookRequest.Metadata.Genres!.Count, bookResponse.Metadata.Genres!.Count);
         Assert.Equal(
             bookRequest.Metadata.Genres.Select(genre => genre.Name!.ToLowerInvariant()).OrderBy(name => name),
             bookResponse.Metadata.Genres.Select(genre => genre.Name).OrderBy(name => name));
 
-        // tags checks
+        // Tags checks.
         Assert.Equal(bookRequest.Metadata.Tags!.Count, bookResponse.Metadata.Tags!.Count);
         Assert.Equal(
             bookRequest.Metadata.Tags.Select(tag => tag.Name!.ToLowerInvariant()).OrderBy(name => name),
             bookResponse.Metadata.Tags.Select(tag => tag.Name).OrderBy(name => name));
 
-        // book specific properties
+        // Book specific properties.
         Assert.Equal(bookRequest.Format, bookResponse.Format);
         Assert.Equal(bookRequest.Edition, bookResponse.Edition);
         Assert.Equal(bookRequest.VolumeNumber, bookResponse.VolumeNumber);
@@ -157,7 +157,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
         Assert.Equal(bookRequest.BarnesAndNobleId, bookResponse.BarnesAndNobleId);
         Assert.Equal(bookRequest.AppleBooksId, bookResponse.AppleBooksId);
 
-        // ISBNs checks
+        // ISBNs checks.
         Assert.Equal(bookRequest.ISBNs!.Count, bookResponse.ISBNs!.Count);
         var requestIsbnData = bookRequest.ISBNs.Select(isbn => new { isbn.Value, isbn.Format }).OrderBy(x => x.Value).ToList();
         var responseIsbnData = bookResponse.ISBNs.Select(isbn => new { isbn.Value, isbn.Format }).OrderBy(x => x.Value).ToList();
@@ -168,7 +168,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
             Assert.Equal(requestIsbnData[i].Format, responseIsbnData[i].Format);
         }
 
-        // ratings checks
+        // Ratings checks.
         Assert.Equal(bookRequest.Ratings!.Count, bookResponse.Ratings!.Count);
         var requestRatingData = bookRequest.Ratings.Select(r => new { r.Source, r.Value, r.MaxValue, r.VoteCount }).OrderBy(x => x.Source).ToList();
         var responseRatingData = bookResponse.Ratings.Select(r => new { r.Source, r.Value, r.MaxValue, r.VoteCount }).OrderBy(x => x.Source).ToList();
@@ -181,18 +181,18 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
             Assert.Equal(requestRatingData[i].VoteCount, responseRatingData[i].VoteCount);
         }
 
-        // series checks
+        // Series checks.
         if (bookRequest.Series is not null)
             Assert.Equal(bookRequest.Series.Title, bookResponse.Series!.Title);
         else
             Assert.Null(bookResponse.Series);
 
-        // check Location header
+        // Check Location header.
         Assert.NotNull(response.Headers.Location);
         string locationUri = response.Headers.Location!.ToString();
         Assert.EndsWith($"/api/v1/libraries/{_libraryId}/books/{bookResponse.Id}", locationUri);
 
-        // extract ID from Location header and compare
+        // Extract ID from Location header and compare.
         string idFromHeader = locationUri.Split('/').Last();
         Assert.Equal(idFromHeader, bookResponse.Id.ToString());
     }
@@ -1320,7 +1320,7 @@ public class AddBookEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>
     public async Task AddBook_WhenTheLibraryDoesNotExist_ShouldReturnNotFound()
     {
         // Arrange
-        // only an admin reaches the library lookup of a library that does not exist, because a regular user is rejected by the ownership policy before it
+        // Only an admin reaches the library lookup of a library that does not exist, because a regular user is rejected by the ownership policy before it.
         HttpClient adminClient = await _apiFactory.CreateAuthenticatedAdminClientAsync();
         Guid missingLibraryId = Guid.NewGuid();
         AddBookRequest bookRequest = _addBookRequestFixture.Create(contributors: []);

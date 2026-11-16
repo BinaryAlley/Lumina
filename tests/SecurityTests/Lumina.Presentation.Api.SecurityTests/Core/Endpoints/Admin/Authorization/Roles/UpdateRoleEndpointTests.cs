@@ -80,8 +80,8 @@ public class UpdateRoleEndpointTests : IClassFixture<LuminaApiFactory>, IAsyncDi
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Roles--")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Roles--")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateRole_WithSQLInjectionInRoleName_ShouldNotCorruptOrDeleteData(string maliciousRoleName)
     {
         // Arrange
@@ -108,8 +108,8 @@ public class UpdateRoleEndpointTests : IClassFixture<LuminaApiFactory>, IAsyncDi
         HttpResponseMessage response = await client.PutAsync("/api/v1/auth/roles", content);
 
         // Assert
-        // the malicious role name passes the authenticated handler and the permissions validation, reaches the
-        // parameterized update, and is persisted verbatim: if it were concatenated into raw SQL, the update would fail
+        // The malicious role name passes the authenticated handler and the permissions validation, reaches the
+        // parameterized update, and is persisted verbatim: if it were concatenated into raw SQL, the update would fail.
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.DoesNotContain("SqliteException", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
 

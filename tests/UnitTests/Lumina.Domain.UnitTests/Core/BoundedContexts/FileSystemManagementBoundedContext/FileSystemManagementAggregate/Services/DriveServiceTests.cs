@@ -62,7 +62,7 @@ public class DriveServiceTests
         [
             CreateMockDriveInfo("C:\\", true),
             CreateMockDriveInfo("D:\\", true),
-            CreateMockDriveInfo("E:\\", false) // Not ready
+            CreateMockDriveInfo("E:\\", false) // Not ready.
         ];
         _mockFileSystem.DriveInfo.GetDrives().Returns(mockDrives);
 
@@ -71,7 +71,7 @@ public class DriveServiceTests
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.Equal(2, result.Value.Count()); // Only ready drives
+        Assert.Equal(2, result.Value.Count()); // Only ready drives.
         Assert.All(result.Value, item => Assert.IsType<WindowsRootItem>(item));
         Assert.Equal(["C:\\", "D:\\"], result.Value.Select(d => d.Name));
     }
@@ -84,7 +84,7 @@ public class DriveServiceTests
         IDriveInfo[] mockDrives =
         [
             CreateMockDriveInfo("C:\\", true),
-            CreateMockDriveInfo("", true) // drive whose name cannot be turned into a valid path
+            CreateMockDriveInfo("", true) // Drive whose name cannot be turned into a valid path.
         ];
         _mockFileSystem.DriveInfo.GetDrives().Returns(mockDrives);
 

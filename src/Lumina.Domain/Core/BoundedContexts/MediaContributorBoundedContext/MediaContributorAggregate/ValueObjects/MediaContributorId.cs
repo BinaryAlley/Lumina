@@ -25,7 +25,7 @@ public sealed class MediaContributorId : EntityId<Guid>
     /// <returns>The created <see cref="MediaContributorId"/> instance.</returns>
     public static MediaContributorId CreateUnique()
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         return new MediaContributorId(Guid.NewGuid());
     }
 
@@ -36,7 +36,7 @@ public sealed class MediaContributorId : EntityId<Guid>
     /// <returns>The created <see cref="MediaContributorId"/> instance.</returns>
     public static MediaContributorId Create(Guid value)
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         return new MediaContributorId(value);
     }
 

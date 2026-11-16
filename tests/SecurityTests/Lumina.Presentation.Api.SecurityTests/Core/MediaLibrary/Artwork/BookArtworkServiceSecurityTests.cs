@@ -57,7 +57,7 @@ public class BookArtworkServiceSecurityTests
         ServiceCollection services = new();
         services.AddInfrastructureLayerServices(mockConfiguration);
         services.AddScoped(_ => mockEnvironmentContext);
-        // the real path service is used, so that the sanitization of hostile segment names is exercised
+        // The real path service is used, so that the sanitization of hostile segment names is exercised.
         services.AddScoped(_ => CreateRealPathService());
         services.AddSingleton(Options.Create(mediaSettings));
         ServiceProvider serviceProvider = services.BuildServiceProvider();
@@ -75,7 +75,7 @@ public class BookArtworkServiceSecurityTests
         if (!TryCreateJunction(linkPath, targetDirectory))
         {
             Directory.Delete(targetDirectory, true);
-            return; // the environment does not support creating reparse points
+            return; // The environment does not support creating reparse points.
         }
 
         try
@@ -92,7 +92,7 @@ public class BookArtworkServiceSecurityTests
         }
         finally
         {
-            // Windows removes a junction with Directory.Delete, while Unix-like platforms unlink the symbolic link with File.Delete
+            // Windows removes a junction with Directory.Delete, while Unix-like platforms unlink the symbolic link with File.Delete.
             if (OperatingSystem.IsWindows())
                 Directory.Delete(linkPath, true);
             else

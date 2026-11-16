@@ -65,7 +65,7 @@ internal sealed class MediaContributorRepository : IMediaContributorRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the existing or newly created <see cref="MediaContributorEntity"/>, or an error.</returns>
     public async Task<Result<MediaContributorEntity>> FindOrCreateByDisplayNameAsync(string displayName, string? legalName, CancellationToken cancellationToken)
     {
-        // the comparison is case-insensitive, so that "Stephen King" and "stephen king" are never treated as distinct contributors
+        // The comparison is case-insensitive, so that "Stephen King" and "stephen king" are never treated as distinct contributors.
         string normalizedDisplayName = displayName.ToLowerInvariant();
 
         // Contributors added earlier in the same unit of work are not returned by a database query, so the change tracker is consulted

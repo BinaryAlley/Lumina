@@ -66,8 +66,8 @@ public class MoodEntityMappingTests
     }
 
     [Theory]
-    [InlineData("")] // empty name
-    [InlineData("   ")] // whitespace name
+    [InlineData("")] // Empty name.
+    [InlineData("   ")] // Whitespace name.
     public void ToDomainValueObject_WhenNameIsWhitespace_ShouldReturnError(string name)
     {
         // Arrange

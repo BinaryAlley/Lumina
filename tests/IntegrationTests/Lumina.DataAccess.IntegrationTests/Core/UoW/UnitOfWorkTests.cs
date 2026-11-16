@@ -212,7 +212,7 @@ public class UnitOfWorkTests
                 Result<Success> firstSaveResult = await sut.SaveChangesAsync(CancellationToken.None);
                 Assert.False(firstSaveResult.IsFailure);
 
-                // stage a second book with the same library and path directly, bypassing the application level pre-check, so that the unique index of the storage medium is the one that rejects it
+                // Stage a second book with the same library and path directly, bypassing the application level pre-check, so that the unique index of the storage medium is the one that rejects it.
                 BookEntity secondBook = _bookEntityFixture.Create();
                 secondBook.LibraryId = libraryId;
                 secondBook.Path = "/books/duplicate.epub";
@@ -275,7 +275,7 @@ public class UnitOfWorkTests
                 Result<Success> firstSaveResult = await sut.SaveChangesAsync(CancellationToken.None);
                 Assert.False(firstSaveResult.IsFailure);
 
-                // stage a duplicate directly through the repository, bypassing the application level existence check, so that the unique index of the storage medium is the one that rejects it
+                // Stage a duplicate directly through the repository, bypassing the application level existence check, so that the unique index of the storage medium is the one that rejects it.
                 FavoriteEntity duplicateFavorite = _favoriteEntityFixture.Create(
                     userId: userId,
                     mediaKind: FavoriteMediaKind.MusicArtist,

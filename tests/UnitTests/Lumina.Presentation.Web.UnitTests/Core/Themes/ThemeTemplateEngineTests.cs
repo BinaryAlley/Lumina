@@ -209,9 +209,9 @@ public class ThemeTemplateEngineTests
     }
 
     [Theory]
-    [InlineData(null)] // unresolved section
-    [InlineData(false)] // boolean false
-    [InlineData("")] // empty string
+    [InlineData(null)] // Unresolved section.
+    [InlineData(false)] // Boolean false.
+    [InlineData("")] // Empty string.
     public void RenderPage_WhenSectionIsFalsy_ShouldSkipChildren(object? sectionValue)
     {
         // Arrange
@@ -487,9 +487,9 @@ public class ThemeTemplateEngineTests
     }
 
     [Theory]
-    [InlineData("{{bad-name}}")] // hyphen is not a valid name part character
-    [InlineData("{{two words}}")] // whitespace inside the expression
-    [InlineData("{{a..b}}")] // empty name part
+    [InlineData("{{bad-name}}")] // Hyphen is not a valid name part character.
+    [InlineData("{{two words}}")] // Whitespace inside the expression.
+    [InlineData("{{a..b}}")] // Empty name part.
     public void RenderPage_WhenExpressionIsInvalid_ShouldReturnTemplateError(string template)
     {
         // Act

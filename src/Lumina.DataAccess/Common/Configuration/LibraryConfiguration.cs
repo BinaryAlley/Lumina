@@ -21,7 +21,7 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
         builder.ToTable("Libraries");
         builder.HasKey(library => library.Id);
         builder.Property(library => library.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
 
         builder.Property(library => library.Title)
@@ -83,19 +83,19 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
             .HasDefaultValue(false)
             .HasColumnOrder(18);
 
-        // one user with many libraries
+        // One user with many libraries.
         builder.HasOne(library => library.User)
             .WithMany(user => user.Libraries)
             .HasForeignKey(library => library.UserId)
             .IsRequired();
 
-        // one library with many scans
+        // One library with many scans.
         builder.HasMany(library => library.LibraryScans)
               .WithOne(libraryScan => libraryScan.Library)
               .HasForeignKey(libraryScan => libraryScan.LibraryId)
-              .OnDelete(DeleteBehavior.Cascade); // deleting a library deletes library scans
+              .OnDelete(DeleteBehavior.Cascade); // Deleting a library deletes library scans.
 
-        // using OwnsMany because paths are domain Value Objects, thus they have no independent identity, and their lifecycle is bound to the Library
+        // Using OwnsMany because paths are domain Value Objects, thus they have no independent identity, and their lifecycle is bound to the Library.
         builder.OwnsMany(library => library.ContentLocations, contentLocationBuilder =>
         {
             contentLocationBuilder.ToTable("LibraryContentLocations");
@@ -112,7 +112,7 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
                  .IsRequired();
         });
 
-        // the path template parts are ordered, so their position is stored explicitly and part of a unique index together with the library
+        // The path template parts are ordered, so their position is stored explicitly and part of a unique index together with the library.
         builder.OwnsMany(library => library.PathTemplateParts, partBuilder =>
         {
             partBuilder.ToTable("LibraryPathTemplateParts");
@@ -139,7 +139,7 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
                 .IsRequired();
         });
 
-        // audit
+        // Audit.
         builder.Property(library => library.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(12);

@@ -81,12 +81,12 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         JwtSecurityTokenHandler handler = new();
         JwtSecurityToken token = handler.ReadJwtToken(result!.Token);
 
-        string expValue = token.Claims.First(c => c.Type == "exp").Value; // get token claims
+        string expValue = token.Claims.First(c => c.Type == "exp").Value; // Get token claims.
         DateTimeOffset tokenExpiration = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expValue));
         DateTimeOffset expectedExpiration = beforeRequest.AddMinutes(15);
 
         // Verify token duration (should be 15 minutes from request time - expiration value is set in tests setup class).
-        TimeSpan allowedVariance = TimeSpan.FromSeconds(30); // allow for processing time
+        TimeSpan allowedVariance = TimeSpan.FromSeconds(30); // Allow for processing time.
         TimeSpan actualDifference = tokenExpiration - beforeRequest;
         TimeSpan expectedDifference = TimeSpan.FromMinutes(15);
 
@@ -178,11 +178,11 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("admin'--")] // comment injection
-    [InlineData("' UNION SELECT * FROM Users--")] // union injection
-    [InlineData("'; DROP TABLE Users--")] // destructive injection
-    [InlineData("' WAITFOR DELAY '0:0:10'--")] // time-based injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("admin'--")] // Comment injection.
+    [InlineData("' UNION SELECT * FROM Users--")] // Union injection.
+    [InlineData("'; DROP TABLE Users--")] // Destructive injection.
+    [InlineData("' WAITFOR DELAY '0:0:10'--")] // Time-based injection.
     public async Task Login_WithSQLInjectionAttempt_ShouldRemainSecure(string maliciousUsername)
     {
         // Arrange

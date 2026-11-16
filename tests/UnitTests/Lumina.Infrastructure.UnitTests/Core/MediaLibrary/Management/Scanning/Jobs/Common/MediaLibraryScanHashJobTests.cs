@@ -349,7 +349,7 @@ public class MediaLibraryScanHashJobTests
 
         // Assert
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
-        // the initial progress and the progress published from the hashing callback are both reported
+        // The initial progress and the progress published from the hashing callback are both reported.
         await _mockDomainEventPublisher.Received(2).PublishAsync(Arg.Is<LibraryScanJobProgressChangedDomainEvent>(domainEvent => domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
     }
 

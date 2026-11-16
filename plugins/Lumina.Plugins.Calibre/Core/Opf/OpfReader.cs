@@ -34,7 +34,7 @@ internal static class OpfReader
         try
         {
             using FileStream fileStream = File.OpenRead(opfFilePath);
-            // the OPF file is untrusted XML, so DTD processing and external entity resolution are disabled, and the document size is bounded
+            // The OPF file is untrusted XML, so DTD processing and external entity resolution are disabled, and the document size is bounded.
             XmlReaderSettings xmlReaderSettings = new()
             {
                 DtdProcessing = DtdProcessing.Prohibit,
@@ -48,7 +48,7 @@ internal static class OpfReader
         }
         catch (XmlException)
         {
-            // a malformed OPF file must not prevent the enrichment of the book from proceeding
+            // A malformed OPF file must not prevent the enrichment of the book from proceeding.
         }
 
         return document;

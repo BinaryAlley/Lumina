@@ -17,11 +17,11 @@ public class TokenGenerator : ITokenGenerator
     /// <returns>A secure token.</returns>
     public string GenerateToken()
     {
-        // allocate an array for the token data
+        // Allocate an array for the token data.
         byte[] tokenData = new byte[32];
-        // fill the array with a cryptographically strong sequence of random values
+        // Fill the array with a cryptographically strong sequence of random values.
         RandomNumberGenerator.Fill(tokenData);
-        // convert to a Base64 string, but replace URL-unsafe characters '+' and '/' with '-' and '_', and remove padding characters ('=')
+        // Convert to a Base64 string, but replace URL-unsafe characters '+' and '/' with '-' and '_', and remove padding characters ('=').
         return Convert.ToBase64String(tokenData).Replace('+', '-').Replace('/', '_').TrimEnd('=');
     }
 }

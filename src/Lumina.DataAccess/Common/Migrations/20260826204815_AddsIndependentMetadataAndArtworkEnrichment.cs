@@ -98,8 +98,8 @@ namespace Lumina.DataAccess.Common.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            // backfill the artwork of the books that already had a cover, so that the stored covers are preserved as enriched cover artwork
-            // before the CoverImagePath column is dropped
+            // Backfill the artwork of the books that already had a cover, so that the stored covers are preserved as enriched cover artwork
+            // before the CoverImagePath column is dropped.
             migrationBuilder.Sql("""
                 INSERT INTO BookArtwork (Id, BookId, ArtworkType, Ordinal, FileName, ContentHash, Status, Provider, LastUpdateUtc, CreatedOnUtc, CreatedBy, UpdatedOnUtc, UpdatedBy)
                 SELECT lower(hex(randomblob(16))), Id, 'Cover', 0, CoverImagePath, 0, 'Enriched', NULL, NULL, datetime('now'), '00000000-0000-0000-0000-000000000000', NULL, NULL

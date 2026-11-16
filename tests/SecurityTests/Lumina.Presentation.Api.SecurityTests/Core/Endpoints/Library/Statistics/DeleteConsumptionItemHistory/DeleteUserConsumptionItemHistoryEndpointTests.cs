@@ -171,11 +171,11 @@ public class DeleteUserConsumptionItemHistoryEndpointTests : IClassFixture<Lumin
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task DeleteUserConsumptionItemHistory_WithInjectionInUserIdRouteValue_ShouldRejectWithoutDeletingRows(string maliciousUserId)
     {
         // Arrange
@@ -194,11 +194,11 @@ public class DeleteUserConsumptionItemHistoryEndpointTests : IClassFixture<Lumin
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task DeleteUserConsumptionItemHistory_WithInjectionInMediaKind_ShouldRejectWithoutDeletingRows(string maliciousMediaKind)
     {
         // Arrange
@@ -217,11 +217,11 @@ public class DeleteUserConsumptionItemHistoryEndpointTests : IClassFixture<Lumin
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task DeleteUserConsumptionItemHistory_WithInjectionInMediaItemId_ShouldRejectWithoutDeletingRows(string maliciousMediaItemId)
     {
         // Arrange
@@ -240,11 +240,11 @@ public class DeleteUserConsumptionItemHistoryEndpointTests : IClassFixture<Lumin
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task DeleteUserConsumptionItemHistory_WithInjectionInLibraryId_ShouldRejectWithoutDeletingRows(string maliciousLibraryId)
     {
         // Arrange

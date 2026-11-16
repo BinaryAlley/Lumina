@@ -997,7 +997,7 @@ internal sealed class PlaylistRepository : IPlaylistRepository
     /// <returns><see langword="true"/> for a unique constraint violation, <see langword="false"/> otherwise.</returns>
     private static bool IsUniqueConstraintViolation(SqliteException exception)
     {
-        return exception.SqliteExtendedErrorCode == 2067; // SQLITE_CONSTRAINT_UNIQUE
+        return exception.SqliteExtendedErrorCode == 2067; // SQLITE_CONSTRAINT_UNIQUE.
     }
 
     /// <summary>
@@ -1007,7 +1007,7 @@ internal sealed class PlaylistRepository : IPlaylistRepository
     /// <returns><see langword="true"/> for a busy or locked database, <see langword="false"/> otherwise.</returns>
     private static bool IsConcurrencyConflict(SqliteException exception)
     {
-        return exception.SqliteErrorCode is 5 or 6; // SQLITE_BUSY, SQLITE_LOCKED
+        return exception.SqliteErrorCode is 5 or 6; // SQLITE_BUSY, SQLITE_LOCKED.
     }
 
     /// <summary>

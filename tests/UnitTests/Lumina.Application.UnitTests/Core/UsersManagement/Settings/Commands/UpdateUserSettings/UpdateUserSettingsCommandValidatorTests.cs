@@ -170,8 +170,8 @@ public class UpdateUserSettingsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(999)] // a value that is not a defined member of the enumeration
-    [InlineData(-1)] // a negative value that is not a defined member of the enumeration
+    [InlineData(999)] // A value that is not a defined member of the enumeration.
+    [InlineData(-1)] // A negative value that is not a defined member of the enumeration.
     public void Validate_WhenVuMeterOrientationIsNotDefined_ShouldHaveValidationError(int vuMeterOrientationValue)
     {
         // Arrange
@@ -201,10 +201,10 @@ public class UpdateUserSettingsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // below the minimum
-    [InlineData(-1)] // negative
-    [InlineData(129)] // above the maximum
-    [InlineData(int.MaxValue)] // far above the maximum
+    [InlineData(0)] // Below the minimum.
+    [InlineData(-1)] // Negative.
+    [InlineData(129)] // Above the maximum.
+    [InlineData(int.MaxValue)] // Far above the maximum.
     public void Validate_WhenVuMeterSegmentCountIsOutOfRange_ShouldHaveValidationError(int vuMeterSegmentCount)
     {
         // Arrange
@@ -218,9 +218,9 @@ public class UpdateUserSettingsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(1)] // the minimum
-    [InlineData(64)] // a middle value
-    [InlineData(128)] // the maximum
+    [InlineData(1)] // The minimum.
+    [InlineData(64)] // A middle value.
+    [InlineData(128)] // The maximum.
     public void Validate_WhenVuMeterSegmentCountIsInRange_ShouldNotHaveValidationError(int vuMeterSegmentCount)
     {
         // Arrange
@@ -234,9 +234,9 @@ public class UpdateUserSettingsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(-1)] // below the minimum
-    [InlineData(33)] // above the maximum
-    [InlineData(int.MinValue)] // far below the minimum
+    [InlineData(-1)] // Below the minimum.
+    [InlineData(33)] // Above the maximum.
+    [InlineData(int.MinValue)] // Far below the minimum.
     public void Validate_WhenVuMeterSegmentGapIsOutOfRange_ShouldHaveValidationError(int vuMeterSegmentGap)
     {
         // Arrange
@@ -250,9 +250,9 @@ public class UpdateUserSettingsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // the minimum
-    [InlineData(16)] // a middle value
-    [InlineData(32)] // the maximum
+    [InlineData(0)] // The minimum.
+    [InlineData(16)] // A middle value.
+    [InlineData(32)] // The maximum.
     public void Validate_WhenVuMeterSegmentGapIsInRange_ShouldNotHaveValidationError(int vuMeterSegmentGap)
     {
         // Arrange
@@ -266,9 +266,9 @@ public class UpdateUserSettingsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(-0.01)] // just below the minimum
-    [InlineData(1.01)] // just above the maximum
-    [InlineData(double.MinValue)] // far below the minimum
+    [InlineData(-0.01)] // Just below the minimum.
+    [InlineData(1.01)] // Just above the maximum.
+    [InlineData(double.MinValue)] // Far below the minimum.
     public void Validate_WhenVuMeterMediumThresholdIsOutOfRange_ShouldHaveValidationError(double vuMeterMediumThreshold)
     {
         // Arrange
@@ -284,9 +284,9 @@ public class UpdateUserSettingsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0.0)] // the minimum
-    [InlineData(0.5)] // a middle value
-    [InlineData(1.0)] // the maximum
+    [InlineData(0.0)] // The minimum.
+    [InlineData(0.5)] // A middle value.
+    [InlineData(1.0)] // The maximum.
     public void Validate_WhenVuMeterMediumThresholdIsInRange_ShouldNotHaveValidationError(double vuMeterMediumThreshold)
     {
         // Arrange
@@ -302,9 +302,9 @@ public class UpdateUserSettingsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(-0.01)] // just below the minimum
-    [InlineData(1.01)] // just above the maximum
-    [InlineData(double.MaxValue)] // far above the maximum
+    [InlineData(-0.01)] // Just below the minimum.
+    [InlineData(1.01)] // Just above the maximum.
+    [InlineData(double.MaxValue)] // Far above the maximum.
     public void Validate_WhenVuMeterHighThresholdIsOutOfRange_ShouldHaveValidationError(double vuMeterHighThreshold)
     {
         // Arrange
@@ -365,8 +365,8 @@ public class UpdateUserSettingsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0.5, 0.5)] // the thresholds are equal
-    [InlineData(0.4, 0.9)] // the high threshold is greater than the medium one
+    [InlineData(0.5, 0.5)] // The thresholds are equal.
+    [InlineData(0.4, 0.9)] // The high threshold is greater than the medium one.
     public void Validate_WhenVuMeterHighThresholdIsGreaterThanOrEqualToMediumThreshold_ShouldNotHaveValidationError(
         double vuMeterMediumThreshold,
         double vuMeterHighThreshold)
@@ -399,9 +399,9 @@ public class UpdateUserSettingsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(-1)] // below the minimum
-    [InlineData(10001)] // above the maximum
-    [InlineData(int.MinValue)] // far below the minimum
+    [InlineData(-1)] // Below the minimum.
+    [InlineData(10001)] // Above the maximum.
+    [InlineData(int.MinValue)] // Far below the minimum.
     public void Validate_WhenVuMeterPeakHoldDurationIsOutOfRange_ShouldHaveValidationError(int vuMeterPeakHoldDurationInMilliseconds)
     {
         // Arrange
@@ -416,9 +416,9 @@ public class UpdateUserSettingsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // the minimum
-    [InlineData(650)] // a middle value
-    [InlineData(10000)] // the maximum
+    [InlineData(0)] // The minimum.
+    [InlineData(650)] // A middle value.
+    [InlineData(10000)] // The maximum.
     public void Validate_WhenVuMeterPeakHoldDurationIsInRange_ShouldNotHaveValidationError(int vuMeterPeakHoldDurationInMilliseconds)
     {
         // Arrange
@@ -433,9 +433,9 @@ public class UpdateUserSettingsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(-0.01)] // just below the minimum
-    [InlineData(100.01)] // just above the maximum
-    [InlineData(double.MinValue)] // far below the minimum
+    [InlineData(-0.01)] // Just below the minimum.
+    [InlineData(100.01)] // Just above the maximum.
+    [InlineData(double.MinValue)] // Far below the minimum.
     public void Validate_WhenVuMeterReleasePerSecondIsOutOfRange_ShouldHaveValidationError(double vuMeterReleasePerSecond)
     {
         // Arrange
@@ -450,9 +450,9 @@ public class UpdateUserSettingsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0.0)] // the minimum
-    [InlineData(3.0)] // a middle value
-    [InlineData(100.0)] // the maximum
+    [InlineData(0.0)] // The minimum.
+    [InlineData(3.0)] // A middle value.
+    [InlineData(100.0)] // The maximum.
     public void Validate_WhenVuMeterReleasePerSecondIsInRange_ShouldNotHaveValidationError(double vuMeterReleasePerSecond)
     {
         // Arrange
@@ -467,9 +467,9 @@ public class UpdateUserSettingsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(-0.01)] // just below the minimum
-    [InlineData(100.01)] // just above the maximum
-    [InlineData(double.MaxValue)] // far above the maximum
+    [InlineData(-0.01)] // Just below the minimum.
+    [InlineData(100.01)] // Just above the maximum.
+    [InlineData(double.MaxValue)] // Far above the maximum.
     public void Validate_WhenVuMeterPeakReleasePerSecondIsOutOfRange_ShouldHaveValidationError(double vuMeterPeakReleasePerSecond)
     {
         // Arrange
@@ -484,9 +484,9 @@ public class UpdateUserSettingsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0.0)] // the minimum
-    [InlineData(0.65)] // a middle value
-    [InlineData(100.0)] // the maximum
+    [InlineData(0.0)] // The minimum.
+    [InlineData(0.65)] // A middle value.
+    [InlineData(100.0)] // The maximum.
     public void Validate_WhenVuMeterPeakReleasePerSecondIsInRange_ShouldNotHaveValidationError(double vuMeterPeakReleasePerSecond)
     {
         // Arrange

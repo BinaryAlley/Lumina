@@ -147,8 +147,8 @@ public class StartConsumptionEndpointTests : IClassFixture<LuminaApiFactory>, ID
     }
 
     [Theory]
-    [InlineData("0")] // MediaKind.None, a defined enumeration member
-    [InlineData("1")] // MediaKind.MusicTrack, a defined enumeration member
+    [InlineData("0")] // MediaKind.None, a defined enumeration member.
+    [InlineData("1")] // MediaKind.MusicTrack, a defined enumeration member.
     public async Task StartConsumption_WhenMediaKindIsNumeric_ShouldReturnUnsupportedMediaKindAndCreateNoRecord(string numericMediaKind)
     {
         // Arrange
@@ -170,11 +170,11 @@ public class StartConsumptionEndpointTests : IClassFixture<LuminaApiFactory>, ID
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task StartConsumption_WithSqlInjectionInLibraryId_ShouldRejectWithoutLeaking(string maliciousLibraryId)
     {
         // Arrange
@@ -189,11 +189,11 @@ public class StartConsumptionEndpointTests : IClassFixture<LuminaApiFactory>, ID
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task StartConsumption_WithSqlInjectionInMediaKind_ShouldRejectWithoutLeaking(string maliciousMediaKind)
     {
         // Arrange
@@ -208,11 +208,11 @@ public class StartConsumptionEndpointTests : IClassFixture<LuminaApiFactory>, ID
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task StartConsumption_WithSqlInjectionInMediaItemId_ShouldRejectWithoutLeaking(string maliciousMediaItemId)
     {
         // Arrange

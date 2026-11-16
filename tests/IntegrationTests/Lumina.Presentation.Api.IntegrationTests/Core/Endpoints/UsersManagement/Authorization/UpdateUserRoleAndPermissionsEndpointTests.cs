@@ -68,12 +68,12 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        // create a non-admin role first
+        // Create a non-admin role first.
         RoleEntity editorRole = _roleEntityFixture.Create(roleName: "Editor");
         dbContext.Roles.Add(editorRole);
         await dbContext.SaveChangesAsync();
 
-        // create test user
+        // Create test user.
         UserEntity user = _userEntityFixture.Create(username: "TestUser", password: "HashedPassword");
         user.TotpSecret = null;
         dbContext.Users.Add(user);
@@ -140,12 +140,12 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        // create Editor role
+        // Create Editor role.
         RoleEntity editorRole = _roleEntityFixture.Create(roleName: "Editor");
         dbContext.Roles.Add(editorRole);
         await dbContext.SaveChangesAsync();
 
-        // get the admin user that was created by CreateAuthenticatedAdminClientAsync
+        // Get the admin user that was created by CreateAuthenticatedAdminClientAsync.
         UserEntity? adminUser = dbContext.Users.FirstOrDefault(u => u.UserRole!.Role.RoleName == "Admin");
         Assert.NotNull(adminUser);
         UpdateUserRoleAndPermissionsRequest request = _updateUserRoleAndPermissionsRequestFixture.Create(
@@ -229,11 +229,11 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        // clear junction tables first
+        // Clear junction tables first.
         await dbContext.Set<RolePermissionEntity>().ExecuteDeleteAsync();
         await dbContext.Set<UserPermissionEntity>().ExecuteDeleteAsync();
 
-        // then clear main tables
+        // Then clear main tables.
         await dbContext.Set<UserEntity>().ExecuteDeleteAsync();
         await dbContext.Set<RoleEntity>().ExecuteDeleteAsync();
         await dbContext.Set<PermissionEntity>().ExecuteDeleteAsync();

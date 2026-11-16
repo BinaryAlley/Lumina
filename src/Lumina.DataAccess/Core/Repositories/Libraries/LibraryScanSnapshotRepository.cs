@@ -103,10 +103,10 @@ internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotReposi
         DateTime nowUtc = DateTime.UtcNow;
         object parameters = new { libraryId, scanId, userId, nowUtc };
 
-        // the Id of the inserted rows is generated in SQL as a random 16 byte value formatted as upper case hex (hex(randomblob(16))), which the storage layer parses as a Guid;
-        // generating the Ids in code would defeat the purpose of these single statement bulk inserts
+        // The Id of the inserted rows is generated in SQL as a random 16 byte value formatted as upper case hex (hex(randomblob(16))), which the storage layer parses as a Guid;
+        // generating the Ids in code would defeat the purpose of these single statement bulk inserts.
 
-        // add an audit entry for every media library scan snapshot item that is no longer present in the current scan, meaning it was deleted from the storage medium
+        // Add an audit entry for every media library scan snapshot item that is no longer present in the current scan, meaning it was deleted from the storage medium.
         const string AUDIT_DELETED_SQL = """
             INSERT INTO LibraryScanResults (Id, LibraryScanId, Status, Path, ContentHash, FileSize, Ticks)
             SELECT hex(randomblob(16)), @scanId, 'Deleted', snapshot.Path, snapshot.ContentHash, snapshot.FileSize, snapshot.Ticks
@@ -124,7 +124,7 @@ internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotReposi
 
         await connection.ExecuteAsync(command).ConfigureAwait(false);
 
-        // add an audit entry for every new or changed media library scan staging result
+        // Add an audit entry for every new or changed media library scan staging result.
         const string AUDIT_CHANGED_SQL = """
             INSERT INTO LibraryScanResults (Id, LibraryScanId, Status, Path, ContentHash, FileSize, Ticks)
             SELECT hex(randomblob(16)), @scanId, CASE WHEN staging.IsNew = 1 THEN 'New' ELSE 'Modified' END, staging.Path, staging.ContentHash, staging.Size, staging.Ticks
@@ -137,7 +137,7 @@ internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotReposi
 
         await connection.ExecuteAsync(command).ConfigureAwait(false);
 
-        // delete the media library scan snapshot items that are no longer present in the current scan, meaning they were deleted from the storage medium
+        // Delete the media library scan snapshot items that are no longer present in the current scan, meaning they were deleted from the storage medium.
         const string DELETE_MISSING_SQL = """
             DELETE FROM LibraryScanSnapshots
             WHERE LibraryId = @libraryId
@@ -153,7 +153,7 @@ internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotReposi
 
         await connection.ExecuteAsync(command).ConfigureAwait(false);
 
-        // upsert the new and changed media library scan staging results into the media library scan snapshot
+        // Upsert the new and changed media library scan staging results into the media library scan snapshot.
         const string UPSERT_SQL = """
             INSERT INTO LibraryScanSnapshots (Id, LibraryId, Path, ContentHash, FileSize, Ticks, CreatedOnUtc, CreatedBy, UpdatedOnUtc, UpdatedBy)
             SELECT hex(randomblob(16)), @libraryId, staging.Path, staging.ContentHash, staging.Size, staging.Ticks, @nowUtc, @userId, NULL, NULL
@@ -172,7 +172,7 @@ internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotReposi
 
         await connection.ExecuteAsync(command).ConfigureAwait(false);
 
-        // clear the staging results of the current scan, as they have been fully applied to the media library scan snapshot
+        // Clear the staging results of the current scan, as they have been fully applied to the media library scan snapshot.
         const string CLEAR_STAGING_SQL = "DELETE FROM LibraryScanStagingResults WHERE LibraryScanId = @scanId;";
 
         command = new(CLEAR_STAGING_SQL, parameters, transaction);

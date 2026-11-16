@@ -122,9 +122,9 @@ public class GetGenreConsumptionRequestTests
     }
 
     [Theory]
-    [InlineData("999")] // a numeric value that is not a member name
-    [InlineData("not-a-media-kind")] // a textual value that is not a member name
-    [InlineData("")] // an empty media kind
+    [InlineData("999")] // A numeric value that is not a member name.
+    [InlineData("not-a-media-kind")] // A textual value that is not a member name.
+    [InlineData("")] // An empty media kind.
     public void Constructor_WhenMediaKindIsInvalid_ShouldPreserveItForTheValidator(string mediaKind)
     {
         // Act
@@ -152,8 +152,8 @@ public class GetGenreConsumptionRequestTests
     }
 
     [Theory]
-    [InlineData("not-a-date")] // a textual value that is not a date
-    [InlineData("2026-13-45T99:99:99")] // a value with out of range components
+    [InlineData("not-a-date")] // A textual value that is not a date.
+    [InlineData("2026-13-45T99:99:99")] // A value with out of range components.
     public void Constructor_WhenDateBoundsAreMalformed_ShouldPreserveThemForTheValidator(string malformedBound)
     {
         // Act

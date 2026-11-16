@@ -93,8 +93,8 @@ public class GetTrackSegmentEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Theory]
-    [InlineData("uppercase")] // the handle format only accepts lowercase hexadecimal characters
-    [InlineData("dashed")] // the handle format is the N format of a GUID, without dashes
+    [InlineData("uppercase")] // The handle format only accepts lowercase hexadecimal characters.
+    [InlineData("dashed")] // The handle format is the N format of a GUID, without dashes.
     public async Task GetTrackSegment_WhenDeliveryIdFormatIsInvalid_ShouldReturnValidationProblem(string malformedHandleKind)
     {
         // Arrange
@@ -144,9 +144,9 @@ public class GetTrackSegmentEndpointTests : IClassFixture<AuthenticatedLuminaApi
     }
 
     [Theory]
-    [InlineData("library")] // the handle was issued for the library of another delivery
-    [InlineData("artist")] // the handle was issued for the artist of another delivery
-    [InlineData("album")] // the handle was issued for the album of another delivery
+    [InlineData("library")] // The handle was issued for the library of another delivery.
+    [InlineData("artist")] // The handle was issued for the artist of another delivery.
+    [InlineData("album")] // The handle was issued for the album of another delivery.
     public async Task GetTrackSegment_WhenDeliveryWasIssuedForAnotherScope_ShouldReturnPlaybackDeliveryNotFound(string mismatchedScope)
     {
         // Arrange

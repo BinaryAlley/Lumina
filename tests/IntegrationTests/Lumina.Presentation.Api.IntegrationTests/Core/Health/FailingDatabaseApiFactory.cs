@@ -24,7 +24,7 @@ public class FailingDatabaseApiFactory : LuminaApiFactory
         base.ConfigureWebHost(builder);
         builder.ConfigureServices(services =>
         {
-            // the health check resolves DatabaseHealthCheck from DI when it runs, so replacing its registration with a failing subclass makes /health/ready report Unhealthy
+            // The health check resolves DatabaseHealthCheck from DI when it runs, so replacing its registration with a failing subclass makes /health/ready report Unhealthy.
             services.RemoveAll<DatabaseHealthCheck>();
             services.AddScoped<DatabaseHealthCheck, FailingDatabaseHealthCheck>();
         });

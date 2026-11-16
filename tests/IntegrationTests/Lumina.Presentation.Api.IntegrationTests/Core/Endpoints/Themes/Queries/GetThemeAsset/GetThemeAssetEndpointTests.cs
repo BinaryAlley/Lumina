@@ -52,7 +52,7 @@ public class GetThemeAssetEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         HttpClient anonymousClient = _apiFactory.CreateClient();
 
         // Act
-        // the asset path is relative to the theme pack root and includes the assets/ prefix, so the URL is
+        // The asset path is relative to the theme pack root and includes the assets/ prefix, so the URL is
         // /themes/{themeId}/assets/assets/{assetPath} (the first assets/ segment is the route prefix)
         HttpResponseMessage response = await anonymousClient.GetAsync("/api/v1/themes/editorial-paper/assets/assets/theme.css");
 

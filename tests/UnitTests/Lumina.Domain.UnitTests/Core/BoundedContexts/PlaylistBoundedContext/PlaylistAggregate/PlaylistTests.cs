@@ -155,8 +155,8 @@ public class PlaylistTests
     }
 
     [Theory]
-    [InlineData(PlaylistMediaItemType.VideoFile)] // a video file cannot belong to a music playlist
-    [InlineData((PlaylistMediaItemType)999)] // a value outside the declared enumeration members
+    [InlineData(PlaylistMediaItemType.VideoFile)] // A video file cannot belong to a music playlist.
+    [InlineData((PlaylistMediaItemType)999)] // A value outside the declared enumeration members.
     public void Create_WhenAnEntryReferencesAMediaItemTypeThePlaylistCannotContain_ShouldReturnPlaylistDoesNotAcceptMediaItems(PlaylistMediaItemType mediaItemType)
     {
         // Arrange
@@ -354,13 +354,13 @@ public class PlaylistTests
     }
 
     [Theory]
-    [InlineData(PlaylistType.Music, PlaylistMediaItemType.MusicTrack, true)] // a music playlist accepts music tracks
-    [InlineData(PlaylistType.Music, PlaylistMediaItemType.VideoFile, false)] // a music playlist does not accept video files
-    [InlineData(PlaylistType.Music, (PlaylistMediaItemType)999, false)] // a value outside the declared enumeration members
-    [InlineData((PlaylistType)999, PlaylistMediaItemType.MusicTrack, false)] // a playlist type outside the declared enumeration members
-    [InlineData((PlaylistType)999, PlaylistMediaItemType.VideoFile, false)] // both sides outside the declared enumeration members
-    [InlineData((PlaylistType)(-1), PlaylistMediaItemType.MusicTrack, false)] // a playlist type below the declared enumeration members
-    [InlineData((PlaylistType)(-1), PlaylistMediaItemType.VideoFile, false)] // both sides below the declared enumeration members
+    [InlineData(PlaylistType.Music, PlaylistMediaItemType.MusicTrack, true)] // A music playlist accepts music tracks.
+    [InlineData(PlaylistType.Music, PlaylistMediaItemType.VideoFile, false)] // A music playlist does not accept video files.
+    [InlineData(PlaylistType.Music, (PlaylistMediaItemType)999, false)] // A value outside the declared enumeration members.
+    [InlineData((PlaylistType)999, PlaylistMediaItemType.MusicTrack, false)] // A playlist type outside the declared enumeration members.
+    [InlineData((PlaylistType)999, PlaylistMediaItemType.VideoFile, false)] // Both sides outside the declared enumeration members.
+    [InlineData((PlaylistType)(-1), PlaylistMediaItemType.MusicTrack, false)] // A playlist type below the declared enumeration members.
+    [InlineData((PlaylistType)(-1), PlaylistMediaItemType.VideoFile, false)] // Both sides below the declared enumeration members.
     public void CanContain_WhenCalled_ShouldOnlyAcceptMusicTracksForMusicPlaylists(PlaylistType playlistType, PlaylistMediaItemType mediaItemType, bool expectedCanContain)
     {
         // Act

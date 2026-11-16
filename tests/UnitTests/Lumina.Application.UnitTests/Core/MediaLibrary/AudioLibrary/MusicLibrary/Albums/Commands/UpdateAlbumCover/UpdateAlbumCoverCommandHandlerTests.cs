@@ -547,9 +547,9 @@ public class UpdateAlbumCoverCommandHandlerTests
     }
 
     [Theory]
-    [InlineData(null)] // no file name at all
-    [InlineData("")] // empty file name
-    [InlineData("   ")] // whitespace file name
+    [InlineData(null)] // No file name at all.
+    [InlineData("")] // Empty file name.
+    [InlineData("   ")] // Whitespace file name.
     public async Task HandleAsync_WhenExistingCoverPathIsEmpty_ShouldNotDeletePreviousArtwork(string? existingCoverPath)
     {
         // Arrange

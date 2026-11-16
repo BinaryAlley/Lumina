@@ -38,7 +38,7 @@ public class LibraryScanProgressChangedDomainEventHandler : IDomainEventHandler<
     public async ValueTask HandleAsync(LibraryScanProgressChangedDomainEvent domainEvent, CancellationToken cancellationToken)
     {
         _mediaLibrariesScanProgressTracker.UpdateScanProgress(domainEvent.LibraryId, domainEvent.MediaLibraryScanCompositeId);
-        // notify SignalR clients that the library scan progress changed
+        // Notify SignalR clients that the library scan progress changed.
         await _debouncedLibraryScanProgressNotifier.SendLibraryProgressUpdateEventAsync(domainEvent.MediaLibraryScanCompositeId, cancellationToken).ConfigureAwait(false);
     }
 }

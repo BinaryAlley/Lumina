@@ -61,9 +61,9 @@ public class MusicAreaTests
     }
 
     [Theory]
-    [InlineData(null)] // null area name
-    [InlineData("")] // empty area name
-    [InlineData("   ")] // whitespace area name
+    [InlineData(null)] // Null area name.
+    [InlineData("")] // Empty area name.
+    [InlineData("   ")] // Whitespace area name.
     public void Create_WhenNameIsNullOrWhitespace_ShouldReturnError(string? name)
     {
         // Act

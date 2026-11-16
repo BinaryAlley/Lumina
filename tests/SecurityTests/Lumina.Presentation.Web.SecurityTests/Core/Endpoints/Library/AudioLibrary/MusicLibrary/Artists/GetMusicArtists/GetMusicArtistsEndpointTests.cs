@@ -49,8 +49,8 @@ public class GetMusicArtistsEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Artists--")] // destructive SQL injection
-    [InlineData("' OR '1'='1")] // basic SQL injection
+    [InlineData("'; DROP TABLE Artists--")] // Destructive SQL injection.
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
     public async Task GetMusicArtists_WhenCalledWithInjectionInSearchTerm_ShouldRemainSecure(string maliciousSearchTerm)
     {
         // Arrange
@@ -80,8 +80,8 @@ public class GetMusicArtistsEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Artists--")] // destructive SQL injection
-    [InlineData("' OR '1'='1")] // basic SQL injection
+    [InlineData("'; DROP TABLE Artists--")] // Destructive SQL injection.
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
     public async Task GetMusicArtists_WhenCalledWithInjectionInFilterAlphaKey_ShouldRemainSecure(string maliciousAlphaKey)
     {
         // Arrange
@@ -106,8 +106,8 @@ public class GetMusicArtistsEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Artists--")] // destructive SQL injection
-    [InlineData("' OR '1'='1")] // basic SQL injection
+    [InlineData("'; DROP TABLE Artists--")] // Destructive SQL injection.
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
     public async Task GetMusicArtists_WhenCalledWithInjectionInSortBy_ShouldRemainSecure(string maliciousSortBy)
     {
         // Arrange

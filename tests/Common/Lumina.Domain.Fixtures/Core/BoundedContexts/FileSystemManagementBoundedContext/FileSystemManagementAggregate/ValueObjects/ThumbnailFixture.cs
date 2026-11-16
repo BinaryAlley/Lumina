@@ -26,7 +26,7 @@ public class ThumbnailFixture
     public Thumbnail Create(ImageType? type = null, byte[]? bytes = null)
     {
         type ??= _faker.PickRandom<ImageType>();
-        bytes ??= _faker.Random.Bytes(1024); // Generate 1KB of random bytes
+        bytes ??= _faker.Random.Bytes(1024); // Generate 1KB of random bytes.
 
         return new Thumbnail(type.Value, bytes);
     }

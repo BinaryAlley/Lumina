@@ -43,7 +43,7 @@ public class MediaContributorDtoFixture
                 displayName: displayName,
                 legalName: legalName,
                 includeDisplayName: includeDisplayName,
-                // this fixture historically left the legal name null unless one was explicitly supplied, so the name fixture is only asked for one when a value is passed
+                // This fixture historically left the legal name null unless one was explicitly supplied, so the name fixture is only asked for one when a value is passed.
                 includeLegalName: includeLegalName && legalName is not null) : null,
             Role: includeRole ? role ?? _faker.PickRandom<MediaContributorRole>() : null);
     }

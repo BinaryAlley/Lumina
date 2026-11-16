@@ -59,10 +59,10 @@ public class GetThemeArchiveEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     }
 
     [Theory]
-    [InlineData("..%2F..%2Fevil")] // encoded slash traversal
-    [InlineData("%2e%2e%2f%2e%2e%2fevil")] // encoded dot-slash traversal
-    [InlineData("..%5Cevil")] // encoded backslash traversal
-    [InlineData("..%2F")] // encoded trailing slash traversal
+    [InlineData("..%2F..%2Fevil")] // Encoded slash traversal.
+    [InlineData("%2e%2e%2f%2e%2e%2fevil")] // Encoded dot-slash traversal.
+    [InlineData("..%5Cevil")] // Encoded backslash traversal.
+    [InlineData("..%2F")] // Encoded trailing slash traversal.
     public async Task GetThemeArchive_WithPathTraversalInThemeId_ShouldReturnCleanNotFoundProblemDetails(string maliciousThemeId)
     {
         // Arrange

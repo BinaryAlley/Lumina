@@ -20,7 +20,7 @@ namespace Lumina.Infrastructure.Core.Plugins;
 /// </summary>
 internal sealed class PluginInstaller : IPluginInstaller
 {
-    // the install mutates the shared plugins directory, so the operations are serialized per resolved directory.
+    // The install mutates the shared plugins directory, so the operations are serialized per resolved directory.
     // A per-instance gate is NOT enough: several hosts can run against the same plugins directory at once (for
     // example the parallel in-memory hosts started by the test factories), so the gate is keyed on the directory.
     private static readonly ConcurrentDictionary<string, SemaphoreSlim> s_pluginDirectoryGates = new(StringComparer.Ordinal);

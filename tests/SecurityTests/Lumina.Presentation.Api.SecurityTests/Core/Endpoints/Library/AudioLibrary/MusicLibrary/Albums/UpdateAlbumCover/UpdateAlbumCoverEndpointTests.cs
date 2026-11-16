@@ -91,8 +91,8 @@ public class UpdateAlbumCoverEndpointTests : IClassFixture<LuminaApiFactory>, ID
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Albums; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Albums; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateAlbumCover_WithSQLInjectionInLibraryRouteId_ShouldRemainSecure(string maliciousLibraryId)
     {
         // Arrange
@@ -109,8 +109,8 @@ public class UpdateAlbumCoverEndpointTests : IClassFixture<LuminaApiFactory>, ID
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Albums; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Albums; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateAlbumCover_WithSQLInjectionInArtistRouteId_ShouldRemainSecure(string maliciousArtistId)
     {
         // Arrange
@@ -127,8 +127,8 @@ public class UpdateAlbumCoverEndpointTests : IClassFixture<LuminaApiFactory>, ID
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Albums; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Albums; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateAlbumCover_WithSQLInjectionInAlbumRouteId_ShouldRemainSecure(string maliciousAlbumId)
     {
         // Arrange

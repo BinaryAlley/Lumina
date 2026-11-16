@@ -350,7 +350,7 @@
             if (segmentIndex === -1)
                 return null;
             const segment = this.segments[segmentIndex];
-            // local is the offset of the requested window inside the segment. position is the segment offset of the chunk
+            // Local is the offset of the requested window inside the segment. position is the segment offset of the chunk
             // the loop is looking at, and filled is how many requested bytes were already copied.
             const local = start - segment.start;
             const result = new Uint8Array(size);

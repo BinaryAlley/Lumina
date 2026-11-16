@@ -139,7 +139,7 @@ public static class PresentationWebLayerServices
             requestLocalizationOptions.RequestCultureProviders = 
             [
                 routeDataRequestCultureProvider, // Keep route-based culture handling,
-                new CookieRequestCultureProvider(), // but also add cookie option, so the application "remembers" the last used language the next time it's opened.
+                new CookieRequestCultureProvider(), // But also add cookie option, so the application "remembers" the last used language the next time it's opened.
                 new AcceptLanguageHeaderRequestCultureProvider()
             ];
         });

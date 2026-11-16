@@ -32,9 +32,9 @@ public static class SharedConfiguration
         configuration.SetBasePath(basePath);
         configuration.AddJsonFile("appsettings.shared.json", optional: false, reloadOnChange: true);
         configuration.AddJsonFile("appsettings.shared.development.json", optional: true, reloadOnChange: true);
-        configuration.AddEnvironmentVariables(); // environment variables should override the configuration files
+        configuration.AddEnvironmentVariables(); // Environment variables should override the configuration files.
 
-        // bind the appsettings sections
+        // Bind the appsettings sections.
         services.AddOptions<DatabaseSettingsDto>()
                 .Bind(configuration.GetRequiredSection(DatabaseSettingsDto.SECTION_NAME))
                 .ValidateFluently()

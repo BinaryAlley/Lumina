@@ -25,7 +25,7 @@ public sealed class SeasonId : EntityId<Guid>
     /// <returns>The created <see cref="SeasonId"/> instance.</returns>
     public static SeasonId CreateUnique()
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         return new SeasonId(Guid.NewGuid());
     }
 
@@ -36,7 +36,7 @@ public sealed class SeasonId : EntityId<Guid>
     /// <returns>The created <see cref="SeasonId"/> instance.</returns>
     public static SeasonId Create(Guid value)
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         return new SeasonId(value);
     }
 

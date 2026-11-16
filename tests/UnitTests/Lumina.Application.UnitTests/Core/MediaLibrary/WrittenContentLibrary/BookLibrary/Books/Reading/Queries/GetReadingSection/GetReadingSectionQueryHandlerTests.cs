@@ -73,7 +73,7 @@ public class GetReadingSectionQueryHandlerTests
         _mockValidator = Substitute.For<IValidator<GetReadingSectionQuery>>();
         _userId = Guid.NewGuid();
 
-        // default stubs: the current user is authenticated and the library ownership policy allows access
+        // Default stubs: the current user is authenticated and the library ownership policy allows access.
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
             .Returns(true);
@@ -132,8 +132,8 @@ public class GetReadingSectionQueryHandlerTests
     }
 
     [Theory]
-    [InlineData(true)] // the user chose to preserve the styles of the books
-    [InlineData(false)] // the user chose to strip the styles of the books
+    [InlineData(true)] // The user chose to preserve the styles of the books.
+    [InlineData(false)] // The user chose to strip the styles of the books.
     public async Task HandleAsync_WhenUserHasPreserveBookStylesSetting_ShouldPassItToTheService(bool shouldPreserveBookStyles)
     {
         // Arrange

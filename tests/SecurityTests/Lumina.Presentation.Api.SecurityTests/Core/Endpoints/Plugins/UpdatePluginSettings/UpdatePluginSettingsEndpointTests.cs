@@ -70,8 +70,8 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Plugins--")] // destructive injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Plugins--")] // Destructive injection.
     public async Task UpdatePluginSettings_WithSQLInjectionInSettings_ShouldNotLeakOrError(string maliciousValue)
     {
         // Arrange
@@ -87,7 +87,7 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaApiFactory>
         HttpResponseMessage response = await client.PutAsJsonAsync($"/api/v1/plugins/{pluginId}/settings", request);
 
         // Assert
-        // the malicious value passes the authenticated handler, reaches the parameterized data access, and is persisted verbatim
+        // The malicious value passes the authenticated handler, reaches the parameterized data access, and is persisted verbatim.
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);

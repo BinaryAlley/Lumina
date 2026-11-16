@@ -13,18 +13,18 @@ namespace Lumina.Infrastructure.UnitTests.Common.Utilities;
 public class ImageTypeUtilitiesTests
 {
     [Theory]
-    [InlineData(ImageType.BMP, "bmp")] // bitmap image
-    [InlineData(ImageType.GIF, "gif")] // graphics interchange format
-    [InlineData(ImageType.PNG, "png")] // portable network graphics
-    [InlineData(ImageType.TIFF, "tiff")] // tagged image file format
-    [InlineData(ImageType.PICT, "pct")] // macintosh picture
-    [InlineData(ImageType.ICO, "ico")] // icon format
-    [InlineData(ImageType.PSD, "psd")] // photoshop document
-    [InlineData(ImageType.JPEG2000, "jp2")] // jpeg 2000
-    [InlineData(ImageType.AVIF, "avif")] // av1 image file format
-    [InlineData(ImageType.WEBP, "webp")] // web picture format
-    [InlineData(ImageType.TGA, "tga")] // truevision tga
-    [InlineData(ImageType.SVG, "svg")] // scalable vector graphics
+    [InlineData(ImageType.BMP, "bmp")] // Bitmap image.
+    [InlineData(ImageType.GIF, "gif")] // Graphics interchange format.
+    [InlineData(ImageType.PNG, "png")] // Portable network graphics.
+    [InlineData(ImageType.TIFF, "tiff")] // Tagged image file format.
+    [InlineData(ImageType.PICT, "pct")] // Macintosh picture.
+    [InlineData(ImageType.ICO, "ico")] // Icon format.
+    [InlineData(ImageType.PSD, "psd")] // Photoshop document.
+    [InlineData(ImageType.JPEG2000, "jp2")] // JPEG 2000.
+    [InlineData(ImageType.AVIF, "avif")] // AV1 image file format.
+    [InlineData(ImageType.WEBP, "webp")] // Web picture format.
+    [InlineData(ImageType.TGA, "tga")] // Truevision TGA.
+    [InlineData(ImageType.SVG, "svg")] // Scalable vector graphics.
     public void ToFileExtension_WhenTypeIsRecognized_ShouldReturnConventionalExtension(ImageType imageType, string expectedExtension)
     {
         // Act
@@ -35,9 +35,9 @@ public class ImageTypeUtilitiesTests
     }
 
     [Theory]
-    [InlineData(ImageType.JPEG)] // joint photographic experts group
-    [InlineData(ImageType.JPEG_CANON)] // canon-specific jpeg
-    [InlineData(ImageType.JPEG_UNKNOWN)] // unknown jpeg
+    [InlineData(ImageType.JPEG)] // Joint photographic experts group.
+    [InlineData(ImageType.JPEG_CANON)] // Canon-specific JPEG.
+    [InlineData(ImageType.JPEG_UNKNOWN)] // Unknown JPEG.
     public void ToFileExtension_WhenTypeIsAnyJpeg_ShouldReturnJpg(ImageType imageType)
     {
         // Act

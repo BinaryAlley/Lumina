@@ -134,11 +134,11 @@ public class GetAllUsersConsumptionStatisticsEndpointTests : IClassFixture<Lumin
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaConsumptionRecords--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaConsumptionRecords")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task GetAllUsersConsumptionStatistics_WithInjectionInLibraryId_ShouldRejectWithoutLeakingData(string maliciousLibraryId)
     {
         // Arrange
@@ -170,8 +170,8 @@ public class GetAllUsersConsumptionStatisticsEndpointTests : IClassFixture<Lumin
     }
 
     [Theory]
-    [InlineData("999")] // out of range numeric value
-    [InlineData("not-a-media-kind")] // textual value that is not an enum member
+    [InlineData("999")] // Out of range numeric value.
+    [InlineData("not-a-media-kind")] // Textual value that is not an enum member.
     public async Task GetAllUsersConsumptionStatistics_WithUnsupportedMediaKind_ShouldNotReturnDataOrLeakInternals(string mediaKind)
     {
         // Arrange

@@ -35,11 +35,11 @@ public class LoginEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("admin'--")] // comment injection
-    [InlineData("' UNION SELECT * FROM Users--")] // union injection
-    [InlineData("'; DROP TABLE Users--")] // destructive injection
-    [InlineData("{{7*7}}")] // template injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("admin'--")] // Comment injection.
+    [InlineData("' UNION SELECT * FROM Users--")] // Union injection.
+    [InlineData("'; DROP TABLE Users--")] // Destructive injection.
+    [InlineData("{{7*7}}")] // Template injection.
     public async Task Login_WithInjectionAttemptInUsername_ShouldRemainSecure(string maliciousUsername)
     {
         // Arrange
@@ -81,7 +81,7 @@ public class LoginEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.DoesNotContain("TestPass123!", content);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
-        // the JWT token returned by the API must not be exposed in plaintext; it is stored encrypted in the Token cookie
+        // The JWT token returned by the API must not be exposed in plaintext; it is stored encrypted in the Token cookie.
         Assert.DoesNotContain("test_jwt_token", content);
         string allSetCookies = string.Join("; ", response.Headers.GetValues("Set-Cookie"));
         Assert.Contains("Token=", allSetCookies);

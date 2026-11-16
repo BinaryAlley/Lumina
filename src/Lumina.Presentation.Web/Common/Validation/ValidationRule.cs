@@ -21,7 +21,7 @@ internal sealed class ValidationRule<TRequest, TProperty> : IValidationRule<TReq
     private readonly List<Func<TProperty, bool>> _predicates = [];
     private readonly List<Error> _predicateErrors = [];
 
-    // instance-aware predicates get their own separate pair of lists instead of being merged into the
+    // Instance-aware predicates get their own separate pair of lists instead of being merged into the
     // lists above, because they have a different delegate signature (TRequest, TProperty) vs (TProperty).
     // Keeping them separate avoids wrapping every plain predicate in an adapter, just to fit one shape.
     private readonly List<Func<TRequest, TProperty, bool>> _instanceAwarePredicates = [];
@@ -132,7 +132,7 @@ internal sealed class ValidationRule<TRequest, TProperty> : IValidationRule<TReq
     /// <returns>The <see cref="Error"/> of every predicate that fails; empty if the rule passes.</returns>
     public IEnumerable<Error> Validate(TRequest instance)
     {
-        // evaluate the condition first, if it returns false, skip validation entirely.
+        // Evaluate the condition first, if it returns false, skip validation entirely.
         if (condition is not null && !condition(instance))
             yield break;
 

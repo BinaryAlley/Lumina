@@ -126,8 +126,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData(int.MaxValue)] // far above the maximum
-    [InlineData(int.MinValue)] // far below the minimum
+    [InlineData(int.MaxValue)] // Far above the maximum.
+    [InlineData(int.MinValue)] // Far below the minimum.
     public async Task UpdateUserSettings_WhenVuMeterSegmentCountIsAtAnIntExtreme_ShouldReturnValidationErrorWithoutCrashing(int vuMeterSegmentCount)
     {
         // Arrange
@@ -145,8 +145,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData(int.MaxValue)] // far above the maximum
-    [InlineData(int.MinValue)] // far below the minimum
+    [InlineData(int.MaxValue)] // Far above the maximum.
+    [InlineData(int.MinValue)] // Far below the minimum.
     public async Task UpdateUserSettings_WhenVuMeterSegmentGapIsAtAnIntExtreme_ShouldReturnValidationErrorWithoutCrashing(int vuMeterSegmentGap)
     {
         // Arrange
@@ -164,8 +164,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData(double.MaxValue)] // far above the maximum
-    [InlineData(double.MinValue)] // far below the minimum
+    [InlineData(double.MaxValue)] // Far above the maximum.
+    [InlineData(double.MinValue)] // Far below the minimum.
     public async Task UpdateUserSettings_WhenVuMeterMediumThresholdIsAtADoubleExtreme_ShouldReturnValidationErrorWithoutCrashing(double vuMeterMediumThreshold)
     {
         // Arrange
@@ -185,8 +185,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData(double.MaxValue)] // far above the maximum
-    [InlineData(double.MinValue)] // far below the minimum
+    [InlineData(double.MaxValue)] // Far above the maximum.
+    [InlineData(double.MinValue)] // Far below the minimum.
     public async Task UpdateUserSettings_WhenVuMeterHighThresholdIsAtADoubleExtreme_ShouldReturnValidationErrorWithoutCrashing(double vuMeterHighThreshold)
     {
         // Arrange
@@ -206,8 +206,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData(int.MaxValue)] // far above the maximum
-    [InlineData(int.MinValue)] // far below the minimum
+    [InlineData(int.MaxValue)] // Far above the maximum.
+    [InlineData(int.MinValue)] // Far below the minimum.
     public async Task UpdateUserSettings_WhenVuMeterPeakHoldDurationIsAtAnIntExtreme_ShouldReturnValidationErrorWithoutCrashing(int vuMeterPeakHoldDurationInMilliseconds)
     {
         // Arrange
@@ -226,8 +226,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData(double.MaxValue)] // far above the maximum
-    [InlineData(double.MinValue)] // far below the minimum
+    [InlineData(double.MaxValue)] // Far above the maximum.
+    [InlineData(double.MinValue)] // Far below the minimum.
     public async Task UpdateUserSettings_WhenVuMeterReleasePerSecondIsAtADoubleExtreme_ShouldReturnValidationErrorWithoutCrashing(double vuMeterReleasePerSecond)
     {
         // Arrange
@@ -245,8 +245,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData(double.MaxValue)] // far above the maximum
-    [InlineData(double.MinValue)] // far below the minimum
+    [InlineData(double.MaxValue)] // Far above the maximum.
+    [InlineData(double.MinValue)] // Far below the minimum.
     public async Task UpdateUserSettings_WhenVuMeterPeakReleasePerSecondIsAtADoubleExtreme_ShouldReturnValidationErrorWithoutCrashing(double vuMeterPeakReleasePerSecond)
     {
         // Arrange
@@ -281,9 +281,9 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory(Skip = "Production bug: a JSON payload whose VuMeterOrientation is not a valid enumeration value makes the FastEndpoints binder throw a System.Text.Json.JsonException, which escapes because UpdateUserSettingsEndpoint calls DontCatchExceptions(), so the API responds with 500 instead of 400 or 422. The body is the generic ProblemDetails and leaks no internals. The test stays skipped until the endpoint maps binding failures to a client error.")]
-    [InlineData("'; DROP TABLE UserSettings; --")] // SQL injection
-    [InlineData("$(rm -rf /)")] // command injection
-    [InlineData("{{7*7}}")] // template injection
+    [InlineData("'; DROP TABLE UserSettings; --")] // SQL injection.
+    [InlineData("$(rm -rf /)")] // Command injection.
+    [InlineData("{{7*7}}")] // Template injection.
     public async Task UpdateUserSettings_WhenVuMeterOrientationIsAMaliciousString_ShouldReturnClientErrorWithoutLeakingInternals(string maliciousOrientation)
     {
         // Arrange

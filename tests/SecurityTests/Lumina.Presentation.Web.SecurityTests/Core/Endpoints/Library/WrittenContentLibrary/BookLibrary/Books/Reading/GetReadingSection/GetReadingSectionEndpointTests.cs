@@ -49,8 +49,8 @@ public class GetReadingSectionEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Books--")] // destructive injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Books--")] // Destructive injection.
     public async Task GetReadingSection_WhenCalledWithInjectionInLocationRef_ShouldRemainSecure(string maliciousLocationRef)
     {
         // Arrange

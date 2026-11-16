@@ -12,7 +12,7 @@
     <div id="file-system-browser-content">
         <div id="file-system-browser-header">
             <div id="file-system-browser-header-navigation-container">
-                <!--File System Navigator-->
+                <!--File System Navigator.-->
                 <div id="navigator-view-mode-container">
                     <button id="navigator-list-view" type="button">@_localizer["ListView"]</button>
                     <button id="navigator-details-view" type="button">@_localizer["DetailsView"]</button>
@@ -21,7 +21,7 @@
                     <button id="navigator-large-icons-view" type="button">@_localizer["LargeIconsView"]</button>
                     <button id="navigator-extra-large-icons-view" type="button">@_localizer["ExtraLargeIconsView"]</button>
                 </div>
-                <!--Navigation-->
+                <!--Navigation.-->
                 <div id="navigator-navigation-controls-container">
                     <div id="navigator-history">
                         <button id="navigator-navigate-back" type="button">@_localizer["Back"]</button>
@@ -33,7 +33,7 @@
                     <button id="navigator-toggle-hidden-button" type="button">@_localizer["ToggleHiddenItems"]</button>
                     <button id="navigator-toggle-selection-button" type="button">@_localizer["ToggleSelectionMode"]</button>
                 </div>
-                <!--Navigator-->
+                <!--Navigator.-->
                 <div id="navigator-address-bar-container">
                     <div id="navigator-address-bar-group">
                         <input type="text" class="navigator-address-bar-input" Name="navigator-address-bar-input" autocomplete="on" id="navigator-address-bar-input" />
@@ -47,18 +47,18 @@
                     <button class="file-system-browser-content-new-directory" type="button">@_localizer["NewDirectory"]</button>
                     <button class="file-system-browser-content-favorite-directory" type="button">@_localizer["FavoriteDirectory"]</button>
                 </div>
-                <!--End File System Navigator-->
+                <!--End File System Navigator.-->
             </div>
         </div>
         <div id="file-system-browser-file-system-container">
-            <!--File System Tree View-->
+            <!--File System Tree View.-->
             <div id="file-system-browser-file-system-treeview-container">
                 <div id="file-system-browser-file-system-treeview">
                     <div id="file-system-browser-treeview" class="treeview">
                     </div>
                 </div>
             </div>
-            <!--End File System Tree View-->
+            <!--End File System Tree View.-->
             <div id="file-system-browser-file-system-directories-container">
                 <div id="file-system-browser-file-system-directories">
                     <div id="file-system-browser-file-system-explorer-container" class="scroll-horizontal">
@@ -88,9 +88,9 @@
 <script defer src="~/js/theme-client-template-engine.js" data-component-script="file-system-browser"></script>
 <script defer src="~/js/file-system-browser-dialog.js" data-component-script="file-system-browser"></script>
 <script defer data-component-init="file-system-browser">
-    // this outer function executes immediately and creates a scope for the variables
+    // This outer function executes immediately and creates a scope for the variables.
     (function() {
-        // this inner function contains the actual initialization code that needs to run
+        // This inner function contains the actual initialization code that needs to run.
         async function checkAndInit() {
             if (typeof initFileSystemBrowser === 'undefined' || typeof callApiGetAsync === 'undefined') {
                 setTimeout(checkAndInit, 10);

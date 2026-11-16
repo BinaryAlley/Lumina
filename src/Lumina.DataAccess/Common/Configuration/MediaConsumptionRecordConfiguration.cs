@@ -21,7 +21,7 @@ public class MediaConsumptionRecordConfiguration : IEntityTypeConfiguration<Medi
         builder.ToTable("MediaConsumptionRecords");
         builder.HasKey(record => record.Id);
         builder.Property(record => record.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
 
         // A consumption record belongs to the user that started it, and it is removed with that user.

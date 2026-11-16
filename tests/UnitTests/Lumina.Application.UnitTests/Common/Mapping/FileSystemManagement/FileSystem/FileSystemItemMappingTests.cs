@@ -30,8 +30,8 @@ public class FileSystemItemMappingTests
     private readonly UnixRootItemFixture _unixRootItemFixture = new();
 
     [Theory]
-    [InlineData(true)] // hidden file system item
-    [InlineData(false)] // visible file system item
+    [InlineData(true)] // Hidden file system item.
+    [InlineData(false)] // Visible file system item.
     public void ToFileSystemItemModel_WhenMappingFileSystemItem_ShouldMapCorrectly(bool isHidden)
     {
         // Arrange
@@ -54,8 +54,8 @@ public class FileSystemItemMappingTests
     }
 
     [Theory]
-    [InlineData(true)] // hidden directory
-    [InlineData(false)] // visible directory
+    [InlineData(true)] // Hidden directory.
+    [InlineData(false)] // Visible directory.
     public void ToTreeNodeResponse_WhenMappingDirectory_ShouldMapCorrectly(bool isHidden)
     {
         // Arrange
@@ -73,8 +73,8 @@ public class FileSystemItemMappingTests
     }
 
     [Theory]
-    [InlineData(true)] // hidden file
-    [InlineData(false)] // visible file
+    [InlineData(true)] // Hidden file.
+    [InlineData(false)] // Visible file.
     public void ToTreeNodeResponse_WhenMappingFile_ShouldMapCorrectly(bool isHidden)
     {
         // Arrange
@@ -132,8 +132,8 @@ public class FileSystemItemMappingTests
     }
 
     [Theory]
-    [InlineData("TestFile.txt", FileSystemItemType.File, true)] // hidden file
-    [InlineData("TestFolder", FileSystemItemType.Directory, false)] // visible directory
+    [InlineData("TestFile.txt", FileSystemItemType.File, true)] // Hidden file.
+    [InlineData("TestFolder", FileSystemItemType.Directory, false)] // Visible directory.
     public void ToFileSystemItemModel_WhenMappingDifferentFileSystemItems_ShouldMapCorrectly(string name, FileSystemItemType type, bool isHidden)
     {
         // Arrange

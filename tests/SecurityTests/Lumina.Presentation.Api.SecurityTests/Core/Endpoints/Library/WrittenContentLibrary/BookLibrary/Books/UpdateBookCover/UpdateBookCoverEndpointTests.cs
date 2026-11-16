@@ -97,8 +97,8 @@ public class UpdateBookCoverEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Books; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Books; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateBookCover_WithSQLInjectionInRouteId_ShouldNotCorruptOrLeakData(string maliciousBookId)
     {
         // Arrange

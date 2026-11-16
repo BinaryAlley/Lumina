@@ -21,7 +21,7 @@ public class RegisterUserCommandValidator : AbstractValidator<RegisterUserComman
             .WithError(Errors.Authentication.UsernameCannotBeEmpty)
             .Length(3, 255)
             .WithError(Errors.Authentication.UsernameMustBeBetween3And255CharactersLong)
-            .Matches("^[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9]$") // only allow letters, numbers, dots, underscores and hyphens, and must start and end with letter or number
+            .Matches("^[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9]$") // Only allow letters, numbers, dots, underscores and hyphens, and must start and end with letter or number.
             .WithError(Errors.Authentication.InvalidUsername);
        
         RuleFor(command => command.Password)

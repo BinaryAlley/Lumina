@@ -64,14 +64,14 @@ public class LibraryPathPart : ValueObject
     /// </returns>
     public static Result<LibraryPathPart> Create(LibraryPathPartKind kind, string? representation, bool isOptional)
     {
-        // a separator carries no representation, it always renders the platform path separator.
+        // A separator carries no representation, it always renders the platform path separator.
         if (kind == LibraryPathPartKind.Separator)
             return new LibraryPathPart(kind, string.Empty, isOptional);
 
         if (string.IsNullOrWhiteSpace(representation))
             return DomainErrors.Library.PathTemplateLiteralCannotBeEmpty;
 
-        // typed parts must carry exactly one value placeholder, so that the position of the captured value is unambiguous.
+        // Typed parts must carry exactly one value placeholder, so that the position of the captured value is unambiguous.
         if (kind != LibraryPathPartKind.Literal && s_placeholderRegex.Matches(representation).Count != 1)
             return DomainErrors.Library.PathTemplateValuePartMustContainSinglePlaceholder;
 

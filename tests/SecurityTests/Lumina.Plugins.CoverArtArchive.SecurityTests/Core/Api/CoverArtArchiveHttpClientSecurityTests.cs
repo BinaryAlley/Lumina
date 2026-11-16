@@ -28,13 +28,13 @@ public class CoverArtArchiveHttpClientSecurityTests
     private readonly CoverArtArchiveSettingsDtoFixture _coverArtArchiveSettingsDtoFixture = new();
 
     [Theory]
-    [InlineData("https://evil.example/index.json")] // an unrelated public host
-    [InlineData("https://localhost/index.json")] // the loopback host name
-    [InlineData("https://127.0.0.1/index.json")] // the IPv4 loopback address
-    [InlineData("https://169.254.169.254/latest/meta-data/")] // the link local cloud metadata endpoint
-    [InlineData("https://10.0.0.5/index.json")] // a private class A address
-    [InlineData("https://192.168.1.10/index.json")] // a private class C address
-    [InlineData("https://coverartarchive.org.evil.example/index.json")] // the trusted host used as a prefix of an attacker controlled host
+    [InlineData("https://evil.example/index.json")] // An unrelated public host.
+    [InlineData("https://localhost/index.json")] // The loopback host name.
+    [InlineData("https://127.0.0.1/index.json")] // The IPv4 loopback address.
+    [InlineData("https://169.254.169.254/latest/meta-data/")] // The link local cloud metadata endpoint.
+    [InlineData("https://10.0.0.5/index.json")] // A private class A address.
+    [InlineData("https://192.168.1.10/index.json")] // A private class C address.
+    [InlineData("https://coverartarchive.org.evil.example/index.json")] // The trusted host used as a prefix of an attacker controlled host.
     public async Task GetReleaseArtworkAsync_WhenTheRedirectPointsAtADisallowedHost_ShouldThrowAndNotReachIt(string location)
     {
         // Arrange
@@ -59,8 +59,8 @@ public class CoverArtArchiveHttpClientSecurityTests
     }
 
     [Theory]
-    [InlineData("http://archive.org/index.json")] // a downgrade of the Internet Archive to plain HTTP
-    [InlineData("http://coverartarchive.org/index.json")] // a downgrade of the Cover Art Archive to plain HTTP
+    [InlineData("http://archive.org/index.json")] // A downgrade of the Internet Archive to plain HTTP.
+    [InlineData("http://coverartarchive.org/index.json")] // A downgrade of the Cover Art Archive to plain HTTP.
     public async Task GetReleaseArtworkAsync_WhenTheRedirectDowngradesToPlainHttp_ShouldThrow(string location)
     {
         // Arrange
@@ -83,8 +83,8 @@ public class CoverArtArchiveHttpClientSecurityTests
     }
 
     [Theory]
-    [InlineData("user@example.com\r\nX-Injected: value")] // carriage return and line feed header injection
-    [InlineData("user@example.com\nX-Injected: value")] // line feed header injection
+    [InlineData("user@example.com\r\nX-Injected: value")] // Carriage return and line feed header injection.
+    [InlineData("user@example.com\nX-Injected: value")] // Line feed header injection.
     public async Task GetReleaseArtworkAsync_WhenThePersistedContactEmailAttemptsHeaderInjection_ShouldNotInjectAnyHeader(string maliciousEmail)
     {
         // Arrange

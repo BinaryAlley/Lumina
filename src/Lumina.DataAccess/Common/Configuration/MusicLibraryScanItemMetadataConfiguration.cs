@@ -20,7 +20,7 @@ public class MusicLibraryScanItemMetadataConfiguration : IEntityTypeConfiguratio
         builder.ToTable("MusicLibraryScanItemMetadata");
         builder.HasKey(musicMetadata => musicMetadata.Id);
         builder.Property(musicMetadata => musicMetadata.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
         builder.Property(musicMetadata => musicMetadata.LibraryScanId)
             .IsRequired()
@@ -103,6 +103,6 @@ public class MusicLibraryScanItemMetadataConfiguration : IEntityTypeConfiguratio
             .HasColumnOrder(31);
 
         builder.HasIndex(musicMetadata => new { musicMetadata.LibraryScanId, musicMetadata.Path })
-            .IsUnique(); // the metadata of the same physical file cannot be staged twice during the same scan
+            .IsUnique(); // The metadata of the same physical file cannot be staged twice during the same scan.
     }
 }

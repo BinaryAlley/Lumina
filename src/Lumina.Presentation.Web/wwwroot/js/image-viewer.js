@@ -39,7 +39,7 @@ class ImageViewerService {
             document.removeEventListener('keydown', this.keydownHandler);
             this.keydownHandler = null;
         }
-        // stop the browser from finishing the load of the previous image in the background
+        // Stop the browser from finishing the load of the previous image in the background.
         this.imageElement.removeAttribute('src');
         this.items = [];
     }
@@ -87,13 +87,13 @@ class ImageViewerService {
         this.prevButton = this.overlay.querySelector('.image-viewer-prev');
         this.nextButton = this.overlay.querySelector('.image-viewer-next');
 
-        // clicking the dimmed background closes the viewer, but not the image or the controls
+        // Clicking the dimmed background closes the viewer, but not the image or the controls.
         this.overlay.addEventListener('click', (e) => {
             if (e.target === this.overlay)
                 this.close();
         });
 
-        // reveal the image only after it finished loading, so the spinner is visible meanwhile
+        // Reveal the image only after it finished loading, so the spinner is visible meanwhile.
         const handleImageLoaded = () => {
             this.spinnerElement.style.display = 'none';
             this.imageElement.classList.add('loaded');
@@ -164,5 +164,5 @@ class ImageViewerService {
     }
 }
 
-// create a global instance of the ImageViewerService
+// Create a global instance of the ImageViewerService.
 const imageViewer = new ImageViewerService();

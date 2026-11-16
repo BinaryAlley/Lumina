@@ -89,7 +89,7 @@ public class MediaContributorTests
         Type contributorType = contributor.GetType();
 
         // Assert
-        // the contributor is a person, agnostic of the roles it played in the media items, so it must not expose a role
+        // The contributor is a person, agnostic of the roles it played in the media items, so it must not expose a role.
         Assert.Null(contributorType.GetProperty("Role"));
     }
 }

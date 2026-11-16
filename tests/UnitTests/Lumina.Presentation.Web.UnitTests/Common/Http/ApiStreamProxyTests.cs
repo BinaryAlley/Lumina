@@ -85,9 +85,9 @@ public class ApiStreamProxyTests
     }
 
     [Theory]
-    [InlineData("public, max-age=60", new[] { "private", "max-age=60" })] // the public instruction is dropped and the max age is preserved
-    [InlineData("no-store", new[] { "private", "no-store" })] // the no store instruction is preserved and privacy is added
-    [InlineData(null, new[] { "private" })] // an absent API instruction becomes a private instruction
+    [InlineData("public, max-age=60", new[] { "private", "max-age=60" })] // The public instruction is dropped and the max age is preserved.
+    [InlineData("no-store", new[] { "private", "no-store" })] // The no store instruction is preserved and privacy is added.
+    [InlineData(null, new[] { "private" })] // An absent API instruction becomes a private instruction.
     public async Task WriteAsync_WhenApiDeclaresCaching_ShouldAlwaysProduceAPrivateInstruction(string? apiCacheControl, string[] expectedFragments)
     {
         // Arrange

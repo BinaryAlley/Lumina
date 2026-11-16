@@ -76,7 +76,7 @@ internal sealed class ValidationRuleForEach<TRequest, TItem> : IValidationRule<T
     /// <returns>The current <see cref="IRuleBuilder{TRequest, TItem}"/> instance for method chaining.</returns>
     public IRuleBuilder<TRequest, TItem> WithError(Error error)
     {
-        // validation rules always produce validation errors, regardless of the error type of the source error
+        // Validation rules always produce validation errors, regardless of the error type of the source error.
         Error validationError = Error.Validation(description: error.Description);
         currentError = validationError;
         if (isLastAddedPredicateInstanceAware && _instanceAwarePredicateErrors.Count > 0)
@@ -106,7 +106,7 @@ internal sealed class ValidationRuleForEach<TRequest, TItem> : IValidationRule<T
     /// <returns>One <see cref="Error"/> per failing predicate, per item; empty if every item passes.</returns>
     public IEnumerable<Error> Validate(TRequest instance)
     {
-        // evaluate the condition first, if it returns false, skip validation entirely.
+        // Evaluate the condition first, if it returns false, skip validation entirely.
         if (condition is not null && !condition(instance))
             yield break;
 

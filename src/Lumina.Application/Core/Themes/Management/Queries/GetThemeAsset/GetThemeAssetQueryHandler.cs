@@ -63,7 +63,7 @@ public class GetThemeAssetQueryHandler : IQueryHandler<GetThemeAssetQuery, Resul
         Result<ThemeAssetDto> assetResult = await _themeService.GetAssetAsync(theme.ThemeId, query.AssetPath!, cancellationToken).ConfigureAwait(false);
         if (assetResult.IsFailure)
         {
-            // the stored files of a bundled theme removed externally are restored, so its assets keep being served
+            // The stored files of a bundled theme removed externally are restored, so its assets keep being served.
             if (theme.InstallSource == ThemeInstallSource.Bundled)
             {
                 Result<Success> restoreResult = await _themeService.RestoreBundledThemeAsync(theme.ThemeId, cancellationToken).ConfigureAwait(false);

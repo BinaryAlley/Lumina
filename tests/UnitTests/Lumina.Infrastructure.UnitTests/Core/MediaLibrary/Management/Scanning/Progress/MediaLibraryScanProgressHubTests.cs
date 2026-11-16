@@ -20,7 +20,7 @@ public class MediaLibraryScanProgressHubTests
     [Fact]
     public async Task SubscribeToScan_WhenCalled_ShouldAddTheConnectionToTheGroupOfTheAuthenticatedUser()
     {
-        // Arrange.
+        // Arrange
         MediaLibraryScanProgressHub sut = new();
         HubCallerContext context = Substitute.For<HubCallerContext>();
         context.ConnectionId.Returns("connection-1");
@@ -33,17 +33,17 @@ public class MediaLibraryScanProgressHubTests
         ClaimsPrincipal user = new(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, userId.ToString())]));
         context.User.Returns(user);
 
-        // Act.
+        // Act
         await sut.SubscribeToScan(scanId);
 
-        // Assert.
+        // Assert
         await groupManager.Received(1).AddToGroupAsync("connection-1", $"{scanId}-{userId}", CancellationToken.None);
     }
 
     [Fact]
     public async Task SubscribeToScan_WhenUserClaimIsMissing_ShouldNotAddTheConnectionToAnyGroup()
     {
-        // Arrange.
+        // Arrange
         MediaLibraryScanProgressHub sut = new();
         HubCallerContext context = Substitute.For<HubCallerContext>();
         context.ConnectionId.Returns("connection-1");
@@ -54,17 +54,17 @@ public class MediaLibraryScanProgressHubTests
         ClaimsPrincipal user = new(new ClaimsIdentity());
         context.User.Returns(user);
 
-        // Act.
+        // Act
         await sut.SubscribeToScan(scanId);
 
-        // Assert.
+        // Assert
         await groupManager.DidNotReceive().AddToGroupAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task SubscribeToScan_WhenUserIdClaimIsNotAGuid_ShouldNotAddTheConnectionToAnyGroup()
     {
-        // Arrange.
+        // Arrange
         MediaLibraryScanProgressHub sut = new();
         HubCallerContext context = Substitute.For<HubCallerContext>();
         context.ConnectionId.Returns("connection-1");
@@ -75,10 +75,10 @@ public class MediaLibraryScanProgressHubTests
         ClaimsPrincipal user = new(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, "not-a-guid")]));
         context.User.Returns(user);
 
-        // Act.
+        // Act
         await sut.SubscribeToScan(scanId);
 
-        // Assert.
+        // Assert
         await groupManager.DidNotReceive().AddToGroupAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 }

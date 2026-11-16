@@ -39,9 +39,9 @@ public class IsrcTests
     }
 
     [Theory]
-    [InlineData(null)] // null ISRC value
-    [InlineData("")] // empty ISRC value
-    [InlineData("   ")] // whitespace ISRC value
+    [InlineData(null)] // Null ISRC value.
+    [InlineData("")] // Empty ISRC value.
+    [InlineData("   ")] // Whitespace ISRC value.
     public void Create_WhenValueIsNullOrWhitespace_ShouldReturnError(string? value)
     {
         // Act
@@ -53,11 +53,11 @@ public class IsrcTests
     }
 
     [Theory]
-    [InlineData("USRC1760783")] // too short
-    [InlineData("USRC176078399")] // too long
-    [InlineData("1SRC17607839")] // country code does not start with two letters
-    [InlineData("USRC1760783X")] // designation segment is not purely numeric
-    [InlineData("USRC-7607839")] // contains an invalid character
+    [InlineData("USRC1760783")] // Too short.
+    [InlineData("USRC176078399")] // Too long.
+    [InlineData("1SRC17607839")] // Country code does not start with two letters.
+    [InlineData("USRC1760783X")] // Designation segment is not purely numeric.
+    [InlineData("USRC-7607839")] // Contains an invalid character.
     public void Create_WhenValueHasInvalidFormat_ShouldReturnError(string value)
     {
         // Act

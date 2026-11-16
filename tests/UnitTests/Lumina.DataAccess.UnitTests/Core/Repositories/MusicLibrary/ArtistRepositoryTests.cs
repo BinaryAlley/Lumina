@@ -806,14 +806,14 @@ public class ArtistRepositoryTests
     }
 
     [Theory]
-    [InlineData("website", SortOrder.Ascending)] // the website field, ascending
-    [InlineData("website", SortOrder.Descending)] // the website field, descending
-    [InlineData("musicbrainzartistid", SortOrder.Ascending)] // the MusicBrainz artist Id field, ascending
-    [InlineData("musicbrainzartistid", SortOrder.Descending)] // the MusicBrainz artist Id field, descending
-    [InlineData("createdonutc", SortOrder.Ascending)] // the creation timestamp field, ascending
-    [InlineData("createdonutc", SortOrder.Descending)] // the creation timestamp field, descending
-    [InlineData("updatedonutc", SortOrder.Ascending)] // the update timestamp field, ascending
-    [InlineData("updatedonutc", SortOrder.Descending)] // the update timestamp field, descending
+    [InlineData("website", SortOrder.Ascending)] // The website field, ascending.
+    [InlineData("website", SortOrder.Descending)] // The website field, descending.
+    [InlineData("musicbrainzartistid", SortOrder.Ascending)] // The MusicBrainz artist Id field, ascending.
+    [InlineData("musicbrainzartistid", SortOrder.Descending)] // The MusicBrainz artist Id field, descending.
+    [InlineData("createdonutc", SortOrder.Ascending)] // The creation timestamp field, ascending.
+    [InlineData("createdonutc", SortOrder.Descending)] // The creation timestamp field, descending.
+    [InlineData("updatedonutc", SortOrder.Ascending)] // The update timestamp field, ascending.
+    [InlineData("updatedonutc", SortOrder.Descending)] // The update timestamp field, descending.
     public async Task GetAllAsync_WhenSortedByField_ShouldOrderByFieldThenById(string sortBy, SortOrder sortOrder)
     {
         // Arrange

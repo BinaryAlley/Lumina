@@ -54,9 +54,9 @@ public class StreamMusicTrackSegmentEndpointTests : IClassFixture<LuminaWebFacto
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection in the delivery handle
-    [InlineData("' OR '1'='1")] // boolean based injection in the delivery handle
-    [InlineData("../../etc/passwd")] // path traversal in the delivery handle
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection in the delivery handle.
+    [InlineData("' OR '1'='1")] // Boolean based injection in the delivery handle.
+    [InlineData("../../etc/passwd")] // Path traversal in the delivery handle.
     public async Task StreamMusicTrackSegment_WithAnInjectionPayloadInDeliveryId_ShouldRejectTheRequestWithoutCallingTheApi(string payload)
     {
         // Arrange
@@ -82,9 +82,9 @@ public class StreamMusicTrackSegmentEndpointTests : IClassFixture<LuminaWebFacto
     }
 
     [Theory]
-    [InlineData("artistId")] // injection in the artist Id
-    [InlineData("albumId")] // injection in the album Id
-    [InlineData("trackId")] // injection in the track Id
+    [InlineData("artistId")] // Injection in the artist Id.
+    [InlineData("albumId")] // Injection in the album Id.
+    [InlineData("trackId")] // Injection in the track Id.
     public async Task StreamMusicTrackSegment_WithAnInjectionPayloadInATrackRouteId_ShouldNormalizeTheIdWithoutLeakingData(string routeValue)
     {
         // Arrange

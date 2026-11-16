@@ -29,9 +29,9 @@ public static class TestHttpContextFactory
     public static DefaultHttpContext Create(string? culture = "en-US", ClaimsPrincipal? user = null, ISession? session = null)
     {
         DefaultHttpContext httpContext = new();
-        // provide a writable response body, so that executed IResult instances can be inspected by the tests
+        // Provide a writable response body, so that executed IResult instances can be inspected by the tests.
         httpContext.Features.Set<IHttpResponseBodyFeature>(new StreamResponseBodyFeature(new MemoryStream()));
-        // provide the minimal services needed by the result execution machinery (logging, options, JSON options)
+        // Provide the minimal services needed by the result execution machinery (logging, options, JSON options).
         httpContext.RequestServices = CreateServiceProvider();
         httpContext.Request.RouteValues["culture"] = culture;
         if (user is not null)
@@ -91,7 +91,7 @@ public static class TestHttpContextFactory
     public static ISession CreateSession()
     {
         ISession session = Substitute.For<ISession>();
-#pragma warning disable CS8601 // possible null reference assignment in the NSubstitute out-argument stub
+#pragma warning disable CS8601 // Possible null reference assignment in the NSubstitute out-argument stub.
         session.TryGetValue(Arg.Any<string>(), out Arg.Any<byte[]>()).Returns(callInfo =>
         {
             callInfo[1] = null;

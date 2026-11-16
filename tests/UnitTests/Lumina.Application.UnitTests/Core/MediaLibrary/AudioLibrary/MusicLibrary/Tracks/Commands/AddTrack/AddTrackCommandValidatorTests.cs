@@ -1009,8 +1009,8 @@ public class AddTrackCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // zero is not a valid track number
-    [InlineData(-1)] // a negative track number is not valid
+    [InlineData(0)] // Zero is not a valid track number.
+    [InlineData(-1)] // A negative track number is not valid.
     public void Validate_WhenTrackNumberIsNotPositive_ShouldHaveValidationError(int trackNumber)
     {
         // Arrange
@@ -1037,8 +1037,8 @@ public class AddTrackCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // zero is not a valid disc number
-    [InlineData(-1)] // a negative disc number is not valid
+    [InlineData(0)] // Zero is not a valid disc number.
+    [InlineData(-1)] // A negative disc number is not valid.
     public void Validate_WhenDiscNumberIsNotPositive_ShouldHaveValidationError(int discNumber)
     {
         // Arrange
@@ -1156,8 +1156,8 @@ public class AddTrackCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // zero is not a valid tempo
-    [InlineData(-1)] // a negative tempo is not valid
+    [InlineData(0)] // Zero is not a valid tempo.
+    [InlineData(-1)] // A negative tempo is not valid.
     public void Validate_WhenBpmIsNotPositive_ShouldHaveValidationError(int bpm)
     {
         // Arrange
@@ -1355,8 +1355,8 @@ public class AddTrackCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // zero is not a valid rating value
-    [InlineData(-1)] // a negative rating value is not valid
+    [InlineData(0)] // Zero is not a valid rating value.
+    [InlineData(-1)] // A negative rating value is not valid.
     public void Validate_WhenRatingValueIsNotPositive_ShouldHaveValidationError(decimal value)
     {
         // Arrange
@@ -1383,8 +1383,8 @@ public class AddTrackCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // zero is not a valid maximum rating value
-    [InlineData(-1)] // a negative maximum rating value is not valid
+    [InlineData(0)] // Zero is not a valid maximum rating value.
+    [InlineData(-1)] // A negative maximum rating value is not valid.
     public void Validate_WhenRatingMaxValueIsNotPositive_ShouldHaveValidationError(decimal maxValue)
     {
         // Arrange

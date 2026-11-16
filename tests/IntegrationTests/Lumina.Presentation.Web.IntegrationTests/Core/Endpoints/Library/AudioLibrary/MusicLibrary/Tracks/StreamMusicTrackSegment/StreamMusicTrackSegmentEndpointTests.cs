@@ -91,8 +91,8 @@ public class StreamMusicTrackSegmentEndpointTests : IClassFixture<LuminaWebFacto
     }
 
     [Theory]
-    [InlineData(HttpStatusCode.ServiceUnavailable)] // a busy normalization pipeline is a transient condition
-    [InlineData(HttpStatusCode.TooManyRequests)] // the stream concurrency limit was reached
+    [InlineData(HttpStatusCode.ServiceUnavailable)] // A busy normalization pipeline is a transient condition.
+    [InlineData(HttpStatusCode.TooManyRequests)] // The stream concurrency limit was reached.
     public async Task StreamMusicTrackSegment_WhenApiReportsATransientCondition_ShouldReturnABareStatus(HttpStatusCode statusCode)
     {
         // Arrange

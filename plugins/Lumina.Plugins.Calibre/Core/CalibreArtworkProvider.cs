@@ -53,7 +53,7 @@ internal sealed class CalibreArtworkProvider : IArtworkProvider<BookMetadataLook
         if (string.IsNullOrWhiteSpace(document.CoverHref))
             return Task.FromResult<IReadOnlyList<ArtworkDto>>([]);
 
-        // the cover reference must be a bare file name contained in the directory of the book, so that no file outside of it can be accessed
+        // The cover reference must be a bare file name contained in the directory of the book, so that no file outside of it can be accessed.
         string coverFileName = Path.GetFileName(document.CoverHref);
         if (coverFileName != document.CoverHref || Path.IsPathRooted(document.CoverHref))
             return Task.FromResult<IReadOnlyList<ArtworkDto>>([]);

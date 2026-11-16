@@ -236,9 +236,9 @@ public class ShuffleTracksEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     }
 
     [Theory]
-    [InlineData(0, "ShuffleTrackCountMustBeGreaterThanZero")] // no track is requested
-    [InlineData(-1, "ShuffleTrackCountMustBeGreaterThanZero")] // a negative selection size
-    [InlineData(501, "ShuffleTrackCountMustBeAtMost500")] // one more than the documented maximum
+    [InlineData(0, "ShuffleTrackCountMustBeGreaterThanZero")] // No track is requested.
+    [InlineData(-1, "ShuffleTrackCountMustBeGreaterThanZero")] // A negative selection size.
+    [InlineData(501, "ShuffleTrackCountMustBeAtMost500")] // One more than the documented maximum.
     public async Task ShuffleTracks_WhenCountIsInvalid_ShouldReturnUnprocessableEntityWithTheValidationError(int count, string expectedError)
     {
         // Arrange

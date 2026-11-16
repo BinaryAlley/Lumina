@@ -21,16 +21,16 @@ public class LibraryScanConfiguration : IEntityTypeConfiguration<LibraryScanEnti
         builder.ToTable("LibraryScans");
         builder.HasKey(library => library.Id);
         builder.Property(library => library.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
 
-        // one user with many library scans
+        // One user with many library scans.
         builder.HasOne(libraryScan => libraryScan.User)
             .WithMany(user => user.LibraryScans)
             .HasForeignKey(libraryScan => libraryScan.UserId)
             .IsRequired();
 
-        // one library with many library scans
+        // One library with many library scans.
         builder.HasOne(libraryScan => libraryScan.Library)
             .WithMany(library => library.LibraryScans)
             .HasForeignKey(libraryScan => libraryScan.LibraryId)
@@ -41,7 +41,7 @@ public class LibraryScanConfiguration : IEntityTypeConfiguration<LibraryScanEnti
             .HasConversion<string>()
             .HasColumnOrder(1);
 
-        // audit
+        // Audit.
         builder.Property(libraryScan => libraryScan.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(2);
@@ -58,10 +58,10 @@ public class LibraryScanConfiguration : IEntityTypeConfiguration<LibraryScanEnti
             .HasDefaultValue(null)
             .HasColumnOrder(5);
 
-        // Indexes 
+        // Indexes.
 
-        // enables fast lookup of latest non-running scans per library
+        // Enables fast lookup of latest non-running scans per library.
         builder.HasIndex(libraryScan => new { libraryScan.LibraryId, libraryScan.Status, libraryScan.CreatedOnUtc })
-            .IsDescending(true, false, true); // CreatedOnUtc DESC
+            .IsDescending(true, false, true); // CreatedOnUtc DESC.
     }
 }

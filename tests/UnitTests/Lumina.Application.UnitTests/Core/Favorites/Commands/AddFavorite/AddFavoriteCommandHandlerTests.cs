@@ -117,9 +117,9 @@ public class AddFavoriteCommandHandlerTests
     }
 
     [Theory]
-    [InlineData(FavoriteMediaKind.None)] // the default value, which is not a kind that can be favorited
-    [InlineData(FavoriteMediaKind.Video)] // video libraries are not catalogued yet
-    [InlineData(FavoriteMediaKind.Photo)] // photo libraries are not catalogued yet
+    [InlineData(FavoriteMediaKind.None)] // The default value, which is not a kind that can be favorited.
+    [InlineData(FavoriteMediaKind.Video)] // Video libraries are not catalogued yet.
+    [InlineData(FavoriteMediaKind.Photo)] // Photo libraries are not catalogued yet.
     public async Task HandleAsync_WhenMediaKindIsNotSupported_ShouldReturnNotSupportedAndNotResolveTheLibrary(FavoriteMediaKind mediaKind)
     {
         // Arrange
@@ -156,10 +156,10 @@ public class AddFavoriteCommandHandlerTests
     }
 
     [Theory]
-    [InlineData(FavoriteMediaKind.MusicArtist, nameof(DomainErrors.Music.ArtistNotFound))] // the artist does not exist
-    [InlineData(FavoriteMediaKind.MusicAlbum, nameof(DomainErrors.Music.AlbumNotFound))] // the album does not exist
-    [InlineData(FavoriteMediaKind.MusicTrack, nameof(DomainErrors.Music.TrackNotFound))] // the track does not exist
-    [InlineData(FavoriteMediaKind.Book, nameof(DomainErrors.WrittenContent.BookNotFound))] // the book does not exist
+    [InlineData(FavoriteMediaKind.MusicArtist, nameof(DomainErrors.Music.ArtistNotFound))] // The artist does not exist.
+    [InlineData(FavoriteMediaKind.MusicAlbum, nameof(DomainErrors.Music.AlbumNotFound))] // The album does not exist.
+    [InlineData(FavoriteMediaKind.MusicTrack, nameof(DomainErrors.Music.TrackNotFound))] // The track does not exist.
+    [InlineData(FavoriteMediaKind.Book, nameof(DomainErrors.WrittenContent.BookNotFound))] // The book does not exist.
     public async Task HandleAsync_WhenTheMediaItemHasNoLibrary_ShouldReturnTheMediaKindSpecificNotFoundError(FavoriteMediaKind mediaKind, string expectedErrorDescription)
     {
         // Arrange

@@ -30,7 +30,7 @@ public class CheckInitializationEndpointTests : IClassFixture<LuminaApiFactory>
         HttpResponseMessage response = await _client.GetAsync("/api/v1/initialization");
 
         // Assert
-        // the initialization check is anonymous, so it must never demand authentication or leak any internal data
+        // The initialization check is anonymous, so it must never demand authentication or leak any internal data.
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);

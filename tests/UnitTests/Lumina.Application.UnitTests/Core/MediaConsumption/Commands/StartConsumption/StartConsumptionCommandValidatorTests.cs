@@ -33,10 +33,10 @@ public class StartConsumptionCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the library Id is empty
-    [InlineData("   ")] // the library Id is whitespace only
-    [InlineData("not-a-guid")] // the library Id is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the library Id is the empty Guid
+    [InlineData("")] // The library Id is empty.
+    [InlineData("   ")] // The library Id is whitespace only.
+    [InlineData("not-a-guid")] // The library Id is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The library Id is the empty Guid.
     public void Validate_WhenLibraryIdIsEmptyOrInvalid_ShouldHaveValidationError(string libraryId)
     {
         // Arrange
@@ -76,11 +76,11 @@ public class StartConsumptionCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the media kind is empty
-    [InlineData("   ")] // the media kind is whitespace only
-    [InlineData("Hologram")] // the media kind is not a member of the enumeration
-    [InlineData("0")] // the media kind is a numeric route value, which the validator rejects by name
-    [InlineData("1")] // a numeric route value that parses to the defined MusicTrack member, which the old Enum.TryParse and Enum.IsDefined logic accepted
+    [InlineData("")] // The media kind is empty.
+    [InlineData("   ")] // The media kind is whitespace only.
+    [InlineData("Hologram")] // The media kind is not a member of the enumeration.
+    [InlineData("0")] // The media kind is a numeric route value, which the validator rejects by name.
+    [InlineData("1")] // A numeric route value that parses to the defined MusicTrack member, which the old Enum.TryParse and Enum.IsDefined logic accepted.
     public void Validate_WhenMediaKindIsEmptyOrUnsupported_ShouldHaveValidationError(string mediaKind)
     {
         // Arrange
@@ -94,7 +94,7 @@ public class StartConsumptionCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("None")] // the default enumeration member is still a member name
+    [InlineData("None")] // The default enumeration member is still a member name.
     [InlineData("MusicTrack")]
     [InlineData("PodcastEpisode")]
     [InlineData("Audiobook")]
@@ -116,8 +116,8 @@ public class StartConsumptionCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("musictrack")] // the member name is lower case
-    [InlineData("BoOk")] // the member name is mixed case
+    [InlineData("musictrack")] // The member name is lower case.
+    [InlineData("BoOk")] // The member name is mixed case.
     public void Validate_WhenMediaKindUsesDifferentCasing_ShouldNotHaveValidationError(string mediaKind)
     {
         // Arrange
@@ -144,10 +144,10 @@ public class StartConsumptionCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the media item Id is empty
-    [InlineData("   ")] // the media item Id is whitespace only
-    [InlineData("not-a-guid")] // the media item Id is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the media item Id is the empty Guid
+    [InlineData("")] // The media item Id is empty.
+    [InlineData("   ")] // The media item Id is whitespace only.
+    [InlineData("not-a-guid")] // The media item Id is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The media item Id is the empty Guid.
     public void Validate_WhenMediaItemIdIsEmptyOrInvalid_ShouldHaveValidationError(string mediaItemId)
     {
         // Arrange

@@ -102,8 +102,8 @@ public class EditableValuesCopierTests
     }
 
     [Theory]
-    [InlineData(false)] // the incoming entity carries a different, non-empty key
-    [InlineData(true)] // the incoming entity carries an unset key
+    [InlineData(false)] // The incoming entity carries a different, non-empty key.
+    [InlineData(true)] // The incoming entity carries an unset key.
     public async Task CopyEditableValues_WhenTheIncomingKeyDoesNotMatchTheTrackedOne_ShouldPreserveTheTrackedIdentity(bool useUnsetKey)
     {
         // Arrange

@@ -32,7 +32,7 @@ public static partial class WebTestHelpers
 
     private const string LOGIN_PAGE_PATH = "/en-us/auth/login";
     private const string LOGIN_ENDPOINT_PATH = "/en-us/auth/api-login";
-    // the change password page renders an antiforgery token for the authenticated user without calling the remote API
+    // The change password page renders an antiforgery token for the authenticated user without calling the remote API.
     private const string AUTHENTICATED_TOKEN_PAGE_PATH = "/en-us/auth/change-password";
 
     [GeneratedRegex("name=\"__RequestVerificationToken\"[^>]*value=\"([^\"]*)\"")]
@@ -57,7 +57,7 @@ public static partial class WebTestHelpers
     /// <returns>An HTTP client authenticated with the application's authentication cookie, together with an antiforgery token.</returns>
     public static async Task<AuthenticatedWebClient> CreateAuthenticatedClientAsync(WebApplicationFactory<Program> factory, string? username = "testuser", string? password = "TestPass123!")
     {
-        // the application marks its cookies as secure, so the test client must communicate over HTTPS for the cookies to be sent back
+        // The application marks its cookies as secure, so the test client must communicate over HTTPS for the cookies to be sent back.
         HttpClient client = factory.CreateClient(new WebApplicationFactoryClientOptions
         {
             BaseAddress = new Uri("https://localhost"),
@@ -65,9 +65,9 @@ public static partial class WebTestHelpers
         });
         string antiforgeryToken = await GetAntiforgeryTokenAsync(client);
         await LoginAsync(client, username!, password!, antiforgeryToken);
-        // the antiforgery token is bound to the authenticated user, because the antiforgery middleware runs after
+        // The antiforgery token is bound to the authenticated user, because the antiforgery middleware runs after
         // authentication; the token captured from the anonymous login page is rejected with a 400 for authenticated
-        // mutating requests, so a fresh token must be captured after the login
+        // mutating requests, so a fresh token must be captured after the login.
         string authenticatedAntiforgeryToken = await GetAntiforgeryTokenAsync(client, AUTHENTICATED_TOKEN_PAGE_PATH);
         return new AuthenticatedWebClient(client, authenticatedAntiforgeryToken);
     }

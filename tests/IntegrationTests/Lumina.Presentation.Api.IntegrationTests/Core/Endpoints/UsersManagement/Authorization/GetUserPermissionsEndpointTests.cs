@@ -65,7 +65,7 @@ public class GetUserPermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         UserEntity? user = dbContext.Users.FirstOrDefault();
         Assert.NotNull(user);
 
-        // Add a direct user permission
+        // Add a direct user permission.
         PermissionEntity permission = dbContext.Permissions.First();
         UserPermissionEntity userPermission = _userPermissionEntityFixture.Create(user, permission);
         dbContext.UserPermissions.Add(userPermission);
@@ -169,11 +169,11 @@ public class GetUserPermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        // clear junction tables first
+        // Clear junction tables first.
         await dbContext.Set<RolePermissionEntity>().ExecuteDeleteAsync();
         await dbContext.Set<UserPermissionEntity>().ExecuteDeleteAsync();
 
-        // then clear main tables
+        // Then clear main tables.
         await dbContext.Set<UserEntity>().ExecuteDeleteAsync();
         await dbContext.Set<RoleEntity>().ExecuteDeleteAsync();
         await dbContext.Set<PermissionEntity>().ExecuteDeleteAsync();

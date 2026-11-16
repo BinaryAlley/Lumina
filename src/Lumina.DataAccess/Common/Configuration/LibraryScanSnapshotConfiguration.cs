@@ -18,10 +18,10 @@ public class LibraryScanSnapshotConfiguration : IEntityTypeConfiguration<Library
     public void Configure(EntityTypeBuilder<LibraryScanSnapshotEntity> builder)
     {
         builder.ToTable("LibraryScanSnapshots");
-        // composite key, so that each media library scan snapshot item is uniquely identified within its library by its path
+        // Composite key, so that each media library scan snapshot item is uniquely identified within its library by its path.
         builder.HasKey(libraryScanSnapshot => new { libraryScanSnapshot.LibraryId, libraryScanSnapshot.Path });
 
-        // one library with many media library scan snapshot items
+        // One library with many media library scan snapshot items.
         builder.HasOne(libraryScanSnapshot => libraryScanSnapshot.Library)
             .WithMany()
             .HasForeignKey(libraryScanSnapshot => libraryScanSnapshot.LibraryId)
@@ -49,7 +49,7 @@ public class LibraryScanSnapshotConfiguration : IEntityTypeConfiguration<Library
             .IsRequired()
             .HasColumnOrder(4);
 
-        // audit
+        // Audit.
         builder.Property(libraryScanSnapshot => libraryScanSnapshot.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(5);
@@ -66,7 +66,7 @@ public class LibraryScanSnapshotConfiguration : IEntityTypeConfiguration<Library
             .HasDefaultValue(null)
             .HasColumnOrder(8);
 
-        // enables fast lookups of the media library scan snapshot items of a library
+        // Enables fast lookups of the media library scan snapshot items of a library.
         builder.HasIndex(libraryScanSnapshot => libraryScanSnapshot.LibraryId);
     }
 }

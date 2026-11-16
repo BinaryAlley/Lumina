@@ -63,7 +63,7 @@ public class BookTests
         book.UpdateContributors([replacementContributor]);
 
         // Assert
-        // the previous contributors are replaced, not appended
+        // The previous contributors are replaced, not appended.
         BookMediaContributor contributor = Assert.Single(book.Contributors);
         Assert.Equal(replacementContributor, contributor);
     }
@@ -169,7 +169,7 @@ public class BookTests
             [.. enrichedSource.Ratings]);
 
         // Assert
-        // the metadata and related fields are replaced with the enriched values
+        // The metadata and related fields are replaced with the enriched values.
         Assert.Equal(enrichedSource.Metadata, book.Metadata);
         Assert.Equal(enrichedSource.Format, book.Format);
         Assert.Equal(enrichedSource.Edition, book.Edition);
@@ -233,7 +233,7 @@ public class BookTests
             [.. secondEnrichmentSource.Ratings]);
 
         // Assert
-        // the second enrichment replaces the first, it is not appended to it
+        // The second enrichment replaces the first, it is not appended to it.
         Assert.Equal(secondEnrichmentSource.ISBNs.Count, book.ISBNs.Count);
         Assert.Equal(secondEnrichmentSource.ISBNs, book.ISBNs);
         Assert.Equal(secondEnrichmentSource.Ratings, book.Ratings);
@@ -253,7 +253,7 @@ public class BookTests
         bool hasCoverImagePath = bookType.GetProperty("CoverImagePath") is not null;
 
         // Assert
-        // the enrichment state is a persistence concern, tracked on the repository entity by the enrichment jobs
+        // The enrichment state is a persistence concern, tracked on the repository entity by the enrichment jobs.
         Assert.False(hasMetadataStatus);
         Assert.False(hasLastMetadataUpdateUtc);
         Assert.False(hasMetadataProvider);

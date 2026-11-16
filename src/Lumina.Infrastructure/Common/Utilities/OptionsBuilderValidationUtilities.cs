@@ -23,7 +23,7 @@ public static class OptionsBuilderValidationUtilities
     /// <returns>The same <see cref="OptionsBuilder{TOptions}"/> instance, to allow for chaining.</returns>
     public static OptionsBuilder<TOptions> ValidateFluently<TOptions>(this OptionsBuilder<TOptions> optionsBuilder) where TOptions : class
     {
-        // register a singleton instance of IValidateOptions<TOptions> using the validator
+        // Register a singleton instance of IValidateOptions<TOptions> using the validator.
         optionsBuilder.Services.AddSingleton<IValidateOptions<TOptions>>(
             serviceProvider => new ValidationOptions<TOptions>(optionsBuilder.Name, serviceProvider.GetRequiredService<IValidator<TOptions>>()));
         return optionsBuilder;

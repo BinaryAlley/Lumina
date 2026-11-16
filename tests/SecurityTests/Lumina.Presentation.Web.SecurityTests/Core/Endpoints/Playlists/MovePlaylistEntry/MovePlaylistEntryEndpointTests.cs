@@ -105,10 +105,10 @@ public class MovePlaylistEntryEndpointTests : IClassFixture<LuminaWebFactory>, I
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Playlists--")] // destructive injection
-    [InlineData("../../admin")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Playlists--")] // Destructive injection.
+    [InlineData("../../admin")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task MovePlaylistEntry_WithInjectionPayloadInRouteIds_ShouldNormalizeThemAndNotForwardTheRawValues(string payload)
     {
         // Arrange
@@ -139,8 +139,8 @@ public class MovePlaylistEntryEndpointTests : IClassFixture<LuminaWebFactory>, I
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Playlists--")] // destructive injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Playlists--")] // Destructive injection.
     public async Task MovePlaylistEntry_WithInjectionPayloadInTargetPosition_ShouldRejectTheRequestWithoutCallingTheApi(string payload)
     {
         // Arrange

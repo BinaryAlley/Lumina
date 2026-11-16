@@ -20,7 +20,7 @@ public class LibraryBookReaderConfigurationConfiguration : IEntityTypeConfigurat
         builder.ToTable("LibraryBookReaderConfigurations");
         builder.HasKey(configuration => configuration.Id);
         builder.Property(configuration => configuration.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
         builder.Property(configuration => configuration.LibraryId)
             .IsRequired()
@@ -32,7 +32,7 @@ public class LibraryBookReaderConfigurationConfiguration : IEntityTypeConfigurat
             .IsRequired()
             .HasColumnOrder(3);
 
-        // audit
+        // Audit.
         builder.Property(configuration => configuration.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(4);

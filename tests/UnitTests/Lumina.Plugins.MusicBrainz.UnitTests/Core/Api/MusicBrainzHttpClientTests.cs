@@ -65,8 +65,8 @@ public class MusicBrainzHttpClientTests
     }
 
     [Theory]
-    [InlineData("https://musicbrainz.org/ws/2/")] // the real service
-    [InlineData("https://mirror.musicbrainz.org/ws/2/")] // a subdomain of the real service
+    [InlineData("https://musicbrainz.org/ws/2/")] // The real service.
+    [InlineData("https://mirror.musicbrainz.org/ws/2/")] // A subdomain of the real service.
     public async Task GetRecordingAsync_WhenTheBaseUrlIsTheRealService_ShouldThrottleTheRequests(string baseUrl)
     {
         // Arrange
@@ -288,9 +288,9 @@ public class MusicBrainzHttpClientTests
     }
 
     [Theory]
-    [InlineData(0, "limit=1")] // a limit below the minimum is clamped up
-    [InlineData(200, "limit=100")] // a limit above the maximum is clamped down
-    [InlineData(50, "limit=50")] // a limit within the range is kept
+    [InlineData(0, "limit=1")] // A limit below the minimum is clamped up.
+    [InlineData(200, "limit=100")] // A limit above the maximum is clamped down.
+    [InlineData(50, "limit=50")] // A limit within the range is kept.
     public async Task SearchArtistsAsync_WhenTheLimitIsOutOfRange_ShouldClampIt(int requestedLimit, string expectedQuery)
     {
         // Arrange
@@ -505,11 +505,11 @@ public class MusicBrainzHttpClientTests
     }
 
     [Theory]
-    [InlineData("A & B")] // ampersand query separator
-    [InlineData("Title #fragment")] // fragment separator
-    [InlineData("A?B")] // query separator
-    [InlineData("../../secret")] // path traversal
-    [InlineData("A\" OR \"B")] // quote escape
+    [InlineData("A & B")] // Ampersand query separator.
+    [InlineData("Title #fragment")] // Fragment separator.
+    [InlineData("A?B")] // Query separator.
+    [InlineData("../../secret")] // Path traversal.
+    [InlineData("A\" OR \"B")] // Quote escape.
     public async Task SearchArtistsAsync_WhenTheQueryContainsReservedCharacters_ShouldKeepThemInsideTheQueryString(string searchTerm)
     {
         // Arrange

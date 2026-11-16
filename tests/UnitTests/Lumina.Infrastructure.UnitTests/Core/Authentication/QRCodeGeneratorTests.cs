@@ -26,7 +26,7 @@ public class QRCodeGeneratorTests
 
         // Assert
         Assert.StartsWith("data:image/png;base64,", result);
-        Assert.True(IsBase64String(result[22..])); // skip "data:image/png;base64,"
+        Assert.True(IsBase64String(result[22..])); // Skip "data:image/png;base64,".
     }
 
     [Fact]
@@ -112,7 +112,7 @@ public class QRCodeGeneratorTests
     {
         // Arrange
         (string username, _) = QRCodeGeneratorFixture.CreateQrCodeTestData();
-        byte[] shortSecret = [1]; // minimum length for Base32 encoding
+        byte[] shortSecret = [1]; // Minimum length for Base32 encoding.
 
         // Act
         string result = _sut.GenerateQrCodeDataUri(username, shortSecret);

@@ -95,8 +95,8 @@ public class UpdateAlbumEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Albums; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Albums; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateAlbum_WithSQLInjectionInBody_ShouldNotCorruptOrLeakData(string maliciousTitle)
     {
         // Arrange
@@ -123,8 +123,8 @@ public class UpdateAlbumEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Albums; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Albums; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateAlbum_WithSQLInjectionInLibraryRouteId_ShouldRemainSecure(string maliciousLibraryId)
     {
         // Arrange
@@ -141,8 +141,8 @@ public class UpdateAlbumEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Albums; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Albums; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateAlbum_WithSQLInjectionInArtistRouteId_ShouldRemainSecure(string maliciousArtistId)
     {
         // Arrange
@@ -159,8 +159,8 @@ public class UpdateAlbumEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Albums; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
+    [InlineData("'; DROP TABLE Albums; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
     public async Task UpdateAlbum_WithSQLInjectionInAlbumRouteId_ShouldRemainSecure(string maliciousAlbumId)
     {
         // Arrange

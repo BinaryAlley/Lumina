@@ -22,7 +22,7 @@ public class FileTypeService : IFileTypeService
 {
     private readonly IFileSystem _fileSystem;
     private readonly IFileSystemPermissionsService _fileSystemPermissionsService;
-    private const int BUFFER_SIZE = 18; // 18 bytes should be more than enough for common images header types
+    private const int BUFFER_SIZE = 18; // 18 bytes should be more than enough for common images header types.
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileTypeService"/> class.
@@ -96,9 +96,9 @@ public class FileTypeService : IFileTypeService
             // Read more content from the file.
             using FileSystemStream stream = _fileSystem.FileStream.New(path, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite);
             byte[] svgBuffer = new byte[1000];
-#pragma warning disable CA2022 // Avoid inexact read with 'Stream.Read'
+#pragma warning disable CA2022 // Avoid inexact read with 'Stream.Read'.
             stream.Read(svgBuffer, 0, 1000);
-#pragma warning restore CA2022 // Avoid inexact read with 'Stream.Read'
+#pragma warning restore CA2022 // Avoid inexact read with 'Stream.Read'.
             string extendedContent = Encoding.UTF8.GetString(svgBuffer);
             // Check if the extended content contains <svg.
             return extendedContent.Contains("<svg", StringComparison.OrdinalIgnoreCase);
@@ -127,13 +127,13 @@ public class FileTypeService : IFileTypeService
     private static ImageType IdentifyHeader(byte[] firstBytes)
     {
         if (Encoding.ASCII.GetBytes("BM").SequenceEqual(firstBytes[..2]))
-            return ImageType.BMP; // BMP
+            return ImageType.BMP; // BMP.
         if (Encoding.ASCII.GetBytes("GIF").SequenceEqual(firstBytes[..3]))
-            return ImageType.GIF; // GIF
+            return ImageType.GIF; // GIF.
         if (new byte[] { 137, 80, 78, 71 }.SequenceEqual(firstBytes[..4]))
-            return ImageType.PNG; // PNG
+            return ImageType.PNG; // PNG.
         if (new byte[] { 73, 73, 42 }.SequenceEqual(firstBytes[..3]) || new byte[] { 77, 77, 42 }.SequenceEqual(firstBytes[..3]))
-            return ImageType.TIFF; // TIFF
+            return ImageType.TIFF; // TIFF.
         if (new byte[] { 255, 216, 255, 224 }.SequenceEqual(firstBytes[..4]))
             return ImageType.JPEG; // JPEG
         // Any JPEG starts with the start-of-image marker FF D8 followed by FF and a marker byte. The marker that follows varies
@@ -142,23 +142,23 @@ public class FileTypeService : IFileTypeService
         if (firstBytes[0] == 255 && firstBytes[1] == 216 && firstBytes[2] == 255)
         {
             if (firstBytes[3] == 225)
-                return ImageType.JPEG_CANON; // JPEG CANON
-            return ImageType.JPEG_UNKNOWN; // JPEG UNKNOWN
+                return ImageType.JPEG_CANON; // JPEG CANON.
+            return ImageType.JPEG_UNKNOWN; // JPEG UNKNOWN.
         }
         if (new byte[] { 0x00, 0x11, 0x02, 0xFF }.SequenceEqual(firstBytes[..4]))
-            return ImageType.PICT; // PICT
+            return ImageType.PICT; // PICT.
         if (new byte[] { 0x00, 0x00, 0x01, 0x00 }.SequenceEqual(firstBytes[..4]))
-            return ImageType.ICO; // ICO
+            return ImageType.ICO; // ICO.
         if (new byte[] { 0x38, 0x42, 0x50, 0x53 }.SequenceEqual(firstBytes[..4]))
-            return ImageType.PSD; // PSD
+            return ImageType.PSD; // PSD.
         if (new byte[] { 0xFF, 0x4F, 0xFF, 0x51 }.SequenceEqual(firstBytes[..4]))
-            return ImageType.JPEG2000; // JPEG 2000
+            return ImageType.JPEG2000; // JPEG 2000.
         if (new byte[] { 0x00, 0x00, 0x00, 0x0C, 0x6A, 0x70, 0x20, 0x20 }.SequenceEqual(firstBytes[..8]))
-            return ImageType.AVIF; // AVIF
+            return ImageType.AVIF; // AVIF.
         if (new byte[] { 0x00, 0x00, 0x00, 0x0C, 0x6A, 0x50, 0x20, 0x20 }.SequenceEqual(firstBytes[..8]))
-            return ImageType.JPEG2000; // JPEG 2000 (variant)
+            return ImageType.JPEG2000; // JPEG 2000 (variant).
         if (new byte[] { 0x52, 0x49, 0x46, 0x46 }.SequenceEqual(firstBytes[..4]) && new byte[] { 0x57, 0x45, 0x42, 0x50 }.SequenceEqual(firstBytes[8..12]))
-            return ImageType.WEBP; // WEBP
+            return ImageType.WEBP; // WEBP.
         return ImageType.None;
     }
 }

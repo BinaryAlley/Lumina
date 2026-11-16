@@ -104,13 +104,13 @@ public class BookRatingDtoMappingTests
         foreach (Result<BookRating> result in resultList)
             Assert.False(result.IsFailure);
 
-        // complete rating
+        // Complete rating.
         Assert.Equal(dtos[0].Value!.Value, resultList[0].Value.Value);
         Assert.Equal(dtos[0].MaxValue!.Value, resultList[0].Value.MaxValue);
         Assert.Equal(dtos[0].Source!.Value, resultList[0].Value.Source.Value);
         Assert.Equal(dtos[0].VoteCount!.Value, resultList[0].Value.VoteCount.Value);
 
-        // minimal rating
+        // Minimal rating.
         Assert.Equal(dtos[1].Value!.Value, resultList[1].Value.Value);
         Assert.Equal(dtos[1].MaxValue!.Value, resultList[1].Value.MaxValue);
         Assert.False(resultList[1].Value.Source.HasValue);

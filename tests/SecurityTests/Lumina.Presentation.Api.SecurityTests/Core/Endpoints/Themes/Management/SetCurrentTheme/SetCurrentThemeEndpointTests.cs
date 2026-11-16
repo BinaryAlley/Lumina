@@ -87,11 +87,11 @@ public class SetCurrentThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     }
 
     [Theory]
-    [InlineData("../evil")] // dot-dot path traversal
-    [InlineData("..\\..\\evil")] // backslash path traversal
-    [InlineData("/etc/passwd")] // absolute path traversal
-    [InlineData("C:\\windows\\system32")] // absolute windows path traversal
-    [InlineData("' OR '1'='1")] // SQL injection attempt
+    [InlineData("../evil")] // Dot-dot path traversal.
+    [InlineData("..\\..\\evil")] // Backslash path traversal.
+    [InlineData("/etc/passwd")] // Absolute path traversal.
+    [InlineData("C:\\windows\\system32")] // Absolute windows path traversal.
+    [InlineData("' OR '1'='1")] // SQL injection attempt.
     public async Task SetCurrentTheme_WithPathTraversalInThemeId_ShouldReturnCleanNotFoundProblemDetails(string maliciousThemeId)
     {
         // Arrange

@@ -21,7 +21,7 @@ public class SchedulerDisplayPreferencesConfiguration : IEntityTypeConfiguration
         builder.ToTable("SchedulerDisplayPreferences");
         builder.HasKey(preferences => preferences.Id);
         builder.Property(preferences => preferences.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
 
         builder.Property(preferences => preferences.UserId)

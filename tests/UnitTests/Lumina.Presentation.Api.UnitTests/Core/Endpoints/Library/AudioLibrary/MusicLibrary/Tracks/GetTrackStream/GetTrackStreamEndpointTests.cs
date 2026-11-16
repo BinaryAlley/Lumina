@@ -75,10 +75,10 @@ public class GetTrackStreamEndpointTests
     }
 
     [Theory]
-    [InlineData(AudioFileFormat.MP3, "audio/mpeg")] // mp3 audio
-    [InlineData(AudioFileFormat.FLAC, "audio/flac")] // flac audio
-    [InlineData(AudioFileFormat.OGG, "audio/ogg")] // ogg audio
-    [InlineData(AudioFileFormat.None, "application/octet-stream")] // an unrecognized format stays opaque binary
+    [InlineData(AudioFileFormat.MP3, "audio/mpeg")] // MP3 audio.
+    [InlineData(AudioFileFormat.FLAC, "audio/flac")] // FLAC audio.
+    [InlineData(AudioFileFormat.OGG, "audio/ogg")] // OGG audio.
+    [InlineData(AudioFileFormat.None, "application/octet-stream")] // An unrecognized format stays opaque binary.
     public async Task ExecuteAsync_WhenSuccessful_ShouldServeTheMediaTypeOfTheFormat(AudioFileFormat format, string expectedContentType)
     {
         // Arrange

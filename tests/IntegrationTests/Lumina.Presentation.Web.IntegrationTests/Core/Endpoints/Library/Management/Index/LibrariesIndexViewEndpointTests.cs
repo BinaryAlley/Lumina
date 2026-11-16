@@ -92,7 +92,7 @@ public class LibrariesIndexViewEndpointTests : IClassFixture<LuminaWebFactory>
     public async Task LibrariesIndexView_WhenRenderedInACultureWithNonAsciiLabels_ShouldInjectTheScriptLabelsAsJson()
     {
         // Arrange
-        // Razor would encode the non-ASCII letters of a raw label as HTML entities, which the browser shows literally inside a script, while JSON escapes them
+        // Razor would encode the non-ASCII letters of a raw label as HTML entities, which the browser shows literally inside a script, while JSON escapes them.
         _apiFactory.ApiClientStub.Reset();
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
 

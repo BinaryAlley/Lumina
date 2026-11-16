@@ -52,7 +52,7 @@ public class PermissionRepositoryTests
         Assert.False(result.IsFailure);
         Assert.Equal(Result.Created, result.Value);
 
-        // check if the permission was added to the context's ChangeTracker
+        // Check if the permission was added to the context's ChangeTracker.
         EntityEntry<PermissionEntity>? addedPermission = _mockContext.ChangeTracker.Entries<PermissionEntity>()
         .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == permissionModel.Id);
         Assert.NotNull(addedPermission);

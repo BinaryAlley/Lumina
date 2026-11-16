@@ -34,8 +34,8 @@ public class ValidatorUtilitiesTests
     }
 
     [Theory]
-    [InlineData(4)] // value is greater than the comparison value
-    [InlineData(100)] // value is much greater than the comparison value
+    [InlineData(4)] // Value is greater than the comparison value.
+    [InlineData(100)] // Value is much greater than the comparison value.
     public void Validate_WhenIntValueIsGreaterThanComparison_ShouldNotHaveValidationError(int value)
     {
         // Arrange
@@ -50,9 +50,9 @@ public class ValidatorUtilitiesTests
     }
 
     [Theory]
-    [InlineData(3)] // value equals the comparison value
-    [InlineData(1)] // value is smaller than the comparison value
-    [InlineData(-5)] // value is negative and smaller than the comparison value
+    [InlineData(3)] // Value equals the comparison value.
+    [InlineData(1)] // Value is smaller than the comparison value.
+    [InlineData(-5)] // Value is negative and smaller than the comparison value.
     public void Validate_WhenIntValueIsNotGreaterThanComparison_ShouldHaveValidationError(int value)
     {
         // Arrange
@@ -262,9 +262,9 @@ public class ValidatorUtilitiesTests
     }
 
     [Theory]
-    [InlineData(null)] // null string
-    [InlineData("")] // empty string
-    [InlineData("   ")] // white-space only string
+    [InlineData(null)] // Null string.
+    [InlineData("")] // Empty string.
+    [InlineData("   ")] // White-space only string.
     public void Validate_WhenNotEmptyValueIsEmpty_ShouldHaveValidationError(string? value)
     {
         // Arrange
@@ -432,9 +432,9 @@ public class ValidatorUtilitiesTests
     }
 
     [Theory]
-    [InlineData(nameof(ValidatorUtilitiesTestEnum.First))] // the exact member name
-    [InlineData("first")] // the member name in lower case
-    [InlineData("SECOND")] // the member name in upper case
+    [InlineData(nameof(ValidatorUtilitiesTestEnum.First))] // The exact member name.
+    [InlineData("first")] // The member name in lower case.
+    [InlineData("SECOND")] // The member name in upper case.
     public void Validate_WhenTextualEnumValueIsAMemberName_ShouldNotHaveValidationError(string textualEnumValue)
     {
         // Arrange
@@ -448,12 +448,12 @@ public class ValidatorUtilitiesTests
     }
 
     [Theory]
-    [InlineData("")] // an empty value
-    [InlineData("   ")] // a whitespace only value
-    [InlineData("Unknown")] // a name that is not a member of the enumeration
-    [InlineData("0")] // a number that is a defined member value, which must still be rejected
-    [InlineData("1")] // another number that is a defined member value
-    [InlineData("99")] // a number that is not a member value
+    [InlineData("")] // An empty value.
+    [InlineData("   ")] // A whitespace only value.
+    [InlineData("Unknown")] // A name that is not a member of the enumeration.
+    [InlineData("0")] // A number that is a defined member value, which must still be rejected.
+    [InlineData("1")] // Another number that is a defined member value.
+    [InlineData("99")] // A number that is not a member value.
     public void Validate_WhenTextualEnumValueIsNotAMemberName_ShouldHaveValidationError(string textualEnumValue)
     {
         // Arrange
@@ -886,8 +886,8 @@ public class ValidatorUtilitiesTests
     }
 
     [Theory]
-    [InlineData(0.99)] // just below the minimum
-    [InlineData(10.01)] // just above the maximum
+    [InlineData(0.99)] // Just below the minimum.
+    [InlineData(10.01)] // Just above the maximum.
     public void Validate_WhenInclusiveNullableDoubleValueIsOutsideRange_ShouldHaveValidationError(double inclusiveNullableDoubleValue)
     {
         // Arrange
@@ -902,9 +902,9 @@ public class ValidatorUtilitiesTests
     }
 
     [Theory]
-    [InlineData(1.0)] // the minimum
-    [InlineData(5.0)] // a middle value
-    [InlineData(10.0)] // the maximum
+    [InlineData(1.0)] // The minimum.
+    [InlineData(5.0)] // A middle value.
+    [InlineData(10.0)] // The maximum.
     public void Validate_WhenInclusiveNullableDoubleValueIsWithinRange_ShouldNotHaveValidationError(double inclusiveNullableDoubleValue)
     {
         // Arrange

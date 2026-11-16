@@ -63,9 +63,9 @@ public class MusicWorkTests
     }
 
     [Theory]
-    [InlineData(null)] // null work title
-    [InlineData("")] // empty work title
-    [InlineData("   ")] // whitespace work title
+    [InlineData(null)] // Null work title.
+    [InlineData("")] // Empty work title.
+    [InlineData("   ")] // Whitespace work title.
     public void Create_WhenTitleIsNullOrWhitespace_ShouldReturnError(string? title)
     {
         // Act

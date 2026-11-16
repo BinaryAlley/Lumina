@@ -117,7 +117,7 @@ public class InstallPluginEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
         await _apiFactory.CreateAndAuthenticateAdminUserAsync(client);
         byte[] zipBytes = CreateZipWithEntries(new Dictionary<string, string>
         {
-            [@"..\evil.dll"] = "evil" // path traversal entry inside the archive
+            [@"..\evil.dll"] = "evil" // Path traversal entry inside the archive.
         });
         _installedPluginFileNames.Add("evil.dll");
 
@@ -128,7 +128,7 @@ public class InstallPluginEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
 
         // Assert
         response.EnsureSuccessStatusCode();
-        // the entry is flattened, so it cannot escape the plugins directory
+        // The entry is flattened, so it cannot escape the plugins directory.
         Assert.False(File.Exists(Path.Combine(AppContext.BaseDirectory, "evil.dll")));
         Assert.True(File.Exists(Path.Combine(AppContext.BaseDirectory, "plugins", "evil.dll")));
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);

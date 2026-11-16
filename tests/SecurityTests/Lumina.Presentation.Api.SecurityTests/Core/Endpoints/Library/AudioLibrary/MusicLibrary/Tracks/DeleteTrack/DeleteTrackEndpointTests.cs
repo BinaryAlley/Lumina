@@ -77,9 +77,9 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // command execution attempt
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // Command execution attempt.
     public async Task DeleteTrack_WithSQLInjectionInLibraryId_ShouldNotCorruptOrLeakData(string maliciousLibraryId)
     {
         // Arrange
@@ -104,9 +104,9 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // command execution attempt
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // Command execution attempt.
     public async Task DeleteTrack_WithSQLInjectionInArtistId_ShouldNotCorruptOrLeakData(string maliciousArtistId)
     {
         // Arrange
@@ -129,9 +129,9 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // command execution attempt
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // Command execution attempt.
     public async Task DeleteTrack_WithSQLInjectionInAlbumId_ShouldNotCorruptOrLeakData(string maliciousAlbumId)
     {
         // Arrange
@@ -154,9 +154,9 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Tracks; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // command execution attempt
+    [InlineData("'; DROP TABLE Tracks; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // Command execution attempt.
     public async Task DeleteTrack_WithSQLInjectionInTrackId_ShouldNotCorruptOrLeakData(string maliciousTrackId)
     {
         // Arrange
@@ -179,10 +179,10 @@ public class DeleteTrackEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     }
 
     [Theory]
-    [InlineData("..%2F..%2Fevil")] // encoded slash traversal
-    [InlineData("%2e%2e%2f%2e%2e%2fevil")] // encoded dot-slash traversal
-    [InlineData("..%5Cevil")] // encoded backslash traversal
-    [InlineData("..%2F")] // encoded trailing slash traversal
+    [InlineData("..%2F..%2Fevil")] // Encoded slash traversal.
+    [InlineData("%2e%2e%2f%2e%2e%2fevil")] // Encoded dot-slash traversal.
+    [InlineData("..%5Cevil")] // Encoded backslash traversal.
+    [InlineData("..%2F")] // Encoded trailing slash traversal.
     public async Task DeleteTrack_WithPathTraversalInTrackId_ShouldReturnCleanProblemDetails(string maliciousTrackId)
     {
         // Arrange

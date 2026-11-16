@@ -20,10 +20,10 @@ public class UserSettingsConfiguration : IEntityTypeConfiguration<UserSettingsEn
         builder.ToTable("UserSettings");
         builder.HasKey(settings => settings.Id);
         builder.Property(settings => settings.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
 
-        // one user with one set of settings
+        // One user with one set of settings.
         builder.HasOne<UserEntity>()
             .WithOne()
             .HasForeignKey<UserSettingsEntity>(settings => settings.UserId)
@@ -130,7 +130,7 @@ public class UserSettingsConfiguration : IEntityTypeConfiguration<UserSettingsEn
             .IsRequired()
             .HasColumnOrder(29);
 
-        // audit
+        // Audit.
         builder.Property(settings => settings.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(5);
@@ -147,7 +147,7 @@ public class UserSettingsConfiguration : IEntityTypeConfiguration<UserSettingsEn
             .HasDefaultValue(null)
             .HasColumnOrder(8);
 
-        // one user can have at most one set of settings
+        // One user can have at most one set of settings.
         builder.HasIndex(settings => settings.UserId)
             .IsUnique();
     }

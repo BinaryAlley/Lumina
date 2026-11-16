@@ -351,7 +351,7 @@ public class AlbumTests
         Assert.Equal(releaseArtistId, album.MusicBrainzReleaseArtistId);
         Assert.True(album.UpdatedOnUtc.HasValue);
         Assert.True(album.UpdatedOnUtc.Value >= beforeUpdate);
-        // the tracks are not part of the details update
+        // The tracks are not part of the details update.
         Assert.Equal(originalTracks, album.Tracks);
     }
 

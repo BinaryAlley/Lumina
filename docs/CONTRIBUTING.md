@@ -444,6 +444,7 @@ namespace MyNamespace // Not Allowed
 ```
 
 #### Formatting:
+- Write comments as sentences: capitalize the first word and end with a period. `TODO`, `FIXME`, `HACK`, `XXX` and `NOTE` bodies stay lowercase after the colon, and commented-out code is left exactly as written.
 - Use a single space after keywords in control flow statements. For example:
 ```csharp
 if (condition) // Correct

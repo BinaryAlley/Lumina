@@ -47,7 +47,7 @@ public class RolePermissionRepositoryTests
         Assert.False(result.IsFailure);
         Assert.Equal(Result.Created, result.Value);
 
-        // check if the role permission was added to the context's ChangeTracker
+        // Check if the role permission was added to the context's ChangeTracker.
         EntityEntry<RolePermissionEntity>? addedRolePermission = _mockContext.ChangeTracker.Entries<RolePermissionEntity>()
         .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == rolePermissionModel.Id);
         Assert.NotNull(addedRolePermission);

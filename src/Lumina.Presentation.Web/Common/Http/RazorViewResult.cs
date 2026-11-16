@@ -45,20 +45,20 @@ public sealed class RazorViewResult : IResult
     /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
     public async Task ExecuteAsync(HttpContext httpContext)
     {
-        // the only accessible ViewDataDictionary constructors require either a model state or an existing dictionary, so start from an empty one and assign the model
+        // The only accessible ViewDataDictionary constructors require either a model state or an existing dictionary, so start from an empty one and assign the model
         // through the Model setter; the setter rebases the model metadata on the runtime type of the value, which is what makes the asp-for tag helpers resolve the
-        // properties of the actual model type instead of a plain object
+        // properties of the actual model type instead of a plain object.
         IModelMetadataProvider metadataProvider = httpContext.RequestServices.GetRequiredService<IModelMetadataProvider>();
         ViewDataDictionary viewData = new(metadataProvider, new ModelStateDictionary()) { Model = _model };
         foreach ((string key, object? value) in _viewData)
             viewData[key] = value;
 
-        // delegate to the MVC view execution machinery instead of rendering the view manually: it discovers the layout and _ViewStart, evaluates the sections,
-        // and resolves the view components and tag helpers, none of which the Results class can do since it has no view rendering support
+        // Delegate to the MVC view execution machinery instead of rendering the view manually: it discovers the layout and _ViewStart, evaluates the sections,
+        // and resolves the view components and tag helpers, none of which the Results class can do since it has no view rendering support.
         ViewResult viewResult = new() { ViewName = _viewName, ViewData = viewData };
         IActionResultExecutor<ViewResult> executor = httpContext.RequestServices.GetRequiredService<IActionResultExecutor<ViewResult>>();
-        // the view engine needs an ActionContext, which FastEndpoints does not provide; synthesize one that carries over the current route data, so that the
-        // culture route value (and therefore the URL-based localization) keeps working while the view is rendered
+        // The view engine needs an ActionContext, which FastEndpoints does not provide; synthesize one that carries over the current route data, so that the
+        // culture route value (and therefore the URL-based localization) keeps working while the view is rendered.
         ActionContext actionContext = new(httpContext, httpContext.GetRouteData() ?? new RouteData(), new ActionDescriptor());
         await executor.ExecuteAsync(actionContext, viewResult).ConfigureAwait(false);
     }

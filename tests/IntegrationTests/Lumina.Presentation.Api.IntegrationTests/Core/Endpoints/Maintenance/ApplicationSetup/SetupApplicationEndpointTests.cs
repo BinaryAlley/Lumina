@@ -93,7 +93,7 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         Assert.NotNull(response.Headers.Location);
         Assert.Equal($"http://localhost/api/v1/users/{result.Id}", response.Headers.Location.ToString());
 
-        // verify default permissions, roles, and role permissions are set
+        // Verify default permissions, roles, and role permissions are set.
         await VerifyDefaultSetup(result.Id);
     }
 
@@ -125,7 +125,7 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         Assert.NotNull(response.Headers.Location);
         Assert.Equal($"http://localhost/api/v1/users/{result.Id}", response.Headers.Location.ToString());
 
-        // verify default permissions, roles, and role permissions are set
+        // Verify default permissions, roles, and role permissions are set.
         await VerifyDefaultSetup(result.Id);
     }
 
@@ -187,26 +187,26 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         
-        // TODO: update list when defaults change
-        // verify default permissions
+        // TODO: update list when defaults change.
+        // Verify default permissions.
         List<PermissionEntity> permissions = await dbContext.Permissions.ToListAsync();
         Assert.Contains(permissions, p => p.PermissionName == AuthorizationPermission.CanViewUsers);
         Assert.Contains(permissions, p => p.PermissionName == AuthorizationPermission.CanDeleteUsers);
         Assert.Contains(permissions, p => p.PermissionName == AuthorizationPermission.CanRegisterUsers);
 
-        // verify default roles
+        // Verify default roles.
         List<RoleEntity> roles = await dbContext.Roles.ToListAsync();
         RoleEntity? adminRole = roles.FirstOrDefault(r => r.RoleName == "Admin");
         Assert.NotNull(adminRole);
 
-        // verify admin role permissions
+        // Verify admin role permissions.
         List<RolePermissionEntity> rolePermissions = await dbContext.RolePermissions
             .Where(rp => rp.RoleId == adminRole!.Id)
             .ToListAsync();
         Assert.NotEmpty(rolePermissions);
         Assert.Contains(rolePermissions, rp => permissions.Any(p => p.Id == rp.PermissionId));
 
-        // verify user has admin role
+        // Verify user has admin role.
         UserRoleEntity? userRole = await dbContext.UserRoles.FirstOrDefaultAsync(ur => ur.UserId == userId && ur.RoleId == adminRole!.Id);
         Assert.NotNull(userRole);
     }

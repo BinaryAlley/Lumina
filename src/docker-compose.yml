@@ -81,7 +81,7 @@ services:
     container_name: grafana
     image: grafana/grafana:13.0.7-ubuntu-slim
     environment:
-      # dev-only stack: set a non-default admin password (override GRAFANA_ADMIN_PASSWORD in real deployments)
+      # Dev-only stack: set a non-default admin password (override GRAFANA_ADMIN_PASSWORD in real deployments).
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-lumina-admin}
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning:ro

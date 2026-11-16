@@ -41,25 +41,25 @@ public class CachedAuthorizationHandler : DelegatingHandler
     /// <returns>The HTTP response message from either the cache or the original API call.</returns>
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        // get the called API endpoint
+        // Get the called API endpoint.
         string requestPath = request.RequestUri!.AbsolutePath;
         string cacheKey = GetAuthorizationCacheKey();
-        // if it's any endpoint other than the one for the authorization request, fire it away towards the original API service
+        // If it's any endpoint other than the one for the authorization request, fire it away towards the original API service.
         if (!requestPath.EndsWith(AUTHORIZATION_ENDPOINT, StringComparison.OrdinalIgnoreCase))
         {
-            if (requestPath.EndsWith(LOGIN_ENDPOINT)) // if login endpoint was hit, a new user is now present, delete previous cached permissions
+            if (requestPath.EndsWith(LOGIN_ENDPOINT)) // If login endpoint was hit, a new user is now present, delete previous cached permissions.
                 await _hybridCache.RemoveAsync(cacheKey, cancellationToken).ConfigureAwait(false);
             return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
         }
-        // otherwise, check the hybrid cache to see if there is a cached authorization
+        // Otherwise, check the hybrid cache to see if there is a cached authorization.
         CachedResponse response = await _hybridCache.GetOrCreateAsync(
             cacheKey,
             async (cancellationToken) =>
             {
-                // perform the actual API call if cache is empty or expired
+                // Perform the actual API call if cache is empty or expired.
                 HttpResponseMessage result = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
                 string content = await result.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                // cache both status code and content
+                // Cache both status code and content.
                 return new CachedResponse
                 {
                     Content = content,
@@ -68,11 +68,11 @@ public class CachedAuthorizationHandler : DelegatingHandler
             },
             new HybridCacheEntryOptions()
             {
-                Expiration = TimeSpan.FromMinutes(5) // cache for the next five minutes
+                Expiration = TimeSpan.FromMinutes(5) // Cache for the next five minutes.
             },
             cancellationToken: cancellationToken
         );
-        // if the API returned 401 Unauthorized (i.e. token expired), DO NOT cache this response - it will be used for authorization endpoints even after successful login,
+        // If the API returned 401 Unauthorized (i.e. token expired), DO NOT cache this response - it will be used for authorization endpoints even after successful login,
         // resulting in incorrect login redirection cycles!
         if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.NotFound)
             await _hybridCache.RemoveAsync(cacheKey, cancellationToken).ConfigureAwait(false);
@@ -88,7 +88,7 @@ public class CachedAuthorizationHandler : DelegatingHandler
     /// <returns>The cache key for the currently authenticated user's authorization response.</returns>
     private string GetAuthorizationCacheKey()
     {
-        // key the cache entry by the authenticated user's id to prevent one user's authorization response from being served to another user
+        // Key the cache entry by the authenticated user's id to prevent one user's authorization response from being served to another user.
         string? userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         return userId is null ? AUTHORIZATION_ENDPOINT : $"{AUTHORIZATION_ENDPOINT}:{userId}";
     }

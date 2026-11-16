@@ -1,7 +1,7 @@
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
+# This stage is used when running from VS in fast mode (Default for Debug configuration).
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-# curl is used by the container healthcheck to probe the /health endpoints
-# ffmpeg is used by the API server to remux or transcode audio the browser cannot play directly.
+# Curl is used by the container healthcheck to probe the /health endpoints.
+# FFmpeg is used by the API server to remux or transcode audio the browser cannot play directly.
 # The package comes from the base image distribution and is not version-pinned, so the encoder set can change with a base image rebuild.
 # The API startup probe verifies the encoders the normalization catalog uses and reports a missing one at startup. Pin the base image digest
 # or the package version when a fully reproducible toolchain is required.
@@ -20,7 +20,7 @@ ARG BUILD_CONFIGURATION=Release
 
 WORKDIR /src
 
-# restore NuGet packages (keeping this section separate from the rest of the project files allows Docker to cache the restored packages)
+# Restore NuGet packages (keeping this section separate from the rest of the project files allows Docker to cache the restored packages).
 COPY ["AssemblyInfo_Shared.cs", "."]
 COPY ["Lumina.Presentation.Api/Lumina.Presentation.Api.csproj", "Lumina.Presentation.Api/"]
 COPY ["Lumina.Application/Lumina.Application.csproj", "Lumina.Application/"]
@@ -33,7 +33,7 @@ COPY ["Lumina.Plugins.Contracts/Lumina.Plugins.Contracts.csproj", "Lumina.Plugin
 
 RUN dotnet restore "./Lumina.Presentation.Api/Lumina.Presentation.Api.csproj" /p:BaseOutputPath=/app/publish/
 
-# build the project
+# Build the project.
 COPY ["Lumina.Presentation.Api/", "Lumina.Presentation.Api/"]
 COPY ["Lumina.Application/", "Lumina.Application/"]
 COPY ["Lumina.Contracts/", "Lumina.Contracts/"]
@@ -60,10 +60,10 @@ WORKDIR /app
 
 COPY --from=publish /app/publish .
 # The HTTP port is controlled per run mode: launchSettings.json for local development, ASPNETCORE_HTTP_PORTS here for
-# Docker, and for a published DLL run directly on a host, ASPNETCORE_URLS (or ASPNETCORE_HTTP_PORTS) must be set
+# Docker, and for a published DLL run directly on a host, ASPNETCORE_URLS (or ASPNETCORE_HTTP_PORTS) must be set.
 ENV ASPNETCORE_HTTP_PORTS=5214
 EXPOSE 5214
 ENTRYPOINT ["dotnet", "Lumina.Presentation.Api.dll"]
 
-# to build this Docker image, run the following command from the root of the project (location of the .slnx solution file):
+# To build this Docker image, run the following command from the root of the project (location of the .slnx solution file):
 # docker build --no-cache -t lumina-api -f Lumina.Presentation.Api/Dockerfile .

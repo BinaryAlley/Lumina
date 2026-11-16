@@ -13,21 +13,21 @@ namespace Lumina.Application.UnitTests.Common.Utilities;
 public class AudioFileFormatUtilitiesTests
 {
     [Theory]
-    [InlineData("track.mp3", AudioFileFormat.MP3)] // mp3 audio file
-    [InlineData("track.flac", AudioFileFormat.FLAC)] // flac audio file
-    [InlineData("track.m4a", AudioFileFormat.M4A)] // m4a audio file
-    [InlineData("track.aac", AudioFileFormat.AAC)] // aac audio file
-    [InlineData("track.ogg", AudioFileFormat.OGG)] // ogg audio file
-    [InlineData("track.opus", AudioFileFormat.OPUS)] // opus audio file
-    [InlineData("track.wav", AudioFileFormat.WAV)] // wav audio file
-    [InlineData("track.wma", AudioFileFormat.WMA)] // wma audio file
-    [InlineData("track.aiff", AudioFileFormat.AIFF)] // aiff audio file
-    [InlineData("track.aif", AudioFileFormat.AIFF)] // aif audio file
-    [InlineData("track.ape", AudioFileFormat.APE)] // ape audio file
-    [InlineData("track.wv", AudioFileFormat.WAVPACK)] // wavpack audio file
-    [InlineData("track.dsf", AudioFileFormat.DSF)] // dsf audio file
-    [InlineData("track.dff", AudioFileFormat.DFF)] // dff audio file
-    [InlineData("track.mka", AudioFileFormat.MATROSKA)] // matroska audio file
+    [InlineData("track.mp3", AudioFileFormat.MP3)] // MP3 audio file.
+    [InlineData("track.flac", AudioFileFormat.FLAC)] // FLAC audio file.
+    [InlineData("track.m4a", AudioFileFormat.M4A)] // M4A audio file.
+    [InlineData("track.aac", AudioFileFormat.AAC)] // AAC audio file.
+    [InlineData("track.ogg", AudioFileFormat.OGG)] // OGG audio file.
+    [InlineData("track.opus", AudioFileFormat.OPUS)] // Opus audio file.
+    [InlineData("track.wav", AudioFileFormat.WAV)] // WAV audio file.
+    [InlineData("track.wma", AudioFileFormat.WMA)] // WMA audio file.
+    [InlineData("track.aiff", AudioFileFormat.AIFF)] // AIFF audio file.
+    [InlineData("track.aif", AudioFileFormat.AIFF)] // AIF audio file.
+    [InlineData("track.ape", AudioFileFormat.APE)] // APE audio file.
+    [InlineData("track.wv", AudioFileFormat.WAVPACK)] // WavPack audio file.
+    [InlineData("track.dsf", AudioFileFormat.DSF)] // DSF audio file.
+    [InlineData("track.dff", AudioFileFormat.DFF)] // DFF audio file.
+    [InlineData("track.mka", AudioFileFormat.MATROSKA)] // Matroska audio file.
     public void ToAudioFileFormat_WhenExtensionIsKnown_ShouldReturnMappedFormat(string filePath, AudioFileFormat expectedFormat)
     {
         // Act

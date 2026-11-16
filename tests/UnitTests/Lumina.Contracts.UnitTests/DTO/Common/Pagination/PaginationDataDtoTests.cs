@@ -41,8 +41,8 @@ public class PaginationDataDtoTests
     }
 
     [Theory]
-    [InlineData(0)] // zero is below the minimum
-    [InlineData(-5)] // negative values are below the minimum
+    [InlineData(0)] // Zero is below the minimum.
+    [InlineData(-5)] // Negative values are below the minimum.
     public void CurrentPage_WhenSettingValueBelowOne_ShouldClampToOne(int value)
     {
         // Arrange
@@ -56,8 +56,8 @@ public class PaginationDataDtoTests
     }
 
     [Theory]
-    [InlineData(0)] // zero is below the minimum
-    [InlineData(-10)] // negative values are below the minimum
+    [InlineData(0)] // Zero is below the minimum.
+    [InlineData(-10)] // Negative values are below the minimum.
     public void PerPage_WhenSettingValueBelowOne_ShouldClampToOne(int value)
     {
         // Arrange

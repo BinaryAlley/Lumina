@@ -35,7 +35,7 @@ public sealed class CryptographyService : ICryptographyService, IDisposable
         if (string.IsNullOrEmpty(plaintext))
             throw new ArgumentException("Value cannot be null or empty", nameof(plaintext));
 
-        // generate a new, random 16-byte IV for each encryption to ensure unique ciphertexts
+        // Generate a new, random 16-byte IV for each encryption to ensure unique ciphertexts.
         byte[] iv = new byte[16];
         using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
             rng.GetBytes(iv);
@@ -50,7 +50,7 @@ public sealed class CryptographyService : ICryptographyService, IDisposable
         byte[] plaintextBytes = Encoding.UTF8.GetBytes(plaintext);
         byte[] ciphertext = encryptor.TransformFinalBlock(plaintextBytes, 0, plaintextBytes.Length);
 
-        // combine IV and ciphertext
+        // Combine IV and ciphertext.
         byte[] combined = new byte[iv.Length + ciphertext.Length];
         Buffer.BlockCopy(iv, 0, combined, 0, iv.Length);
         Buffer.BlockCopy(ciphertext, 0, combined, iv.Length, ciphertext.Length);
@@ -69,13 +69,13 @@ public sealed class CryptographyService : ICryptographyService, IDisposable
         if (string.IsNullOrEmpty(ciphertext))
             throw new ArgumentException("Value cannot be null or empty", nameof(ciphertext));
 
-        // decode the combined data (IV + ciphertext) from Base64
+        // Decode the combined data (IV + ciphertext) from Base64.
         byte[] combined = Convert.FromBase64String(ciphertext);
 
         if (combined.Length < 16)
             throw new ArgumentException("Invalid ciphertext");
 
-        // extract IV and ciphertext
+        // Extract IV and ciphertext.
         byte[] iv = new byte[16];
         byte[] encryptedData = new byte[combined.Length - 16];
         Buffer.BlockCopy(combined, 0, iv, 0, 16);

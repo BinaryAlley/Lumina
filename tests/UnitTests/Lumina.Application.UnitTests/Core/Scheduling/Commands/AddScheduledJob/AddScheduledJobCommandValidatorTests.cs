@@ -21,9 +21,9 @@ public class AddScheduledJobCommandValidatorTests
     private readonly AddScheduledJobCommandFixture _addScheduledJobCommandFixture = new();
 
     [Theory]
-    [InlineData(null)] // null name
-    [InlineData("")] // empty name
-    [InlineData("   ")] // whitespace name
+    [InlineData(null)] // Null name.
+    [InlineData("")] // Empty name.
+    [InlineData("   ")] // Whitespace name.
     public void Validate_WhenNameIsNullOrWhitespace_ShouldHaveValidationError(string? name)
     {
         // Arrange
@@ -89,8 +89,8 @@ public class AddScheduledJobCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // interval of zero
-    [InlineData(-1)] // negative interval
+    [InlineData(0)] // Interval of zero.
+    [InlineData(-1)] // Negative interval.
     public void Validate_WhenIntervalScheduleHasNonPositiveInterval_ShouldHaveValidationError(int intervalMinutes)
     {
         // Arrange
@@ -132,8 +132,8 @@ public class AddScheduledJobCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(-1)] // hour below the allowed range
-    [InlineData(24)] // hour above the allowed range
+    [InlineData(-1)] // Hour below the allowed range.
+    [InlineData(24)] // Hour above the allowed range.
     public void Validate_WhenDailyScheduleHasOutOfRangeHour_ShouldHaveValidationError(int hour)
     {
         // Arrange
@@ -150,8 +150,8 @@ public class AddScheduledJobCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(-1)] // minute below the allowed range
-    [InlineData(60)] // minute above the allowed range
+    [InlineData(-1)] // Minute below the allowed range.
+    [InlineData(60)] // Minute above the allowed range.
     public void Validate_WhenDailyScheduleHasOutOfRangeMinute_ShouldHaveValidationError(int minute)
     {
         // Arrange

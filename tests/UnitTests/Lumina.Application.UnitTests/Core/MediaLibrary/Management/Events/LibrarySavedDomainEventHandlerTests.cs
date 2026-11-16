@@ -74,7 +74,7 @@ public class LibrarySavedDomainEventHandlerTests
         IOptions<MediaSettingsDto> mediaSettingsOptions = Substitute.For<IOptions<MediaSettingsDto>>();
         mediaSettingsOptions.Value.Returns(mediaSettings);
 
-        // default stubs: the cover source file exists and is a valid image, the library directory does not exist yet, and all path combinations succeed
+        // Default stubs: the cover source file exists and is a valid image, the library directory does not exist yet, and all path combinations succeed.
         _mockPathService.PathSeparator.Returns('/');
         _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>())
             .Returns(callInfo => Result.From(string.Concat(callInfo.ArgAt<string>(0), callInfo.ArgAt<string>(1))));
@@ -166,8 +166,8 @@ public class LibrarySavedDomainEventHandlerTests
         Guid libraryId = Guid.NewGuid();
         Library library = _libraryFixture.Create(id: libraryId, coverImage: "/Media/Libraries/guid/cover.png");
         LibrarySavedDomainEvent domainEvent = _librarySavedDomainEventFixture.Create(library: library);
-        // mirror the real CombinePath behavior, which treats the combined name as a directory segment and appends a trailing
-        // separator; the internal cover path resolution must still yield the file path without that trailing separator
+        // Mirror the real CombinePath behavior, which treats the combined name as a directory segment and appends a trailing
+        // separator; the internal cover path resolution must still yield the file path without that trailing separator.
         _mockPathService.CombinePath(Arg.Any<string>(), Arg.Any<string>())
             .Returns(callInfo => Result.From(string.Concat(callInfo.ArgAt<string>(0), callInfo.ArgAt<string>(1)) + '/'));
         string internalImagePath = $"{AppContext.BaseDirectory.TrimEnd('/')}/Media/Libraries/guid/cover.png";

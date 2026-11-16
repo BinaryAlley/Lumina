@@ -58,8 +58,8 @@ public class GetReadingResourceEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Books--")] // destructive injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Books--")] // Destructive injection.
     public async Task GetReadingResource_WithSQLInjectionInResourceKey_ShouldNotLeakDatabaseDetails(string maliciousResourceKey)
     {
         // Arrange
@@ -84,8 +84,8 @@ public class GetReadingResourceEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData("../../etc/passwd")] // directory traversal
-    [InlineData("..%2F..%2Fetc%2Fpasswd")] // encoded directory traversal
+    [InlineData("../../etc/passwd")] // Directory traversal.
+    [InlineData("..%2F..%2Fetc%2Fpasswd")] // Encoded directory traversal.
     public async Task GetReadingResource_WithPathTraversalInResourceKey_ShouldNotExposeFilesystemPaths(string traversalPayload)
     {
         // Arrange

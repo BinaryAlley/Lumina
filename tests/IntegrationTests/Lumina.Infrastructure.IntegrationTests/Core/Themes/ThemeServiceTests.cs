@@ -107,7 +107,7 @@ public class ThemeServiceTests : IDisposable
     public void HasThemePack_WhenThemeIsNotInstalled_ShouldReturnFalse()
     {
         // Arrange
-        // nothing is installed
+        // Nothing is installed.
 
         // Act
         bool result = _sut.HasThemePack("test-theme");
@@ -878,9 +878,9 @@ public class ThemeServiceTests : IDisposable
     }
 
     [Theory]
-    [InlineData("../secret")] // parent scope traversal attempt
-    [InlineData("/etc/passwd")] // rooted path attempt
-    [InlineData("templates//nested")] // empty segment attempt
+    [InlineData("../secret")] // Parent scope traversal attempt.
+    [InlineData("/etc/passwd")] // Rooted path attempt.
+    [InlineData("templates//nested")] // Empty segment attempt.
     public async Task GetTemplateAsync_WhenPageKeyAttemptsToEscapeTheThemePack_ShouldReturnThemeTemplateNotFound(string pageKey)
     {
         // Arrange

@@ -69,9 +69,9 @@ public class GetTagConsumptionEndpointTests
     }
 
     [Theory]
-    [InlineData(null)] // no user selected, the current user is implied
-    [InlineData("")] // empty user selected
-    [InlineData("   ")] // whitespace user selected
+    [InlineData(null)] // No user selected, the current user is implied.
+    [InlineData("")] // Empty user selected.
+    [InlineData("   ")] // Whitespace user selected.
     public async Task ExecuteAsync_WhenUserIdIsNullOrWhitespace_ShouldRequestCurrentUserTagsWithoutQueryString(string? userId)
     {
         // Arrange

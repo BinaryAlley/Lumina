@@ -18,7 +18,7 @@ public static class ScriptIdentifierHelper
     /// <summary>
     /// Generates a unique script identifier using a GUID.
     /// </summary>
-    /// <returns>A unique identifier in format "script_{guid}"</returns>
+    /// <returns>A unique identifier in format "script_{guid}".</returns>
     /// <exception cref="InvalidOperationException">Thrown if a duplicate identifier is detected.</exception>
     public static string GenerateScriptId()
     {

@@ -46,9 +46,9 @@ public class StreamMusicTrackSegmentEndpointTests
     }
 
     [Theory]
-    [InlineData("uppercase")] // the handle format only accepts lowercase hexadecimal characters
-    [InlineData("dashed")] // the handle format is the N format of a GUID, without dashes
-    [InlineData("short")] // a handle that is shorter than the format allows
+    [InlineData("uppercase")] // The handle format only accepts lowercase hexadecimal characters.
+    [InlineData("dashed")] // The handle format is the N format of a GUID, without dashes.
+    [InlineData("short")] // A handle that is shorter than the format allows.
     public async Task ExecuteAsync_WhenDeliveryIdIsInvalid_ShouldReturnNotFoundWithoutCallingTheApi(string malformedHandleKind)
     {
         // Arrange
@@ -104,9 +104,9 @@ public class StreamMusicTrackSegmentEndpointTests
     }
 
     [Theory]
-    [InlineData("artistId", "' OR '1'='1")] // an unparseable artist Id is normalized to an empty GUID
-    [InlineData("albumId", "'; DROP TABLE Tracks; --")] // an unparseable album Id is normalized to an empty GUID
-    [InlineData("trackId", "not-a-guid")] // an unparseable track Id is normalized to an empty GUID
+    [InlineData("artistId", "' OR '1'='1")] // An unparseable artist Id is normalized to an empty GUID.
+    [InlineData("albumId", "'; DROP TABLE Tracks; --")] // An unparseable album Id is normalized to an empty GUID.
+    [InlineData("trackId", "not-a-guid")] // An unparseable track Id is normalized to an empty GUID.
     public async Task ExecuteAsync_WhenRouteIdsAreNotParseable_ShouldForwardEmptyGuidsToTheApi(string routeValue, string invalidValue)
     {
         // Arrange
@@ -137,8 +137,8 @@ public class StreamMusicTrackSegmentEndpointTests
     }
 
     [Theory]
-    [InlineData(HttpStatusCode.ServiceUnavailable)] // a busy normalization pipeline is a transient condition
-    [InlineData(HttpStatusCode.TooManyRequests)] // the stream concurrency limit was reached
+    [InlineData(HttpStatusCode.ServiceUnavailable)] // A busy normalization pipeline is a transient condition.
+    [InlineData(HttpStatusCode.TooManyRequests)] // The stream concurrency limit was reached.
     public async Task ExecuteAsync_WhenApiReportsATransientCondition_ShouldReturnABareStatusWithoutThrowing(HttpStatusCode statusCode)
     {
         // Arrange

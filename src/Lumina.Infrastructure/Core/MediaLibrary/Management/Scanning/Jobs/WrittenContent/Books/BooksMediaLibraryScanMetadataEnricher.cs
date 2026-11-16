@@ -205,7 +205,7 @@ internal sealed class BooksMediaLibraryScanMetadataEnricher : IMediaLibraryScanM
         BookMetadataLookupDto bookMetadataLookup = new(
             LibraryId: bookEntity.LibraryId,
             Path: bookEntity.Path,
-            Isbn: bookEntity.ISBNs.Count > 0 ? bookEntity.ISBNs.Where(isbn => isbn.Value is not null).Select(isbn => isbn.Value!).First() : null, // TODO: This should not take just the first ISBN, it should ask the metadata plugin to retry with the next ISBN, if the first one returned no results.
+            Isbn: bookEntity.ISBNs.Count > 0 ? bookEntity.ISBNs.Where(isbn => isbn.Value is not null).Select(isbn => isbn.Value!).First() : null, // TODO: this should not take just the first ISBN, it should ask the metadata plugin to retry with the next ISBN, if the first one returned no results.
             OpenLibraryId: bookEntity.OpenLibraryId,
             Title: bookEntity.Title,
             Author: null,

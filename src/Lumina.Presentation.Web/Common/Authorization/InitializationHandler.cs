@@ -43,11 +43,11 @@ public class InitializationHandler : AuthorizationHandler<InitializationRequirem
             HttpContext? httpContext = authorizationHandlerContext.Resource as HttpContext;
             if (result.IsInitialized)
             {
-                // admin account was registered, remove this requirement from the session
+                // Admin account was registered, remove this requirement from the session.
                 httpContext?.Session.Remove(HttpContextItemKeys.PENDING_SUPER_ADMIN_SETUP);
                 authorizationHandlerContext.Succeed(initializationRequirement);
             }
-            else // store in session that super admin setup is needed
+            else // Store in session that super admin setup is needed.
                 httpContext?.Session.SetString(HttpContextItemKeys.PENDING_SUPER_ADMIN_SETUP, "true");
         }
         catch (Exception exception)

@@ -72,9 +72,9 @@ public class GetArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDisposab
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Artists; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // command execution attempt
+    [InlineData("'; DROP TABLE Artists; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // Command execution attempt.
     public async Task GetArtist_WithSQLInjectionInLibraryId_ShouldNotCorruptOrLeakData(string maliciousLibraryId)
     {
         // Arrange
@@ -96,9 +96,9 @@ public class GetArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDisposab
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE Artists; --")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // command execution attempt
+    [InlineData("'; DROP TABLE Artists; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; EXEC xp_cmdshell('dir'); --")] // Command execution attempt.
     public async Task GetArtist_WithSQLInjectionInArtistId_ShouldNotCorruptOrLeakData(string maliciousArtistId)
     {
         // Arrange

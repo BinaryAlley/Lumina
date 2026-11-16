@@ -38,10 +38,10 @@ public class UserMappingTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Same(repositoryEntity, result); // should modify the same instance
-        Assert.Equal(domainEntity.Username, result.Username); // only username should be updated
+        Assert.Same(repositoryEntity, result); // Should modify the same instance.
+        Assert.Equal(domainEntity.Username, result.Username); // Only username should be updated.
 
-        // verify other properties remain unchanged
+        // Verify other properties remain unchanged.
         Assert.Equal(repositoryEntity.Id, result.Id);
         Assert.Equal(repositoryEntity.Password, result.Password);
         Assert.Equal(repositoryEntity.TotpSecret, result.TotpSecret);

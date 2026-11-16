@@ -44,9 +44,9 @@ public class LoginViewEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("/de-de/auth/login")] // German culture
-    [InlineData("/fr-fr/auth/login")] // French culture
-    [InlineData("/zh-cn/auth/login")] // Chinese culture
+    [InlineData("/de-de/auth/login")] // German culture.
+    [InlineData("/fr-fr/auth/login")] // French culture.
+    [InlineData("/zh-cn/auth/login")] // Chinese culture.
     public async Task LoginView_WhenCalledWithLocalizedCulture_ShouldRenderLoginPage(string culturePath)
     {
         // Arrange

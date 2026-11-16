@@ -66,8 +66,8 @@ public class ScanLibraryEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("'; DROP TABLE Libraries--")] // destructive injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Libraries--")] // Destructive injection.
     public async Task ScanLibrary_WithInjectionInId_ShouldNotLeakOrError(string maliciousId)
     {
         // Arrange

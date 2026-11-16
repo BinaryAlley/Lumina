@@ -38,11 +38,11 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     /// </summary>
     public LuminaApiFactory()
     {
-        // each factory gets its own uniquely named shared in-memory database, so that parallel test classes remain isolated from one another;
+        // Each factory gets its own uniquely named shared in-memory database, so that parallel test classes remain isolated from one another;
         // the shared cache allows each DbContext to open its own pooled connection to the same database, instead of sharing a single connection,
-        // which would otherwise serialize every request on one connection and cause nested transaction errors between requests
+        // which would otherwise serialize every request on one connection and cause nested transaction errors between requests.
         _sharedInMemoryConnectionString = string.Format(SHARED_IN_MEMORY_CONNECTION_STRING_PREFIX, Guid.NewGuid());
-        // keep a single anchor connection open, so that the shared in-memory database it refers to is not dropped
+        // Keep a single anchor connection open, so that the shared in-memory database it refers to is not dropped.
         _connection = new SqliteConnection(_sharedInMemoryConnectionString);
         _connection.Open();
     }
@@ -55,14 +55,14 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     {
         builder.ConfigureAppConfiguration((context, config) =>
         {
-            // clear all existing configuration sources
+            // Clear all existing configuration sources.
             config.Sources.Clear();
 
             config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             config.AddJsonFile($"appsettings.test.json", optional: true, reloadOnChange: true);
             config.AddJsonFile("appsettings.shared.json", optional: true, reloadOnChange: true);
             config.AddJsonFile($"appsettings.shared.test.json", optional: true, reloadOnChange: true);
-            // First add the test values directly
+            // First add the test values directly.
             config.AddInMemoryCollection(initialData: new Dictionary<string, string?>
             {
                 ["JwtSettings:SecretKey"] = "test-key-thats-at-least-32-chars-long-for-jwt",
@@ -70,22 +70,22 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
                 ["JwtSettings:Issuer"] = "test-issuer",
                 ["JwtSettings:Audience"] = "test-audience",
                 ["CorsSettings:AllowedOrigins:0"] = "http://localhost:5012",
-                ["EncryptionSettings:SecretKey"] = TEST_ENCRYPTION_KEY // base64 encoded test key
+                ["EncryptionSettings:SecretKey"] = TEST_ENCRYPTION_KEY // Base64 encoded test key.
             });
         });
         builder.ConfigureServices(services =>
         {
-            // remove existing DbContext configuration
+            // Remove existing DbContext configuration.
             ServiceDescriptor? descriptor = services.SingleOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(DbContextOptions<LuminaDbContext>));
             if (descriptor is not null)
                 services.Remove(descriptor);
-            // add SQLite DbContext configuration
+            // Add SQLite DbContext configuration.
             services.AddDbContext<LuminaDbContext>((serviceProvider, options) =>
             {
                 options.UseSqlite(_sharedInMemoryConnectionString);
                 options.AddInterceptors(serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>());
             });
-            // configure JWT authentication for testing
+            // Configure JWT authentication for testing.
             services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -99,7 +99,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("test-key-thats-at-least-32-chars-long-for-jwt"))
                 };
             });
-            // build service provider and ensure database is created
+            // Build service provider and ensure database is created.
             ServiceProvider servicePreovider = services.BuildServiceProvider();
             using (IServiceScope scope = servicePreovider.CreateScope())
             {

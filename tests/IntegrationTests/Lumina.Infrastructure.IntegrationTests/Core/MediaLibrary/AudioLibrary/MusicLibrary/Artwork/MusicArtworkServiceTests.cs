@@ -119,13 +119,13 @@ public class MusicArtworkServiceTests
     }
 
     [Theory]
-    [InlineData(ArtworkType.Cover, 0, "cover.jpg")] // the front cover uses the bare type name
-    [InlineData(ArtworkType.Back, 0, "back.jpg")] // the back cover uses the bare type name
-    [InlineData(ArtworkType.Medium, 0, "medium.jpg")] // a single medium uses the bare type name
-    [InlineData(ArtworkType.Booklet, 0, "booklet.jpg")] // the first booklet page uses the bare type name
-    [InlineData(ArtworkType.Booklet, 2, "booklet-2.jpg")] // a further booklet page is suffixed with its ordinal
-    [InlineData(ArtworkType.Liner, 1, "liner-1.jpg")] // a liner note page is suffixed with its ordinal
-    [InlineData(ArtworkType.Other, 0, "other.jpg")] // any other type falls back to the generic name
+    [InlineData(ArtworkType.Cover, 0, "cover.jpg")] // The front cover uses the bare type name.
+    [InlineData(ArtworkType.Back, 0, "back.jpg")] // The back cover uses the bare type name.
+    [InlineData(ArtworkType.Medium, 0, "medium.jpg")] // A single medium uses the bare type name.
+    [InlineData(ArtworkType.Booklet, 0, "booklet.jpg")] // The first booklet page uses the bare type name.
+    [InlineData(ArtworkType.Booklet, 2, "booklet-2.jpg")] // A further booklet page is suffixed with its ordinal.
+    [InlineData(ArtworkType.Liner, 1, "liner-1.jpg")] // A liner note page is suffixed with its ordinal.
+    [InlineData(ArtworkType.Other, 0, "other.jpg")] // Any other type falls back to the generic name.
     public async Task SaveAlbumArtworkAsync_WhenTheArtworkHasAType_ShouldNameTheFileAfterTheTypeAndOrdinal(ArtworkType artworkType, int ordinal, string expectedFileName)
     {
         // Arrange
@@ -833,9 +833,9 @@ public class MusicArtworkServiceTests
     }
 
     [Theory]
-    [InlineData(null)] // a null path is a no-op
-    [InlineData("")] // an empty path is a no-op
-    [InlineData("   ")] // a whitespace path is a no-op
+    [InlineData(null)] // A null path is a no-op.
+    [InlineData("")] // An empty path is a no-op.
+    [InlineData("   ")] // A whitespace path is a no-op.
     public void DeleteStoredArtwork_WhenThePathIsMissing_ShouldReturnDeletedWithoutTouchingTheFileSystem(string? artworkRelativePath)
     {
         // Act

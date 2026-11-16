@@ -1,7 +1,7 @@
 namespace Lumina.Domain.SharedKernel.Common.Enums.Common;
 
 /// <summary>
-/// Enumeration for the sort order
+/// Enumeration for the sort order.
 /// </summary>
 public enum SortOrder
 {

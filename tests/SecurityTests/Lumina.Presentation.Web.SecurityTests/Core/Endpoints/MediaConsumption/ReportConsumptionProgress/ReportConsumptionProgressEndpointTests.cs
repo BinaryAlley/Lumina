@@ -122,10 +122,10 @@ public class ReportConsumptionProgressEndpointTests : IClassFixture<LuminaWebFac
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("1;DROP TABLE")] // destructive injection
-    [InlineData("../../admin")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // script injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("1;DROP TABLE")] // Destructive injection.
+    [InlineData("../../admin")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Script injection.
     public async Task ReportConsumptionProgress_WithInjectionPayloadInRecordId_ShouldUseTheEmptyGuidAndNotForwardTheRawValue(string payload)
     {
         // Arrange

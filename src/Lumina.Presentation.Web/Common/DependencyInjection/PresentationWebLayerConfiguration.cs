@@ -22,10 +22,10 @@ internal static class PresentationWebLayerConfiguration
     /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
     internal static IServiceCollection BindConfiguration(this IServiceCollection serviceCollection, IConfigurationManager configuration)
     {
-        // add the configuration sources to the configuration builder
+        // Add the configuration sources to the configuration builder.
         configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
         configuration.AddJsonFile("appsettings.development.json", optional: true, reloadOnChange: true);
-        configuration.AddEnvironmentVariables(); // environment variables should override the configuration files
+        configuration.AddEnvironmentVariables(); // Environment variables should override the configuration files.
 
         serviceCollection.AddOptions<ServerConfigurationDto>()
                          .Bind(configuration.GetRequiredSection(ServerConfigurationDto.SECTION_NAME))

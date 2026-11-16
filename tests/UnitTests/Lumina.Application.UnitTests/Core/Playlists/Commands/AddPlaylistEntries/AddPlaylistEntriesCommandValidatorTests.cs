@@ -34,10 +34,10 @@ public class AddPlaylistEntriesCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // an empty identifier
-    [InlineData("   ")] // a white-space only identifier
-    [InlineData("not-a-guid")] // an identifier that cannot be parsed
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the empty Guid, which is never a valid playlist
+    [InlineData("")] // An empty identifier.
+    [InlineData("   ")] // A white-space only identifier.
+    [InlineData("not-a-guid")] // An identifier that cannot be parsed.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The empty Guid, which is never a valid playlist.
     public void Validate_WhenPlaylistIdIsNotAValidIdentifier_ShouldHaveValidationError(string playlistId)
     {
         // Arrange

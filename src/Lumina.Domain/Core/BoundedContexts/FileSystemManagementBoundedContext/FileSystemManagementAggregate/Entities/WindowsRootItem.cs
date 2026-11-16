@@ -45,7 +45,7 @@ public sealed class WindowsRootItem : FileSystemItem
         string name,
         FileSystemItemStatus status = FileSystemItemStatus.Accessible)
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         Result<FileSystemPathId> createPathResult = FileSystemPathId.Create(path);
         if (createPathResult.IsFailure)
             return createPathResult.Errors;
@@ -72,7 +72,7 @@ public sealed class WindowsRootItem : FileSystemItem
         string name,
         FileSystemItemStatus status = FileSystemItemStatus.Accessible)
     {
-        // TODO: enforce invariants        
+        // TODO: enforce invariants.
         WindowsRootItem newFile = new(
             id,
             name);

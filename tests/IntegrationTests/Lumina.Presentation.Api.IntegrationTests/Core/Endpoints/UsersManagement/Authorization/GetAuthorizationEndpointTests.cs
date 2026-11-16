@@ -174,7 +174,7 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
 
     private async Task<UserEntity> AddRolesAndPermissionsToUser(UserEntity existingUser, LuminaDbContext dbContext)
     {
-        // create and save role and permission first
+        // Create and save role and permission first.
         RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
         PermissionEntity viewUsersPermission = _permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanViewUsers);
 
@@ -182,21 +182,21 @@ public class GetAuthorizationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         await dbContext.Permissions.AddAsync(viewUsersPermission);
         await dbContext.SaveChangesAsync();
 
-        // create role permission
+        // Create role permission.
         RolePermissionEntity rolePermission = _rolePermissionEntityFixture.Create(role: adminRole, permission: viewUsersPermission);
         await dbContext.RolePermissions.AddAsync(rolePermission);
         await dbContext.SaveChangesAsync();
 
-        // remove existing user role if any
+        // Remove existing user role if any.
         if (existingUser.UserRole != null)
             dbContext.UserRoles.Remove(existingUser.UserRole);
 
-        // add new user role
+        // Add new user role.
         UserRoleEntity userRole = _userRoleEntityFixture.Create(user: existingUser, role: adminRole);
         await dbContext.UserRoles.AddAsync(userRole);
         await dbContext.SaveChangesAsync();
 
-        // refresh the user entity
+        // Refresh the user entity.
         await dbContext.Entry(existingUser).ReloadAsync();
 
         return existingUser;

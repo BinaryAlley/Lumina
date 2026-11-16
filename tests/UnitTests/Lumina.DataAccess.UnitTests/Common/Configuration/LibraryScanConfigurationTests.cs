@@ -79,7 +79,7 @@ public class LibraryScanConfigurationTests
     public void Configure_WhenApplied_ShouldConfigureDescendingIndexOnLibraryIdStatusAndCreatedOnUtc()
     {
         // Arrange
-        // the read-optimized runtime model does not store the index sort order, so the design-time model is inspected instead
+        // The read-optimized runtime model does not store the index sort order, so the design-time model is inspected instead.
         IDesignTimeModel designTimeModel = _context.GetService<IDesignTimeModel>();
         IEntityType entityType = designTimeModel.Model.FindEntityType(typeof(LibraryScanEntity))!;
 

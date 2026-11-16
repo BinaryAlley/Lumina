@@ -42,8 +42,8 @@ public class PlaylistEntryTests
     }
 
     [Theory]
-    [InlineData(PlaylistMediaItemType.MusicTrack)] // a track of a music library
-    [InlineData(PlaylistMediaItemType.VideoFile)] // a video file, kept whatever the playlist that references it accepts today
+    [InlineData(PlaylistMediaItemType.MusicTrack)] // A track of a music library.
+    [InlineData(PlaylistMediaItemType.VideoFile)] // A video file, kept whatever the playlist that references it accepts today.
     public void Create_WhenCalled_ShouldPreserveTheMediaItemType(PlaylistMediaItemType mediaItemType)
     {
         // Act

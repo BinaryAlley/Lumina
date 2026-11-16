@@ -29,10 +29,10 @@ public class TagTests
     }
 
     [Theory]
-    [InlineData("  BeStSeLLeR  ", "bestseller")] // ASCII mixed case with surrounding whitespace
-    [InlineData("ÉLECTRO", "électro")] // non-ASCII Latin uppercase
-    [InlineData("ЖАНР", "жанр")] // non-Latin uppercase
-    [InlineData("   indie   ", "indie")] // surrounding whitespace
+    [InlineData("  BeStSeLLeR  ", "bestseller")] // ASCII mixed case with surrounding whitespace.
+    [InlineData("ÉLECTRO", "électro")] // Non-ASCII Latin uppercase.
+    [InlineData("ЖАНР", "жанр")] // Non-Latin uppercase.
+    [InlineData("   indie   ", "indie")] // Surrounding whitespace.
     public void Create_WhenNameHasMixedCaseOrSurroundingWhitespace_ShouldNormalizeIt(string name, string expectedName)
     {
         // Act
@@ -70,9 +70,9 @@ public class TagTests
     }
 
     [Theory]
-    [InlineData(null)] // null name
-    [InlineData("")] // empty name
-    [InlineData("   ")] // whitespace name
+    [InlineData(null)] // Null name.
+    [InlineData("")] // Empty name.
+    [InlineData("   ")] // Whitespace name.
     public void Create_WhenNameIsNullOrWhitespace_ShouldReturnError(string? name)
     {
         // Act

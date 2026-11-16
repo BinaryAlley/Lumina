@@ -47,23 +47,23 @@ public class ThemeAudioPlayerBuilderTests
     }
 
     [Theory]
-    [InlineData("toggleExpanded", "ToggleExpanded")] // the expanded player toggle
-    [InlineData("previous", "AudioPlayerPrevious")] // the previous track control
-    [InlineData("next", "AudioPlayerNext")] // the next track control
-    [InlineData("stop", "AudioPlayerStop")] // the stop control
-    [InlineData("repeat", "AudioPlayerRepeat")] // the repeat control
-    [InlineData("repeatOff", "AudioPlayerRepeatOff")] // repeat turned off
-    [InlineData("repeatAll", "AudioPlayerRepeatAll")] // repeat of the whole queue
-    [InlineData("repeatOne", "AudioPlayerRepeatOne")] // repeat of a single track
-    [InlineData("queue", "AudioPlayerQueue")] // the play queue title
-    [InlineData("albumArtwork", "AudioPlayerAlbumArtwork")] // the album artwork placeholder
-    [InlineData("addQueueToPlaylist", "AudioPlayerAddQueueToPlaylist")] // adding the queue to a playlist
-    [InlineData("addToPlaylist", "PlaylistAddToPlaylist")] // adding a single track to a playlist
-    [InlineData("selectPlaylist", "AudioPlayerSelectPlaylist")] // the playlist selector
-    [InlineData("noPlaylists", "AudioPlayerNoPlaylists")] // no saved playlist is available
-    [InlineData("add", "AudioPlayerAdd")] // the add confirmation
-    [InlineData("playlistQueueAdded", "AudioPlayerPlaylistQueueAdded")] // the queue was added to a playlist
-    [InlineData("playlistQueueAddFailed", "AudioPlayerPlaylistQueueAddFailed")] // adding the queue to a playlist failed
+    [InlineData("toggleExpanded", "ToggleExpanded")] // The expanded player toggle.
+    [InlineData("previous", "AudioPlayerPrevious")] // The previous track control.
+    [InlineData("next", "AudioPlayerNext")] // The next track control.
+    [InlineData("stop", "AudioPlayerStop")] // The stop control.
+    [InlineData("repeat", "AudioPlayerRepeat")] // The repeat control.
+    [InlineData("repeatOff", "AudioPlayerRepeatOff")] // Repeat turned off.
+    [InlineData("repeatAll", "AudioPlayerRepeatAll")] // Repeat of the whole queue.
+    [InlineData("repeatOne", "AudioPlayerRepeatOne")] // Repeat of a single track.
+    [InlineData("queue", "AudioPlayerQueue")] // The play queue title.
+    [InlineData("albumArtwork", "AudioPlayerAlbumArtwork")] // The album artwork placeholder.
+    [InlineData("addQueueToPlaylist", "AudioPlayerAddQueueToPlaylist")] // Adding the queue to a playlist.
+    [InlineData("addToPlaylist", "PlaylistAddToPlaylist")] // Adding a single track to a playlist.
+    [InlineData("selectPlaylist", "AudioPlayerSelectPlaylist")] // The playlist selector.
+    [InlineData("noPlaylists", "AudioPlayerNoPlaylists")] // No saved playlist is available.
+    [InlineData("add", "AudioPlayerAdd")] // The add confirmation.
+    [InlineData("playlistQueueAdded", "AudioPlayerPlaylistQueueAdded")] // The queue was added to a playlist.
+    [InlineData("playlistQueueAddFailed", "AudioPlayerPlaylistQueueAddFailed")] // Adding the queue to a playlist failed.
     public void Build_WhenCalled_ShouldLocalizeThePlayerString(string modelKey, string resourceKey)
     {
         // Act

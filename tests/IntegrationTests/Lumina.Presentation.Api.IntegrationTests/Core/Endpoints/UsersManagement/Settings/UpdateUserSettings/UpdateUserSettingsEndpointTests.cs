@@ -273,8 +273,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
     }
 
     [Theory]
-    [InlineData(0)] // below the minimum
-    [InlineData(129)] // above the maximum
+    [InlineData(0)] // Below the minimum.
+    [InlineData(129)] // Above the maximum.
     public async Task UpdateUserSettings_WhenVuMeterSegmentCountIsOutOfRange_ShouldReturnValidationError(int vuMeterSegmentCount)
     {
         // Arrange
@@ -288,8 +288,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
     }
 
     [Theory]
-    [InlineData(-1)] // below the minimum
-    [InlineData(33)] // above the maximum
+    [InlineData(-1)] // Below the minimum.
+    [InlineData(33)] // Above the maximum.
     public async Task UpdateUserSettings_WhenVuMeterSegmentGapIsOutOfRange_ShouldReturnValidationError(int vuMeterSegmentGap)
     {
         // Arrange
@@ -303,8 +303,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
     }
 
     [Theory]
-    [InlineData(-0.01)] // just below the minimum
-    [InlineData(1.01)] // just above the maximum
+    [InlineData(-0.01)] // Just below the minimum.
+    [InlineData(1.01)] // Just above the maximum.
     public async Task UpdateUserSettings_WhenVuMeterMediumThresholdIsOutOfRange_ShouldReturnValidationError(double vuMeterMediumThreshold)
     {
         // Arrange
@@ -320,8 +320,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
     }
 
     [Theory]
-    [InlineData(-0.01)] // just below the minimum
-    [InlineData(1.01)] // just above the maximum
+    [InlineData(-0.01)] // Just below the minimum.
+    [InlineData(1.01)] // Just above the maximum.
     public async Task UpdateUserSettings_WhenVuMeterHighThresholdIsOutOfRange_ShouldReturnValidationError(double vuMeterHighThreshold)
     {
         // Arrange
@@ -352,8 +352,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
     }
 
     [Theory]
-    [InlineData(0.5, 0.5)] // the thresholds are equal
-    [InlineData(0.4, 0.9)] // the high threshold is greater than the medium one
+    [InlineData(0.5, 0.5)] // The thresholds are equal.
+    [InlineData(0.4, 0.9)] // The high threshold is greater than the medium one.
     public async Task UpdateUserSettings_WhenVuMeterHighThresholdIsGreaterThanOrEqualToMediumThreshold_ShouldUpdateSettings(
         double vuMeterMediumThreshold,
         double vuMeterHighThreshold)
@@ -372,8 +372,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
     }
 
     [Theory]
-    [InlineData(-1)] // below the minimum
-    [InlineData(10001)] // above the maximum
+    [InlineData(-1)] // Below the minimum.
+    [InlineData(10001)] // Above the maximum.
     public async Task UpdateUserSettings_WhenVuMeterPeakHoldDurationIsOutOfRange_ShouldReturnValidationError(int vuMeterPeakHoldDurationInMilliseconds)
     {
         // Arrange
@@ -388,8 +388,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
     }
 
     [Theory]
-    [InlineData(-0.01)] // just below the minimum
-    [InlineData(100.01)] // just above the maximum
+    [InlineData(-0.01)] // Just below the minimum.
+    [InlineData(100.01)] // Just above the maximum.
     public async Task UpdateUserSettings_WhenVuMeterReleasePerSecondIsOutOfRange_ShouldReturnValidationError(double vuMeterReleasePerSecond)
     {
         // Arrange
@@ -403,8 +403,8 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<AuthenticatedLumina
     }
 
     [Theory]
-    [InlineData(-0.01)] // just below the minimum
-    [InlineData(100.01)] // just above the maximum
+    [InlineData(-0.01)] // Just below the minimum.
+    [InlineData(100.01)] // Just above the maximum.
     public async Task UpdateUserSettings_WhenVuMeterPeakReleasePerSecondIsOutOfRange_ShouldReturnValidationError(double vuMeterPeakReleasePerSecond)
     {
         // Arrange

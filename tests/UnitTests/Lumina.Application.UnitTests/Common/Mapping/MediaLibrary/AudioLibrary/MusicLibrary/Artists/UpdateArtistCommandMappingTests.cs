@@ -68,7 +68,7 @@ public class UpdateArtistCommandMappingTests
         Album updatedAlbum = result.Value.Albums.First(album => album.Id.Value == albumId);
         Assert.Equal(albumCommand.Metadata!.Title, updatedAlbum.Metadata.Title);
         Track updatedTrack = updatedAlbum.Tracks.First(track => track.Id.Value == trackId);
-        // the file system path of an existing track is never changed by the update, it is set only when the track is created
+        // The file system path of an existing track is never changed by the update, it is set only when the track is created.
         Assert.Equal(originalPath, updatedTrack.Path);
         Assert.NotEqual(attemptedPath, updatedTrack.Path);
         Assert.Equal(7, updatedTrack.TrackNumber);

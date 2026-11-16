@@ -13,10 +13,10 @@ namespace Lumina.Presentation.Web.UnitTests.Common.Playback;
 public class PlaybackDeliveryIdTests
 {
     [Theory]
-    [InlineData("0123456789abcdef0123456789abcdef")] // a lowercase hexadecimal handle
-    [InlineData("ffffffffffffffffffffffffffffffff")] // an all lowercase hexadecimal handle
-    [InlineData("00000000000000000000000000000000")] // an all zero handle
-    [InlineData("8f14e45fceea167a5a36dedd4bea2543")] // a random lowercase hexadecimal handle
+    [InlineData("0123456789abcdef0123456789abcdef")] // A lowercase hexadecimal handle.
+    [InlineData("ffffffffffffffffffffffffffffffff")] // An all lowercase hexadecimal handle.
+    [InlineData("00000000000000000000000000000000")] // An all zero handle.
+    [InlineData("8f14e45fceea167a5a36dedd4bea2543")] // A random lowercase hexadecimal handle.
     public void IsValid_WhenValueIsThirtyTwoLowercaseHexadecimalCharacters_ShouldReturnTrue(string value)
     {
         // Act
@@ -27,15 +27,15 @@ public class PlaybackDeliveryIdTests
     }
 
     [Theory]
-    [InlineData(null)] // an absent handle is not valid
-    [InlineData("")] // an empty handle is not valid
-    [InlineData("   ")] // a whitespace only handle is not valid
-    [InlineData("0123456789abcdef0123456789abcde")] // a handle with 31 characters is too short
-    [InlineData("0123456789abcdef0123456789abcdef0")] // a handle with 33 characters is too long
-    [InlineData("0123456789ABCDEF0123456789ABCDEF")] // an uppercase handle is not accepted
-    [InlineData("01234567-89ab-cdef-0123-456789abcdef")] // a dashed GUID is not accepted
-    [InlineData("0123456789abcdef0123456789abcdeg")] // a non hexadecimal handle is not accepted
-    [InlineData("0123456789abcdef0123456789abcde ")] // a handle with a trailing space is not accepted
+    [InlineData(null)] // An absent handle is not valid.
+    [InlineData("")] // An empty handle is not valid.
+    [InlineData("   ")] // A whitespace only handle is not valid.
+    [InlineData("0123456789abcdef0123456789abcde")] // A handle with 31 characters is too short.
+    [InlineData("0123456789abcdef0123456789abcdef0")] // A handle with 33 characters is too long.
+    [InlineData("0123456789ABCDEF0123456789ABCDEF")] // An uppercase handle is not accepted.
+    [InlineData("01234567-89ab-cdef-0123-456789abcdef")] // A dashed GUID is not accepted.
+    [InlineData("0123456789abcdef0123456789abcdeg")] // A non hexadecimal handle is not accepted.
+    [InlineData("0123456789abcdef0123456789abcde ")] // A handle with a trailing space is not accepted.
     public void IsValid_WhenValueDoesNotMatchTheHandleFormat_ShouldReturnFalse(string? value)
     {
         // Act

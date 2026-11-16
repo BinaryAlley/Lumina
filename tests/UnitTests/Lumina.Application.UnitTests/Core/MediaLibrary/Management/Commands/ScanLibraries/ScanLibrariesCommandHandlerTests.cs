@@ -58,7 +58,7 @@ public class ScanLibrariesCommandHandlerTests
         _mockDomainEventsQueue = Substitute.For<IDomainEventsQueue>();
         _userId = Guid.NewGuid();
 
-        // default stubs: the current user is authenticated and is an admin
+        // Default stubs: the current user is authenticated and is an admin.
         _mockCurrentUserService.UserId.Returns(_userId);
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(true);
         _mockLibraryScanRepository.GetPastMonthScansByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())

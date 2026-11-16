@@ -33,7 +33,7 @@ public class EncryptionSettingsDtoValidatorTests
     {
         // Arrange
         EncryptionSettingsDto model = _fixture.Build<EncryptionSettingsDto>()
-            .With(x => x.SecretKey, "dGhpcyBpcyBhIHZhbGlkIGJhc2U2NCBzdHJpbmc=") // "this is a valid base64 string" in base64
+            .With(x => x.SecretKey, "dGhpcyBpcyBhIHZhbGlkIGJhc2U2NCBzdHJpbmc=") // "this is a valid base64 string" in base64.
             .Create();
 
         // Act

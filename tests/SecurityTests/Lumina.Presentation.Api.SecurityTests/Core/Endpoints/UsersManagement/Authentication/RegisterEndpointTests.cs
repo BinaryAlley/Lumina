@@ -106,11 +106,11 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("admin'--")] // comment injection
-    [InlineData("' UNION SELECT * FROM Users--")] // union injection
-    [InlineData("'; DROP TABLE Users--")] // destructive injection
-    [InlineData("' WAITFOR DELAY '0:0:10'--")] // time-based injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("admin'--")] // Comment injection.
+    [InlineData("' UNION SELECT * FROM Users--")] // Union injection.
+    [InlineData("'; DROP TABLE Users--")] // Destructive injection.
+    [InlineData("' WAITFOR DELAY '0:0:10'--")] // Time-based injection.
     public async Task Register_WithSQLInjectionAttempt_ShouldRemainSecure(string maliciousUsername)
     {
         // Arrange
@@ -135,10 +135,10 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     }
 
     [Theory]
-    [InlineData("password123")] // common password
-    [InlineData("123456789")] // numeric only
-    [InlineData("abcdefgh")] // lowercase only
-    [InlineData("short")] // too short
+    [InlineData("password123")] // Common password.
+    [InlineData("123456789")] // Numeric only.
+    [InlineData("abcdefgh")] // Lowercase only.
+    [InlineData("short")] // Too short.
     public async Task Register_WithWeakPassword_ShouldBeDenied(string weakPassword)
     {
         // Arrange
@@ -156,12 +156,12 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
 
         // Assert
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-        Assert.DoesNotContain(weakPassword, content); // shouldn't leak the actual password
+        Assert.DoesNotContain(weakPassword, content); // Shouldn't leak the actual password.
     }
 
     [Theory]
-    [InlineData("TestPass123!")] // valid password
-    [InlineData("Ab1!defghijklmnopqrstuvwxyz")] // long password
+    [InlineData("TestPass123!")] // Valid password.
+    [InlineData("Ab1!defghijklmnopqrstuvwxyz")] // Long password.
     public async Task Register_WithValidPassword_ShouldAcceptPassword(string password)
     {
         // Arrange

@@ -956,7 +956,7 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
 
                 FileInfo segmentFile = new(Path.Combine(temporaryPath, fileName));
                 decimal durationSeconds = endSeconds - startSeconds;
-                // ffmpeg can append a final segment whose time range is empty when the last frame ends exactly on a segment boundary. That segment is
+                // FFmpeg can append a final segment whose time range is empty when the last frame ends exactly on a segment boundary. That segment is
                 // discarded after the list is sorted, but a zero duration anywhere else, or a missing or empty segment that is supposed to carry audio, is a malformed production.
                 if (durationSeconds == 0)
                 {

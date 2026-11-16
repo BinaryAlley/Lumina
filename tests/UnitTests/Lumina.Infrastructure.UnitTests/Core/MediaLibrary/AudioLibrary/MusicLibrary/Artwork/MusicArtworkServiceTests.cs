@@ -315,9 +315,9 @@ public class MusicArtworkServiceTests
     }
 
     [Theory]
-    [InlineData("cover")] // a name without an extension falls back to the .img extension
-    [InlineData("")] // an empty name falls back to the .img extension
-    [InlineData(null)] // a null name falls back to the .img extension
+    [InlineData("cover")] // A name without an extension falls back to the .img extension.
+    [InlineData("")] // An empty name falls back to the .img extension.
+    [InlineData(null)] // A null name falls back to the .img extension.
     public async Task SaveAlbumArtworkAsync_WhenTheUploadedFileNameHasNoExtension_ShouldBufferTheUploadWithTheImgExtension(string? fileName)
     {
         // Arrange
@@ -427,9 +427,9 @@ public class MusicArtworkServiceTests
     }
 
     [Theory]
-    [InlineData(null)] // a null path is a no-op
-    [InlineData("")] // an empty path is a no-op
-    [InlineData("   ")] // a whitespace path is a no-op
+    [InlineData(null)] // A null path is a no-op.
+    [InlineData("")] // An empty path is a no-op.
+    [InlineData("   ")] // A whitespace path is a no-op.
     public void DeleteStoredArtwork_WhenThePathIsMissing_ShouldReturnDeletedWithoutTouchingTheFileSystem(string? artworkRelativePath)
     {
         // Act

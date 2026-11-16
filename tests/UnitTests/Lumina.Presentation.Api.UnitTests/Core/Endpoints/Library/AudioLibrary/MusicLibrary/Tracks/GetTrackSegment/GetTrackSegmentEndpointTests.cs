@@ -43,10 +43,10 @@ public class GetTrackSegmentEndpointTests
     }
 
     [Theory]
-    [InlineData("MP4", "audio/mp4")] // mp4 delivery container
-    [InlineData("OGG", "audio/ogg")] // ogg delivery container
-    [InlineData("MP3", "audio/mpeg")] // mp3 delivery container
-    [InlineData("not-a-container", "application/octet-stream")] // an unknown delivery container falls back to opaque binary
+    [InlineData("MP4", "audio/mp4")] // MP4 delivery container.
+    [InlineData("OGG", "audio/ogg")] // OGG delivery container.
+    [InlineData("MP3", "audio/mpeg")] // MP3 delivery container.
+    [InlineData("not-a-container", "application/octet-stream")] // An unknown delivery container falls back to opaque binary.
     public async Task ExecuteAsync_WhenSegmentIsProduced_ShouldReturnDisposingStreamResultWithTheSegment(string container, string expectedContentType)
     {
         // Arrange
@@ -135,9 +135,9 @@ public class GetTrackSegmentEndpointTests
     }
 
     [Theory]
-    [InlineData("NotFound", StatusCodes.Status404NotFound)] // the delivery, track or segment does not exist
-    [InlineData("Conflict", StatusCodes.Status409Conflict)] // the delivery changed since the manifest declared it
-    [InlineData("ResourceUnavailable", StatusCodes.Status503ServiceUnavailable)] // the normalization pipeline is temporarily unavailable
+    [InlineData("NotFound", StatusCodes.Status404NotFound)] // The delivery, track or segment does not exist.
+    [InlineData("Conflict", StatusCodes.Status409Conflict)] // The delivery changed since the manifest declared it.
+    [InlineData("ResourceUnavailable", StatusCodes.Status503ServiceUnavailable)] // The normalization pipeline is temporarily unavailable.
     public async Task ExecuteAsync_WhenHandlerReturnsAProblemError_ShouldReturnTheMappedStatusCode(string errorKind, int expectedStatusCode)
     {
         // Arrange

@@ -46,11 +46,11 @@ public class AddArtistCommandValidatorTests
     private readonly IsrcDtoFixture _isrcDtoFixture = new();
 
     [Theory]
-    [InlineData(null)] // missing route value
-    [InlineData("")] // empty route value
-    [InlineData("   ")] // whitespace route value, which both the not empty rule and the format rule reject
-    [InlineData("not-a-library-guid")] // non-Guid route value
-    [InlineData("00000000-0000-0000-0000-000000000000")] // empty Guid route value
+    [InlineData(null)] // Missing route value.
+    [InlineData("")] // Empty route value.
+    [InlineData("   ")] // Whitespace route value, which both the not empty rule and the format rule reject.
+    [InlineData("not-a-library-guid")] // Non-Guid route value.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // Empty Guid route value.
     public void Validate_WhenLibraryIdIsEmptyOrInvalid_ShouldHaveValidationError(string? libraryId)
     {
         // Arrange
@@ -77,8 +77,8 @@ public class AddArtistCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // empty name
-    [InlineData("   ")] // whitespace name, which the not empty rule rejects
+    [InlineData("")] // Empty name.
+    [InlineData("   ")] // Whitespace name, which the not empty rule rejects.
     public void Validate_WhenNameIsEmpty_ShouldHaveValidationError(string name)
     {
         // Arrange
@@ -290,8 +290,8 @@ public class AddArtistCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // empty title
-    [InlineData("   ")] // whitespace title, which the not empty rule rejects
+    [InlineData("")] // Empty title.
+    [InlineData("   ")] // Whitespace title, which the not empty rule rejects.
     public void Validate_WhenAlbumTitleIsEmpty_ShouldHaveValidationError(string title)
     {
         // Arrange
@@ -436,8 +436,8 @@ public class AddArtistCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // zero is not a valid total discs value
-    [InlineData(-1)] // a negative total discs value is not valid
+    [InlineData(0)] // Zero is not a valid total discs value.
+    [InlineData(-1)] // A negative total discs value is not valid.
     public void Validate_WhenAlbumTotalDiscsIsNotPositive_ShouldHaveValidationError(int totalDiscs)
     {
         // Arrange
@@ -477,8 +477,8 @@ public class AddArtistCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // zero is not a valid total tracks value
-    [InlineData(-1)] // a negative total tracks value is not valid
+    [InlineData(0)] // Zero is not a valid total tracks value.
+    [InlineData(-1)] // A negative total tracks value is not valid.
     public void Validate_WhenAlbumTotalTracksIsNotPositive_ShouldHaveValidationError(int totalTracks)
     {
         // Arrange
@@ -921,9 +921,9 @@ public class AddArtistCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("123")] // too short to be a barcode
-    [InlineData("abcdefghijkl")] // not numeric
-    [InlineData("12345678901234")] // too long to be a barcode
+    [InlineData("123")] // Too short to be a barcode.
+    [InlineData("abcdefghijkl")] // Not numeric.
+    [InlineData("12345678901234")] // Too long to be a barcode.
     public void Validate_WhenAlbumBarcodeHasInvalidFormat_ShouldHaveValidationError(string barcode)
     {
         // Arrange
@@ -937,8 +937,8 @@ public class AddArtistCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("123456789012")] // 12 digit barcode
-    [InlineData("1234567890123")] // 13 digit barcode
+    [InlineData("123456789012")] // 12 digit barcode.
+    [InlineData("1234567890123")] // 13 digit barcode.
     public void Validate_WhenAlbumBarcodeIsValid_ShouldNotHaveValidationError(string barcode)
     {
         // Arrange
@@ -1070,8 +1070,8 @@ public class AddArtistCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // zero is not a valid rating value
-    [InlineData(-1)] // a negative rating value is not valid
+    [InlineData(0)] // Zero is not a valid rating value.
+    [InlineData(-1)] // A negative rating value is not valid.
     public void Validate_WhenAlbumRatingValueIsNotPositive_ShouldHaveValidationError(decimal value)
     {
         // Arrange
@@ -1111,8 +1111,8 @@ public class AddArtistCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // zero is not a valid maximum rating value
-    [InlineData(-1)] // a negative maximum rating value is not valid
+    [InlineData(0)] // Zero is not a valid maximum rating value.
+    [InlineData(-1)] // A negative maximum rating value is not valid.
     public void Validate_WhenAlbumRatingMaxValueIsNotPositive_ShouldHaveValidationError(decimal maxValue)
     {
         // Arrange
@@ -1191,8 +1191,8 @@ public class AddArtistCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // empty path
-    [InlineData("   ")] // whitespace path, which the not empty rule rejects
+    [InlineData("")] // Empty path.
+    [InlineData("   ")] // Whitespace path, which the not empty rule rejects.
     public void Validate_WhenTrackPathIsEmpty_ShouldHaveValidationError(string path)
     {
         // Arrange
@@ -1676,8 +1676,8 @@ public class AddArtistCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // zero is not a valid track number
-    [InlineData(-1)] // a negative track number is not valid
+    [InlineData(0)] // Zero is not a valid track number.
+    [InlineData(-1)] // A negative track number is not valid.
     public void Validate_WhenTrackNumberIsNotPositive_ShouldHaveValidationError(int trackNumber)
     {
         // Arrange
@@ -1691,8 +1691,8 @@ public class AddArtistCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // zero is not a valid disc number
-    [InlineData(-1)] // a negative disc number is not valid
+    [InlineData(0)] // Zero is not a valid disc number.
+    [InlineData(-1)] // A negative disc number is not valid.
     public void Validate_WhenDiscNumberIsNotPositive_ShouldHaveValidationError(int discNumber)
     {
         // Arrange
@@ -1732,8 +1732,8 @@ public class AddArtistCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // zero is not a valid tempo
-    [InlineData(-1)] // a negative tempo is not valid
+    [InlineData(0)] // Zero is not a valid tempo.
+    [InlineData(-1)] // A negative tempo is not valid.
     public void Validate_WhenTrackBpmIsNotPositive_ShouldHaveValidationError(int bpm)
     {
         // Arrange
@@ -1838,8 +1838,8 @@ public class AddArtistCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // zero is not a valid rating value
-    [InlineData(-1)] // a negative rating value is not valid
+    [InlineData(0)] // Zero is not a valid rating value.
+    [InlineData(-1)] // A negative rating value is not valid.
     public void Validate_WhenTrackRatingValueIsNotPositive_ShouldHaveValidationError(decimal value)
     {
         // Arrange
@@ -1866,8 +1866,8 @@ public class AddArtistCommandValidatorTests
     }
 
     [Theory]
-    [InlineData(0)] // zero is not a valid maximum rating value
-    [InlineData(-1)] // a negative maximum rating value is not valid
+    [InlineData(0)] // Zero is not a valid maximum rating value.
+    [InlineData(-1)] // A negative maximum rating value is not valid.
     public void Validate_WhenTrackRatingMaxValueIsNotPositive_ShouldHaveValidationError(decimal maxValue)
     {
         // Arrange

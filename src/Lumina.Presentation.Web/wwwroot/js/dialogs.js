@@ -120,7 +120,7 @@ class DialogService {
                 </div>
             </div>
         `;
-        // add a resize observer to handle content height
+        // Add a resize observer to handle content height.
         const resizeObserver = new ResizeObserver(() => {
             const modalHeight = modalBackground.clientHeight;
             const dialogContent = dialogElement.querySelector('.dialog-content');
@@ -130,13 +130,13 @@ class DialogService {
 
         resizeObserver.observe(modalBackground);
 
-        // cleanup observer when dialog is closed
+        // Cleanup observer when dialog is closed.
         const cleanup = () => {
             resizeObserver.disconnect();
             document.removeEventListener('keydown', keyHandler);
         };
 
-        // add click handlers for buttons
+        // Add click handlers for buttons.
         const buttons = dialogElement.querySelectorAll('.dialog-button');
         buttons.forEach(button => {
             button.addEventListener('click', () => {
@@ -145,7 +145,7 @@ class DialogService {
             });
         });
 
-        // add keyboard support
+        // Add keyboard support.
         const keyHandler = (e) => {
             if (e.key === 'Escape' && dialog.buttons.includes(DialogButton.CANCEL)) {
                 cleanup();
@@ -194,5 +194,5 @@ class DialogService {
     }
 }
 
-// create a global instance of the DialogService
+// Create a global instance of the DialogService.
 const dialogService = new DialogService();

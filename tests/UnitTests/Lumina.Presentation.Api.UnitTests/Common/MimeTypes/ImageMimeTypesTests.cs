@@ -13,11 +13,11 @@ namespace Lumina.Presentation.Api.UnitTests.Common.MimeTypes;
 public class ImageMimeTypesTests
 {
     [Theory]
-    [InlineData(ImageType.BMP, "image/bmp")] // bmp image type
-    [InlineData(ImageType.JPEG, "image/jpeg")] // jpeg image type
-    [InlineData(ImageType.JPEG_CANON, "image/jpeg")] // canon jpeg image type
-    [InlineData(ImageType.SVG, "image/svg+xml")] // svg image type
-    [InlineData(ImageType.TGA, "image/x-tga")] // tga image type
+    [InlineData(ImageType.BMP, "image/bmp")] // BMP image type.
+    [InlineData(ImageType.JPEG, "image/jpeg")] // JPEG image type.
+    [InlineData(ImageType.JPEG_CANON, "image/jpeg")] // Canon JPEG image type.
+    [InlineData(ImageType.SVG, "image/svg+xml")] // SVG image type.
+    [InlineData(ImageType.TGA, "image/x-tga")] // TGA image type.
     public void GetMimeType_WhenTypeIsKnown_ShouldReturnTheMappedMimeType(ImageType type, string expectedMimeType)
     {
         // Act
@@ -28,8 +28,8 @@ public class ImageMimeTypesTests
     }
 
     [Theory]
-    [InlineData(ImageType.None)] // the none image type has no mime mapping
-    [InlineData((ImageType)999)] // an unknown image type has no mime mapping
+    [InlineData(ImageType.None)] // The none image type has no mime mapping.
+    [InlineData((ImageType)999)] // An unknown image type has no mime mapping.
     public void GetMimeType_WhenTypeIsUnknown_ShouldReturnOpaqueBinaryMimeType(ImageType type)
     {
         // Act

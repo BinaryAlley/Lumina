@@ -45,8 +45,8 @@ public class SetupApplicationEndpointTests : IClassFixture<LuminaApiFactory>
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        // the setup endpoint is anonymous, so it must never demand authentication; the admin account is created once, so
-        // the request either creates it or reports that it already exists, depending on the shared database state of the class
+        // The setup endpoint is anonymous, so it must never demand authentication; the admin account is created once, so
+        // the request either creates it or reports that it already exists, depending on the shared database state of the class.
         Assert.True(response.StatusCode == HttpStatusCode.Created || response.StatusCode == HttpStatusCode.Conflict);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
@@ -55,16 +55,16 @@ public class SetupApplicationEndpointTests : IClassFixture<LuminaApiFactory>
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // basic SQL injection
-    [InlineData("admin'--")] // comment injection
-    [InlineData("' UNION SELECT * FROM Users--")] // union injection
-    [InlineData("'; DROP TABLE Users--")] // destructive injection
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("admin'--")] // Comment injection.
+    [InlineData("' UNION SELECT * FROM Users--")] // Union injection.
+    [InlineData("'; DROP TABLE Users--")] // Destructive injection.
     public async Task SetupApplication_WithSQLInjectionAttempt_ShouldRemainSecure(string maliciousUsername)
     {
         // Arrange
-        // note: the setup validator only checks that the username is not empty, so the malicious value reaches the handler,
+        // Note: the setup validator only checks that the username is not empty, so the malicious value reaches the handler,
         // where it is used as a literal username in parameterized queries; the security guarantee is that it never
-        // executes as SQL or leaks the query internals
+        // executes as SQL or leaks the query internals.
         RegistrationRequest request = _registrationRequestFixture.Create(
             username: maliciousUsername,
             password: "TestPass123!",
@@ -79,8 +79,8 @@ public class SetupApplicationEndpointTests : IClassFixture<LuminaApiFactory>
         string content = await response.Content.ReadAsStringAsync();
 
         // Assert
-        // the malicious username is treated as literal data (the setup either creates the admin or reports that one already exists),
-        // so the request must never fail with an unhandled exception or leak the query internals
+        // The malicious username is treated as literal data (the setup either creates the admin or reports that one already exists),
+        // so the request must never fail with an unhandled exception or leak the query internals.
         Assert.True(response.StatusCode == HttpStatusCode.Created || response.StatusCode == HttpStatusCode.Conflict);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);

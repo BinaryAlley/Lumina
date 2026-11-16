@@ -34,10 +34,10 @@ public class GetPlaylistQueryValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the playlist Id is empty
-    [InlineData("   ")] // the playlist Id is whitespace only
-    [InlineData("not-a-guid")] // the playlist Id is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the playlist Id is the empty Guid
+    [InlineData("")] // The playlist Id is empty.
+    [InlineData("   ")] // The playlist Id is whitespace only.
+    [InlineData("not-a-guid")] // The playlist Id is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The playlist Id is the empty Guid.
     public void Validate_WhenPlaylistIdIsEmptyOrInvalid_ShouldHaveValidationError(string playlistId)
     {
         // Arrange

@@ -316,10 +316,10 @@ public class FavoriteRepositoryTests
     }
 
     [Theory]
-    [InlineData(FavoriteMediaKind.MusicArtist)] // the artist catalogue serves the library Id of an artist
-    [InlineData(FavoriteMediaKind.MusicAlbum)] // the album catalogue serves the library Id of an album
-    [InlineData(FavoriteMediaKind.MusicTrack)] // the track catalogue serves the library Id of a track
-    [InlineData(FavoriteMediaKind.Book)] // the book catalogue serves the library Id of a book
+    [InlineData(FavoriteMediaKind.MusicArtist)] // The artist catalogue serves the library Id of an artist.
+    [InlineData(FavoriteMediaKind.MusicAlbum)] // The album catalogue serves the library Id of an album.
+    [InlineData(FavoriteMediaKind.MusicTrack)] // The track catalogue serves the library Id of a track.
+    [InlineData(FavoriteMediaKind.Book)] // The book catalogue serves the library Id of a book.
     public async Task GetMediaItemLibraryIdAsync_WhenTheMediaItemExists_ShouldReturnTheLibraryIdOfItsCatalogue(FavoriteMediaKind mediaKind)
     {
         // Arrange
@@ -390,9 +390,9 @@ public class FavoriteRepositoryTests
     }
 
     [Theory]
-    [InlineData(FavoriteMediaKind.Video)] // planned kind, no video catalogue exists
-    [InlineData(FavoriteMediaKind.Photo)] // planned kind, no photo catalogue exists
-    [InlineData((FavoriteMediaKind)999)] // an undefined value that is neither catalogued nor planned
+    [InlineData(FavoriteMediaKind.Video)] // Planned kind, no video catalogue exists.
+    [InlineData(FavoriteMediaKind.Photo)] // Planned kind, no photo catalogue exists.
+    [InlineData((FavoriteMediaKind)999)] // An undefined value that is neither catalogued nor planned.
     public async Task GetMediaItemLibraryIdAsync_WhenTheKindHasNoCatalogue_ShouldReturnSuccessWithNullWithoutReadingTheCatalogue(FavoriteMediaKind mediaKind)
     {
         // Arrange
@@ -911,8 +911,8 @@ public class FavoriteRepositoryTests
     }
 
     [Theory]
-    [InlineData(FavoriteMediaKind.Video)] // planned kind, so no display data can be resolved yet
-    [InlineData(FavoriteMediaKind.Photo)] // planned kind, so no display data can be resolved yet
+    [InlineData(FavoriteMediaKind.Video)] // Planned kind, so no display data can be resolved yet.
+    [InlineData(FavoriteMediaKind.Photo)] // Planned kind, so no display data can be resolved yet.
     public async Task GetAllForUserAsync_WhenTheFavoriteIsOfAPlannedKind_ShouldReturnItWithoutDisplayData(FavoriteMediaKind mediaKind)
     {
         // Arrange
@@ -1121,11 +1121,11 @@ public class FavoriteRepositoryTests
     }
 
     [Theory]
-    [InlineData(FavoriteMediaKind.MusicArtist, false)] // the artist itself is soft deleted
-    [InlineData(FavoriteMediaKind.MusicAlbum, false)] // the album itself is soft deleted
-    [InlineData(FavoriteMediaKind.MusicAlbum, true)] // the album's artist is soft deleted
-    [InlineData(FavoriteMediaKind.MusicTrack, false)] // the track itself is soft deleted
-    [InlineData(FavoriteMediaKind.MusicTrack, true)] // the track's album is soft deleted
+    [InlineData(FavoriteMediaKind.MusicArtist, false)] // The artist itself is soft deleted.
+    [InlineData(FavoriteMediaKind.MusicAlbum, false)] // The album itself is soft deleted.
+    [InlineData(FavoriteMediaKind.MusicAlbum, true)] // The album's artist is soft deleted.
+    [InlineData(FavoriteMediaKind.MusicTrack, false)] // The track itself is soft deleted.
+    [InlineData(FavoriteMediaKind.MusicTrack, true)] // The track's album is soft deleted.
     public async Task GetMediaItemLibraryIdAsync_WhenTheMusicItemIsSoftDeleted_ShouldReturnSuccessWithNull(FavoriteMediaKind mediaKind, bool isAncestorDeleted)
     {
         // Arrange
@@ -1144,11 +1144,11 @@ public class FavoriteRepositoryTests
     }
 
     [Theory]
-    [InlineData(FavoriteMediaKind.MusicArtist, false)] // the artist itself is soft deleted
-    [InlineData(FavoriteMediaKind.MusicAlbum, false)] // the album itself is soft deleted
-    [InlineData(FavoriteMediaKind.MusicAlbum, true)] // the album's artist is soft deleted
-    [InlineData(FavoriteMediaKind.MusicTrack, false)] // the track itself is soft deleted
-    [InlineData(FavoriteMediaKind.MusicTrack, true)] // the track's album is soft deleted
+    [InlineData(FavoriteMediaKind.MusicArtist, false)] // The artist itself is soft deleted.
+    [InlineData(FavoriteMediaKind.MusicAlbum, false)] // The album itself is soft deleted.
+    [InlineData(FavoriteMediaKind.MusicAlbum, true)] // The album's artist is soft deleted.
+    [InlineData(FavoriteMediaKind.MusicTrack, false)] // The track itself is soft deleted.
+    [InlineData(FavoriteMediaKind.MusicTrack, true)] // The track's album is soft deleted.
     public async Task GetAllForUserAsync_WhenTheFavoritedMusicItemIsSoftDeleted_ShouldKeepTheFavoriteWithoutDisplayData(FavoriteMediaKind mediaKind, bool isAncestorDeleted)
     {
         // Arrange

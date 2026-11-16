@@ -19,7 +19,7 @@ public class QRCodeGeneratorFixture
     public static (string Username, byte[] Secret) CreateQrCodeTestData()
     {
         string username = new Faker().Person.UserName;
-        byte[] secret = new byte[20]; // Standard TOTP secret length
+        byte[] secret = new byte[20]; // Standard TOTP secret length.
         Random.Shared.NextBytes(secret);
         return (username, secret);
     }

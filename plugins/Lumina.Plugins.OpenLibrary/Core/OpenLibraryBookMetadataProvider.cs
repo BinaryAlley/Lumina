@@ -104,7 +104,7 @@ internal sealed class OpenLibraryBookMetadataProvider : IMetadataProvider<BookMe
         OpenLibrarySearchDocumentResponse? openLibrarySearchDocumentResponse = null;
         string? openLibraryId = bookMetadataLookup.OpenLibraryId;
         string? isbn = bookMetadataLookup.Isbn;
-        // if we have an Open Library Id, that's the first thing we should search by
+        // If we have an Open Library Id, that's the first thing we should search by.
         if (!string.IsNullOrWhiteSpace(openLibraryId))
         {
             string olid = NormalizeOlid(openLibraryId);
@@ -123,10 +123,10 @@ internal sealed class OpenLibraryBookMetadataProvider : IMetadataProvider<BookMe
             if (openLibraryEditionResponse is null && openLibraryWorkResponse is null)
                 return null;
         }
-        // no Open Library Id, let's try by ISBN
+        // No Open Library Id, let's try by ISBN.
         if (openLibraryEditionResponse is null && !string.IsNullOrWhiteSpace(isbn))
             openLibraryEditionResponse = await _openLibraryHttpClient.GetEditionByIsbnAsync(isbn, cancellationToken).ConfigureAwait(false);
-        // if we still have no results, let's go nuclear and search by metadata
+        // If we still have no results, let's go nuclear and search by metadata.
         if (openLibraryEditionResponse is null && openLibraryWorkResponse is null)
         {
             IReadOnlyList<OpenLibrarySearchDocumentResponse> searchResults = await _openLibraryHttpClient.SearchAsync(bookMetadataLookup, 1, cancellationToken).ConfigureAwait(false);
@@ -143,7 +143,7 @@ internal sealed class OpenLibraryBookMetadataProvider : IMetadataProvider<BookMe
             if (openLibraryEditionResponse is null && searchResults[0].EditionKeys.Count > 0)
                 openLibraryEditionResponse = await _openLibraryHttpClient.GetEditionAsync(searchResults[0].EditionKeys[0], cancellationToken).ConfigureAwait(false);
         }
-        // if by this time we still have no result, let's forget it...
+        // If by this time we still have no result, let's forget it...
         if (openLibraryEditionResponse is null && openLibraryWorkResponse is null && openLibrarySearchDocumentResponse is null)
             return null;
 
@@ -208,7 +208,7 @@ internal sealed class OpenLibraryBookMetadataProvider : IMetadataProvider<BookMe
     private static int ScoreEdition(OpenLibraryEditionResponse openLibraryEdition, string? wantedIsbn, string? wantedLanguage)
     {
         int score = 0;
-        // if we get an ISBN match, that's the most certain identification score
+        // If we get an ISBN match, that's the most certain identification score.
         if (wantedIsbn is not null && openLibraryEdition.Isbn10.Concat(openLibraryEdition.Isbn13).Any(value => string.Equals(SafeNormalizeIsbn(value), wantedIsbn, StringComparison.OrdinalIgnoreCase)))
             score += 10_000;
 

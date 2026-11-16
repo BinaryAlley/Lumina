@@ -49,16 +49,16 @@ public class PlaybackDeliveryIdTests
     }
 
     [Theory]
-    [InlineData(null)] // an absent handle cannot address a delivery
-    [InlineData("")] // an empty handle has the wrong length
-    [InlineData("   ")] // a whitespace handle has the wrong length
-    [InlineData("                                ")] // a handle made only of whitespace has the right length but is not hexadecimal
-    [InlineData("0123456789abcdef0123456789abcde")] // 31 characters, one short of a handle
-    [InlineData("0123456789abcdef0123456789abcdef0")] // 33 characters, one over a handle
-    [InlineData("0123456789ABCDEF0123456789ABCDEF")] // uppercase hexadecimal is not the canonical lowercase form
-    [InlineData("01234567-89ab-cdef-0123-456789abcdef")] // the D format of a Guid carries dashes
-    [InlineData("0123456789abcdef0123456789abcdeg")] // the last character is not a hexadecimal digit
-    [InlineData("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz")] // no character is a hexadecimal digit
+    [InlineData(null)] // An absent handle cannot address a delivery.
+    [InlineData("")] // An empty handle has the wrong length.
+    [InlineData("   ")] // A whitespace handle has the wrong length.
+    [InlineData("                                ")] // A handle made only of whitespace has the right length but is not hexadecimal.
+    [InlineData("0123456789abcdef0123456789abcde")] // 31 characters, one short of a handle.
+    [InlineData("0123456789abcdef0123456789abcdef0")] // 33 characters, one over a handle.
+    [InlineData("0123456789ABCDEF0123456789ABCDEF")] // Uppercase hexadecimal is not the canonical lowercase form.
+    [InlineData("01234567-89ab-cdef-0123-456789abcdef")] // The D format of a Guid carries dashes.
+    [InlineData("0123456789abcdef0123456789abcdeg")] // The last character is not a hexadecimal digit.
+    [InlineData("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz")] // No character is a hexadecimal digit.
     public void IsValid_WhenValueIsNotACanonicalHandle_ShouldReturnFalse(string? value)
     {
         // Act

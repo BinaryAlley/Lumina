@@ -58,7 +58,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
         _apiFactory = apiFactory;
         _testUsername = $"testuser_{Guid.NewGuid()}";
 
-        // get the encryption service with the test key from factory
+        // Get the encryption service with the test key from factory.
         using IServiceScope scope = apiFactory.Services.CreateScope();
         _cryptographyService = scope.ServiceProvider.GetRequiredService<ICryptographyService>();
     }
@@ -78,7 +78,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
         // Arrange       
         UserEntity user = await CreateUserWithTotp();
 
-        // decrypt the TOTP secret and generate a valid code
+        // Decrypt the TOTP secret and generate a valid code.
         byte[] totpSecret = Convert.FromBase64String(_cryptographyService.Decrypt(user.TotpSecret!));
         Totp totp = new(totpSecret);
         string validTotpCode = totp.ComputeTotp(DateTime.UtcNow);
@@ -101,11 +101,11 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
         Assert.NotNull(result);
         Assert.True(result!.IsPasswordReset);
 
-        // Create a new context to get fresh data
+        // Create a new context to get fresh data.
         using IServiceScope verificationScope = _apiFactory.Services.CreateScope();
         LuminaDbContext verificationContext = verificationScope.ServiceProvider.GetRequiredService<LuminaDbContext>();
 
-        // Ensure we get fresh data from the database
+        // Ensure we get fresh data from the database.
         verificationContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         UserEntity? updatedUser = await verificationContext.Users
             .AsNoTracking()
@@ -244,12 +244,12 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     public async Task RecoverPassword_WhenUserDoesNotUseTotpAndTriesToRecoverWithoutCode_ShouldReturnForbiddenResult()
     {
         // Arrange
-        // Setup user without TOTP
+        // Setup user without TOTP.
         using (IServiceScope scope = _apiFactory.Services.CreateScope())
         {
             LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
             UserEntity userWithoutTotp = _userEntityFixture.Create(username: "userwithoutotp2", password: _hashService.HashString("OldPass123!"));
-            userWithoutTotp.TotpSecret = null; // No TOTP configured
+            userWithoutTotp.TotpSecret = null; // No TOTP configured.
             dbContext.Users.Add(userWithoutTotp);
             await dbContext.SaveChangesAsync();
         }

@@ -67,10 +67,10 @@ public class LocalMusicArtworkSettingsProviderTests
     }
 
     [Theory]
-    [InlineData("false", true, false)] // a stored value disables extraction over a default that enables it
-    [InlineData("true", false, true)] // a stored value enables extraction over a default that disables it
-    [InlineData("True", false, true)] // the stored value is parsed without regard to casing
-    [InlineData("FALSE", true, false)] // the stored value is parsed without regard to casing
+    [InlineData("false", true, false)] // A stored value disables extraction over a default that enables it.
+    [InlineData("true", false, true)] // A stored value enables extraction over a default that disables it.
+    [InlineData("True", false, true)] // The stored value is parsed without regard to casing.
+    [InlineData("FALSE", true, false)] // The stored value is parsed without regard to casing.
     public async Task GetAsync_WhenTheSettingIsPersisted_ShouldOverlayItOverTheDefaults(string storedValue, bool defaultValue, bool expectedValue)
     {
         // Arrange

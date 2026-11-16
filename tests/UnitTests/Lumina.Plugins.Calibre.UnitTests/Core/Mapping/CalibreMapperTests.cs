@@ -103,7 +103,7 @@ public class CalibreMapperTests
     }
 
     [Theory]
-    [InlineData(0)] // a zero series index is not a meaningful volume number
+    [InlineData(0)] // A zero series index is not a meaningful volume number.
     public void Map_WhenSeriesIndexIsZero_ShouldReturnNullVolumeNumber(double seriesIndex)
     {
         // Arrange
@@ -350,7 +350,7 @@ public class CalibreMapperTests
         BookMetadataDto result = CalibreMapper.Map(document);
 
         // Assert
-        // a book without a publication date must still be enrichable, so the release info is present with empty fields
+        // A book without a publication date must still be enrichable, so the release info is present with empty fields.
         Assert.NotNull(result.ReleaseInfo);
         Assert.Null(result.ReleaseInfo!.OriginalReleaseDate);
         Assert.Null(result.ReleaseInfo.OriginalReleaseYear);

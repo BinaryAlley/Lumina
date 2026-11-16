@@ -73,9 +73,9 @@ public class BookMetadataDtoMappingTests
     }
 
     [Theory]
-    [InlineData(null)] // missing title
-    [InlineData("")] // empty title
-    [InlineData("   ")] // whitespace title
+    [InlineData(null)] // Missing title.
+    [InlineData("")] // Empty title.
+    [InlineData("   ")] // Whitespace title.
     public void ApplyMetadata_WhenTitleIsNullOrWhitespace_ShouldReturnTitleCannotBeEmptyError(string? title)
     {
         // Arrange

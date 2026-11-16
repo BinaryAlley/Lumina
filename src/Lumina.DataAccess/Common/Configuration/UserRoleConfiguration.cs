@@ -19,26 +19,26 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRoleEntity>
     {
         builder.ToTable("UserRoles");
 
-        // primary key
+        // Primary key.
         builder.HasKey(userRole => userRole.UserId );
 
-        builder.Ignore(userRole => userRole.Id); // Id is only needed as a generic constraint for the repository, but this entity uses a composite key as Id
+        builder.Ignore(userRole => userRole.Id); // Id is only needed as a generic constraint for the repository, but this entity uses a composite key as Id.
 
-        // foreign key: User (one-to-one relationship)
+        // Foreign key: User (one-to-one relationship).
         builder.HasOne(userRole => userRole.User)
             .WithOne(user => user.UserRole)
             .HasForeignKey<UserRoleEntity>(userRole => userRole.UserId)
             .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade); // deleting a User deletes associated UserRole
+            .OnDelete(DeleteBehavior.Cascade); // Deleting a User deletes associated UserRole.
 
-        // foreign key: Role (many-to-one relationship)
+        // Foreign key: Role (many-to-one relationship).
         builder.HasOne(userRole => userRole.Role)
             .WithMany(role => role.UserRoles)
             .HasForeignKey(userRole => userRole.RoleId)
             .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade); // deleting a Role deletes associated UserRoles
+            .OnDelete(DeleteBehavior.Cascade); // Deleting a Role deletes associated UserRoles.
 
-        // audit
+        // Audit.
         builder.Property(userRole => userRole.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(1);
@@ -55,7 +55,7 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRoleEntity>
             .HasDefaultValue(null)
             .HasColumnOrder(4);
 
-        // indexes
+        // Indexes.
         builder.HasIndex(userRole => new { userRole.UserId, userRole.RoleId })
             .IsUnique();
     }

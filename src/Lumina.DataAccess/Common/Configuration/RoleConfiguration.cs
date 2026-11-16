@@ -28,7 +28,7 @@ public class RoleConfiguration : IEntityTypeConfiguration<RoleEntity>
             .HasMaxLength(100)
             .HasColumnOrder(1);
 
-        // audit
+        // Audit.
         builder.Property(role => role.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(3);

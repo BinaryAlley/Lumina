@@ -314,7 +314,7 @@ public class Library : AggregateRoot<LibraryId>
         if (!_domainEvents.Any(domainEvent => domainEvent is LibraryDeletedDomainEvent))
             _domainEvents.Add(new LibraryDeletedDomainEvent(Guid.NewGuid(), this, DateTime.UtcNow));
 
-        // TODO: Perhaps trigger events for removing content related to the removed library (media metadata, etc.).
+        // TODO: perhaps trigger events for removing content related to the removed library (media metadata, etc.).
         return Result.Deleted;
     }
 }

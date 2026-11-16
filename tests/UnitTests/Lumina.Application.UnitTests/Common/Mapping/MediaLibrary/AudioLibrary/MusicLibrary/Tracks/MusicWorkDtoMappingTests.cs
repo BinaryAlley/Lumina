@@ -92,8 +92,8 @@ public class MusicWorkDtoMappingTests
     }
 
     [Theory]
-    [InlineData("")] // empty work title
-    [InlineData("   ")] // whitespace work title
+    [InlineData("")] // Empty work title.
+    [InlineData("   ")] // Whitespace work title.
     public void ToDomainEntity_WhenTitleIsEmptyOrWhitespace_ShouldReturnError(string title)
     {
         // Arrange

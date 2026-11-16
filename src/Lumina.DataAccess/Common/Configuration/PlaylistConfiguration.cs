@@ -21,7 +21,7 @@ public class PlaylistConfiguration : IEntityTypeConfiguration<PlaylistEntity>
         builder.ToTable("Playlists");
         builder.HasKey(playlist => playlist.Id);
         builder.Property(playlist => playlist.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
 
         // A playlist belongs to the user that created it, and it is removed with that user.

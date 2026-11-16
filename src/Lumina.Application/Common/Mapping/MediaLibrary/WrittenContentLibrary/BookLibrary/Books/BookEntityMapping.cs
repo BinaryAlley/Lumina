@@ -199,7 +199,7 @@ public static class BookEntityMapping
             repositoryEntity.ReleaseCountry,
             repositoryEntity.ReleaseVersion
         );
-        // language and original language make sense only if their subproperties have values
+        // Language and original language make sense only if their subproperties have values.
         LanguageInfoDto? languageInfoEntity = !string.IsNullOrWhiteSpace(repositoryEntity.LanguageCode) ||
                                           !string.IsNullOrWhiteSpace(repositoryEntity.LanguageName) ||
                                           !string.IsNullOrWhiteSpace(repositoryEntity.LanguageNativeName)

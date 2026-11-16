@@ -78,11 +78,11 @@ public class CoverArtArchiveSettingsProviderTests
     }
 
     [Theory]
-    [InlineData("user\r\n@example.com")] // carriage return and line feed injection
-    [InlineData("user@example.com\r\nX-Injected: value")] // header injection attempt
-    [InlineData("user(comment)@example.com")] // parentheses break the user agent comment
-    [InlineData("user\"quoted\"@example.com")] // quotes break the header value
-    [InlineData("user example@example.com")] // an inner space is not a valid token character
+    [InlineData("user\r\n@example.com")] // Carriage return and line feed injection.
+    [InlineData("user@example.com\r\nX-Injected: value")] // Header injection attempt.
+    [InlineData("user(comment)@example.com")] // Parentheses break the user agent comment.
+    [InlineData("user\"quoted\"@example.com")] // Quotes break the header value.
+    [InlineData("user example@example.com")] // An inner space is not a valid token character.
     public async Task GetAsync_WhenThePersistedContactEmailContainsUnsafeCharacters_ShouldDropIt(string storedEmail)
     {
         // Arrange
@@ -99,9 +99,9 @@ public class CoverArtArchiveSettingsProviderTests
     }
 
     [Theory]
-    [InlineData("", null)] // an empty value clears the email
-    [InlineData("   ", null)] // a white space value clears the email
-    [InlineData("  user@example.com  ", "user@example.com")] // a value with surrounding white space is trimmed
+    [InlineData("", null)] // An empty value clears the email.
+    [InlineData("   ", null)] // A white space value clears the email.
+    [InlineData("  user@example.com  ", "user@example.com")] // A value with surrounding white space is trimmed.
     public async Task GetAsync_WhenThePersistedContactEmailIsPresent_ShouldSetOrClearIt(string storedEmail, string? expectedEmail)
     {
         // Arrange
@@ -119,17 +119,17 @@ public class CoverArtArchiveSettingsProviderTests
 
     [Theory]
     [InlineData("2.5", 2.5)]
-    [InlineData("0", 0)] // an interval of zero is allowed
-    [InlineData("-3", 0)] // a negative interval is clamped to zero
-    [InlineData("not-a-number", 1)] // an unparsable value keeps the default
-    [InlineData("NaN", 1)] // a non finite value keeps the default
-    [InlineData("Infinity", 1)] // a non finite value keeps the default
-    [InlineData("-Infinity", 1)] // a non finite value keeps the default
-    [InlineData("1e400", 1)] // a value that overflows the double range keeps the default
-    [InlineData("1e308", 60)] // a huge but finite value is clamped to the maximum
-    [InlineData("1000", 60)] // a value above the maximum is clamped
-    [InlineData("60", 60)] // the maximum itself is kept
-    [InlineData("59", 59)] // a value within the range is kept
+    [InlineData("0", 0)] // An interval of zero is allowed.
+    [InlineData("-3", 0)] // A negative interval is clamped to zero.
+    [InlineData("not-a-number", 1)] // An unparsable value keeps the default.
+    [InlineData("NaN", 1)] // A non finite value keeps the default.
+    [InlineData("Infinity", 1)] // A non finite value keeps the default.
+    [InlineData("-Infinity", 1)] // A non finite value keeps the default.
+    [InlineData("1e400", 1)] // A value that overflows the double range keeps the default.
+    [InlineData("1e308", 60)] // A huge but finite value is clamped to the maximum.
+    [InlineData("1000", 60)] // A value above the maximum is clamped.
+    [InlineData("60", 60)] // The maximum itself is kept.
+    [InlineData("59", 59)] // A value within the range is kept.
     public async Task GetAsync_WhenThePersistedMinimumRequestIntervalIsPresent_ShouldParseAndClampIt(string storedInterval, double expectedSeconds)
     {
         // Arrange

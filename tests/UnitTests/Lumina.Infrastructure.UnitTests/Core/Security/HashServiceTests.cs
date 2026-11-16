@@ -57,7 +57,7 @@ public class HashServiceTests
         // Assert
         Assert.NotNull(hash);
         Assert.NotEmpty(hash);
-        // verify it's a valid Base64 string
+        // Verify it's a valid Base64 string.
         Assert.NotNull(Convert.FromBase64String(hash));
     }
 
@@ -92,8 +92,8 @@ public class HashServiceTests
 
     [Theory]
     [InlineData("")]
-    [InlineData("dGVzdA==")] // valid base64 but wrong length
-    [InlineData("YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo=")] // valid base64 but wrong length
+    [InlineData("dGVzdA==")] // Valid base64 but wrong length.
+    [InlineData("YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo=")] // Valid base64 but wrong length.
     public void CheckStringAgainstHash_WhenHashIsInvalidLength_ShouldReturnFalse(string invalidHash)
     {
         // Arrange

@@ -25,8 +25,8 @@ public class BookReaderEnablementCacheTests
     }
 
     [Theory]
-    [InlineData(true)] // reader enabled
-    [InlineData(false)] // reader disabled
+    [InlineData(true)] // Reader enabled.
+    [InlineData(false)] // Reader disabled.
     public void Set_WhenCalled_ThenGetShouldReturnTheCachedValue(bool isEnabled)
     {
         // Arrange

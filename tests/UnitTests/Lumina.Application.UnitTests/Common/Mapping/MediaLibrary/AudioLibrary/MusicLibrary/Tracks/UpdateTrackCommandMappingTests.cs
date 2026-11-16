@@ -93,7 +93,7 @@ public class UpdateTrackCommandMappingTests
         // Assert
         Assert.False(result.IsFailure);
         Track updatedTrack = result.Value.Albums.First(album => album.Id.Value == albumId).Tracks.First(track => track.Id.Value == trackId);
-        // the file system path is never changed by the update, it is set only when the track is created
+        // The file system path is never changed by the update, it is set only when the track is created.
         Assert.Equal(originalPath, updatedTrack.Path);
         Assert.Equal(command.TrackNumber, updatedTrack.TrackNumber);
         Assert.False(updatedTrack.DiscNumber.HasValue);

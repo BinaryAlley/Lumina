@@ -195,8 +195,8 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     }
 
     [Theory]
-    [InlineData("0")] // MediaKind.None, a defined enumeration member
-    [InlineData("1")] // MediaKind.MusicTrack, a defined enumeration member
+    [InlineData("0")] // MediaKind.None, a defined enumeration member.
+    [InlineData("1")] // MediaKind.MusicTrack, a defined enumeration member.
     public async Task GetResumePoint_WhenMediaKindIsNumeric_ShouldReturnUnsupportedMediaKindAndServeNoData(string numericMediaKind)
     {
         // Arrange
@@ -220,11 +220,11 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaResumePoints--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaResumePoints")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaResumePoints--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaResumePoints")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task GetResumePoint_WithSqlInjectionInMediaKind_ShouldRejectWithoutLeaking(string maliciousMediaKind)
     {
         // Arrange
@@ -239,11 +239,11 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     }
 
     [Theory]
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("'; DROP TABLE MediaResumePoints--")] // destructive injection
-    [InlineData("1; DELETE FROM MediaResumePoints")] // stacked statement injection
-    [InlineData("../../../etc/passwd")] // path traversal
-    [InlineData("<script>alert(1)</script>")] // markup injection
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("'; DROP TABLE MediaResumePoints--")] // Destructive injection.
+    [InlineData("1; DELETE FROM MediaResumePoints")] // Stacked statement injection.
+    [InlineData("../../../etc/passwd")] // Path traversal.
+    [InlineData("<script>alert(1)</script>")] // Markup injection.
     public async Task GetResumePoint_WithSqlInjectionInMediaItemId_ShouldRejectWithoutLeaking(string maliciousMediaItemId)
     {
         // Arrange

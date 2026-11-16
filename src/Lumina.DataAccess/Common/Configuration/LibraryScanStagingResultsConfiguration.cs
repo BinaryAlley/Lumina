@@ -18,10 +18,10 @@ public class LibraryScanStagingResultsConfiguration : IEntityTypeConfiguration<L
     public void Configure(EntityTypeBuilder<LibraryScanStagingResultsEntity> builder)
     {
         builder.ToTable("LibraryScanStagingResults");
-        // composite key, so that each media library scan staging result is uniquely identified within its scan by its path
+        // Composite key, so that each media library scan staging result is uniquely identified within its scan by its path.
         builder.HasKey(libraryScanStagingResult => new { libraryScanStagingResult.LibraryScanId, libraryScanStagingResult.Path });
 
-        // one media library scan with many media library scan staging results
+        // One media library scan with many media library scan staging results.
         builder.HasOne<LibraryScanEntity>()
             .WithMany()
             .HasForeignKey(libraryScanStagingResult => libraryScanStagingResult.LibraryScanId)
@@ -61,7 +61,7 @@ public class LibraryScanStagingResultsConfiguration : IEntityTypeConfiguration<L
             .IsRequired()
             .HasColumnOrder(7);
 
-        // enables fast lookups of the staging results of a scan that need their content hashed
+        // Enables fast lookups of the staging results of a scan that need their content hashed.
         builder.HasIndex(libraryScanStagingResult => new { libraryScanStagingResult.LibraryScanId, libraryScanStagingResult.NeedsRehash });
     }
 }

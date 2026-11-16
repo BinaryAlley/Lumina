@@ -73,8 +73,8 @@ public class UpdatePlaybackStateEndpointTests : IClassFixture<LuminaApiFactory>,
     }
 
     [Theory]
-    [InlineData(double.MaxValue)] // far above the maximum
-    [InlineData(double.MinValue)] // far below the minimum
+    [InlineData(double.MaxValue)] // Far above the maximum.
+    [InlineData(double.MinValue)] // Far below the minimum.
     public async Task UpdatePlaybackState_WhenVolumeIsAtADoubleExtreme_ShouldReturnValidationErrorWithoutLeakingInternals(double volume)
     {
         // Arrange
@@ -139,9 +139,9 @@ public class UpdatePlaybackStateEndpointTests : IClassFixture<LuminaApiFactory>,
     }
 
     [Theory(Skip = "Production bug: a JSON payload whose volume is a string makes the FastEndpoints binder throw a System.Text.Json.JsonException, which escapes because UpdatePlaybackStateEndpoint calls DontCatchExceptions(), so the API responds with 500 instead of 400 or 422. The body is the generic ProblemDetails and leaks no internals. The test stays skipped until the endpoint maps binding failures to a client error.")]
-    [InlineData("'; DROP TABLE UserSettings; --")] // SQL injection
-    [InlineData("$(rm -rf /)")] // command injection
-    [InlineData("../../etc/passwd")] // path traversal
+    [InlineData("'; DROP TABLE UserSettings; --")] // SQL injection.
+    [InlineData("$(rm -rf /)")] // Command injection.
+    [InlineData("../../etc/passwd")] // Path traversal.
     public async Task UpdatePlaybackState_WhenAStringIsSentInTheVolumeField_ShouldReturnAClientErrorWithoutLeakingInternalDetails(string maliciousValue)
     {
         // Arrange

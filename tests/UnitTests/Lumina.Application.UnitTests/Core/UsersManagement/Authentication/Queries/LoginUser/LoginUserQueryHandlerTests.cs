@@ -193,7 +193,7 @@ public class LoginUserQueryHandlerTests
         UserEntity user = _userEntityFixture.Create();
         user.Password = Uri.EscapeDataString(hashedPassword);
         user.TempPassword = Uri.EscapeDataString(hashedTempPassword);
-        user.TempPasswordCreated = DateTime.UtcNow.AddMinutes(-16); // Expired (more than 15 minutes old)
+        user.TempPasswordCreated = DateTime.UtcNow.AddMinutes(-16); // Expired (more than 15 minutes old).
 
         LoginUserQuery query = _loginUserQueryFixture.Create(user.Username, password);
 
@@ -229,18 +229,18 @@ public class LoginUserQueryHandlerTests
         UserEntity user = _userEntityFixture.Create();
         user.Password = Uri.EscapeDataString(hashedPassword);
         user.TempPassword = Uri.EscapeDataString(hashedTempPassword);
-        // Set temp password created time to 10 minutes ago (still valid)
+        // Set temp password created time to 10 minutes ago (still valid).
         user.TempPasswordCreated = DateTime.UtcNow.AddMinutes(-10);
-        user.TotpSecret = null; // Ensure no TOTP validation is needed
+        user.TotpSecret = null; // Ensure no TOTP validation is needed.
 
         LoginUserQuery query = _loginUserQueryFixture.Create(user.Username, password);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
         _mockHashService.CheckStringAgainstHash(password, hashedPassword)
-            .Returns(false); // Regular password check fails
+            .Returns(false); // Regular password check fails.
         _mockHashService.CheckStringAgainstHash(password, hashedTempPassword)
-            .Returns(true); // Temp password check succeeds
+            .Returns(true); // Temp password check succeeds.
         _mockJwtTokenGenerator.GenerateToken(user.Id.ToString(), user.Username)
             .Returns(jwtToken);
 
@@ -344,16 +344,16 @@ public class LoginUserQueryHandlerTests
         UserEntity user = _userEntityFixture.Create();
         user.Password = Uri.EscapeDataString(hashedPassword);
         user.TempPassword = Uri.EscapeDataString(hashedTempPassword);
-        user.TempPasswordCreated = DateTime.UtcNow.AddMinutes(-10); // Valid timeframe
+        user.TempPasswordCreated = DateTime.UtcNow.AddMinutes(-10); // Valid timeframe.
 
         LoginUserQuery query = _loginUserQueryFixture.Create(user.Username, password);
 
         _mockUserRepository.GetByUsernameAsync(user.Username, Arg.Any<CancellationToken>())
             .Returns(Result.From<UserEntity?>(user));
         _mockHashService.CheckStringAgainstHash(password, hashedPassword)
-            .Returns(false); // Regular password check fails
+            .Returns(false); // Regular password check fails.
         _mockHashService.CheckStringAgainstHash(password, hashedTempPassword)
-            .Returns(false); // Temp password check also fails
+            .Returns(false); // Temp password check also fails.
 
         // Act
         Result<LoginResponse> result = await _sut.HandleAsync(query, CancellationToken.None);

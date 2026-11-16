@@ -140,10 +140,10 @@ public class GetRecentlyConsumedRequestMappingTests
     }
 
     [Theory]
-    [InlineData(0, 0, 1, 1)] // both at the lower boundary
-    [InlineData(0, -5, 1, 1)] // zero current page with a negative page size
-    [InlineData(-3, 10, 1, 10)] // negative current page with a valid page size
-    [InlineData(-2, -7, 1, 1)] // both negative
+    [InlineData(0, 0, 1, 1)] // Both at the lower boundary.
+    [InlineData(0, -5, 1, 1)] // Zero current page with a negative page size.
+    [InlineData(-3, 10, 1, 10)] // Negative current page with a valid page size.
+    [InlineData(-2, -7, 1, 1)] // Both negative.
     public void ToQuery_WhenCurrentPageOrPerPageIsNotPositive_ShouldClampOnlyTheInvalidValue(
         int currentPage,
         int perPage,

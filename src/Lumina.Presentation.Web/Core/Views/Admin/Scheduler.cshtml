@@ -441,8 +441,8 @@ It keeps the DOM contract the client script binds to, without any images or colo
         //+----------------------------------------------------------------------------------------+
 
         function resizeGraph() {
-            // The graph fills the width of its container next to the legend, and its height follows the legend, with a sensible floor; the height must not be derived 
-            from the canvas element box, because the flex layout stretches the canvas and its replaced-element aspect ratio would blow the box up.
+            // The graph fills the width of its container next to the legend, and its height follows the legend, with a sensible floor; the height must not be derived
+            // from the canvas element box, because the flex layout stretches the canvas and its replaced-element aspect ratio would blow the box up.
             const container = graphCanvas.parentElement;
             if (!container || container.clientWidth <= 0)
                 return;

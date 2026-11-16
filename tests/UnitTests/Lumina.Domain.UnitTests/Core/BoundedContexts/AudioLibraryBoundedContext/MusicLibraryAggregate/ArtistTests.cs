@@ -190,9 +190,9 @@ public class ArtistTests
     }
 
     [Theory]
-    [InlineData(null)] // null name
-    [InlineData("")] // empty name
-    [InlineData("   ")] // whitespace name
+    [InlineData(null)] // Null name.
+    [InlineData("")] // Empty name.
+    [InlineData("   ")] // Whitespace name.
     public void Create_WhenNameIsNullOrWhitespace_ShouldReturnArtistNameCannotBeEmptyError(string? name)
     {
         // Act
@@ -311,9 +311,9 @@ public class ArtistTests
     }
 
     [Theory]
-    [InlineData(null)] // null name
-    [InlineData("")] // empty name
-    [InlineData("   ")] // whitespace name
+    [InlineData(null)] // Null name.
+    [InlineData("")] // Empty name.
+    [InlineData("   ")] // Whitespace name.
     public void CreateWithId_WhenNameIsNullOrWhitespace_ShouldReturnArtistNameCannotBeEmptyError(string? name)
     {
         // Act

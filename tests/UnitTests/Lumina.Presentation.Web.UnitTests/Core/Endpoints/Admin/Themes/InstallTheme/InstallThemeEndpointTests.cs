@@ -90,14 +90,14 @@ public class InstallThemeEndpointTests
 
     private void ConfigureFormWithArchive(byte[] content, string fileName)
     {
-        // the stream stays open for the duration of the test, since the endpoint reads it through the form file during execution
+        // The stream stays open for the duration of the test, since the endpoint reads it through the form file during execution.
         MemoryStream archiveStream = new(content);
         IFormFile formFile = new FormFile(archiveStream, 0, content.Length, "archive", fileName);
         FormFileCollection files = [formFile];
         IFormCollection form = new FormCollection([], files);
         _sut.HttpContext.Request.ContentType = "multipart/form-data; boundary=----test";
-        // a real FormFeature is used instead of a substitute, because the endpoint execution reads the form through the
-        // request machinery, which would bypass a mocked feature and parse the (empty) request body
+        // A real FormFeature is used instead of a substitute, because the endpoint execution reads the form through the
+        // request machinery, which would bypass a mocked feature and parse the (empty) request body.
         _sut.HttpContext.Features.Set<IFormFeature>(new FormFeature(form));
     }
 }

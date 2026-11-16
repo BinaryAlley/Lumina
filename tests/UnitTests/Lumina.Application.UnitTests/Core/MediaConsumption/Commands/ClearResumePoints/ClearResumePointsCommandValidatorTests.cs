@@ -33,10 +33,10 @@ public class ClearResumePointsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the target user Id is empty
-    [InlineData("   ")] // the target user Id is whitespace only
-    [InlineData("not-a-guid")] // the target user Id is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the target user Id is the empty Guid
+    [InlineData("")] // The target user Id is empty.
+    [InlineData("   ")] // The target user Id is whitespace only.
+    [InlineData("not-a-guid")] // The target user Id is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The target user Id is the empty Guid.
     public void Validate_WhenTargetUserIdIsEmptyOrInvalid_ShouldHaveValidationError(string targetUserId)
     {
         // Arrange
@@ -76,10 +76,10 @@ public class ClearResumePointsCommandValidatorTests
     }
 
     [Theory]
-    [InlineData("")] // the library Id is empty
-    [InlineData("   ")] // the library Id is whitespace only
-    [InlineData("not-a-guid")] // the library Id is not a Guid
-    [InlineData("00000000-0000-0000-0000-000000000000")] // the library Id is the empty Guid
+    [InlineData("")] // The library Id is empty.
+    [InlineData("   ")] // The library Id is whitespace only.
+    [InlineData("not-a-guid")] // The library Id is not a Guid.
+    [InlineData("00000000-0000-0000-0000-000000000000")] // The library Id is the empty Guid.
     public void Validate_WhenLibraryIdIsEmptyOrInvalid_ShouldHaveValidationError(string libraryId)
     {
         // Arrange

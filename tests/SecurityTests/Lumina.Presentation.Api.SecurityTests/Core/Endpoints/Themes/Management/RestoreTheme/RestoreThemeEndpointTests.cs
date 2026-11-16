@@ -118,10 +118,10 @@ public class RestoreThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
     }
 
     [Theory]
-    [InlineData("..%2F..%2Fevil")] // encoded slash traversal
-    [InlineData("%2e%2e%2f%2e%2e%2fevil")] // encoded dot-slash traversal
-    [InlineData("..%5Cevil")] // encoded backslash traversal
-    [InlineData("..%2F")] // encoded trailing slash traversal
+    [InlineData("..%2F..%2Fevil")] // Encoded slash traversal.
+    [InlineData("%2e%2e%2f%2e%2e%2fevil")] // Encoded dot-slash traversal.
+    [InlineData("..%5Cevil")] // Encoded backslash traversal.
+    [InlineData("..%2F")] // Encoded trailing slash traversal.
     public async Task RestoreTheme_WithPathTraversalInThemeId_ShouldReturnCleanNotFoundProblemDetails(string maliciousThemeId)
     {
         // Arrange
@@ -140,8 +140,8 @@ public class RestoreThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
 
-        // note: some payloads are normalized away by the server before routing, producing an empty-body 404;
-        // when the value reaches the handler, the failure must still be the generic theme-not-found problem
+        // Note: some payloads are normalized away by the server before routing, producing an empty-body 404;
+        // when the value reaches the handler, the failure must still be the generic theme-not-found problem.
         if (!string.IsNullOrWhiteSpace(content))
         {
             Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);

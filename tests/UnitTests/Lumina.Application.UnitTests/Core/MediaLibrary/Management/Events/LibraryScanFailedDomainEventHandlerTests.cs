@@ -59,7 +59,7 @@ public class LibraryScanFailedDomainEventHandlerTests
         _mockMediaLibrariesScanCancellationTracker = Substitute.For<IMediaLibrariesScanCancellationTracker>();
         _mockDebouncedLibraryScanProgressNotifier = Substitute.For<IMediaLibraryScanProgressNotifier>();
 
-        // default stubs: the library scan update, the snapshot rollback and the staging results clearing succeed
+        // Default stubs: the library scan update, the snapshot rollback and the staging results clearing succeed.
         _mockLibraryScanRepository.UpdateAsync(Arg.Any<LibraryScanEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Updated);
         _mockLibraryScanSnapshotRepository.RollbackSnapshotForScanAsync(Arg.Any<Guid>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>())

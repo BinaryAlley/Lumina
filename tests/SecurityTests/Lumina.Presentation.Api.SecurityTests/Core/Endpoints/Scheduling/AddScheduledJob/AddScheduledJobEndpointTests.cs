@@ -96,9 +96,9 @@ public class AddScheduledJobEndpointTests : IClassFixture<LuminaApiFactory>, IAs
     }
 
     [Theory]
-    [InlineData("'; DROP TABLE ScheduledJobs--")] // destructive injection
-    [InlineData("' OR '1'='1")] // boolean-based injection
-    [InlineData("<script>alert('xss')</script>")] // script injection
+    [InlineData("'; DROP TABLE ScheduledJobs--")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    [InlineData("<script>alert('xss')</script>")] // Script injection.
     public async Task AddScheduledJob_WithMaliciousName_ShouldNotLeakDataOrExecuteInjection(string maliciousName)
     {
         // Arrange
