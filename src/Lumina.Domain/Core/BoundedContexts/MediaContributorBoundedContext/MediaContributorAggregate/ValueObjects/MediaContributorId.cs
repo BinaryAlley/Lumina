@@ -26,7 +26,7 @@ public sealed class MediaContributorId : EntityId<Guid>
     public static MediaContributorId CreateUnique()
     {
         // TODO: enforce invariants.
-        return new MediaContributorId(Guid.NewGuid());
+        return new MediaContributorId(Guid.CreateVersion7());
     }
 
     /// <summary>

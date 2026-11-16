@@ -27,7 +27,7 @@ public sealed class AlbumId : EntityId<Guid>
     /// <returns>The created <see cref="AlbumId"/> instance.</returns>
     public static AlbumId CreateUnique()
     {
-        return new AlbumId(Guid.NewGuid());
+        return new AlbumId(Guid.CreateVersion7());
     }
 
     /// <summary>

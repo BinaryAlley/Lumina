@@ -105,6 +105,8 @@ internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotReposi
 
         // The Id of the inserted rows is generated in SQL as a random 16 byte value formatted as upper case hex (hex(randomblob(16))), which the storage layer parses as a Guid;
         // generating the Ids in code would defeat the purpose of these single statement bulk inserts.
+        // These Ids are random version 4 values rather than the version 7 values used elsewhere, because SQLite cannot produce a version 7 GUID
+        // inside this statement. See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0020.md for details.
 
         // Add an audit entry for every media library scan snapshot item that is no longer present in the current scan, meaning it was deleted from the storage medium.
         const string AUDIT_DELETED_SQL = """

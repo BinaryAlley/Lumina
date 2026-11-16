@@ -95,7 +95,7 @@ internal static class ThemeSynchronizer
 
                 ThemeEntity themeEntity = new()
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.CreateVersion7(),
                     ThemeId = manifestResult.Value.Id,
                     Name = manifestResult.Value.Name,
                     Description = manifestResult.Value.Description,

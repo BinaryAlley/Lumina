@@ -147,7 +147,7 @@ internal sealed class MediaLibraryScanProviderConfigurationInvalidationJob : Med
                 library.ArtworkProvidersConfigurationFingerprint = artworkFingerprint;
                 library.PathTemplateFingerprint = pathTemplateFingerprint;
                 library.UpdatedOnUtc = DateTime.UtcNow;
-                library.UpdatedBy = Guid.NewGuid();
+                library.UpdatedBy = Guid.CreateVersion7();
 
                 Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                 if (saveChangesResult.IsFailure)
@@ -159,11 +159,11 @@ internal sealed class MediaLibraryScanProviderConfigurationInvalidationJob : Med
                     throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
                 // Increment the number of completed jobs progress.
-                await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.CreateVersion7(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                 Status = LibraryScanJobStatus.Completed;
                 // When this job has no linked children, it is the last job in the directed acyclic job graph, and the scan is completed.
                 if (Children.Count == 0)
-                    await domainEventPublisher.PublishAsync(new LibraryScanFinishedDomainEvent(Guid.NewGuid(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                    await domainEventPublisher.PublishAsync(new LibraryScanFinishedDomainEvent(Guid.CreateVersion7(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
                 // Call each linked child with the obtained payload.
                 foreach (IMediaLibraryScanJob child in Children)
@@ -198,7 +198,7 @@ internal sealed class MediaLibraryScanProviderConfigurationInvalidationJob : Med
             return scanJobProgressResult.Errors;
 
         await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(
-            Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+            Guid.CreateVersion7(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
         return Result.Success;
     }

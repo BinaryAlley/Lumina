@@ -48,7 +48,7 @@ public static class ArtistMapping
             Ratings = [.. domainEntity.Ratings.ToRepositoryEntities()],
             Contributors = [.. domainEntity.Contributors.Select(contributor => new ArtistContributorEntity
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 ArtistId = domainEntity.Id.Value,
                 MediaContributorId = contributor.ContributorId.Value,
                 Role = contributor.Role,

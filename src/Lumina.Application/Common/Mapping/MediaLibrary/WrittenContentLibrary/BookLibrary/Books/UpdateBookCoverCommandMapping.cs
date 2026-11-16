@@ -29,7 +29,7 @@ public static class UpdateBookCoverCommandMapping
         {
             return new BookArtworkEntity
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 BookId = bookId,
                 ArtworkType = ArtworkType.Cover,
                 Ordinal = 0,

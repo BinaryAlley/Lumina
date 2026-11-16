@@ -27,7 +27,7 @@ public sealed class TrackId : EntityId<Guid>
     /// <returns>The created <see cref="TrackId"/> instance.</returns>
     public static TrackId CreateUnique()
     {
-        return new TrackId(Guid.NewGuid());
+        return new TrackId(Guid.CreateVersion7());
     }
 
     /// <summary>

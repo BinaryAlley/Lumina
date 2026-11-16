@@ -170,7 +170,7 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
                 }
 
                 // This job finished, increment the number of processed jobs progress.
-                await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.CreateVersion7(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                 Status = LibraryScanJobStatus.Completed;
 
                 // Call each linked child with the obtained payload.
@@ -237,7 +237,7 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
 
                 fingerprintBatch.Add(new DirectoryScanFingerprintEntity()
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.CreateVersion7(),
                     LibraryId = LibraryId.Value,
                     Path = currentDirectory.FullName,
                     LastWriteTimeUtc = currentLastWriteTimeUtc
@@ -389,7 +389,7 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
     {
         return new LibraryScanStagingResultsEntity()
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.CreateVersion7(),
             LibraryScanId = ScanId.Value,
             Path = file.FullName,
             Size = file.Length,
@@ -417,7 +417,7 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
             return scanJobProgressResult.Errors;
 
         await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(
-            Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+            Guid.CreateVersion7(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
         return Result.Success;
     }

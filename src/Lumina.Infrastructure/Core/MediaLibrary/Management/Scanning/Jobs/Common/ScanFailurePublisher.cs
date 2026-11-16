@@ -32,7 +32,7 @@ internal static class ScanFailurePublisher
         {
             await using AsyncServiceScope asyncServiceScope = serviceScopeFactory.CreateAsyncScope();
             IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
-            await domainEventPublisher.PublishAsync(new LibraryScanFailedDomainEvent(Guid.NewGuid(), libraryId, compositeKey, DateTime.UtcNow, Optional<string>.FromNullable(exception.Message)), cancellationToken).ConfigureAwait(false);
+            await domainEventPublisher.PublishAsync(new LibraryScanFailedDomainEvent(Guid.CreateVersion7(), libraryId, compositeKey, DateTime.UtcNow, Optional<string>.FromNullable(exception.Message)), cancellationToken).ConfigureAwait(false);
         }
         catch
         {

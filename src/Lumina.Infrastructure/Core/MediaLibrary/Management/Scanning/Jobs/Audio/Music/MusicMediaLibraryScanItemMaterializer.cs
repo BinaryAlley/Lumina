@@ -257,7 +257,7 @@ internal sealed class MusicMediaLibraryScanItemMaterializer : IMediaLibraryScanI
     {
         return new ArtistEntity
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.CreateVersion7(),
             LibraryId = libraryId,
             Name = name,
             MusicBrainzArtistId = musicBrainzArtistId,
@@ -284,7 +284,7 @@ internal sealed class MusicMediaLibraryScanItemMaterializer : IMediaLibraryScanI
         MusicLibraryScanItemMetadataEntity firstStagedItem = stagedItems[0];
         return new AlbumEntity
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.CreateVersion7(),
             ArtistId = artistId,
             LibraryId = libraryId,
             Title = title,
@@ -311,7 +311,7 @@ internal sealed class MusicMediaLibraryScanItemMaterializer : IMediaLibraryScanI
     {
         return new TrackEntity
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.CreateVersion7(),
             AlbumId = albumId,
             LibraryId = libraryId,
             Path = stagedItem.Path,

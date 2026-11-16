@@ -89,7 +89,7 @@ public sealed class Favorite : AggregateRoot<FavoriteId>
             Optional<DateTime>.None());
 
         favorite._domainEvents.Add(new FavoriteAddedDomainEvent(
-            Guid.NewGuid(),
+            Guid.CreateVersion7(),
             favorite.Id,
             userId,
             mediaItemId,
@@ -135,7 +135,7 @@ public sealed class Favorite : AggregateRoot<FavoriteId>
         _domainEvents.Clear();
         IsRemoved = true;
         _domainEvents.Add(new FavoriteRemovedDomainEvent(
-            Guid.NewGuid(),
+            Guid.CreateVersion7(),
             Id,
             UserId,
             MediaItemId,

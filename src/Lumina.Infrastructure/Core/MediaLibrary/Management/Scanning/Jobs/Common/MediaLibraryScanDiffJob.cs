@@ -76,7 +76,7 @@ internal sealed class MediaLibraryScanDiffJob : MediaLibraryScanJob, IMediaLibra
                     throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
 
                 // This job finished, increment the number of processed jobs progress.
-                await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.NewGuid(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.CreateVersion7(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
                 Status = LibraryScanJobStatus.Completed;
 
                 // Call each linked child with the obtained payload.
@@ -112,7 +112,7 @@ internal sealed class MediaLibraryScanDiffJob : MediaLibraryScanJob, IMediaLibra
             return scanJobProgressResult.Errors;
 
         await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(
-            Guid.NewGuid(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+            Guid.CreateVersion7(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
         return Result.Success;
     }

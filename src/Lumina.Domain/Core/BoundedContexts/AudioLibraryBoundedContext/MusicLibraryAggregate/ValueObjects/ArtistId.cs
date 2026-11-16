@@ -27,7 +27,7 @@ public sealed class ArtistId : EntityId<Guid>
     /// <returns>The created <see cref="ArtistId"/> instance.</returns>
     public static ArtistId CreateUnique()
     {
-        return new ArtistId(Guid.NewGuid());
+        return new ArtistId(Guid.CreateVersion7());
     }
 
     /// <summary>

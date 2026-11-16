@@ -26,7 +26,7 @@ public sealed class SeasonId : EntityId<Guid>
     public static SeasonId CreateUnique()
     {
         // TODO: enforce invariants.
-        return new SeasonId(Guid.NewGuid());
+        return new SeasonId(Guid.CreateVersion7());
     }
 
     /// <summary>

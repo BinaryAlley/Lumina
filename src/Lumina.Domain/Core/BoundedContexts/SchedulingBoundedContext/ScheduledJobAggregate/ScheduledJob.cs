@@ -125,7 +125,7 @@ public class ScheduledJob : AggregateRoot<ScheduledJobId>
     {
         if (Status != ScheduledJobStatus.Added)
             return Errors.Scheduling.ScheduledJobCycleAlreadyStarted;
-        _domainEvents.Add(new ScheduledJobAddedDomainEvent(Guid.NewGuid(), Id, DateTime.UtcNow));
+        _domainEvents.Add(new ScheduledJobAddedDomainEvent(Guid.CreateVersion7(), Id, DateTime.UtcNow));
         return Result.Success;
     }
 
@@ -139,7 +139,7 @@ public class ScheduledJob : AggregateRoot<ScheduledJobId>
             return Errors.Scheduling.ScheduledJobCycleAlreadyStarted;
 
         Status = ScheduledJobStatus.Active;
-        _domainEvents.Add(new ScheduledJobCycleStartedDomainEvent(Guid.NewGuid(), Id, DateTime.UtcNow));
+        _domainEvents.Add(new ScheduledJobCycleStartedDomainEvent(Guid.CreateVersion7(), Id, DateTime.UtcNow));
         return Result.Success;
     }
 
@@ -159,10 +159,10 @@ public class ScheduledJob : AggregateRoot<ScheduledJobId>
         if (previousStatus == ScheduledJobStatus.Running)
         {
             LastCompletedOnUtc = Optional<DateTime>.Some(DateTime.UtcNow);
-            _domainEvents.Add(new ScheduledJobExecutionStoppedDomainEvent(Guid.NewGuid(), Id, DateTime.UtcNow));
+            _domainEvents.Add(new ScheduledJobExecutionStoppedDomainEvent(Guid.CreateVersion7(), Id, DateTime.UtcNow));
         }
         else
-            _domainEvents.Add(new ScheduledJobCycleStoppedDomainEvent(Guid.NewGuid(), Id, DateTime.UtcNow));
+            _domainEvents.Add(new ScheduledJobCycleStoppedDomainEvent(Guid.CreateVersion7(), Id, DateTime.UtcNow));
         return Result.Success;
     }
 
@@ -174,7 +174,7 @@ public class ScheduledJob : AggregateRoot<ScheduledJobId>
     {
         if (Status == ScheduledJobStatus.Running)
             return Errors.Scheduling.ScheduledJobAlreadyRunning;
-        _domainEvents.Add(new ScheduledJobFiredDomainEvent(Guid.NewGuid(), Id, DateTime.UtcNow));
+        _domainEvents.Add(new ScheduledJobFiredDomainEvent(Guid.CreateVersion7(), Id, DateTime.UtcNow));
         return Result.Success;
     }
 
@@ -184,7 +184,7 @@ public class ScheduledJob : AggregateRoot<ScheduledJobId>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public Result<Success> Remove()
     {
-        _domainEvents.Add(new ScheduledJobRemovedDomainEvent(Guid.NewGuid(), Id, DateTime.UtcNow));
+        _domainEvents.Add(new ScheduledJobRemovedDomainEvent(Guid.CreateVersion7(), Id, DateTime.UtcNow));
         return Result.Success;
     }
 
@@ -198,11 +198,11 @@ public class ScheduledJob : AggregateRoot<ScheduledJobId>
         if (Status == ScheduledJobStatus.Running)
             return Errors.Scheduling.ScheduledJobAlreadyRunning;
 
-        Guid runId = Guid.NewGuid();
+        Guid runId = Guid.CreateVersion7();
         _currentExecutionRunId = Optional<Guid>.Some(runId);
         Status = ScheduledJobStatus.Running;
         LastStartedOnUtc = Optional<DateTime>.Some(DateTime.UtcNow);
-        _domainEvents.Add(new ScheduledJobExecutionStartedDomainEvent(Guid.NewGuid(), Id, runId, TaskType, isCycleRun, DateTime.UtcNow));
+        _domainEvents.Add(new ScheduledJobExecutionStartedDomainEvent(Guid.CreateVersion7(), Id, runId, TaskType, isCycleRun, DateTime.UtcNow));
         return Result.Success;
     }
 
@@ -223,7 +223,7 @@ public class ScheduledJob : AggregateRoot<ScheduledJobId>
         // A cycle run returns the scheduled job to its active state, where it waits for the next execution; a one time execution finishes the scheduled job.
         Status = isCycleRun ? ScheduledJobStatus.Active : ScheduledJobStatus.Completed;
         LastCompletedOnUtc = Optional<DateTime>.Some(DateTime.UtcNow);
-        _domainEvents.Add(new ScheduledJobExecutionCompletedDomainEvent(Guid.NewGuid(), Id, runId, TaskType, isCycleRun, DateTime.UtcNow));
+        _domainEvents.Add(new ScheduledJobExecutionCompletedDomainEvent(Guid.CreateVersion7(), Id, runId, TaskType, isCycleRun, DateTime.UtcNow));
         return Result.Success;
     }
 }

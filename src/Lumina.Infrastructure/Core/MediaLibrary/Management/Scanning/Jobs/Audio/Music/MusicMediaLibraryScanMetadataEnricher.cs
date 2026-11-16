@@ -586,7 +586,7 @@ internal sealed class MusicMediaLibraryScanMetadataEnricher : IMediaLibraryScanM
             return scanJobProgressResult.Errors;
 
         await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(
-            Guid.NewGuid(), libraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+            Guid.CreateVersion7(), libraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
         return Result.Success;
     }

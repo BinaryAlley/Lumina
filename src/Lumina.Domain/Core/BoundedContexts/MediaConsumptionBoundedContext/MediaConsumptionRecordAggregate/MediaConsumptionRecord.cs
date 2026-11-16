@@ -171,7 +171,7 @@ public sealed class MediaConsumptionRecord : AggregateRoot<MediaConsumptionRecor
             0);
 
         record._domainEvents.Add(new MediaConsumptionStartedDomainEvent(
-            Guid.NewGuid(),
+            Guid.CreateVersion7(),
             record.Id,
             userId,
             libraryId,
@@ -216,7 +216,7 @@ public sealed class MediaConsumptionRecord : AggregateRoot<MediaConsumptionRecor
             0);
 
         record._domainEvents.Add(new MediaConsumptionStartedDomainEvent(
-            Guid.NewGuid(),
+            Guid.CreateVersion7(),
             record.Id,
             userId,
             libraryId,
@@ -224,7 +224,7 @@ public sealed class MediaConsumptionRecord : AggregateRoot<MediaConsumptionRecor
             mediaKind,
             occurredOnUtc));
         record._domainEvents.Add(new MediaConsumptionCompletedDomainEvent(
-            Guid.NewGuid(),
+            Guid.CreateVersion7(),
             record.Id,
             userId,
             libraryId,
@@ -341,7 +341,7 @@ public sealed class MediaConsumptionRecord : AggregateRoot<MediaConsumptionRecor
         LastActivityOnUtc = occurredOnUtc;
         UpdatedOnUtc = Optional<DateTime>.Some(occurredOnUtc);
         _domainEvents.Add(new MediaConsumptionProgressedDomainEvent(
-            Guid.NewGuid(),
+            Guid.CreateVersion7(),
             Id,
             UserId,
             LibraryId,
@@ -393,7 +393,7 @@ public sealed class MediaConsumptionRecord : AggregateRoot<MediaConsumptionRecor
         LastActivityOnUtc = occurredOnUtc;
         UpdatedOnUtc = Optional<DateTime>.Some(occurredOnUtc);
         _domainEvents.Add(new MediaConsumptionCompletedDomainEvent(
-            Guid.NewGuid(),
+            Guid.CreateVersion7(),
             Id,
             UserId,
             LibraryId,
@@ -445,7 +445,7 @@ public sealed class MediaConsumptionRecord : AggregateRoot<MediaConsumptionRecor
         LastActivityOnUtc = occurredOnUtc;
         UpdatedOnUtc = Optional<DateTime>.Some(occurredOnUtc);
         _domainEvents.Add(new MediaConsumptionStoppedDomainEvent(
-            Guid.NewGuid(),
+            Guid.CreateVersion7(),
             Id,
             UserId,
             LibraryId,

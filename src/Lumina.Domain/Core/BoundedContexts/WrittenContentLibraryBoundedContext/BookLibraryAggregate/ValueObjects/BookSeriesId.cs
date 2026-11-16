@@ -33,7 +33,7 @@ public sealed class BookSeriesId : ValueObject
     /// <returns>The created <see cref="BookSeriesId"/> instance.</returns>
     public static BookSeriesId CreateUnique()
     {
-        return new BookSeriesId(Guid.NewGuid());
+        return new BookSeriesId(Guid.CreateVersion7());
     }
 
     /// <summary>

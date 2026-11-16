@@ -101,7 +101,7 @@ public class AddPlaylistEntryCommandHandler : ICommandHandler<AddPlaylistEntryCo
         if (!Playlist.CanContain(getPlaylistResult.Value.Type, PlaylistMediaItemType.MusicTrack))
             return DomainErrors.Playlists.PlaylistDoesNotAcceptMediaItems;
 
-        Guid entryId = Guid.NewGuid();
+        Guid entryId = Guid.CreateVersion7();
         DateTime updatedOnUtc = DateTime.UtcNow;
         Result<PlaylistBulkAddResultDto> addEntryResult = await _unitOfWork.PlaylistRepository
             .AddEntriesAsync(playlistId, userId, [trackId], PlaylistMediaItemType.MusicTrack, [entryId], updatedOnUtc, cancellationToken).ConfigureAwait(false);

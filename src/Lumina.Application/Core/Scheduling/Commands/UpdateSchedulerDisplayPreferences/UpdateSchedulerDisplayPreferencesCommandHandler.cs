@@ -67,7 +67,7 @@ public class UpdateSchedulerDisplayPreferencesCommandHandler : ICommandHandler<U
         // Upsert the display preferences of the scheduler page of the current user.
         SchedulerDisplayPreferencesEntity displayPreferences = new()
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.CreateVersion7(),
             UserId = userId,
             JobTypeFilter = command.JobTypeFilter,
             DisplayTimeSpan = command.DisplayTimeSpan,

@@ -66,7 +66,7 @@ public static class AlbumMapping
             MusicBrainzReleaseArtistId = domainEntity.MusicBrainzReleaseArtistId.HasValue ? domainEntity.MusicBrainzReleaseArtistId.Value.Value : null,
             Contributors = [.. domainEntity.Contributors.Select(contributor => new AlbumContributorEntity
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 AlbumId = domainEntity.Id.Value,
                 MediaContributorId = contributor.ContributorId.Value,
                 Role = contributor.Role,

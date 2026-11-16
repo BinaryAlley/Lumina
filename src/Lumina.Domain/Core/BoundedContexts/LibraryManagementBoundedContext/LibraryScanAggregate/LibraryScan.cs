@@ -94,7 +94,7 @@ public class LibraryScan : AggregateRoot<ScanId>
         if (_pastScans.Any(libraryScan => libraryScan.Status == LibraryScanJobStatus.Running || libraryScan.Status == LibraryScanJobStatus.Pending))
             return Errors.LibraryScanning.LibraryAlreadyBeingScanned;
 
-        _domainEvents.Add(new LibraryScanQueuedDomainEvent(Guid.NewGuid(), Id, UserId, LibraryId, DateTime.UtcNow));
+        _domainEvents.Add(new LibraryScanQueuedDomainEvent(Guid.CreateVersion7(), Id, UserId, LibraryId, DateTime.UtcNow));
 
         return Result.Success;
     }
@@ -114,7 +114,7 @@ public class LibraryScan : AggregateRoot<ScanId>
         if (_pastScans.Any(libraryScan => libraryScan.Status == LibraryScanJobStatus.Running || libraryScan.Status == LibraryScanJobStatus.Pending))
             return Errors.LibraryScanning.LibraryAlreadyBeingScanned;
 
-        _domainEvents.Add(new LibraryScanStartedDomainEvent(Guid.NewGuid(), this, DateTime.UtcNow));
+        _domainEvents.Add(new LibraryScanStartedDomainEvent(Guid.CreateVersion7(), this, DateTime.UtcNow));
 
         return Result.Success;
     }
@@ -145,7 +145,7 @@ public class LibraryScan : AggregateRoot<ScanId>
         else
             return Errors.LibraryScanning.CanOnlyCancelPendingOrRunningScans;
         
-        _domainEvents.Add(new LibraryScanCancelledDomainEvent(Guid.NewGuid(), Id, LibraryId, DateTime.UtcNow));
+        _domainEvents.Add(new LibraryScanCancelledDomainEvent(Guid.CreateVersion7(), Id, LibraryId, DateTime.UtcNow));
  
         return Result.Success;
     }

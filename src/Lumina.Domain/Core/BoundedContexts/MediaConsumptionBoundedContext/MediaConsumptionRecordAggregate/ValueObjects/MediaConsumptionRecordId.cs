@@ -27,7 +27,7 @@ public sealed class MediaConsumptionRecordId : EntityId<Guid>
     /// <returns>The created <see cref="MediaConsumptionRecordId"/> instance.</returns>
     public static MediaConsumptionRecordId CreateUnique()
     {
-        return new MediaConsumptionRecordId(Guid.NewGuid());
+        return new MediaConsumptionRecordId(Guid.CreateVersion7());
     }
 
     /// <summary>

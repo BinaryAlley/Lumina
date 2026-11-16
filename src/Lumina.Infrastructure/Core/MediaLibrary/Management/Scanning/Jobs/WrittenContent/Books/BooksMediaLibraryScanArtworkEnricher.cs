@@ -210,7 +210,7 @@ internal sealed class BooksMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
             {
                 coverArtwork.Status = ArtworkStatus.Failed;
                 coverArtwork.UpdatedOnUtc = DateTime.UtcNow;
-                coverArtwork.UpdatedBy = Guid.NewGuid();
+                coverArtwork.UpdatedBy = Guid.CreateVersion7();
             }
             return;
         }
@@ -240,7 +240,7 @@ internal sealed class BooksMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
                 {
                     existingCoverArtwork.Status = ArtworkStatus.Failed;
                     existingCoverArtwork.UpdatedOnUtc = DateTime.UtcNow;
-                    existingCoverArtwork.UpdatedBy = Guid.NewGuid();
+                    existingCoverArtwork.UpdatedBy = Guid.CreateVersion7();
                 }
                 return;
             }
@@ -262,7 +262,7 @@ internal sealed class BooksMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
                 existingCoverArtwork.Provider = resolvedArtwork.ProviderName;
                 existingCoverArtwork.LastUpdateUtc = DateTime.UtcNow;
                 existingCoverArtwork.UpdatedOnUtc = DateTime.UtcNow;
-                existingCoverArtwork.UpdatedBy = Guid.NewGuid();
+                existingCoverArtwork.UpdatedBy = Guid.CreateVersion7();
             }
         }
         else
@@ -272,7 +272,7 @@ internal sealed class BooksMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
             existingCoverArtwork.Provider = resolvedArtwork.ProviderName;
             existingCoverArtwork.LastUpdateUtc = DateTime.UtcNow;
             existingCoverArtwork.UpdatedOnUtc = DateTime.UtcNow;
-            existingCoverArtwork.UpdatedBy = Guid.NewGuid();
+            existingCoverArtwork.UpdatedBy = Guid.CreateVersion7();
         }
     }
 
@@ -332,7 +332,7 @@ internal sealed class BooksMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
     {
         return new BookArtworkEntity
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.CreateVersion7(),
             BookId = bookId,
             ArtworkType = ArtworkType.Cover,
             Ordinal = 0,
@@ -364,7 +364,7 @@ internal sealed class BooksMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
             return scanJobProgressResult.Errors;
 
         await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(
-            Guid.NewGuid(), libraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+            Guid.CreateVersion7(), libraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
         return Result.Success;
     }

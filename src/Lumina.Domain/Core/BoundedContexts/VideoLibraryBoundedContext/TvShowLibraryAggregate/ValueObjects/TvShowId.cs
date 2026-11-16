@@ -26,7 +26,7 @@ public sealed class TvShowId : EntityId<Guid>
     public static TvShowId CreateUnique()
     {
         // TODO: enforce invariants.
-        return new TvShowId(Guid.NewGuid());
+        return new TvShowId(Guid.CreateVersion7());
     }
 
     /// <summary>

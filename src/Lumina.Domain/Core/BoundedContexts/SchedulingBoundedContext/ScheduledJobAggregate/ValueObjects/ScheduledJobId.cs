@@ -27,7 +27,7 @@ public sealed class ScheduledJobId : EntityId<Guid>
     /// <returns>The created <see cref="ScheduledJobId"/> instance.</returns>
     public static ScheduledJobId CreateUnique()
     {
-        return new ScheduledJobId(Guid.NewGuid());
+        return new ScheduledJobId(Guid.CreateVersion7());
     }
 
     /// <summary>

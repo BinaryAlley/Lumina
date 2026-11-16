@@ -171,7 +171,7 @@ internal sealed class BooksMediaLibraryScanItemMaterializer : IMediaLibraryScanI
 
         return new BookEntity
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.CreateVersion7(),
             LibraryId = library.Id.Value,
             Path = path,
             Title = title,

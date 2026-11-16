@@ -221,7 +221,7 @@ internal sealed class BooksMediaLibraryScanMetadataEnricher : IMediaLibraryScanM
             // No metadata provider returned usable metadata, so the book is marked as failed to enrich, keeping its previous metadata.
             bookEntity.MetadataStatus = MetadataStatus.Failed;
             bookEntity.UpdatedOnUtc = DateTime.UtcNow;
-            bookEntity.UpdatedBy = Guid.NewGuid();
+            bookEntity.UpdatedBy = Guid.CreateVersion7();
             return;
         }
 
@@ -244,7 +244,7 @@ internal sealed class BooksMediaLibraryScanMetadataEnricher : IMediaLibraryScanM
                 continue;
             linkedContributors.Add(new BookContributorEntity
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.CreateVersion7(),
                 BookId = bookEntity.Id,
                 MediaContributorId = contributorEntity.Id,
                 Role = role,
@@ -395,7 +395,7 @@ internal sealed class BooksMediaLibraryScanMetadataEnricher : IMediaLibraryScanM
             return scanJobProgressResult.Errors;
 
         await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(
-            Guid.NewGuid(), libraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+            Guid.CreateVersion7(), libraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
 
         return Result.Success;
     }

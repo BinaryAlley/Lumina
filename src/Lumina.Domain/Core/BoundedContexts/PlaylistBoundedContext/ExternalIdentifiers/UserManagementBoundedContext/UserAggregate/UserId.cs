@@ -27,7 +27,7 @@ public sealed class UserId : EntityId<Guid>
     /// <returns>The created <see cref="UserId"/> instance.</returns>
     public static UserId CreateUnique()
     {
-        return new UserId(Guid.NewGuid());
+        return new UserId(Guid.CreateVersion7());
     }
 
     /// <summary>

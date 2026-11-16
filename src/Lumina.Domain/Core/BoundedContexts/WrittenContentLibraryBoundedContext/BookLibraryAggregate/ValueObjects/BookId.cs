@@ -27,7 +27,7 @@ public sealed class BookId : EntityId<Guid>
     /// <returns>The created <see cref="BookId"/> instance.</returns>
     public static BookId CreateUnique()
     {
-        return new BookId(Guid.NewGuid());
+        return new BookId(Guid.CreateVersion7());
     }
 
     /// <summary>
