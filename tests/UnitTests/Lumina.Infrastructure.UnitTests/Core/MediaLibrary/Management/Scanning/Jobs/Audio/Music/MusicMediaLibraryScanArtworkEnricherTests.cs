@@ -343,7 +343,7 @@ public class MusicMediaLibraryScanArtworkEnricherTests
     }
 
     [Fact]
-    public async Task EnrichAsync_WhenClearingTheStoredArtworkFilesFails_ShouldLeaveTheArtistUnresolved()
+    public async Task EnrichAsync_WhenClearingTheStoredArtworkFilesFails_ShouldClearTheStoredArtworkRecordsAndMarkTheArtistFailed()
     {
         // Arrange
         ArtistEntity artist = _artistEntityFixture.Create(libraryId: _libraryId.Value);
@@ -356,8 +356,16 @@ public class MusicMediaLibraryScanArtworkEnricherTests
         await _sut.EnrichAsync(_libraryId, _scanId, _userId, CancellationToken.None);
 
         // Assert
-        await _mockMusicArtworkRepository.DidNotReceive().DeleteByOwnerAsync(Arg.Any<MusicArtworkOwnerType>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>());
-        await _mockMusicArtworkRepository.DidNotReceive().InsertRangeAsync(Arg.Any<IReadOnlyCollection<MusicArtworkEntity>>(), Arg.Any<CancellationToken>());
+        await _mockMusicArtworkRepository.Received(1).DeleteByOwnerAsync(MusicArtworkOwnerType.Artist, artist.Id, Arg.Any<CancellationToken>());
+        await _mockMusicArtworkRepository.Received(1).InsertRangeAsync(
+            Arg.Is<IReadOnlyCollection<MusicArtworkEntity>>(entities => entities.Count == 1
+                && entities.First().OwnerType == MusicArtworkOwnerType.Artist
+                && entities.First().OwnerId == artist.Id
+                && entities.First().Status == ArtworkStatus.Failed
+                && entities.First().FileName == null),
+            Arg.Any<CancellationToken>());
+        await _mockMusicArtworkService.DidNotReceive().SaveArtistArtworkAsync(
+            Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<ArtworkDto>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
