@@ -27,7 +27,7 @@ public sealed class MovieId : EntityId<Guid>
     /// <returns>The created <see cref="MovieId"/> instance.</returns>
     public static MovieId CreateUnique()
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         return new MovieId(Guid.NewGuid());
     }
 
@@ -38,7 +38,7 @@ public sealed class MovieId : EntityId<Guid>
     /// <returns>The created <see cref="MovieId"/> instance.</returns>
     public static MovieId Create(Guid value)
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         return new MovieId(value);
     }
 

@@ -40,22 +40,22 @@ public class ValidationOptions<TOptions> : IValidateOptions<TOptions> where TOpt
     /// <returns>A <see cref="ValidateOptionsResult"/> that indicates whether the validation was successful or not.</returns>
     public ValidateOptionsResult Validate(string? name, TOptions options)
     {
-        // check if the name of the options is specified and matches the provided one
+        // Check if the name of the options is specified and matches the provided one.
         if (Name is not null && Name != name)
             return ValidateOptionsResult.Skip;
 
-        ArgumentNullException.ThrowIfNull(options, nameof(options)); // don't go further if the options are null
+        ArgumentNullException.ThrowIfNull(options, nameof(options)); // Don't go further if the options are null.
 
-        List<Error> validationResult = _validator.Validate(options); // validate the options using the validator
+        List<Error> validationResult = _validator.Validate(options); // Validate the options using the validator.
 
-        // return a response based on the validation result
+        // Return a response based on the validation result.
         if (validationResult.Count == 0)
             return ValidateOptionsResult.Success;
 
-        // if the validation fails, collect the error messages
+        // If the validation fails, collect the error messages.
         string[] errors = [.. validationResult.Select(error => $"Options validation failed for '{error.Code}' with error: '{error.Description}'")];
 
-        // and return them with a failure result
+        // And return them with a failure result.
         return ValidateOptionsResult.Fail(errors);
     }
 }

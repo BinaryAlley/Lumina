@@ -67,7 +67,7 @@ public sealed class File : FileSystemItem
         FileSystemItemStatus status = FileSystemItemStatus.Accessible,
         bool isHidden = false)
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         Result<FileSystemPathId> createPathResult = FileSystemPathId.Create(path);
         if (createPathResult.IsFailure)
             return createPathResult.Errors;
@@ -108,7 +108,7 @@ public sealed class File : FileSystemItem
         FileSystemItemStatus status = FileSystemItemStatus.Accessible,
         bool isHidden = false)
     {
-        // TODO: enforce invariants        
+        // TODO: enforce invariants.
         File newFile = new(
             id,
             name,

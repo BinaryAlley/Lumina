@@ -48,7 +48,7 @@ public static class LibraryMapping
             {
                 Id = scanId.Value,
                 LibraryId = domainEntity.Id.Value,
-                UserId = domainEntity.UserId.Value, // rest of properties will be populated by EF Core
+                UserId = domainEntity.UserId.Value, // Rest of properties will be populated by EF Core.
                 Status = default,
                 User = null!,
                 Library = null!,

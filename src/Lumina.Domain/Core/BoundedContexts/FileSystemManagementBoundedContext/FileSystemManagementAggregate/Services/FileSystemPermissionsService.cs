@@ -15,7 +15,7 @@ namespace Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.
 /// <summary>
 /// Service for file system permissions.
 /// </summary>
-internal class FileSystemPermissionsService : IFileSystemPermissionsService // TODO: Refactor towards abstractions that would allow testing.
+internal class FileSystemPermissionsService : IFileSystemPermissionsService // TODO: refactor towards abstractions that would allow testing.
 {
     private readonly IPlatformContextManager _platformContextManager;
 
@@ -41,9 +41,9 @@ internal class FileSystemPermissionsService : IFileSystemPermissionsService // T
         if (platformType == PlatformType.Unix)
             return CanAccessPathUnix(path.Path, accessMode);
         else if (platformType == PlatformType.Windows)
-#pragma warning disable CA1416 // Validate platform compatibility
+#pragma warning disable CA1416 // Validate platform compatibility.
             return CanAccessPathWindows(path.Path, accessMode, isFile);
-#pragma warning restore CA1416 // Validate platform compatibility
+#pragma warning restore CA1416 // Validate platform compatibility.
         else
             throw new PlatformNotSupportedException("Support for this platform is not compiled into this assembly.");
     }

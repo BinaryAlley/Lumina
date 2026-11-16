@@ -57,11 +57,11 @@ public class ExceptionHandlingMiddleware
             // The client went away while its request or response was being processed, so there is nobody left to answer.
             context.Abort();
         }
-        catch (ApiException apiException) // threat API exceptions differently - they contain Problem Details properties
+        catch (ApiException apiException) // Treat API exceptions differently - they contain Problem Details properties.
         {
             await HandleApiExceptionAsync(context, apiException);
         }
-        catch (Exception ex) // other cases - 
+        catch (Exception ex) // Other cases.
         {
             _logger.LogError(ex, "Unexpected exception occurred: {Message}", ex.Message);
             // Once the response has started, its status and headers are already on the wire, so they can no longer be replaced: the connection
@@ -104,7 +104,7 @@ public class ExceptionHandlingMiddleware
     /// </summary>
     private async Task HandleApiExceptionAsync(HttpContext context, ApiException apiException)
     {
-        // log all available details for debugging/monitoring
+        // Log all available details for debugging/monitoring.
         _logger.LogError(
             apiException,
             "API Exception occurred. Status: {StatusCode}, Title: {Title}, Detail: {Detail}, Extensions: {Extensions}",
@@ -121,8 +121,8 @@ public class ExceptionHandlingMiddleware
             return;
         }
 
-        // handle unauthorized errors by prompting the user to re-login
-        if (apiException.HttpStatusCode == HttpStatusCode.Unauthorized) // HTTP 401 Unauthorized actually means lack of valid authentication credentials (not logged in)
+        // Handle unauthorized errors by prompting the user to re-login.
+        if (apiException.HttpStatusCode == HttpStatusCode.Unauthorized) // HTTP 401 Unauthorized actually means lack of valid authentication credentials (not logged in).
             await HandleUnauthorizedAsync(context);
         else if (apiException.HttpStatusCode == HttpStatusCode.NotFound) // 
             await HandleNotFoundAsync(context, apiException);
@@ -137,8 +137,8 @@ public class ExceptionHandlingMiddleware
     /// </summary>
     private async Task HandleNotFoundAsync(HttpContext context, ApiException apiException)
     {
-        // when the API reports the currently logged-in user no longer exists (404 from the current-user authorization check),
-        // the stored session is stale: sign out and send the user to the login page instead of the not-found page
+        // When the API reports the currently logged-in user no longer exists (404 from the current-user authorization check),
+        // the stored session is stale: sign out and send the user to the login page instead of the not-found page.
         if (context.User?.Identity?.IsAuthenticated == true && IsCurrentUserAuthorizationCheck(apiException))
         {
             await HandleUnauthorizedAsync(context).ConfigureAwait(false);
@@ -161,7 +161,7 @@ public class ExceptionHandlingMiddleware
             string culture = context.Request.RouteValues["culture"]?.ToString()?.ToLower() ?? "en-us";
             string notFoundUrl = $"/{culture}/not-found";
             _logger.LogInformation("Redirecting user to NotFound url");
-            context.Response.Redirect(notFoundUrl); // force an entire refresh of the current location, so that header and footer are re-rendered too
+            context.Response.Redirect(notFoundUrl); // Force an entire refresh of the current location, so that header and footer are re-rendered too.
         }
         else
             await WriteStatusOnlyResponseAsync(context, (int)HttpStatusCode.NotFound).ConfigureAwait(false);
@@ -265,7 +265,7 @@ public class ExceptionHandlingMiddleware
     /// </summary>
     private async Task HandleUnauthorizedAsync(HttpContext context)
     {
-        // when API JWT tokens expire, the client app is still logged in, so, sign out the user and delete the authentication cookie and token
+        // When API JWT tokens expire, the client app is still logged in, so, sign out the user and delete the authentication cookie and token.
         await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
         context.Response.Cookies.Delete("Token");
 
@@ -284,7 +284,7 @@ public class ExceptionHandlingMiddleware
             string returnUrl = $"{context.Request.Path}{context.Request.QueryString}";
             string loginUrl = $"/{culture}/auth/login?returnUrl={Uri.EscapeDataString(returnUrl)}";
             _logger.LogInformation("Redirecting unauthorized user to {Url}", loginUrl);
-            context.Response.Redirect(loginUrl); // force an entire refresh of the current location, so that header and footer are re-rendered too
+            context.Response.Redirect(loginUrl); // Force an entire refresh of the current location, so that header and footer are re-rendered too.
         }
         else
             await WriteStatusOnlyResponseAsync(context, (int)HttpStatusCode.Unauthorized).ConfigureAwait(false);
@@ -299,7 +299,7 @@ public class ExceptionHandlingMiddleware
 
         if (apiException.ProblemDetails is not null)
         {
-            // only show the meaningful error message to the user
+            // Only show the meaningful error message to the user.
             if (!string.IsNullOrEmpty(apiException.ProblemDetails.Detail))
                 errorMessage.AppendLine($"<b>{_stringLocalizer[apiException.ProblemDetails.Detail]}</b><br>");
             else if (!string.IsNullOrEmpty(apiException.ProblemDetails.Title))

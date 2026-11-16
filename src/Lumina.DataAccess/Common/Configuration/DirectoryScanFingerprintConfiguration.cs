@@ -18,10 +18,10 @@ public class DirectoryScanFingerprintConfiguration : IEntityTypeConfiguration<Di
     public void Configure(EntityTypeBuilder<DirectoryScanFingerprintEntity> builder)
     {
         builder.ToTable("DirectoryScanFingerprints");
-        // composite key, so that each directory scan fingerprint is uniquely identified within its library by its path
+        // Composite key, so that each directory scan fingerprint is uniquely identified within its library by its path.
         builder.HasKey(directoryScanFingerprint => new { directoryScanFingerprint.LibraryId, directoryScanFingerprint.Path });
 
-        // one library with many directory scan fingerprints
+        // One library with many directory scan fingerprints.
         builder.HasOne<LibraryEntity>()
             .WithMany()
             .HasForeignKey(directoryScanFingerprint => directoryScanFingerprint.LibraryId)
@@ -41,7 +41,7 @@ public class DirectoryScanFingerprintConfiguration : IEntityTypeConfiguration<Di
             .IsRequired()
             .HasColumnOrder(2);
 
-        // enables fast lookups of the directory scan fingerprints of a library
+        // Enables fast lookups of the directory scan fingerprints of a library.
         builder.HasIndex(directoryScanFingerprint => directoryScanFingerprint.LibraryId);
     }
 }

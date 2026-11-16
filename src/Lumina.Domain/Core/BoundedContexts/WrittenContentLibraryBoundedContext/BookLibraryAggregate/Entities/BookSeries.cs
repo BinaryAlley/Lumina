@@ -64,7 +64,7 @@ public sealed class BookSeries : Entity<BookSeriesId>
         bool isComplete,
         List<Book> books)
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         return new BookSeries(
             id,
             metadata,
@@ -87,7 +87,7 @@ public sealed class BookSeries : Entity<BookSeriesId>
         bool isComplete,
         List<Book> books)
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         return new BookSeries(
             BookSeriesId.CreateUnique(),
             metadata,

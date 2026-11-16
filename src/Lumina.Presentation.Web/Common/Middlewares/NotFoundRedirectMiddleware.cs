@@ -40,7 +40,7 @@ public class NotFoundRedirectMiddleware
                              context.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture.Name?.ToLower() ??
                              "en-us";
 
-            // re-execute the request so the user gets the error page
+            // Re-execute the request so the user gets the error page.
             string? originalPath = context.Request.Path.Value;
             context.Items["originalPath"] = originalPath;
             _logger.LogInformation("Redirecting user to NotFound url");

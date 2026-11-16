@@ -65,7 +65,7 @@ internal static class ApplicationHandlerTelemetry
     {
         activity?.SetStatus(ActivityStatusCode.Error, error);
         RecordOutcome(activity, handlerName, handlerType, duration, isSuccess: false);
-        // business-rule failures are routine outcomes (e.g. failed logins), so log at Debug to avoid noise from high-frequency handlers
+        // Business-rule failures are routine outcomes (e.g. failed logins), so log at Debug to avoid noise from high-frequency handlers.
         logger.LogDebug("Failed handling {HandlerType} {HandlerName} in {DurationMs}ms: {Error}", handlerType, handlerName, duration.TotalMilliseconds, error);
     }
 

@@ -22,16 +22,16 @@ public class QRCodeGenerator : IQRCodeGenerator
     /// <returns>Data URI for the QR code.</returns>
     public string GenerateQrCodeDataUri(string username, byte[] secret)
     {
-        // convert secret to Base32
+        // Convert secret to Base32.
         string base32Secret = Base32Encoding.ToString(secret);
-        // build the otpauth URI
+        // Build the otpauth URI.
         string otpauthString = $"otpauth://totp/{ISSUER}:{Uri.EscapeDataString(username)}?secret={base32Secret}&issuer={ISSUER}";
-        // generate QR Code
+        // Generate QR Code.
         QRCoder.QRCodeGenerator qrGenerator = new();
         QRCodeData qrData = qrGenerator.CreateQrCode(otpauthString, QRCoder.QRCodeGenerator.ECCLevel.Q);
         PngByteQRCode qrCode = new(qrData);
-        // convert QR Code to Data URI
-        byte[] pngBytes = qrCode.GetGraphic(20);  // specify a pixel size if needed
+        // Convert QR Code to Data URI.
+        byte[] pngBytes = qrCode.GetGraphic(20);  // Specify a pixel size if needed.
         string dataUri = "data:image/png;base64," + Convert.ToBase64String(pngBytes);
         return dataUri;
     }

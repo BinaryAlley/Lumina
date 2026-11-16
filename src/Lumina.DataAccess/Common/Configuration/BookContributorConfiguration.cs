@@ -20,7 +20,7 @@ public class BookContributorConfiguration : IEntityTypeConfiguration<BookContrib
         builder.ToTable("BookContributors");
         builder.HasKey(bookContributor => bookContributor.Id);
         builder.Property(bookContributor => bookContributor.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
 
         builder.Property(bookContributor => bookContributor.BookId)
@@ -35,7 +35,7 @@ public class BookContributorConfiguration : IEntityTypeConfiguration<BookContrib
             .IsRequired()
             .HasColumnOrder(3);
 
-        // audit
+        // Audit.
         builder.Property(bookContributor => bookContributor.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(4);

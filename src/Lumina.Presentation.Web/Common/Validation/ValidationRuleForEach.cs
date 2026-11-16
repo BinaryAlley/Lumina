@@ -106,7 +106,7 @@ internal sealed class ValidationRuleForEach<TRequest, TItem> : IValidationRule<T
     /// <returns>One <see cref="Error"/> per failing predicate, per item; empty if every item passes.</returns>
     public IEnumerable<Error> Validate(TRequest instance)
     {
-        // Evaluate the condition first, if it returns false, skip validation entirely..
+        // Evaluate the condition first, if it returns false, skip validation entirely.
         if (condition is not null && !condition(instance))
             yield break;
 

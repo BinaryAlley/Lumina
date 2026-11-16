@@ -93,7 +93,7 @@ public class LoginEndpoint : BaseEndpoint<LoginRequest, IResult>
             string currentCulture = Culture;
             // Handle ReturnUrl and ensure it includes the correct culture.
             string redirectUrl;
-            if (!string.IsNullOrEmpty(request.ReturnUrl) && IsLocalUrl(request.ReturnUrl)) // ensure that return URL contains the correct culture
+            if (!string.IsNullOrEmpty(request.ReturnUrl) && IsLocalUrl(request.ReturnUrl)) // Ensure that return URL contains the correct culture.
                 redirectUrl = request.ReturnUrl.StartsWith($"/{currentCulture}/") ? request.ReturnUrl : $"/{currentCulture}{request.ReturnUrl}";
             else
             {
@@ -123,7 +123,7 @@ public class LoginEndpoint : BaseEndpoint<LoginRequest, IResult>
                         if (error.Value.ValueKind == JsonValueKind.Array)
                             foreach (JsonElement errorValue in error.Value.EnumerateArray())
                                 if (errorValue.ValueKind == JsonValueKind.String && errorValue.GetString() == "InvalidTotpCode" && string.IsNullOrEmpty(request.TotpCode))
-                                    return JsonSuccess(new { isTotpRequired = true }); // only get here when user did not enter a TOTP code at all, otherwise rethrow the validation error
+                                    return JsonSuccess(new { isTotpRequired = true }); // Only get here when user did not enter a TOTP code at all, otherwise rethrow the validation error.
             throw;
         }
     }

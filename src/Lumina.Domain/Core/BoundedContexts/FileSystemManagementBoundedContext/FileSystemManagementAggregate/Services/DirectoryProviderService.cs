@@ -136,7 +136,7 @@ internal class DirectoryProviderService : IDirectoryProviderService
     /// <summary>
     /// Creates a new directory with the specified name, at the specified path.
     /// </summary>
-    /// <param name="path">The path where the directory will be created..</param>
+    /// <param name="path">The path where the directory will be created.</param>
     /// <param name="name">The name of the directory that will be created.</param>
     /// <returns>An <see cref="Result{TValue}"/> containing either the path of a created directory, or an error.</returns>
     public Result<FileSystemPathId> CreateDirectory(FileSystemPathId path, string name)

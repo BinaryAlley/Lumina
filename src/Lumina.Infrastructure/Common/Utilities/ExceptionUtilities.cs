@@ -33,16 +33,16 @@ public static class ExceptionUtilities
     /// <returns>A list of exceptions representing the list of inner exception(s) of <paramref name="exception"/>.</returns>
     public static IEnumerable<Exception> GetInnerExceptions(this Exception exception, int maximumDepth = 5)
     {
-        // check if there are any more inner exceptions to return
+        // Check if there are any more inner exceptions to return.
         if (exception == null || maximumDepth <= 0)
             yield break;
-        // yield the current level exception itself
+        // Yield the current level exception itself.
         yield return exception;
-        // if the exception is an AggregateException, treat it differently and get its all exceptions
+        // If the exception is an AggregateException, treat it differently and get its all exceptions.
         if (exception is AggregateException aggregateException)
             foreach (Exception? innerException in aggregateException.InnerExceptions.SelectMany(innerException => innerException.GetInnerExceptions(maximumDepth - 1)))
                 yield return innerException;
-        // if it's a normal exception, recursively get its list of inner exceptions and yield them
+        // If it's a normal exception, recursively get its list of inner exceptions and yield them.
         foreach (Exception innerException in exception.InnerException?.GetInnerExceptions(maximumDepth - 1) ?? [])
             yield return innerException;
     }

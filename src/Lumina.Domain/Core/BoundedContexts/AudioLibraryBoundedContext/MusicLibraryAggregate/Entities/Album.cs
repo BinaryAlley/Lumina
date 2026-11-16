@@ -214,7 +214,7 @@ public sealed class Album : Entity<AlbumId>
             contributors,
             ratings,
             tracks,
-            DateTime.UtcNow, // TODO: should be IDateTimeProvider
+            DateTime.UtcNow, // TODO: should be IDateTimeProvider.
             Optional<DateTime>.None());
     }
 
@@ -315,7 +315,7 @@ public sealed class Album : Entity<AlbumId>
     /// <param name="contributors">The media contributors of the album.</param>
     internal void UpdateContributors(IReadOnlyCollection<MusicMediaContributor> contributors)
     {
-        // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
+        // Replace the contents of the collection in place, preserving the readonly reference invariants of the entity.
         _contributors.Clear();
         _contributors.AddRange(contributors);
     }
@@ -326,7 +326,7 @@ public sealed class Album : Entity<AlbumId>
     /// <param name="ratings">The ratings of the album.</param>
     internal void UpdateRatings(IReadOnlyCollection<AudioRating> ratings)
     {
-        // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
+        // Replace the contents of the collection in place, preserving the readonly reference invariants of the entity.
         _ratings.Clear();
         _ratings.AddRange(ratings);
     }

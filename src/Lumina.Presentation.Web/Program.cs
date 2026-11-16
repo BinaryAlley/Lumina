@@ -42,19 +42,19 @@ public class Program
         builder.Services.AddHealthChecks()
             .AddCheck<ApiReachabilityHealthCheck>("api", HealthStatus.Unhealthy, ["ready"]);
 
-        // determine log path based on environment
+        // Determine log path based on environment.
         string logPath;
         if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
         {
-            logPath = Environment.GetEnvironmentVariable("LOG_PATH") ?? "/logs"; // use docker volume path
-            builder.WebHost.ConfigureKestrel(options => options.ListenAnyIP(5012)); // HTTP only
+            logPath = Environment.GetEnvironmentVariable("LOG_PATH") ?? "/logs"; // Use docker volume path.
+            builder.WebHost.ConfigureKestrel(options => options.ListenAnyIP(5012)); // HTTP only.
         }
         else
-            logPath = Path.Combine(AppContext.BaseDirectory, "logs"); // use local binary path
+            logPath = Path.Combine(AppContext.BaseDirectory, "logs"); // Use local binary path.
         Directory.CreateDirectory(logPath);
         if (!logPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
             logPath = logPath += Path.DirectorySeparatorChar;
-        // set environment variable for Serilog configuration
+        // Set environment variable for Serilog configuration.
         Environment.SetEnvironmentVariable("LOG_PATH", logPath);
 
         builder.Host.UseSerilog((context, services, configuration) =>
@@ -70,7 +70,7 @@ public class Program
         app.UseRequestLocalization();
         app.UseSerilogRequestLogging();
 
-        // configure the HTTP request pipeline.
+        // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment() && Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
         {
             app.UseExceptionHandler("/home/error");
@@ -83,33 +83,33 @@ public class Program
         {
             OnPrepareResponse = staticFileResponseContext =>
             {
-                // disable static file caching during development
+                // Disable static file caching during development.
                 if (app.Environment.IsDevelopment())
                 {
                     staticFileResponseContext.Context.Response.Headers.Append("Cache-Control", "no-cache, no-store");
                     staticFileResponseContext.Context.Response.Headers.Append("Expires", "-1");
                 }
             },
-            // prevent static files from being processed by routing
+            // Prevent static files from being processed by routing.
             ServeUnknownFileTypes = true
         });
-        app.UseCultureRedirect(); // if the user attempts to go to a localized route without providing a culture, redirect to default culture
-        app.UseApiExceptionHandling(); // handle any problem details returned by the API
+        app.UseCultureRedirect(); // If the user attempts to go to a localized route without providing a culture, redirect to default culture.
+        app.UseApiExceptionHandling(); // Handle any problem details returned by the API.
         app.UseRouting();
-        app.UseRequestLocalization(); // set the culture from the localized routes
-        // restore the Cache-Control chosen by the endpoint after the antiforgery and session middlewares overwrite it
+        app.UseRequestLocalization(); // Set the culture from the localized routes.
+        // Restore the Cache-Control chosen by the endpoint after the antiforgery and session middlewares overwrite it.
         app.UseCacheControlHeader();
         app.UseSession();
         app.UseAuthentication();
         app.UseAuthorization();
         // The rate limiting policies are evaluated after authentication, because the track stream limit is partitioned per authenticated user.
         app.UseRateLimiter();
-        // validate the antiforgery token after authentication, because the token is bound to the authenticated user and
-        // validating it before the user is known would reject every request made by a logged-in user
+        // Validate the antiforgery token after authentication, because the token is bound to the authenticated user and
+        // validating it before the user is known would reject every request made by a logged-in user.
         app.UseAntiforgeryFE(additionalContentTypes: ["application/json"]);
         app.UseForwardedHeaders();
 
-        // handle path base from reverse proxies
+        // Handle path base from reverse proxies.
         app.Use((context, next) =>
         {
             context.Response.Headers["X-Content-Type-Options"] = "nosniff";
@@ -121,7 +121,7 @@ public class Program
 
         app.UseFastEndpoints();
 
-        // add API documentation (OpenApi/Scalar), so that the endpoints exposed by the web application are discoverable and their contracts are visible
+        // Add API documentation (OpenApi/Scalar), so that the endpoints exposed by the web application are discoverable and their contracts are visible.
         app.MapOpenApi();
         app.UseOpenApi(openApiDocumentMiddlewareSettings => openApiDocumentMiddlewareSettings.Path = "/openapi/{documentName}.json");
         app.MapScalarApiReference(scalarOptions =>
@@ -132,8 +132,8 @@ public class Program
                 .WithDotNetFlag(true);
         });
 
-        // liveness and readiness probes, probed by container orchestrators and load balancers; the readiness probe also
-        // verifies that the API is reachable, so the web application is only reported ready when it can actually serve requests
+        // Liveness and readiness probes, probed by container orchestrators and load balancers; the readiness probe also
+        // verifies that the API is reachable, so the web application is only reported ready when it can actually serve requests.
         app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
         app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = healthCheck => healthCheck.Tags.Contains("ready") });
 

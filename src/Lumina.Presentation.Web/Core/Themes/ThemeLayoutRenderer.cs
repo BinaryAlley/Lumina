@@ -16,7 +16,7 @@ namespace Lumina.Presentation.Web.Core.Themes;
 /// </summary>
 public class ThemeLayoutRenderer
 {
-    // the page keys mirror the paths of the corresponding Razor views under Core/Views, so that theme templates can override them at the page, section or default scope
+    // The page keys mirror the paths of the corresponding Razor views under Core/Views, so that theme templates can override them at the page, section or default scope.
     private const string LAYOUT_PAGE_KEY = "shared/layout";
     private const string NAV_PAGE_KEY = "shared/nav-menu";
     private const string SERVER_UNREACHABLE_BANNER_PAGE_KEY = "shared/server-unreachable-banner";
@@ -101,7 +101,7 @@ public class ThemeLayoutRenderer
         }
         catch (Exception)
         {
-            // the themed shell is best effort: when the active theme cannot be loaded, the application layout renders the
+            // The themed shell is best effort: when the active theme cannot be loaded, the application layout renders the
             // page instead. The exception must not propagate, otherwise the exception handling middleware turns the page
             // into a JSON error instead of the fallback layout, so any page breaks whenever the theme API is unavailable.
             return Error.NotFound(code: "Theme.Template.Unavailable", description: "The active theme could not be loaded.");
@@ -130,8 +130,8 @@ public class ThemeLayoutRenderer
         }
         catch (Exception)
         {
-            // the navigation menu is best effort: when the theme navigation template cannot be loaded or rendered,
-            // the application navigation menu is rendered instead, keeping the themed shell of the page intact
+            // The navigation menu is best effort: when the theme navigation template cannot be loaded or rendered,
+            // the application navigation menu is rendered instead, keeping the themed shell of the page intact.
         }
 
         return await _viewRenderer.RenderPartialAsync("_NavMenu", cancellationToken);

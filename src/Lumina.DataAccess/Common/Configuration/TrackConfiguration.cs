@@ -167,8 +167,8 @@ public class TrackConfiguration : IEntityTypeConfiguration<TrackEntity>
             .HasForeignKey(track => track.AlbumId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // since Tag and Genre are Domain ValueObjects (no identity), but we also don't want to have duplicates,
-        // we need to configure them as many-to-many relationships, where the tag/genre itself is the primary key
+        // Since Tag and Genre are Domain ValueObjects (no identity), but we also don't want to have duplicates,
+        // we need to configure them as many-to-many relationships, where the tag/genre itself is the primary key.
         builder.HasMany(track => track.Tags)
             .WithMany()
             .UsingEntity<Dictionary<string, object>>(
@@ -296,7 +296,7 @@ public class TrackConfiguration : IEntityTypeConfiguration<TrackEntity>
 
         builder.HasIndex(track => new { track.AlbumId, track.TrackNumber });
         builder.HasIndex(track => new { track.LibraryId, track.Path })
-            .IsUnique(); // the same physical track file cannot appear twice in the same library
+            .IsUnique(); // The same physical track file cannot appear twice in the same library.
         // The deleted items page filters by library and deletion state, and orders by the stored deletion time, the title and the Id, so the
         // filtered index follows the same order and no temporary B-tree is needed for the sort, while visible rows add no entries to it.
         builder.HasIndex(track => new { track.LibraryId, track.IsDeleted, track.DeletedOnUtc, track.Title, track.Id })

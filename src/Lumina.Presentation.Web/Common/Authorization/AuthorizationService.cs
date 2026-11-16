@@ -66,7 +66,7 @@ public class AuthorizationService : IAuthorizationService
     /// <returns>The user's authorization details.</returns>
     private async Task<GetAuthorizationResponse> GetUserAuthorizationAsync(CancellationToken cancellationToken)
     {
-        // anonymous users and users without an identifier claim have no role or permissions, so deny without querying the API
+        // Anonymous users and users without an identifier claim have no role or permissions, so deny without querying the API.
         string? userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId))
             return new GetAuthorizationResponse(Guid.Empty, string.Empty, []);

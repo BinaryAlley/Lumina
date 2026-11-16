@@ -84,7 +84,7 @@ public class RecoverPasswordCommandHandler : ICommandHandler<RecoverPasswordComm
                 return Errors.Authentication.InvalidTotpCode;
 
         // Generate the hash of a temporary password and record when it was created, so that the reset flow can expire it after 15 minutes.
-        getUserResult.Value.TempPassword = Uri.EscapeDataString(_hashService.HashString("Abcd123$")); // TODO: Replace the hardcoded password with a randomly generated one.
+        getUserResult.Value.TempPassword = Uri.EscapeDataString(_hashService.HashString("Abcd123$")); // TODO: replace the hardcoded password with a randomly generated one.
         getUserResult.Value.TempPasswordCreated = DateTime.UtcNow;
 
         // Update the user and persist the temporary password.

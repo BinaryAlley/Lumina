@@ -79,7 +79,7 @@ public class ParsedLibraryPath : ValueObject
     /// <returns>A list of items defining the equality.</returns>
     public override IEnumerable<object?> GetEqualityComponents()
     {
-        // the captured values are stored in a dictionary, so they are ordered by their kind to keep equality independent of insertion order.
+        // The captured values are stored in a dictionary, so they are ordered by their kind to keep equality independent of insertion order.
         foreach (KeyValuePair<LibraryPathPartKind, string> capturedValue in _values.OrderBy(capturedValue => capturedValue.Key))
         {
             yield return capturedValue.Key;

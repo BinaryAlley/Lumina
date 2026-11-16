@@ -43,7 +43,7 @@ public class ThemePageRenderer
 
             model.ThemeId = document.Theme.Id;
             model.AssetBase = $"/theme-assets/{document.Theme.Id}/assets";
-            // a fresh script id per render lets the AJAX navigator unload this view's script when navigating away
+            // A fresh script id per render lets the AJAX navigator unload this view's script when navigating away.
             model.ScriptId = ScriptIdentifierHelper.GenerateScriptId();
 
             return _templateEngine.RenderPage(document.Template, model);
@@ -54,7 +54,7 @@ public class ThemePageRenderer
         }
         catch (Exception)
         {
-            // themed rendering is best effort: when the active theme cannot be loaded, the caller falls back to the Razor
+            // Themed rendering is best effort: when the active theme cannot be loaded, the caller falls back to the Razor
             // view. The exception must not propagate, otherwise the exception handling middleware turns the page into a
             // JSON error instead of the Razor fallback, so any themed page breaks whenever the theme API is unavailable.
             return Error.NotFound(code: "Theme.Template.Unavailable", description: "The active theme could not be loaded.");

@@ -14,7 +14,7 @@ namespace Lumina.Presentation.Web.Core.Themes;
 /// </summary>
 public class ThemeFileSystemBrowserRenderer
 {
-    // the page keys mirror the template files of the theme packs, pinned in each theme manifest so that a missing sub template does not resolve to the component shell template
+    // The page keys mirror the template files of the theme packs, pinned in each theme manifest so that a missing sub template does not resolve to the component shell template.
     private const string SHELL_PAGE_KEY = "shared/file-system-browser";
     private const string TREE_NODE_PAGE_KEY = "shared/file-system-browser/tree-node";
     private const string EXPLORER_ITEM_PAGE_KEY = "shared/file-system-browser/explorer-item";
@@ -73,7 +73,7 @@ public class ThemeFileSystemBrowserRenderer
         }
         catch (Exception)
         {
-            // the file system browser is best effort: when the component template of the active theme cannot be loaded or rendered, the application Razor fallback is rendered instead
+            // The file system browser is best effort: when the component template of the active theme cannot be loaded or rendered, the application Razor fallback is rendered instead.
             return Error.NotFound(code: "Theme.Template.Unavailable", description: "The file system browser theme template could not be loaded.");
         }
     }
@@ -91,8 +91,8 @@ public class ThemeFileSystemBrowserRenderer
         try
         {
             ThemeRenderDocumentDto document = await _themeService.GetRenderDocumentAsync(pageKey, themeId, cancellationToken).ConfigureAwait(false);
-            // when the theme does not ship the sub template, the mirrored template resolution walks up the path scopes
-            // and returns the component shell template instead, which the client script must not render as dynamic content
+            // When the theme does not ship the sub template, the mirrored template resolution walks up the path scopes
+            // and returns the component shell template instead, which the client script must not render as dynamic content.
             if (string.Equals(document.Template, shellTemplate, StringComparison.Ordinal))
                 return string.Empty;
 
@@ -104,7 +104,7 @@ public class ThemeFileSystemBrowserRenderer
         }
         catch (Exception)
         {
-            // each sub template is best effort: when the theme omits one, the client script renders that part with its built-in markup instead
+            // Each sub template is best effort: when the theme omits one, the client script renders that part with its built-in markup instead.
             return string.Empty;
         }
     }

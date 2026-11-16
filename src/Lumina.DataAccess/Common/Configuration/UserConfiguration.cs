@@ -21,7 +21,7 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
         builder.ToTable("Users");
         builder.HasKey(user => user.Id);
         builder.Property(user => user.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
 
         builder.Property(user => user.Username)
@@ -45,11 +45,11 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
             .HasDefaultValue(null)
             .HasColumnOrder(5);
 
-        // relationships
+        // Relationships.
         builder.HasMany(user => user.Libraries)
             .WithOne(library => library.User)
             .HasForeignKey(library => library.UserId)
-            .IsRequired() // a library must have a user
+            .IsRequired() // A library must have a user.
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(user => user.UserRole)
@@ -63,7 +63,7 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
             .HasForeignKey(userPermission => userPermission.UserId)
             .OnDelete(DeleteBehavior.Cascade); 
 
-        // audit
+        // Audit.
         builder.Property(user => user.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(6);
@@ -80,8 +80,8 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
             .HasDefaultValue(null)
             .HasColumnOrder(9);
 
-        // indexes
+        // Indexes.
         builder.HasIndex(user => user.Username)
-            .IsUnique(); // queried frequently
+            .IsUnique(); // Queried frequently.
     }
 }

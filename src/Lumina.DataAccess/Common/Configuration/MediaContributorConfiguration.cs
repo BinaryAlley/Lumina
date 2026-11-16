@@ -20,7 +20,7 @@ public class MediaContributorConfiguration : IEntityTypeConfiguration<MediaContr
         builder.ToTable("MediaContributors");
         builder.HasKey(contributor => contributor.Id);
         builder.Property(contributor => contributor.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
         builder.Property(contributor => contributor.DisplayName)
             .IsRequired()
@@ -38,7 +38,7 @@ public class MediaContributorConfiguration : IEntityTypeConfiguration<MediaContr
         builder.Property(contributor => contributor.DateOfDeath)
             .HasColumnOrder(5);
 
-        // audit
+        // Audit.
         builder.Property(contributor => contributor.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(6);

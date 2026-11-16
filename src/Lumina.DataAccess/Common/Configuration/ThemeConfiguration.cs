@@ -21,10 +21,10 @@ public class ThemeConfiguration : IEntityTypeConfiguration<ThemeEntity>
         builder.ToTable("Themes");
         builder.HasKey(theme => theme.Id);
         builder.Property(theme => theme.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the install, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the install, we need to tell EF not to generate it.
             .HasColumnOrder(0);
 
-        // the manifest id is the business key used by the clients, so it must be unique
+        // The manifest id is the business key used by the clients, so it must be unique.
         builder.HasIndex(theme => theme.ThemeId)
             .IsUnique();
 
@@ -63,7 +63,7 @@ public class ThemeConfiguration : IEntityTypeConfiguration<ThemeEntity>
             .HasConversion<string>()
             .HasColumnOrder(7);
 
-        // at most one theme can be current: the filtered unique index guarantees it at the database level, since every row that is not current has a null value here, and nulls are allowed to repeat
+        // At most one theme can be current: the filtered unique index guarantees it at the database level, since every row that is not current has a null value here, and nulls are allowed to repeat.
         builder.HasIndex(theme => theme.IsCurrent)
             .IsUnique()
             .HasFilter("IsCurrent = 1");
@@ -80,7 +80,7 @@ public class ThemeConfiguration : IEntityTypeConfiguration<ThemeEntity>
             .IsRequired()
             .HasColumnOrder(10);
 
-        // audit
+        // Audit.
         builder.Property(theme => theme.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(11);

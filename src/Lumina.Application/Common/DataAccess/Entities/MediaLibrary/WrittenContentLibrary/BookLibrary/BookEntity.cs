@@ -73,7 +73,7 @@ public class BookEntity : IStorageEntity, IAuditableEntity
     public ReleaseCountry? ReleaseCountry { get; set; }
 
     /// <summary>
-    /// Gets or sets the optional release version or edition. (e.g. "Original", "Director's Cut", "2.0")
+    /// Gets or sets the optional release version or edition. (e.g. "Original", "Director's Cut", "2.0").
     /// </summary>
     public string? ReleaseVersion { get; set; }
 
@@ -141,7 +141,7 @@ public class BookEntity : IStorageEntity, IAuditableEntity
     /// Gets or sets the volume or book number in the series, if applicable.
     /// </summary>
     public float? VolumeNumber { get; set; }
-    // TODO: uncomment when series is implemented
+    // TODO: uncomment when series is implemented.
     /// <summary>
     /// Gets or sets the series id, if the book is part of a series.
     /// </summary>

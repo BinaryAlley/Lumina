@@ -503,7 +503,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         // SQLite reports a generic constraint failure code for several constraints, so the extended code is used to tell a unique violation apart.
         return exception.InnerException is SqliteException sqliteException
-            && sqliteException.SqliteExtendedErrorCode == 2067; // SQLITE_CONSTRAINT_UNIQUE
+            && sqliteException.SqliteExtendedErrorCode == 2067; // SQLITE_CONSTRAINT_UNIQUE.
     }
 
     /// <summary>
@@ -523,7 +523,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     /// <returns><see langword="true"/> if the database is busy or locked, <see langword="false"/> otherwise.</returns>
     private static bool IsSqliteBusyOrLocked(SqliteException exception)
     {
-        return exception.SqliteErrorCode is 5 or 6; // SQLITE_BUSY, SQLITE_LOCKED
+        return exception.SqliteErrorCode is 5 or 6; // SQLITE_BUSY, SQLITE_LOCKED.
     }
 
     /// <summary>

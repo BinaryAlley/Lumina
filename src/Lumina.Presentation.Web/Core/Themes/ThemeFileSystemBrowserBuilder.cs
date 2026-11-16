@@ -12,7 +12,7 @@ namespace Lumina.Presentation.Web.Core.Themes;
 /// </summary>
 public sealed class ThemeFileSystemBrowserBuilder
 {
-    // the resource base name deliberately excludes the "Core.Resources" segment: the localization factory re-roots it with the configured ResourcesPath
+    // The resource base name deliberately excludes the "Core.Resources" segment: the localization factory re-roots it with the configured ResourcesPath.
     private const string VIEW_RESOURCE_BASE_NAME = "Lumina.Presentation.Web.Views.Shared.Components.FileSystemBrowser.Default";
     private const string VIEW_RESOURCE_LOCATION = "Lumina.Presentation.Web";
 

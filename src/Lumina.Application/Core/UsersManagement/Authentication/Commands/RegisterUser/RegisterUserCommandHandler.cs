@@ -116,7 +116,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
         if (saveChangesResult.IsFailure)
             return saveChangesResult.Errors;
 
-        // TODO: Insert the default admin profile preferences when they are implemented.
+        // TODO: insert the default admin profile preferences when they are implemented.
         // If 2FA was enabled, the TOTP secret needs to be delivered to the client unencrypted, so it can be displayed.
         return new RegistrationResponse(user.Id, user.Username, totpSecret);
     }

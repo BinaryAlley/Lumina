@@ -21,7 +21,7 @@ public class MediaResumePointConfiguration : IEntityTypeConfiguration<MediaResum
         builder.ToTable("MediaResumePoints");
         builder.HasKey(resumePoint => resumePoint.Id);
         builder.Property(resumePoint => resumePoint.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
 
         // A resume point belongs to the user that owns it, and it is removed with that user.

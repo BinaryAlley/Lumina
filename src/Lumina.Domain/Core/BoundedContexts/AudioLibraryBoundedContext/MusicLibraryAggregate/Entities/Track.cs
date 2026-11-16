@@ -226,7 +226,7 @@ public sealed class Track : Entity<TrackId>
             musicBrainzTrackId,
             contributors,
             ratings,
-            DateTime.UtcNow, // TODO: should be IDateTimeProvider
+            DateTime.UtcNow, // TODO: should be IDateTimeProvider.
             Optional<DateTime>.None());
     }
 
@@ -304,7 +304,7 @@ public sealed class Track : Entity<TrackId>
     /// <param name="moods">The moods of the track.</param>
     internal void UpdateMoods(IReadOnlyCollection<Mood> moods)
     {
-        // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
+        // Replace the contents of the collection in place, preserving the readonly reference invariants of the entity.
         _moods.Clear();
         _moods.AddRange(moods);
     }
@@ -315,7 +315,7 @@ public sealed class Track : Entity<TrackId>
     /// <param name="isrcs">The ISRCs of the track.</param>
     internal void UpdateIsrcs(IReadOnlyCollection<Isrc> isrcs)
     {
-        // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
+        // Replace the contents of the collection in place, preserving the readonly reference invariants of the entity.
         _isrcs.Clear();
         _isrcs.AddRange(isrcs);
     }
@@ -326,7 +326,7 @@ public sealed class Track : Entity<TrackId>
     /// <param name="contributors">The media contributors of the track.</param>
     internal void UpdateContributors(IReadOnlyCollection<MusicMediaContributor> contributors)
     {
-        // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
+        // Replace the contents of the collection in place, preserving the readonly reference invariants of the entity.
         _contributors.Clear();
         _contributors.AddRange(contributors);
     }
@@ -337,7 +337,7 @@ public sealed class Track : Entity<TrackId>
     /// <param name="ratings">The ratings of the track.</param>
     internal void UpdateRatings(IReadOnlyCollection<AudioRating> ratings)
     {
-        // replace the contents of the collection in place, preserving the readonly reference invariants of the entity
+        // Replace the contents of the collection in place, preserving the readonly reference invariants of the entity.
         _ratings.Clear();
         _ratings.AddRange(ratings);
     }

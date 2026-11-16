@@ -11,7 +11,7 @@ namespace Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
 public class FileDto : FileSystemItemDto
 {
     /// <summary>
-    /// Gets or sets the size of the file, in bytes
+    /// Gets or sets the size of the file, in bytes.
     /// </summary>
     public long Size { get; set; }
 }

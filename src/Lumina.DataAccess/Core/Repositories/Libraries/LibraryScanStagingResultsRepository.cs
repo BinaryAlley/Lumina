@@ -23,7 +23,7 @@ namespace Lumina.DataAccess.Core.Repositories.Libraries;
 /// </summary>
 internal sealed class LibraryScanStagingResultsRepository : ILibraryScanStagingResultsRepository
 {
-    private const int INSERT_BATCH_SIZE = 500; // keeps the number of bound parameters of a single INSERT statement well under the SQLite parameter limit
+    private const int INSERT_BATCH_SIZE = 500; // Keeps the number of bound parameters of a single INSERT statement well under the SQLite parameter limit.
     private readonly LuminaDbContext _luminaDbContext;
 
     /// <summary>
@@ -43,14 +43,14 @@ internal sealed class LibraryScanStagingResultsRepository : ILibraryScanStagingR
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertRangeAsync(IReadOnlyCollection<LibraryScanStagingResultsEntity> entities, CancellationToken cancellationToken)
     {
-        // nothing to insert for an empty collection
+        // Nothing to insert for an empty collection.
         if (entities.Count == 0)
             return Result.Created;
 
         await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
         await using DbTransaction transaction = await connection.BeginTransactionAsync(cancellationToken);
         List<LibraryScanStagingResultsEntity> remainingEntities = [.. entities];
-        // insert the entities in batches, to keep the number of bound parameters of a single INSERT statement under the SQLite parameter limit
+        // Insert the entities in batches, to keep the number of bound parameters of a single INSERT statement under the SQLite parameter limit.
         while (remainingEntities.Count > 0)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -73,8 +73,8 @@ internal sealed class LibraryScanStagingResultsRepository : ILibraryScanStagingR
     public async Task<Result<Updated>> MarkChangesAgainstSnapshotAsync(Guid scanId, Guid libraryId, CancellationToken cancellationToken)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
-        // compare the discovered file system items against the media library scan snapshot of the previous scan, entirely in the database, so that the snapshot never needs to be loaded into memory:
-        // an item with no snapshot entry is new, an item with the same size and last write time is unchanged and keeps the stored hash, and everything else changed and needs its content hashed again
+        // Compare the discovered file system items against the media library scan snapshot of the previous scan, entirely in the database, so that the snapshot never needs to be loaded into memory:
+        // An item with no snapshot entry is new, an item with the same size and last write time is unchanged and keeps the stored hash, and everything else changed and needs its content hashed again.
         const string MARK_CHANGES_SQL = """
             UPDATE LibraryScanStagingResults AS staging
             SET ContentHash = COALESCE(snapshot.ContentHash, 0),

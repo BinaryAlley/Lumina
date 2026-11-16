@@ -15,7 +15,7 @@ using System.Reflection;
 namespace Lumina.DataAccess.Common.DependencyInjection;
 
 /// <summary>
-/// Utility class for registering the services of the Data Access layer into the Dependency Injection container..
+/// Utility class for registering the services of the Data Access layer into the Dependency Injection container.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public static class DataAccessLayerServices

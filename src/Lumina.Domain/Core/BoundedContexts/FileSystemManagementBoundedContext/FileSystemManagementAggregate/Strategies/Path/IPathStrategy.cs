@@ -53,7 +53,7 @@ public interface IPathStrategy
     /// <summary>
     /// Returns a collection of characters that are invalid for paths.
     /// </summary>
-    /// <returns>A collection of characters that are invalid in the context of paths</returns>
+    /// <returns>A collection of characters that are invalid in the context of paths.</returns>
     char[] GetInvalidPathCharsForPlatform();
 
     /// <summary>

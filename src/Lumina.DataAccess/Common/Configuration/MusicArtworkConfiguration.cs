@@ -20,7 +20,7 @@ public class MusicArtworkConfiguration : IEntityTypeConfiguration<MusicArtworkEn
         builder.ToTable("MusicArtwork");
         builder.HasKey(musicArtwork => musicArtwork.Id);
         builder.Property(musicArtwork => musicArtwork.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
         builder.Property(musicArtwork => musicArtwork.OwnerType)
             .IsRequired()
@@ -54,7 +54,7 @@ public class MusicArtworkConfiguration : IEntityTypeConfiguration<MusicArtworkEn
         builder.Property(musicArtwork => musicArtwork.LastUpdateUtc)
             .HasColumnOrder(9);
 
-        // audit
+        // Audit.
         builder.Property(musicArtwork => musicArtwork.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(10);

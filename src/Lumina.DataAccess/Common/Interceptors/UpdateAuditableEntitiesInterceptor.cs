@@ -68,7 +68,7 @@ public sealed class UpdateAuditableEntitiesInterceptor : SaveChangesInterceptor
         Guid? userId = _currentUserService.UserId;
         DateTime utcNow = _dateTimeProvider.UtcNow;
 
-        // retrieve all entities implementing IAuditableEntity that are being tracked and have either Added or Modified state
+        // Retrieve all entities implementing IAuditableEntity that are being tracked and have either Added or Modified state.
         foreach (EntityEntry<IAuditableEntity> entry in context.ChangeTracker.Entries<IAuditableEntity>())
         {
             if (entry.State == EntityState.Added)
@@ -100,12 +100,12 @@ public sealed class UpdateAuditableEntitiesInterceptor : SaveChangesInterceptor
     /// <param name="utcNow">The current UTC timestamp.</param>
     private static void SetModificationProperties(EntityEntry<IAuditableEntity> entry, Guid? userId, DateTime utcNow)
     {
-        // prevent modification of creation properties
+        // Prevent modification of creation properties.
         entry.Property(auditableEntity => auditableEntity.CreatedOnUtc).IsModified = false;
         entry.Property(auditableEntity => auditableEntity.CreatedBy).IsModified = false;
 
-        // set modification properties
+        // Set modification properties.
         entry.Entity.UpdatedOnUtc = utcNow;
-        entry.Entity.UpdatedBy = userId ?? Guid.Parse("11111111-1111-1111-1111-111111111111"); // "SYSTEM" user Id
+        entry.Entity.UpdatedBy = userId ?? Guid.Parse("11111111-1111-1111-1111-111111111111"); // "SYSTEM" user Id.
     }
 }

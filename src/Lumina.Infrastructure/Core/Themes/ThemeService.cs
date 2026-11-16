@@ -53,7 +53,7 @@ public sealed class ThemeService : IThemeService
     private readonly string _storageRoot;
     private readonly string _stagingRoot;
     private readonly string _bundledRoot;
-    // serializes theme pack mutations, so concurrent installs and deletes cannot race on the same files; the gate is
+    // Serializes theme pack mutations, so concurrent installs and deletes cannot race on the same files; the gate is
     // shared by every instance that writes to the same storage root, because several hosts can run against the same
     // storage directory at once (for example the parallel in-memory hosts started by the test factories). A per-instance
     // gate is NOT enough: concurrent hosts raced on the shared staging cleanup and one host's directory move failed with
@@ -148,7 +148,7 @@ public sealed class ThemeService : IThemeService
                 if (manifestResult.IsFailure)
                     return manifestResult.Errors;
 
-                // install means replace: the files of an existing theme with the same manifest id are swapped with the new pack
+                // Install means replace: the files of an existing theme with the same manifest id are swapped with the new pack.
                 string destination = Path.Combine(_storageRoot, manifestResult.Value.Id);
                 await SwapIntoDestinationAsync(extractionPath, destination, cancellationToken);
                 return manifestResult.Value;
@@ -160,8 +160,8 @@ public sealed class ThemeService : IThemeService
             }
             catch (IOException exception)
             {
-                // the extracted pack could not be moved into place; the install is best effort, so the caller receives an error
-                // instead of an unhandled exception that would crash the host or fail the request
+                // The extracted pack could not be moved into place; the install is best effort, so the caller receives an error
+                // instead of an unhandled exception that would crash the host or fail the request.
                 _logger.LogWarning(exception, "The theme pack could not be installed.");
                 return Errors.Themes.ThemeFilesUnreadable;
             }
@@ -182,17 +182,17 @@ public sealed class ThemeService : IThemeService
                 }
                 catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
                 {
-                    // a locked staging file must not turn the install into an unhandled exception; the stale staging
-                    // directory is removed on the next install attempt
+                    // A locked staging file must not turn the install into an unhandled exception; the stale staging
+                    // directory is removed on the next install attempt.
                     _logger.LogTrace(exception, "Failed to clean up the theme staging directory.");
                 }
             }
         }
         catch (IOException exception)
         {
-            // a file system failure before or during the install (for example a locked storage or staging directory)
+            // A file system failure before or during the install (for example a locked storage or staging directory)
             // must not escape as an unhandled exception, which would crash the host or fail the request; the install
-            // is best effort and returns an error instead
+            // is best effort and returns an error instead.
             _logger.LogWarning(exception, "The theme pack could not be installed.");
             return Errors.Themes.ThemeFilesUnreadable;
         }
@@ -294,7 +294,7 @@ public sealed class ThemeService : IThemeService
             ? explicitPath
             : ResolveMirroredTemplatePath(themePath, pageKey);
 
-        // a template is used for a page only when the theme provides one explicitly or as a mirrored file
+        // A template is used for a page only when the theme provides one explicitly or as a mirrored file.
         if (templatePath is null)
             return Errors.Themes.ThemeTemplateNotFound;
 
@@ -321,7 +321,7 @@ public sealed class ThemeService : IThemeService
         string? candidate = pageKey;
         while (candidate is not null)
         {
-            // normalize the mirrored candidate so that malicious page keys cannot escape the theme pack
+            // Normalize the mirrored candidate so that malicious page keys cannot escape the theme pack.
             Result<string> normalizedResult = NormalizeRelativePath($"templates/{candidate}.html");
             if (normalizedResult.IsSuccess)
             {
@@ -510,7 +510,7 @@ public sealed class ThemeService : IThemeService
             if (entry.Length > _options.MaxSingleFileBytes)
                 return Error.Validation(code: "Theme.File.TooLarge", description: $"Theme file '{normalizedPath}' is too large.");
 
-            // guard the total decompressed size, so a tiny archive cannot expand into a decompression bomb
+            // Guard the total decompressed size, so a tiny archive cannot expand into a decompression bomb.
             expandedBytes += entry.Length;
             if (expandedBytes > _options.MaxExpandedBytes)
                 return Error.Validation(code: "Theme.Archive.ExpandedTooLarge", description: "The expanded theme archive is too large.");
@@ -533,7 +533,7 @@ public sealed class ThemeService : IThemeService
                 if (read == 0)
                     break;
 
-                // enforce the per-file limit while streaming, because the declared entry size is not trustworthy
+                // Enforce the per-file limit while streaming, because the declared entry size is not trustworthy.
                 entryBytes += read;
                 if (entryBytes > _options.MaxSingleFileBytes)
                     return Error.Validation(code: "Theme.File.TooLarge", description: $"Theme file '{normalizedPath}' is too large.");
@@ -752,7 +752,7 @@ public sealed class ThemeService : IThemeService
             if (segment is "." or ".." || segment.Length > 80 || segment.EndsWith(' ') || segment.EndsWith('.'))
                 return PackageInvalid($"Theme path segment '{segment}' is invalid.");
 
-            // a theme path segment must be already safe, meaning that sanitizing it would leave it unchanged
+            // A theme path segment must be already safe, meaning that sanitizing it would leave it unchanged.
             Result<PathSegment> sanitizeResult = _pathService.SanitizeSegment(segment);
             if (sanitizeResult.IsFailure || !string.Equals(sanitizeResult.Value.Name, segment, StringComparison.Ordinal))
                 return PackageInvalid($"Theme path segment '{segment}' is invalid.");

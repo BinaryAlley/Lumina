@@ -31,7 +31,7 @@ internal class MediaLibraryScanJobFactory : IMediaLibraryScanJobFactory
     /// <exception cref="ArgumentException">Thrown when the type of the requested media library scan job has not been registered.</exception>
     public TJob CreateJob<TJob>(LibraryId libraryId) where TJob : IMediaLibraryScanJob
     {
-        // resolve the job from DI
+        // Resolve the job from DI.
         TJob job = _serviceProvider.GetRequiredService<TJob>() ?? throw new ArgumentException("Job type not registered in the DI system.");
         job.LibraryId = libraryId;
         return job;

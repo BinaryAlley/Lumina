@@ -47,7 +47,7 @@ public class SetLanguageEndpoint : BaseEndpoint<SetLanguageRequest, IResult>
                 Expires = DateTimeOffset.UtcNow.AddYears(1),
                 IsEssential = true,
                 SameSite = SameSiteMode.Lax,
-                Path = "/" // ensure the cookie works across all paths
+                Path = "/" // Ensure the cookie works across all paths.
             }
         );
         // Determine the URL to return to, defaulting to the localized home page when no return URL is supplied.

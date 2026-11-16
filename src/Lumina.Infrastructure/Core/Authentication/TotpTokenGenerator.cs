@@ -16,7 +16,7 @@ public class TotpTokenGenerator : ITotpTokenGenerator
     /// <returns>The generated TOTP secret.</returns>
     public byte[] GenerateSecret()
     {
-        return KeyGeneration.GenerateRandomKey();  // generate a random key for TOTP
+        return KeyGeneration.GenerateRandomKey();  // Generate a random key for TOTP.
     }
 
     /// <summary>
@@ -28,7 +28,7 @@ public class TotpTokenGenerator : ITotpTokenGenerator
     public bool ValidateToken(byte[] secret, string token)
     {
         Totp totp = new(secret);
-        // verify the TOTP token, allowing for slight time drifts between server and client
+        // Verify the TOTP token, allowing for slight time drifts between server and client.
         return totp.VerifyTotp(token, out _, VerificationWindow.RfcSpecifiedNetworkDelay);
     }
 }

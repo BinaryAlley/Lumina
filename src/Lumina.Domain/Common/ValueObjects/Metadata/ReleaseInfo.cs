@@ -42,7 +42,7 @@ public class ReleaseInfo : ValueObject
     public Optional<ReleaseCountry> ReleaseCountry { get; }
 
     /// <summary>
-    /// Gets the optional release version or edition. (e.g. "Original", "Director's Cut", "2.0")
+    /// Gets the optional release version or edition. (e.g. "Original", "Director's Cut", "2.0").
     /// </summary>
     public Optional<string> ReleaseVersion { get; }
 

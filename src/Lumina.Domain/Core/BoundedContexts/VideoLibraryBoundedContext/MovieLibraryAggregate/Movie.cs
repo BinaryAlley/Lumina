@@ -58,7 +58,7 @@ public sealed class Movie : Entity<MovieId>
     /// <returns>The created <see cref="Movie"/>.</returns>
     public static Result<Movie> Create(VideoMetadata metadata, List<MediaContributorId> contributors, List<Rating> ratings)
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         return new Movie(MovieId.CreateUnique(), metadata, contributors, ratings);
     }
 
@@ -72,7 +72,7 @@ public sealed class Movie : Entity<MovieId>
     /// <returns>The created <see cref="Movie"/>.</returns>
     public static Result<Movie> Create(MovieId id, VideoMetadata metadata, List<MediaContributorId> contributors, List<Rating> ratings)
     {
-        // TODO: enforce invariants
+        // TODO: enforce invariants.
         return new Movie(id, metadata, contributors, ratings);
     }
 }

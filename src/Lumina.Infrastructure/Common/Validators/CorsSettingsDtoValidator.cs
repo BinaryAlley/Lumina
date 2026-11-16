@@ -36,7 +36,7 @@ public class CorsSettingsDtoValidator : AbstractValidator<CorsSettingsDto>
     private bool BeValidOrigin(string origin)
     {
         if (origin == "*")
-            return true; // wildcard allowed without credentials
+            return true; // Wildcard allowed without credentials.
         return Uri.TryCreate(origin, UriKind.Absolute, out Uri? uri) && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps) && !origin.EndsWith('/');
     }
 }

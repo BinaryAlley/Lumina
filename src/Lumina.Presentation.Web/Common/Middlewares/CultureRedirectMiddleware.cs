@@ -28,17 +28,17 @@ public class CultureRedirectMiddleware
     /// <param name="context">The <see cref="HttpContext"/> for the current request.</param>
     public async Task InvokeAsync(HttpContext context)
     {
-        // check if the request path starts with "/" and does not contain any culture
+        // Check if the request path starts with "/" and does not contain any culture.
         string? path = context.Request.Path.Value?.ToLowerInvariant();
-        // redirect routes that would lead to the home page
+        // Redirect routes that would lead to the home page.
         if (path == "/" || path == "/home" || path == "/index")
         {
-            // try to get the user's preferred culture from cookies
+            // Try to get the user's preferred culture from cookies.
             IRequestCultureFeature? feature = context.Features.Get<IRequestCultureFeature>();
             string? userCulture = feature?.RequestCulture.Culture.Name;
-            // if no specific culture is found, use "en-US" as fallback
+            // If no specific culture is found, use "en-US" as fallback.
             string redirectCulture = userCulture ?? "en-US";
-            // redirect the user to their preferred culture route
+            // Redirect the user to their preferred culture route.
             context.Response.Redirect($"/{redirectCulture.ToLower()}/");
             return;
         }

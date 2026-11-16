@@ -23,7 +23,7 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
         builder.ToTable("Books");
         builder.HasKey(book => book.Id);
         builder.Property(book => book.Id)
-            .ValueGeneratedNever() // because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
             .HasColumnOrder(0);
 
         builder.Property(book => book.Title)
@@ -62,8 +62,8 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
             .HasColumnOrder(14);
         builder.Property(book => book.OriginalLanguageNativeName)
             .HasColumnOrder(15);
-        // since Tag is a Domain ValueObject (no identity), but we also don't want to have duplicates,
-        // we need to configure it as a many-to-many relationship, where the tag itself is the primary key
+        // Since Tag is a Domain ValueObject (no identity), but we also don't want to have duplicates,
+        // we need to configure it as a many-to-many relationship, where the tag itself is the primary key.
         builder.HasMany(book => book.Tags)
             .WithMany()
             .UsingEntity<Dictionary<string, object>>(
@@ -213,7 +213,7 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
                 .IsRequired();
         });
 
-        // audit
+        // Audit.
         builder.Property(book => book.CreatedOnUtc)
             .IsRequired()
             .HasColumnOrder(32);
@@ -231,7 +231,7 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
             .HasColumnOrder(35);
 
         builder.HasIndex(book => new { book.LibraryId, book.Path })
-            .IsUnique(); // the same physical book on disk cannot appear twice in the same library
+            .IsUnique(); // The same physical book on disk cannot appear twice in the same library.
         builder.HasIndex(book => new { book.LibraryId, book.MetadataStatus });
         // The deleted items page filters by library and deletion state, and orders by the stored deletion time, the title and the Id, so the
         // index follows the same order and no temporary B-tree is needed for the sort.

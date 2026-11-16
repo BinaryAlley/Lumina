@@ -38,7 +38,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     /// <returns>The generated JWT token.</returns>
     public string GenerateToken(string id, string username)
     {
-        // use a symmetric key approach
+        // Use a symmetric key approach.
         SigningCredentials signingCredentials = new(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettingsModel.SecretKey)), SecurityAlgorithms.HmacSha256);
         Claim[] claims =
         [

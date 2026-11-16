@@ -47,7 +47,7 @@ public class InstallPluginEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IR
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(FastEndpoints.EmptyRequest request, CancellationToken cancellationToken)
     {
-        // a multipart body without any part cannot be parsed as a form, so a malformed upload is treated as a missing archive
+        // A multipart body without any part cannot be parsed as a form, so a malformed upload is treated as a missing archive.
         IFormFile? archive = null;
         if (HttpContext.Request.HasFormContentType)
         {

@@ -102,14 +102,14 @@ public static class PresentationApiLayerServices
             {
                 string clientIp = httpContext.Request.Headers["X-Forwarded-For"] // First check forwarded headers, in case this is behind a reverse proxy.
                     .FirstOrDefault()?.Split(',')[0].Trim() // Take first IP, if multiple available, to avoid IP spoofing attempts,
-                    ?? httpContext.Connection.RemoteIpAddress?.ToString() // then try RemoteIpAddress.
+                    ?? httpContext.Connection.RemoteIpAddress?.ToString() // Then try RemoteIpAddress.
                     ?? "unknown"; // Fallback if both are null.
                 return RateLimitPartition.GetFixedWindowLimiter(
                     partitionKey: $"auth_{clientIp}",
                     factory: _ => new FixedWindowRateLimiterOptions
                     {
-                        PermitLimit = 10, // Allow 10 attempts
-                        Window = TimeSpan.FromMinutes(15), // within 15 minute window.
+                        PermitLimit = 10, // Allow 10 attempts.
+                        Window = TimeSpan.FromMinutes(15), // Within 15 minute window.
                         QueueLimit = 0,  // Don't queue requests.
                         AutoReplenishment = true  // Automatically reset rate limiter tokens.
                     });

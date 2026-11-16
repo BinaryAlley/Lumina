@@ -69,7 +69,7 @@ internal sealed class LibraryMetadataProviderConfigurationRepository : ILibraryM
             _luminaDbContext.LibraryMetadataProviderConfigurations.Add(configuration);
         else
         {
-            // update only the mutable fields, preserving the Id of the existing configuration
+            // Update only the mutable fields, preserving the Id of the existing configuration.
             existingConfiguration.LibraryId = configuration.LibraryId;
             existingConfiguration.PluginId = configuration.PluginId;
             existingConfiguration.IsEnabled = configuration.IsEnabled;
