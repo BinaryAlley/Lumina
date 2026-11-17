@@ -242,7 +242,7 @@ POST api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books
   "metadataProvider": null,
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": null,
-  "coverPath": "/media/books/tolkien/the-fellowship-of-the-ring/cover.jpg"
+  "coverPath": "/media/books/books-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/J.R.R. Tolkien/The Fellowship of the Ring-32b336e8-dafc-4a08-9dec-9454e66dd55d/cover.jpg"
 }
 ```
 
@@ -358,7 +358,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{bookId}
   "metadataProvider": null,
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": null,
-  "coverPath": "/media/books/tolkien/the-fellowship-of-the-ring/cover.jpg"
+  "coverPath": "/media/books/books-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/J.R.R. Tolkien/The Fellowship of the Ring-32b336e8-dafc-4a08-9dec-9454e66dd55d/cover.jpg"
 }
 ```
 
@@ -472,7 +472,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books?currentPage=1&pe
       "metadataProvider": null,
       "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
       "updatedOnUtc": null,
-      "coverPath": "/media/books/tolkien/the-fellowship-of-the-ring/cover.jpg"
+      "coverPath": "/media/books/books-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/J.R.R. Tolkien/The Fellowship of the Ring-32b336e8-dafc-4a08-9dec-9454e66dd55d/cover.jpg"
     }
   ],
   "currentPage": 1,
@@ -513,7 +513,7 @@ GET api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/lite?currentPage
       "id": "32b336e8-dafc-4a08-9dec-9454e66dd55d",
       "title": "The Fellowship of the Ring",
       "releaseYear": 1954,
-      "coverPath": "/media/covers/the-fellowship-of-the-ring.jpg"
+      "coverPath": "/media/books/books-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/J.R.R. Tolkien/The Fellowship of the Ring-32b336e8-dafc-4a08-9dec-9454e66dd55d/cover.jpg"
     }
   ],
   "currentPage": 1,
@@ -724,7 +724,7 @@ PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{bookId}
   "metadataProvider": "GoogleBooks",
   "createdOnUtc": "2025-01-01T12:00:00.0000000Z",
   "updatedOnUtc": "2025-02-01T12:00:00.0000000Z",
-  "coverPath": "/media/books/books-3f2504e0-4f89-41d3-9a0c-0305e82c3301/The Lord of the Rings-2b0e5f5a-0b3f-4b7e-8f4a-8c9e3d2f5a6b/cover.jpg"
+  "coverPath": "/media/books/books-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/J.R.R. Tolkien/The Fellowship of the Ring-32b336e8-dafc-4a08-9dec-9454e66dd55d/cover.jpg"
 }
 ```
 
@@ -754,7 +754,7 @@ Content-Type: image/jpeg
 
 ```json
 {
-  "coverPath": "/media/books/books-3f2504e0-4f89-41d3-9a0c-0305e82c3301/The Lord of the Rings-2b0e5f5a-0b3f-4b7e-8f4a-8c9e3d2f5a6b/cover.jpg"
+  "coverPath": "/media/books/books-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/J.R.R. Tolkien/The Fellowship of the Ring-32b336e8-dafc-4a08-9dec-9454e66dd55d/cover.jpg"
 }
 ```
 
@@ -901,7 +901,7 @@ Returns the books of the media library identified by the route that the user del
     "originalTitle": null,
     "path": "/media/libraries/books/the-fellowship-of-the-ring.pdf",
     "deletedOnUtc": "2026-11-12T10:15:30Z",
-    "coverPath": "/media/books/tolkien/the-fellowship-of-the-ring/cover.jpg"
+    "coverPath": "/media/books/books-3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/J.R.R. Tolkien/The Fellowship of the Ring-f4c8a9a0-3d77-4e86-9b1a-2f7a5c4b6d31/cover.jpg"
   }
 ]
 ```
