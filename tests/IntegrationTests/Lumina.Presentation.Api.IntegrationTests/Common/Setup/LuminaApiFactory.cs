@@ -84,6 +84,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
             {
                 options.UseSqlite(_sharedInMemoryConnectionString);
                 options.AddInterceptors(serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>());
+                ConfigureDbContextOptions(serviceProvider, options);
             });
             // Configure JWT authentication for testing.
             services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
@@ -108,6 +109,21 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
                 dbContext.Database.Migrate(); 
             }
         });
+    }
+
+    /// <summary>
+    /// Configures additional options of the database context used by the tests.
+    /// </summary>
+    /// <remarks>
+    /// The hook is invoked every time the options of a database context are built, including once for the throwaway provider that migrates the
+    /// database while the host is configured and once for the final provider of the host. Derived factories that resolve test services from the
+    /// provided <paramref name="serviceProvider"/> must register those services before the shared factory configures the database, and must call
+    /// this base implementation so that options added here are never silently skipped.
+    /// </remarks>
+    /// <param name="serviceProvider">The service provider used to resolve the options of the database context.</param>
+    /// <param name="options">The options builder of the database context being configured.</param>
+    protected virtual void ConfigureDbContextOptions(IServiceProvider serviceProvider, DbContextOptionsBuilder options)
+    {
     }
 
     /// <summary>
