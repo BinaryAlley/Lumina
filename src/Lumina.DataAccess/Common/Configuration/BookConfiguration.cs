@@ -235,6 +235,8 @@ public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
         builder.HasIndex(book => new { book.LibraryId, book.MetadataStatus });
         // The deleted items page filters by library and deletion state, and orders by the stored deletion time, the title and the Id, so the
         // index follows the same order and no temporary B-tree is needed for the sort.
-        builder.HasIndex(book => new { book.LibraryId, book.IsDeleted, book.DeletedOnUtc, book.Title, book.Id });
+        // Only deleted books maintain an entry in the index, since visible books never appear in the listing.
+        builder.HasIndex(book => new { book.LibraryId, book.IsDeleted, book.DeletedOnUtc, book.Title, book.Id })
+            .HasFilter("\"IsDeleted\" = 1");
     }
 }

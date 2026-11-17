@@ -2117,7 +2117,8 @@ namespace Lumina.DataAccess.Common.Migrations
                     b.HasIndex("LibraryId", "Path")
                         .IsUnique();
 
-                    b.HasIndex("LibraryId", "IsDeleted", "DeletedOnUtc", "Title", "Id");
+                    b.HasIndex("LibraryId", "IsDeleted", "DeletedOnUtc", "Title", "Id")
+                        .HasFilter("\"IsDeleted\" = 1");
 
                     b.ToTable("Books", (string)null);
                 });
