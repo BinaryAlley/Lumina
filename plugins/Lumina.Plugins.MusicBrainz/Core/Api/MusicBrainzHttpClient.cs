@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Plugins.Contracts.Common.Http;
 using Lumina.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
 using Lumina.Plugins.MusicBrainz.Common.Models.DTO.Settings;
 using Lumina.Plugins.MusicBrainz.Core.Settings;
@@ -33,6 +34,9 @@ internal sealed class MusicBrainzHttpClient
 
     // Transient failures and rate limiting are retried with an exponential backoff, so a single hiccup does not mark an item as failed to enrich.
     private const int MAXIMUM_ATTEMPT_COUNT = 4;
+
+    // The redirects of a self hosted mirror are followed explicitly, so the host redirect policy can be opted out of and only the same host can be reached.
+    private const int MAXIMUM_REDIRECT_COUNT = 5;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MusicBrainzHttpClient"/> class.
@@ -222,15 +226,55 @@ internal sealed class MusicBrainzHttpClient
     }
 
     /// <summary>
-    /// Sends a GET request to the MusicBrainz web service, throttled to respect the configured minimum request interval unless the configured
-    /// base URL is not the real MusicBrainz service, in which case no rate limit is imposed. Transient failures, rate limiting and transport
-    /// exceptions are retried, preferring the delay requested by the web service when it is provided.
+    /// Sends a GET request to the MusicBrainz web service, following its redirects explicitly so they are confined to the configured host, and throttled to
+    /// respect the configured minimum request interval unless the configured base URL is not the real MusicBrainz service, in which case no rate limit is imposed.
+    /// Transient failures, rate limiting and transport exceptions are retried, preferring the delay requested by the web service when it is provided.
     /// </summary>
     /// <param name="settings">The settings that configure the MusicBrainz web service requests.</param>
     /// <param name="relativeUrl">The URL of the resource, relative to the base address.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>The HTTP response message for the request.</returns>
+    /// <exception cref="HttpRequestException">The service redirected the request to a host or a scheme that is not allowed, or too many times.</exception>
     private async Task<HttpResponseMessage> SendAsync(MusicBrainzSettingsDto settings, string relativeUrl, CancellationToken cancellationToken)
+    {
+        Uri baseUri = new(settings.BaseUrl, UriKind.Absolute);
+        // The permission to reach a private address is scoped to the host of the configured base URL, so a mirror cannot redirect the request to another
+        // private host, and the link local and cloud metadata ranges stay blocked even when the permission is granted.
+        string? allowedPrivateHost = settings.DoesAllowPrivateBaseUrl ? baseUri.IdnHost : null;
+        Uri requestUri = BuildRequestUri(settings.BaseUrl, relativeUrl);
+
+        for (int redirectCount = 0; redirectCount <= MAXIMUM_REDIRECT_COUNT; redirectCount++)
+        {
+            HttpResponseMessage response = await SendWithRetriesAsync(settings, requestUri, allowedPrivateHost, cancellationToken).ConfigureAwait(false);
+
+            if (!IsRedirect(response.StatusCode) || response.Headers.Location is null)
+                return response;
+
+            Uri? redirectUri = ResolveRedirect(requestUri, response.Headers.Location);
+            // The response of a redirect is not returned, so it must be disposed here to release its connection.
+            response.Dispose();
+
+            // A redirect is followed only to the configured host, and never from HTTPS to HTTP, so a compromised or misbehaving mirror cannot redirect the
+            // request to any other host, while a plain HTTP self hosted mirror keeps working across the redirects of its reverse proxy.
+            if (redirectUri is null || !IsAllowedRedirect(baseUri, redirectUri))
+                throw new HttpRequestException(HttpRequestError.ConfigurationLimitExceeded, "The MusicBrainz service redirected the request to a disallowed target.");
+
+            requestUri = redirectUri;
+        }
+
+        throw new HttpRequestException(HttpRequestError.ConfigurationLimitExceeded, "The MusicBrainz service redirected the request too many times.");
+    }
+
+    /// <summary>
+    /// Sends a GET request to the provided URI, throttled to respect the configured minimum request interval. Transient failures and rate limiting are retried,
+    /// so a single hiccup does not surface as a failed resolution.
+    /// </summary>
+    /// <param name="settings">The settings that configure the MusicBrainz web service requests.</param>
+    /// <param name="requestUri">The absolute URI of the resource to request.</param>
+    /// <param name="allowedPrivateHost">The host that may be private, or <see langword="null"/> when no such permission was granted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>The HTTP response message for the request.</returns>
+    private async Task<HttpResponseMessage> SendWithRetriesAsync(MusicBrainzSettingsDto settings, Uri requestUri, string? allowedPrivateHost, CancellationToken cancellationToken)
     {
         EnsureRequestHeaders(settings);
         // The rate limit is enforced by the MusicBrainz web service itself, so it is only observed when the requests actually reach it; a self hosted
@@ -248,12 +292,17 @@ internal sealed class MusicBrainzHttpClient
             HttpResponseMessage response;
             try
             {
-                HttpRequestMessage request = new(HttpMethod.Get, BuildRequestUri(settings.BaseUrl, relativeUrl));
+                HttpRequestMessage request = new(HttpMethod.Get, requestUri);
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                // The client follows the redirects itself, confined to the configured host, so it opts out of the host redirect handling.
+                request.Options.Set(OutboundRequestOptions.FollowRedirects, false);
+                if (allowedPrivateHost is not null && string.Equals(requestUri.IdnHost, allowedPrivateHost, StringComparison.OrdinalIgnoreCase))
+                    request.Options.Set(OutboundRequestOptions.AllowedPrivateHost, allowedPrivateHost);
                 response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             }
-            catch (HttpRequestException) when (!isLastAttempt)
+            catch (HttpRequestException exception) when (!isLastAttempt && !IsPolicyRejection(exception))
             {
+                // A rejection by the host outbound address policy is deterministic and is reported as ConfigurationLimitExceeded, so it is not retried.
                 await Task.Delay(GetRetryDelay(attempt, null), cancellationToken).ConfigureAwait(false);
                 continue;
             }
@@ -269,6 +318,42 @@ internal sealed class MusicBrainzHttpClient
 
             return response;
         }
+    }
+
+    /// <summary>
+    /// Determines whether the provided status code is a redirect.
+    /// </summary>
+    /// <param name="statusCode">The status code to check.</param>
+    /// <returns><see langword="true"/> when the status code is a redirect, otherwise <see langword="false"/>.</returns>
+    private static bool IsRedirect(HttpStatusCode statusCode)
+    {
+        return statusCode is HttpStatusCode.MovedPermanently or HttpStatusCode.Found or HttpStatusCode.SeeOther
+            or HttpStatusCode.TemporaryRedirect or HttpStatusCode.PermanentRedirect;
+    }
+
+    /// <summary>
+    /// Resolves the location of a redirect against the URI of the request it was returned for.
+    /// </summary>
+    /// <param name="requestUri">The URI of the request the redirect was returned for.</param>
+    /// <param name="location">The location of the redirect.</param>
+    /// <returns>The absolute URI of the redirect, or <see langword="null"/> when it could not be resolved.</returns>
+    private static Uri? ResolveRedirect(Uri requestUri, Uri location)
+    {
+        if (location.IsAbsoluteUri)
+            return location;
+        return Uri.TryCreate(requestUri, location, out Uri? resolvedUri) ? resolvedUri : null;
+    }
+
+    /// <summary>
+    /// Determines whether the provided redirect target may be followed: it must stay on the host of the configured base address, and it may not downgrade an HTTPS base address to plain HTTP.
+    /// </summary>
+    /// <param name="baseUri">The URI of the configured base address.</param>
+    /// <param name="redirectUri">The URI of the redirect target.</param>
+    /// <returns><see langword="true"/> when the redirect may be followed, otherwise <see langword="false"/>.</returns>
+    private static bool IsAllowedRedirect(Uri baseUri, Uri redirectUri)
+    {
+        bool isSchemeAllowed = redirectUri.Scheme == Uri.UriSchemeHttps || (baseUri.Scheme == Uri.UriSchemeHttp && redirectUri.Scheme == Uri.UriSchemeHttp);
+        return isSchemeAllowed && string.Equals(baseUri.IdnHost, redirectUri.IdnHost, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -291,6 +376,22 @@ internal sealed class MusicBrainzHttpClient
             }
         }
         return TimeSpan.FromMilliseconds(250 * Math.Pow(2, attempt));
+    }
+
+    /// <summary>
+    /// Determines whether the provided exception, or one of its inner exceptions, reports a rejection by the host outbound address policy.
+    /// </summary>
+    /// <param name="exception">The exception to inspect.</param>
+    /// <returns><see langword="true"/> when the exception chain contains a policy rejection, otherwise <see langword="false"/>.</returns>
+    /// <remarks>
+    /// SocketsHttpHandler wraps an exception thrown by the connect callback in an HttpRequestException with the ConnectionError error, so the policy rejection is only visible on the inner exception.
+    /// </remarks>
+    private static bool IsPolicyRejection(HttpRequestException exception)
+    {
+        for (Exception? currentException = exception; currentException is not null; currentException = currentException.InnerException)
+            if (currentException is HttpRequestException httpRequestException && httpRequestException.HttpRequestError == HttpRequestError.ConfigurationLimitExceeded)
+                return true;
+        return false;
     }
 
     /// <summary>

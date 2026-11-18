@@ -111,13 +111,27 @@ public class MusicBrainzSettingsProviderTests
     [Theory]
     [InlineData("http://127.0.0.1/ws/2/")] // IPv4 loopback.
     [InlineData("http://localhost/ws/2/")] // Loopback host name.
+    [InlineData("http://localhost./ws/2/")] // Loopback host name with a trailing dot.
     [InlineData("http://[::1]/ws/2/")] // IPv6 loopback.
     [InlineData("http://169.254.169.254/latest/meta-data/")] // Link local cloud metadata endpoint.
     [InlineData("http://10.0.0.5/ws/2/")] // Private class A range.
     [InlineData("http://172.16.0.1/ws/2/")] // Private class B range.
+    [InlineData("http://[::ffff:10.0.0.5]/ws/2/")] // An IPv4-mapped private address.
     [InlineData("http://192.168.1.10/ws/2/")] // Private class C range.
     [InlineData("http://0.0.0.0/ws/2/")] // Unspecified address.
     [InlineData("http://[fc00::1]/ws/2/")] // IPv6 unique local range.
+    [InlineData("http://[fd00:ec2::254]/ws/2/")] // The AWS IMDSv6 endpoint, which lives in a unique local range.
+    [InlineData("http://198.18.0.1/ws/2/")] // IPv4 benchmarking range.
+    [InlineData("http://198.51.100.10/ws/2/")] // TEST-NET-2 documentation range.
+    [InlineData("http://203.0.113.10/ws/2/")] // TEST-NET-3 documentation range.
+    [InlineData("http://224.0.0.1/ws/2/")] // IPv4 multicast range.
+    [InlineData("http://[ff02::1]/ws/2/")] // IPv6 multicast range.
+    [InlineData("http://[2001:db8::1]/ws/2/")] // IPv6 documentation range.
+    [InlineData("http://[::127.0.0.1]/ws/2/")] // IPv4 compatible IPv6 address.
+    [InlineData("http://[64:ff9b:1::1]/ws/2/")] // Local use NAT64 prefix.
+    [InlineData("http://[2002::1]/ws/2/")] // IPv6 6to4 range.
+    [InlineData("http://[64:ff9b::1]/ws/2/")] // IPv6 NAT64 prefix.
+    [InlineData("http://[100::1]/ws/2/")] // IPv6 discard only range.
     public async Task GetAsync_WhenThePersistedBaseUrlPointsAtALocalOrPrivateHost_ShouldKeepTheDefaultBaseUrl(string baseUrl)
     {
         // Arrange
@@ -137,6 +151,7 @@ public class MusicBrainzSettingsProviderTests
     [InlineData("http://192.168.1.10/ws/2/")] // Private class C range, a typical self hosted mirror.
     [InlineData("http://localhost/ws/2/")] // Loopback host name.
     [InlineData("http://[fc00::1]/ws/2/")] // IPv6 unique local range.
+    [InlineData("http://[::ffff:10.0.0.5]/ws/2/")] // An IPv4-mapped private address.
     public async Task GetAsync_WhenPrivateBaseUrlsAreExplicitlyAllowed_ShouldApplyThem(string baseUrl)
     {
         // Arrange
@@ -191,6 +206,22 @@ public class MusicBrainzSettingsProviderTests
 
         // Assert
         Assert.Equal("http://mirror.example/ws/2/", result.BaseUrl);
+    }
+
+    [Fact]
+    public async Task GetAsync_WhenThePersistedBaseUrlIsAnIPv4MappedPublicAddress_ShouldApplyIt()
+    {
+        // Arrange
+        IPluginSettingsStore mockStore = Substitute.For<IPluginSettingsStore>();
+        mockStore.GetSettingsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(
+            new Dictionary<string, string> { [MusicBrainzSettingsKeys.BASE_URL] = "http://[::ffff:93.184.216.34]/ws/2/" });
+        MusicBrainzSettingsProvider sut = new(mockStore, Guid.NewGuid(), CreateDefaults());
+
+        // Act
+        MusicBrainzSettingsDto result = await sut.GetAsync(CancellationToken.None);
+
+        // Assert
+        Assert.Equal("http://[::ffff:93.184.216.34]/ws/2/", result.BaseUrl);
     }
 
     [Fact]

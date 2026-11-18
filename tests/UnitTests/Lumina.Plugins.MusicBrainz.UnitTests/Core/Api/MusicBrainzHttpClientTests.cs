@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Plugins.Contracts.Common.Http;
 using Lumina.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
 using Lumina.Plugins.MusicBrainz.Core;
 using Lumina.Plugins.MusicBrainz.Core.Api;
@@ -182,6 +183,115 @@ public class MusicBrainzHttpClientTests
     }
 
     [Fact]
+    public async Task GetRecordingAsync_WhenTheServiceRedirectsToTheSameHost_ShouldFollowIt()
+    {
+        // Arrange
+        (MusicBrainzHttpClient client, StubHttpMessageHandler handler, _) = CreateClient("http://localhost/", TimeSpan.Zero,
+            (request, callIndex) => callIndex == 1 ? Redirect("http://localhost/ws/2/redirected") : Json(RECORDING_JSON));
+
+        // Act
+        MusicBrainzRecordingResponse? result = await client.GetRecordingAsync(Guid.NewGuid(), CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(2, handler.CallCount);
+        Assert.True(handler.Requests[1].Options.TryGetValue(OutboundRequestOptions.FollowRedirects, out bool shouldFollowRedirects));
+        Assert.False(shouldFollowRedirects);
+    }
+
+    [Fact]
+    public async Task GetRecordingAsync_WhenTheServiceRedirectsToAnotherHost_ShouldThrowWithoutFollowingIt()
+    {
+        // Arrange
+        (MusicBrainzHttpClient client, StubHttpMessageHandler handler, _) = CreateClient("http://localhost/", TimeSpan.Zero,
+            (request, callIndex) => Redirect("http://other.example/ws/2/redirected"));
+
+        // Act
+        Task Act()
+        {
+            return client.GetRecordingAsync(Guid.NewGuid(), CancellationToken.None);
+        }
+
+        // Assert
+        await Assert.ThrowsAsync<HttpRequestException>(Act);
+        Assert.Equal(1, handler.CallCount);
+    }
+
+    [Fact]
+    public async Task GetRecordingAsync_WhenTheServiceDowngradesHttpsToPlainHttp_ShouldThrowWithoutFollowingIt()
+    {
+        // Arrange
+        (MusicBrainzHttpClient client, StubHttpMessageHandler handler, _) = CreateClient("https://musicbrainz.org/ws/2/", TimeSpan.Zero,
+            (request, callIndex) => Redirect("http://musicbrainz.org/ws/2/redirected"));
+
+        // Act
+        Task Act()
+        {
+            return client.GetRecordingAsync(Guid.NewGuid(), CancellationToken.None);
+        }
+
+        // Assert
+        await Assert.ThrowsAsync<HttpRequestException>(Act);
+        Assert.Equal(1, handler.CallCount);
+    }
+
+    [Fact]
+    public async Task GetRecordingAsync_WhenTheServiceRedirectsTooManyTimes_ShouldThrow()
+    {
+        // Arrange
+        (MusicBrainzHttpClient client, StubHttpMessageHandler handler, _) = CreateClient("http://localhost/", TimeSpan.Zero,
+            (request, callIndex) => Redirect("http://localhost/ws/2/loop"));
+
+        // Act
+        Task Act()
+        {
+            return client.GetRecordingAsync(Guid.NewGuid(), CancellationToken.None);
+        }
+
+        // Assert
+        await Assert.ThrowsAsync<HttpRequestException>(Act);
+        // The initial request plus the maximum number of followed redirects are sent before the loop is detected.
+        Assert.Equal(6, handler.CallCount);
+    }
+
+    [Fact]
+    public async Task GetRecordingAsync_WhenTheHostRejectsTheRequest_ShouldNotRetry()
+    {
+        // Arrange
+        (MusicBrainzHttpClient client, StubHttpMessageHandler handler, _) = CreateClient("http://localhost/", TimeSpan.Zero,
+            (request, callIndex) => throw new HttpRequestException(HttpRequestError.ConfigurationLimitExceeded, "Rejected."));
+
+        // Act
+        Task Act()
+        {
+            return client.GetRecordingAsync(Guid.NewGuid(), CancellationToken.None);
+        }
+
+        // Assert
+        await Assert.ThrowsAsync<HttpRequestException>(Act);
+        Assert.Equal(1, handler.CallCount);
+    }
+
+    [Fact]
+    public async Task GetRecordingAsync_WhenTheConnectPolicyWrapsTheRejection_ShouldNotRetry()
+    {
+        // Arrange
+        HttpRequestException rejection = new(HttpRequestError.ConfigurationLimitExceeded, "Rejected.");
+        (MusicBrainzHttpClient client, StubHttpMessageHandler handler, _) = CreateClient("http://localhost/", TimeSpan.Zero,
+            (request, callIndex) => throw new HttpRequestException(HttpRequestError.ConnectionError, "Connection error.", rejection));
+
+        // Act
+        Task Act()
+        {
+            return client.GetRecordingAsync(Guid.NewGuid(), CancellationToken.None);
+        }
+
+        // Assert
+        await Assert.ThrowsAsync<HttpRequestException>(Act);
+        Assert.Equal(1, handler.CallCount);
+    }
+
+    [Fact]
     public async Task GetRecordingAsync_WhenEveryAttemptFails_ShouldThrowAfterExhaustingTheRetries()
     {
         // Arrange
@@ -241,6 +351,33 @@ public class MusicBrainzHttpClientTests
 
         // Assert
         Assert.Equal("Custom/9.9", handler.Requests[0].Headers.UserAgent.ToString());
+    }
+
+    [Fact]
+    public async Task GetRecordingAsync_WhenAPrivateBaseUrlIsAllowed_ShouldScopeThePermissionToTheBaseHost()
+    {
+        // Arrange
+        (MusicBrainzHttpClient client, StubHttpMessageHandler handler, _) = CreateClient("http://localhost/", TimeSpan.Zero, doesAllowPrivateBaseUrl: true);
+
+        // Act
+        await client.GetRecordingAsync(Guid.NewGuid(), CancellationToken.None);
+
+        // Assert
+        Assert.True(handler.Requests[0].Options.TryGetValue(OutboundRequestOptions.AllowedPrivateHost, out string? allowedPrivateHost));
+        Assert.Equal("localhost", allowedPrivateHost);
+    }
+
+    [Fact]
+    public async Task GetRecordingAsync_WhenAPrivateBaseUrlIsNotAllowed_ShouldNotAllowTheRequestToReachPrivateEndPoints()
+    {
+        // Arrange
+        (MusicBrainzHttpClient client, StubHttpMessageHandler handler, _) = CreateClient("http://localhost/", TimeSpan.Zero, doesAllowPrivateBaseUrl: false);
+
+        // Act
+        await client.GetRecordingAsync(Guid.NewGuid(), CancellationToken.None);
+
+        // Assert
+        Assert.False(handler.Requests[0].Options.TryGetValue(OutboundRequestOptions.AllowedPrivateHost, out string? _));
     }
 
     [Fact]
@@ -532,16 +669,18 @@ public class MusicBrainzHttpClientTests
     /// <param name="minimumRequestInterval">The minimum request interval configured for the client.</param>
     /// <param name="responseFactory">Optional. The factory that produces the response of a request.</param>
     /// <param name="contactEmail">Optional. The contact email configured for the client.</param>
+    /// <param name="doesAllowPrivateBaseUrl">Optional. Whether the base URL may point at a private or local host.</param>
     /// <returns>The created client, its stub handler and the underlying HTTP client.</returns>
     private (MusicBrainzHttpClient Client, StubHttpMessageHandler Handler, HttpClient HttpClient) CreateClient(
         string baseUrl,
         TimeSpan minimumRequestInterval,
         Func<HttpRequestMessage, int, HttpResponseMessage>? responseFactory = null,
-        string? contactEmail = null)
+        string? contactEmail = null,
+        bool? doesAllowPrivateBaseUrl = null)
     {
         StubHttpMessageHandler handler = new(responseFactory ?? ((request, callIndex) => Json(RECORDING_JSON)));
         HttpClient httpClient = new(handler);
-        MusicBrainzHttpClient client = CreateMusicBrainzHttpClient(httpClient, baseUrl, minimumRequestInterval, contactEmail);
+        MusicBrainzHttpClient client = CreateMusicBrainzHttpClient(httpClient, baseUrl, minimumRequestInterval, contactEmail, doesAllowPrivateBaseUrl);
         return (client, handler, httpClient);
     }
 
@@ -552,11 +691,13 @@ public class MusicBrainzHttpClientTests
     /// <param name="baseUrl">The base URL of the MusicBrainz web service the client points to.</param>
     /// <param name="minimumRequestInterval">The minimum request interval configured for the client.</param>
     /// <param name="contactEmail">Optional. The contact email configured for the client.</param>
+    /// <param name="doesAllowPrivateBaseUrl">Optional. Whether the base URL may point at a private or local host.</param>
     /// <returns>The created client.</returns>
-    private MusicBrainzHttpClient CreateMusicBrainzHttpClient(HttpClient httpClient, string baseUrl, TimeSpan minimumRequestInterval, string? contactEmail)
+    private MusicBrainzHttpClient CreateMusicBrainzHttpClient(HttpClient httpClient, string baseUrl, TimeSpan minimumRequestInterval, string? contactEmail, bool? doesAllowPrivateBaseUrl = null)
     {
         MusicBrainzSettingsProvider settingsProvider = new(null, MusicBrainzPlugin.s_pluginId, _musicBrainzSettingsDtoFixture.Create(
             baseUrl: baseUrl,
+            doesAllowPrivateBaseUrl: doesAllowPrivateBaseUrl,
             userAgent: "Lumina-Test/1.0",
             contactEmail: contactEmail,
             includeContactEmail: contactEmail is not null,
@@ -574,5 +715,17 @@ public class MusicBrainzHttpClientTests
     private static HttpResponseMessage Json(string json)
     {
         return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(json, Encoding.UTF8, "application/json") };
+    }
+
+    /// <summary>
+    /// Creates a temporary redirect response to the provided location.
+    /// </summary>
+    /// <param name="location">The absolute location of the redirect target.</param>
+    /// <returns>The created response.</returns>
+    private static HttpResponseMessage Redirect(string location)
+    {
+        HttpResponseMessage redirect = new(HttpStatusCode.TemporaryRedirect);
+        redirect.Headers.Location = new Uri(location);
+        return redirect;
     }
 }

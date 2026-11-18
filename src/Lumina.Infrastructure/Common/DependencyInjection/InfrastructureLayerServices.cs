@@ -139,11 +139,23 @@ public static class InfrastructureLayerServices
 
         services.AddSingleton<IMediaLibraryScanProgressNotifier, DebouncedMediaLibraryScanProgressNotifier>();
 
-        // Artwork downloads: the remote artwork of any provider is downloaded through a client that follows redirects only to public HTTPS hosts,
-        // so a URL returned by a provider, or a redirect it points at, can never reach a private, loopback or link local address of the host.
-        services.AddHttpClient(NamedHttpClients.ARTWORK_DOWNLOAD)
-            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false })
-            .AddHttpMessageHandler(() => new PublicHostRedirectHandler());
+        // Every outbound HTTP client of the host is guarded, including the clients the provider plugins register: the host of every request is resolved and
+        // must be public, the connection is made to the validated address itself, so a URL chosen by a provider, or a name that resolves to an internal
+        // address, can never make the host reach a private, loopback or link local address, and redirects are followed only to public HTTPS hosts.
+        services.AddSingleton<PublicHostValidator>();
+        services.ConfigureHttpClientDefaults(httpClientBuilder => httpClientBuilder
+            .ConfigurePrimaryHttpMessageHandler(serviceProvider => PublicHostConnectionGuard.CreatePrimaryHandler(
+                serviceProvider.GetRequiredService<PublicHostValidator>(),
+                serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(PublicHostConnectionGuard))))
+            .AddHttpMessageHandler(serviceProvider => new PublicHostValidationHandler(
+                serviceProvider.GetRequiredService<PublicHostValidator>(),
+                serviceProvider.GetRequiredService<ILogger<PublicHostValidationHandler>>()))
+            .AddHttpMessageHandler(serviceProvider => new PublicHostRedirectHandler(
+                serviceProvider.GetRequiredService<PublicHostValidator>(),
+                serviceProvider.GetRequiredService<ILogger<PublicHostRedirectHandler>>())));
+
+        // Artwork downloads: the remote artwork of any provider is downloaded through the same guarded client pipeline, and is stored by the artwork services below.
+        services.AddHttpClient(NamedHttpClients.ARTWORK_DOWNLOAD);
 
         // Book artwork: stores the artwork of the books into the internal media directory.
         services.AddScoped<IBookArtworkService, BookArtworkService>();

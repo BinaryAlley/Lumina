@@ -18,6 +18,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Net.Sockets;
 #endregion
 
 namespace Lumina.Presentation.Api.SecurityTests.Core.MediaLibrary.Artwork;
@@ -63,6 +65,55 @@ public class BookArtworkServiceSecurityTests
         ServiceProvider serviceProvider = services.BuildServiceProvider();
         using IServiceScope scope = serviceProvider.CreateScope();
         _sut = scope.ServiceProvider.GetRequiredService<IBookArtworkService>();
+    }
+
+    [Theory]
+    [InlineData("http://169.254.169.254/latest/meta-data/")] // The link local cloud metadata endpoint.
+    [InlineData("http://10.0.0.5/cover.jpg")] // A private class A address.
+    [InlineData("http://[::1]/cover.jpg")] // The IPv6 loopback address.
+    public async Task SaveBookArtworkAsync_WhenRemoteArtworkPointsAtAPrivateAddress_ShouldNotDownloadIt(string remoteUrl)
+    {
+        // Arrange
+        using CancellationTokenSource cancellationTokenSource = new(TimeSpan.FromSeconds(10));
+
+        // Act
+        Result<string> result = await _sut.SaveBookArtworkAsync(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            "Library",
+            "Author",
+            "Title",
+            _artworkDtoFixture.Create(remoteUrl: remoteUrl),
+            cancellationTokenSource.Token);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.FileNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task SaveBookArtworkAsync_WhenRemoteArtworkPointsAtTheLoopbackAddress_ShouldNotConnectToIt()
+    {
+        // Arrange
+        using TcpListener listener = new(IPAddress.Loopback, 0);
+        listener.Start();
+        int port = ((IPEndPoint)listener.LocalEndpoint).Port;
+        using CancellationTokenSource cancellationTokenSource = new(TimeSpan.FromSeconds(10));
+
+        // Act
+        Result<string> result = await _sut.SaveBookArtworkAsync(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            "Library",
+            "Author",
+            "Title",
+            _artworkDtoFixture.Create(remoteUrl: $"http://127.0.0.1:{port}/cover.jpg"),
+            cancellationTokenSource.Token);
+
+        // Assert
+        // The real dependency injection container must reject the address before any connection is made, so nothing reaches the listener.
+        Assert.True(result.IsFailure);
+        Assert.False(listener.Pending());
     }
 
     [Fact]

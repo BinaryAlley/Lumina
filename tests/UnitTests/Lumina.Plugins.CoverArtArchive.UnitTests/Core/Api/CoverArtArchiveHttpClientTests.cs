@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Plugins.Contracts.Common.Http;
 using Lumina.Plugins.CoverArtArchive.Common.Models.Contracts.Responses;
 using Lumina.Plugins.CoverArtArchive.Core;
 using Lumina.Plugins.CoverArtArchive.Core.Api;
@@ -52,6 +53,20 @@ public class CoverArtArchiveHttpClientTests
         Assert.Equal("https://coverartarchive.org/release/11111111-1111-1111-1111-111111111111/1.jpg", Assert.Single(result.Images)!.Image);
         Assert.Equal($"/release/{s_releaseId:D}", handler.Requests[0].RequestUri!.AbsolutePath);
         Assert.Equal("coverartarchive.org", handler.Requests[0].RequestUri!.Host);
+    }
+
+    [Fact]
+    public async Task GetReleaseArtworkAsync_WhenCalled_ShouldOptOutOfTheHostRedirectHandling()
+    {
+        // Arrange
+        (CoverArtArchiveHttpClient client, StubHttpMessageHandler handler) = CreateClient();
+
+        // Act
+        await client.GetReleaseArtworkAsync(s_releaseId, CancellationToken.None);
+
+        // Assert
+        Assert.True(handler.Requests[0].Options.TryGetValue(OutboundRequestOptions.FollowRedirects, out bool shouldFollowRedirects));
+        Assert.False(shouldFollowRedirects);
     }
 
     [Fact]
@@ -296,6 +311,43 @@ public class CoverArtArchiveHttpClientTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(2, handler.CallCount);
+    }
+
+    [Fact]
+    public async Task GetReleaseArtworkAsync_WhenTheHostRejectsTheRequest_ShouldNotRetry()
+    {
+        // Arrange
+        (CoverArtArchiveHttpClient client, StubHttpMessageHandler handler) = CreateClient(
+            (request, callIndex) => throw new HttpRequestException(HttpRequestError.ConfigurationLimitExceeded, "Rejected."));
+
+        // Act
+        Task Act()
+        {
+            return client.GetReleaseArtworkAsync(s_releaseId, CancellationToken.None);
+        }
+
+        // Assert
+        await Assert.ThrowsAsync<HttpRequestException>(Act);
+        Assert.Equal(1, handler.CallCount);
+    }
+
+    [Fact]
+    public async Task GetReleaseArtworkAsync_WhenTheConnectPolicyWrapsTheRejection_ShouldNotRetry()
+    {
+        // Arrange
+        HttpRequestException rejection = new(HttpRequestError.ConfigurationLimitExceeded, "Rejected.");
+        (CoverArtArchiveHttpClient client, StubHttpMessageHandler handler) = CreateClient(
+            (request, callIndex) => throw new HttpRequestException(HttpRequestError.ConnectionError, "Connection error.", rejection));
+
+        // Act
+        Task Act()
+        {
+            return client.GetReleaseArtworkAsync(s_releaseId, CancellationToken.None);
+        }
+
+        // Assert
+        await Assert.ThrowsAsync<HttpRequestException>(Act);
+        Assert.Equal(1, handler.CallCount);
     }
 
     [Fact]

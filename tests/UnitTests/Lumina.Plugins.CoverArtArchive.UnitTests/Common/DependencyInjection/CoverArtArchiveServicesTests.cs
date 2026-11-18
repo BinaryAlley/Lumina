@@ -129,22 +129,23 @@ public class CoverArtArchiveServicesTests
     }
 
     [Fact]
-    public void AddCoverArtArchiveArtworkProvider_WhenTheClientIsResolved_ShouldDisableAutomaticRedirectsOnItsPrimaryHandler()
+    public void AddCoverArtArchiveArtworkProvider_WhenTheHostConfiguresHttpClientDefaults_ShouldKeepThePrimaryHandlerOfTheHost()
     {
         // Arrange
         ServiceCollection services = new();
+        StubPrimaryHttpMessageHandler hostPrimaryHandler = new();
+        services.ConfigureHttpClientDefaults(builder => builder.ConfigurePrimaryHttpMessageHandler(() => hostPrimaryHandler));
         services.AddCoverArtArchiveArtworkProvider(pluginId: Guid.NewGuid());
         ServiceProvider serviceProvider = services.BuildServiceProvider();
         using (IServiceScope scope = serviceProvider.CreateScope())
         {
             // Act
             CoverArtArchiveHttpClient client = scope.ServiceProvider.GetRequiredService<CoverArtArchiveHttpClient>();
-            HttpClientHandler primaryHandler = GetPrimaryHandler(client);
 
             // Assert
-            // Automatic redirects must stay disabled on the primary handler, otherwise it would follow a server controlled redirect on its own,
-            // before the client can check the target host against the Cover Art Archive and the Internet Archive, bypassing that control.
-            Assert.False(primaryHandler.AllowAutoRedirect);
+            // The host owns the primary handler, because it is what disables automatic redirects and connects only to addresses validated to be public.
+            // The plugin must not replace it, otherwise it would follow a server controlled redirect on its own and bypass the guard of the host.
+            Assert.Same(hostPrimaryHandler, GetPrimaryHandler(client));
         }
     }
 
@@ -170,14 +171,14 @@ public class CoverArtArchiveServicesTests
     /// Gets the primary HTTP message handler of the provided client, unwrapping the delegating handlers built by the HTTP client factory around it.
     /// </summary>
     /// <param name="client">The client whose primary handler is retrieved.</param>
-    /// <returns>The primary HTTP client handler of the client.</returns>
-    private static HttpClientHandler GetPrimaryHandler(CoverArtArchiveHttpClient client)
+    /// <returns>The primary HTTP message handler of the client.</returns>
+    private static HttpMessageHandler GetPrimaryHandler(CoverArtArchiveHttpClient client)
     {
         HttpClient httpClient = (HttpClient)GetFieldOfType(client, typeof(HttpClient))!;
         HttpMessageHandler? handler = (HttpMessageHandler?)GetFieldOfType(httpClient, typeof(HttpMessageHandler));
         while (handler is DelegatingHandler delegatingHandler)
             handler = delegatingHandler.InnerHandler;
-        return Assert.IsType<HttpClientHandler>(handler);
+        return handler ?? throw new InvalidOperationException("The HTTP client has no primary handler.");
     }
 
     /// <summary>
@@ -201,5 +202,24 @@ public class CoverArtArchiveServicesTests
             type = type.BaseType;
         }
         throw new InvalidOperationException($"No field assignable to {fieldType} was found on {instance.GetType()} or its base types.");
+    }
+
+    /// <summary>
+    /// Primary HTTP message handler that identifies the handler the host configured, so a test can verify that the plugin does not replace it.
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    private sealed class StubPrimaryHttpMessageHandler : HttpMessageHandler
+    {
+        /// <summary>
+        /// Sends the provided request. The tests never send a request through this handler.
+        /// </summary>
+        /// <param name="request">The request to send.</param>
+        /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+        /// <returns>The response of the request.</returns>
+        /// <exception cref="NotSupportedException">Always thrown, because this handler only identifies the handler configured by the host.</exception>
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            throw new NotSupportedException();
+        }
     }
 }
