@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Plugins.Contracts.Common.Http;
 using Lumina.Plugins.CoverArtArchive.Common.Models.Contracts.Responses;
 using Lumina.Plugins.CoverArtArchive.Common.Models.DTO.Settings;
 using Lumina.Plugins.CoverArtArchive.Core.Settings;
@@ -118,8 +119,8 @@ internal sealed class CoverArtArchiveHttpClient
 
         Uri requestUri = new(new Uri(BASE_URL, UriKind.Absolute), relativeUrl);
 
-        // The metadata endpoints answer with a temporary redirect to the Internet Archive, so the redirect is followed explicitly, which keeps the
-        // automatic redirects disabled and confines the following to the hosts the Cover Art Archive is allowed to delegate its responses to.
+        // The metadata endpoints answer with a temporary redirect to the Internet Archive, so the redirect is followed explicitly, which keeps the automatic
+        // redirects disabled, opts out of the host redirect handling, and confines the following to the hosts the Cover Art Archive may delegate its responses to.
         for (int redirectCount = 0; redirectCount <= MAXIMUM_REDIRECT_COUNT; redirectCount++)
         {
             HttpResponseMessage response = await SendWithRetriesAsync(settings, requestUri, cancellationToken).ConfigureAwait(false);
@@ -164,10 +165,14 @@ internal sealed class CoverArtArchiveHttpClient
             {
                 HttpRequestMessage request = new(HttpMethod.Get, requestUri);
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                // The client follows the redirects itself, confined to the hosts the Cover Art Archive may delegate its responses to, so it opts out of the
+                // host redirect handling and receives the redirect response instead.
+                request.Options.Set(OutboundRequestOptions.FollowRedirects, false);
                 response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             }
-            catch (HttpRequestException) when (!isLastAttempt)
+            catch (HttpRequestException exception) when (!isLastAttempt && !IsPolicyRejection(exception))
             {
+                // A rejection by the host outbound address policy is deterministic and is reported as ConfigurationLimitExceeded, so it is not retried.
                 await Task.Delay(GetRetryDelay(attempt, null), cancellationToken).ConfigureAwait(false);
                 continue;
             }
@@ -236,6 +241,22 @@ internal sealed class CoverArtArchiveHttpClient
             }
         }
         return TimeSpan.FromMilliseconds(250 * Math.Pow(2, attempt));
+    }
+
+    /// <summary>
+    /// Determines whether the provided exception, or one of its inner exceptions, reports a rejection by the host outbound address policy.
+    /// </summary>
+    /// <param name="exception">The exception to inspect.</param>
+    /// <returns><see langword="true"/> when the exception chain contains a policy rejection, otherwise <see langword="false"/>.</returns>
+    /// <remarks>
+    /// SocketsHttpHandler wraps an exception thrown by the connect callback in an HttpRequestException with the ConnectionError error, so the policy rejection is only visible on the inner exception.
+    /// </remarks>
+    private static bool IsPolicyRejection(HttpRequestException exception)
+    {
+        for (Exception? currentException = exception; currentException is not null; currentException = currentException.InnerException)
+            if (currentException is HttpRequestException httpRequestException && httpRequestException.HttpRequestError == HttpRequestError.ConfigurationLimitExceeded)
+                return true;
+        return false;
     }
 
     /// <summary>

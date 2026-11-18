@@ -130,17 +130,20 @@ internal sealed class MusicBrainzSettingsProvider
     /// <param name="host">The host of the persisted base URL.</param>
     /// <returns><see langword="true"/> when the host is public, otherwise <see langword="false"/>.</returns>
     /// <remarks>
-    /// A host name is accepted as is, because it cannot be classified without resolving it, which is deliberately not done here.
-    /// A private or local host is accepted when <see cref="MusicBrainzSettingsDto.DoesAllowPrivateBaseUrl"/> is enabled, which supports self hosted
-    /// mirrors on a local network.
+    /// A host name is accepted as is, because it cannot be classified without resolving it, which is deliberately not done here. The host that runs the plugin
+    /// resolves it again when the request is sent, and rejects it when any address it resolves to is private, unless <see cref="MusicBrainzSettingsDto.DoesAllowPrivateBaseUrl"/>
+    /// enabled the private base address. That permission applies only to the host of the configured base address, so a redirect to another private host is still
+    /// rejected, and the link local and cloud metadata ranges are always rejected. Enabling the setting supports self hosted mirrors on a local network.
+    /// The address classification matches the one the host applies to a resolved address, so the settings layer does not accept a base URL that the host later
+    /// rejects.
     /// </remarks>
     private static bool IsPublicHost(string host)
     {
         if (string.IsNullOrWhiteSpace(host))
             return false;
 
-        // Uri.Host surrounds an IPv6 literal with brackets, which IPAddress.TryParse does not accept.
-        string normalizedHost = host.Trim('[', ']');
+        // Uri.Host surrounds an IPv6 literal with brackets, which IPAddress.TryParse does not accept, and a fully qualified name may end with a dot.
+        string normalizedHost = host.Trim('[', ']').TrimEnd('.');
         if (string.Equals(normalizedHost, "localhost", StringComparison.OrdinalIgnoreCase))
             return false;
 
@@ -153,32 +156,64 @@ internal sealed class MusicBrainzSettingsProvider
         if (IPAddress.IsLoopback(address) || address.Equals(IPAddress.Any) || address.Equals(IPAddress.IPv6Any))
             return false;
 
-        if (address.AddressFamily == AddressFamily.InterNetwork)
-        {
-            byte[] octets = address.GetAddressBytes();
-            // The unspecified, private, loopback, link local and carrier grade NAT ranges are rejected, as they are the common targets of an SSRF.
-            return octets[0] switch
-            {
-                0 => false,
-                10 => false,
-                100 when octets[1] is >= 64 and <= 127 => false,
-                127 => false,
-                169 when octets[1] == 254 => false,
-                172 when octets[1] is >= 16 and <= 31 => false,
-                192 when octets[1] == 168 => false,
-                _ => true
-            };
-        }
+        // IPv4-mapped IPv6 addresses were converted to IPv4 above, so the family split never sees one.
+        return address.AddressFamily == AddressFamily.InterNetwork
+            ? IsPublicIPv4Address(address)
+            : IsPublicIPv6Address(address);
+    }
 
-        if (address.IsIPv6LinkLocal || address.IsIPv6SiteLocal)
+    /// <summary>
+    /// Determines whether the provided IPv4 address is public.
+    /// </summary>
+    /// <param name="address">The IPv4 address to check.</param>
+    /// <returns><see langword="true"/> when the address is public, otherwise <see langword="false"/>.</returns>
+    private static bool IsPublicIPv4Address(IPAddress address)
+    {
+        byte[] octets = address.GetAddressBytes();
+        return octets[0] switch
+        {
+            0 => false, // The 0.0.0.0/8 "this network" range.
+            10 => false, // The 10.0.0.0/8 private range.
+            100 when octets[1] is >= 64 and <= 127 => false, // The 100.64.0.0/10 carrier grade NAT range.
+            127 => false, // The 127.0.0.0/8 loopback range.
+            169 when octets[1] == 254 => false, // The 169.254.0.0/16 link local range, including the cloud metadata endpoints.
+            172 when octets[1] is >= 16 and <= 31 => false, // The 172.16.0.0/12 private range.
+            192 when octets[1] == 168 => false, // The 192.168.0.0/16 private range.
+            192 when octets[1] == 0 && (octets[2] is 0 or 2) => false, // The IETF protocol assignments and TEST-NET-1 documentation ranges.
+            198 when octets[1] is >= 18 and <= 19 => false, // The 198.18.0.0/15 benchmarking range.
+            198 when octets[1] == 51 && octets[2] == 100 => false, // The TEST-NET-2 documentation range.
+            203 when octets[1] == 0 && octets[2] == 113 => false, // The TEST-NET-3 documentation range.
+            >= 224 => false, // The multicast range, the reserved range, and the broadcast address.
+            _ => true
+        };
+    }
+
+    /// <summary>
+    /// Determines whether the provided IPv6 address is public.
+    /// </summary>
+    /// <param name="address">The IPv6 address to check.</param>
+    /// <returns><see langword="true"/> when the address is public, otherwise <see langword="false"/>.</returns>
+    private static bool IsPublicIPv6Address(IPAddress address)
+    {
+        if (address.IsIPv6LinkLocal || address.IsIPv6SiteLocal || address.IsIPv6Multicast || address.IsIPv6Teredo || address.IsIPv6UniqueLocal)
             return false;
 
         byte[] addressBytes = address.GetAddressBytes();
-        // The fc00::/7 unique local range is rejected, matching the private IPv4 ranges.
-        if ((addressBytes[0] & 0xFE) == 0xFC)
+        // The ::/96 IPv4 compatible and ::ffff:0:0/96 IPv4 translated ranges embed an IPv4 address, and the mapped form is already converted to IPv4, so no
+        // address with an all zero first eighty bits is public.
+        if (addressBytes[0] == 0 && addressBytes[1] == 0 && addressBytes[2] == 0 && addressBytes[3] == 0 &&
+            addressBytes[4] == 0 && addressBytes[5] == 0 && addressBytes[6] == 0 && addressBytes[7] == 0 &&
+            addressBytes[8] == 0 && addressBytes[9] == 0)
             return false;
 
-        return true;
+        return addressBytes[0] switch
+        {
+            0x00 when addressBytes[1] == 0x64 && addressBytes[2] == 0xFF && addressBytes[3] == 0x9B => false, // The 64:ff9b::/96 NAT64 prefix, which can map to private IPv4 addresses.
+            0x01 when addressBytes[1] == 0x00 && addressBytes[2] == 0x00 && addressBytes[3] == 0x00 => false, // The 100::/64 discard only range.
+            0x20 when addressBytes[1] == 0x01 && addressBytes[2] == 0x0D && addressBytes[3] == 0xB8 => false, // The 2001:db8::/32 documentation range.
+            0x20 when addressBytes[1] == 0x02 => false, // The 2002::/16 6to4 range.
+            _ => true
+        };
     }
 
     /// <summary>

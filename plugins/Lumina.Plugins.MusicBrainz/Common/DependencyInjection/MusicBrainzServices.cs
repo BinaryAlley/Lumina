@@ -8,7 +8,6 @@ using Lumina.Plugins.MusicBrainz.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
-using System.Net.Http;
 #endregion
 
 namespace Lumina.Plugins.MusicBrainz.Common.DependencyInjection;
@@ -45,9 +44,9 @@ internal static class MusicBrainzServices
         // The response cache is process-wide, so that an entity shared by many items, like a release shared by all its tracks, is fetched only once.
         services.TryAddSingleton<MusicBrainzResponseCache>();
 
-        // Redirects are not followed, so the configurable base URL cannot be used to reach an internal address through a redirect from a mirror.
-        services.AddHttpClient<MusicBrainzHttpClient>()
-            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+        // The host creates the primary handler of the outbound clients, which disables automatic redirects and connects only to addresses validated to be
+        // public. The client follows the redirects itself, confined to the configured host, so the configurable base URL cannot be used to reach an internal address.
+        services.AddHttpClient<MusicBrainzHttpClient>();
 
         // Register the metadata providers as keyed by pluginId transient services, so they can be resolved specifically among other IMetadataProvider implementations.
         // A single plugin exposes one provider per entity type, because the metadata contract is typed to a single lookup and metadata pair.

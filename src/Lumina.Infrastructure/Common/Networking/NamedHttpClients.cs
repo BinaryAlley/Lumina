@@ -6,7 +6,7 @@ namespace Lumina.Infrastructure.Common.Networking;
 internal static class NamedHttpClients
 {
     /// <summary>
-    /// The name of the HTTP client used to download remote artwork, whose redirects are followed only to public hosts.
+    /// The name of the HTTP client used to download remote artwork, which is guarded like every other outbound client of the host.
     /// </summary>
     internal const string ARTWORK_DOWNLOAD = "artwork-download";
 }

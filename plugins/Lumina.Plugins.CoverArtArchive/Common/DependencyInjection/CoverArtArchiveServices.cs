@@ -8,7 +8,6 @@ using Lumina.Plugins.CoverArtArchive.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
-using System.Net.Http;
 #endregion
 
 namespace Lumina.Plugins.CoverArtArchive.Common.DependencyInjection;
@@ -46,12 +45,9 @@ internal static class CoverArtArchiveServices
         // is fetched only once during a run.
         services.TryAddSingleton<CoverArtArchiveResponseCache>();
 
-        // Automatic redirects are disabled on purpose: the metadata endpoints answer with a temporary redirect to the Internet Archive, and the client
-        // follows that redirect itself, checking every hop against CoverArtArchiveHosts. Letting the primary handler follow redirects automatically
-        // would make it follow whatever Location the response carries, which is server controlled, and would bypass that host check, which is the SSRF
-        // control here; the base URL being a constant does not make the redirect target trustworthy.
-        services.AddHttpClient<CoverArtArchiveHttpClient>()
-            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+        // The client follows the redirects of the Cover Art Archive itself, confined to the hosts the archive may delegate its responses to, so it opts out of the
+        // host redirect handling. The host still validates and pins the address of every request and confirms that it is public.
+        services.AddHttpClient<CoverArtArchiveHttpClient>();
 
         // Register the artwork provider as a keyed by pluginId transient service, so it can be resolved specifically among other IArtworkProvider implementations.
         services.AddKeyedTransient<IArtworkProvider, CoverArtArchiveAlbumArtworkProvider>(pluginId);
