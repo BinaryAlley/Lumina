@@ -73,7 +73,7 @@ public class GetAllUsersConsumptionStatisticsEndpointTests : IClassFixture<Lumin
 
         // Assert
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        Assert.Contains("access-denied", response.Headers.Location!.ToString());
+        Assert.Equal("https://localhost/en-us/auth/access-denied", response.Headers.Location!.ToString());
         Assert.DoesNotContain(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint.StartsWith("users/", StringComparison.Ordinal));
     }
 

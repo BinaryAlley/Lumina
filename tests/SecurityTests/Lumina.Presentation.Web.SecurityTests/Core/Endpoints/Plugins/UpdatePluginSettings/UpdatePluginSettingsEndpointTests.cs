@@ -1,9 +1,11 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.Enums.Authorization;
 using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Common.Requests.Plugins;
 using Lumina.Presentation.Web.Core.Endpoints.Plugins.UpdatePluginSettings;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
 using Lumina.Presentation.Web.Fixtures.Common.Requests.Plugins;
+using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
@@ -21,6 +23,7 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Plugins.UpdatePlu
 public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
+    private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
     private readonly ProblemDetailsDtoFixture _problemDetailsDtoFixture = new();
     private readonly UpdatePluginSettingsRequestFixture _updatePluginSettingsRequestFixture = new();
 
@@ -38,6 +41,7 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "Admin", permissions: Enum.GetValues<AuthorizationPermission>());
         UpdatePluginSettingsRequest request = _updatePluginSettingsRequestFixture.Create();
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage updateRequest = new(HttpMethod.Put, "/en-us/admin/manage-plugins/api-update-plugin-settings")
@@ -52,7 +56,7 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaWebFactory>
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.DoesNotContain(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"plugins/{request.PluginId}/settings");
+        Assert.Empty(_apiFactory.ApiClientStub.PutRequests);
     }
 
     [Fact]
@@ -76,7 +80,32 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaWebFactory>
         // Assert
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.Equal("http://localhost/en-us/auth/login", response.Headers.Location!.ToString());
-        Assert.DoesNotContain(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"plugins/{request.PluginId}/settings");
+        Assert.Empty(_apiFactory.ApiClientStub.PutRequests);
+    }
+
+    [Fact]
+    public async Task UpdatePluginSettings_WhenCalledByNonAdminUser_ShouldRedirectToAccessDenied()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "User", permissions: Enum.GetValues<AuthorizationPermission>());
+        UpdatePluginSettingsRequest request = _updatePluginSettingsRequestFixture.Create();
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        HttpRequestMessage updateRequest = new(HttpMethod.Put, "/en-us/admin/manage-plugins/api-update-plugin-settings")
+        {
+            Content = JsonContent.Create(request)
+        };
+        updateRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        updateRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        updateRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(updateRequest);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Equal("https://localhost/en-us/auth/access-denied", response.Headers.Location!.ToString());
+        Assert.Empty(_apiFactory.ApiClientStub.PutRequests);
     }
 
     [Fact]
@@ -84,6 +113,7 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "Admin", permissions: Enum.GetValues<AuthorizationPermission>());
         UpdatePluginSettingsRequest request = _updatePluginSettingsRequestFixture.Create();
         string endpoint = $"plugins/{request.PluginId}/settings";
         _apiFactory.ApiClientStub.RegisterPutException(endpoint, new ApiException(

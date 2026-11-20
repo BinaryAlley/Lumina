@@ -1,5 +1,9 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.DTO.Plugins;
+using Lumina.Presentation.Web.Common.Enums.Authorization;
 using Lumina.Presentation.Web.Core.Endpoints.Plugins.Index;
+using Lumina.Presentation.Web.Fixtures.Common.DTO.Plugins;
+using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
@@ -15,6 +19,9 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Plugins.Index;
 public class PluginsIndexViewEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
+    private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
+    private readonly PluginDtoFixture _pluginDtoFixture = new();
+    private readonly PluginSettingsDtoFixture _pluginSettingsDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginsIndexViewEndpointTests"/> class.
@@ -39,5 +46,45 @@ public class PluginsIndexViewEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.Equal("http://localhost/en-us/auth/login", response.Headers.Location!.ToString());
         Assert.DoesNotContain(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint == "plugins");
+    }
+
+    [Fact]
+    public async Task PluginsIndex_WhenCalledByNonAdminUser_ShouldRedirectToAccessDenied()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "User", permissions: Enum.GetValues<AuthorizationPermission>());
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.GetAsync("/en-us/admin/manage-plugins");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Equal("https://localhost/en-us/auth/access-denied", response.Headers.Location!.ToString());
+        Assert.DoesNotContain(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint == "plugins");
+    }
+
+    [Fact]
+    public async Task PluginsIndex_WhenCalledByAdminUser_ShouldReturnPluginsPage()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "Admin", permissions: Enum.GetValues<AuthorizationPermission>());
+        PluginDto[] expectedPlugins = [_pluginDtoFixture.Create(name: "OpenLibrary")];
+        string settingsEndpoint = $"plugins/{expectedPlugins[0].Id}/settings";
+        _apiFactory.ApiClientStub.RegisterGetResponse("plugins", expectedPlugins);
+        _apiFactory.ApiClientStub.RegisterGetResponse(settingsEndpoint, _pluginSettingsDtoFixture.Create(pluginId: expectedPlugins[0].Id));
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.GetAsync("/en-us/admin/manage-plugins");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("text/html", response.Content.Headers.ContentType!.MediaType);
+        Assert.Contains(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint == "plugins");
+        Assert.Contains(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint == settingsEndpoint);
     }
 }

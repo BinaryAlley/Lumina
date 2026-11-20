@@ -82,7 +82,7 @@ public class DeleteLibraryEndpointTests : IClassFixture<LuminaWebFactory>
 
         // Assert
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        Assert.Contains("access-denied", response.Headers.Location!.ToString());
+        Assert.Equal("https://localhost/en-us/auth/access-denied", response.Headers.Location!.ToString());
         Assert.DoesNotContain(_apiFactory.ApiClientStub.DeleteEndpointsCalled, endpoint => endpoint == $"libraries/{libraryId}");
     }
 

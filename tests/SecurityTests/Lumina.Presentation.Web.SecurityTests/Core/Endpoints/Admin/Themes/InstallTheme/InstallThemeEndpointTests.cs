@@ -1,5 +1,7 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.Enums.Authorization;
 using Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.InstallTheme;
+using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
@@ -16,6 +18,7 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Themes.Inst
 public class InstallThemeEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
+    private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="InstallThemeEndpointTests"/> class.
@@ -31,6 +34,7 @@ public class InstallThemeEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "Admin", permissions: Enum.GetValues<AuthorizationPermission>());
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage installRequest = new(HttpMethod.Post, "/en-us/admin/themes/api-install-theme")
         {
@@ -65,6 +69,29 @@ public class InstallThemeEndpointTests : IClassFixture<LuminaWebFactory>
         // Assert
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Assert.Equal("http://localhost/en-us/auth/login", response.Headers.Location!.ToString());
+        Assert.DoesNotContain(_apiFactory.ApiClientStub.PostRequests, postRequest => postRequest.Endpoint == "themes");
+    }
+
+    [Fact]
+    public async Task InstallTheme_WhenCalledByNonAdminUser_ShouldRedirectToAccessDenied()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "User", permissions: Enum.GetValues<AuthorizationPermission>());
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        HttpRequestMessage installRequest = new(HttpMethod.Post, "/en-us/admin/themes/api-install-theme")
+        {
+            Content = CreateMultipartContent("theme.zip")
+        };
+        installRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        installRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(installRequest);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Equal("https://localhost/en-us/auth/access-denied", response.Headers.Location!.ToString());
         Assert.DoesNotContain(_apiFactory.ApiClientStub.PostRequests, postRequest => postRequest.Endpoint == "themes");
     }
 

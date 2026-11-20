@@ -38,9 +38,9 @@ public class StubApiHttpClient : IApiHttpClient
     private ApiException? _blobException;
 
     /// <summary>
-    /// Gets the authorization response returned for the <c>auth/get-authorization</c> endpoint.
+    /// Gets or sets the authorization response returned for the <c>auth/get-authorization</c> endpoint. It defaults to an Administrator with every permission.
     /// </summary>
-    public GetAuthorizationResponse AuthorizationResponse { get; set; } = new(Guid.NewGuid(), "Admin", Enum.GetValues<AuthorizationPermission>());
+    public GetAuthorizationResponse AuthorizationResponse { get; set; } = CreateDefaultAuthorizationResponse();
 
     /// <summary>
     /// Gets or sets the exception thrown when the <c>auth/get-authorization</c> endpoint is called, or <see langword="null"/> to return
@@ -77,6 +77,11 @@ public class StubApiHttpClient : IApiHttpClient
     /// Gets the list of DELETE endpoints that were requested.
     /// </summary>
     public List<string> DeleteEndpointsCalled { get; } = [];
+
+    /// <summary>
+    /// Gets the list of blob endpoints that were requested.
+    /// </summary>
+    public List<string> BlobEndpointsCalled { get; } = [];
 
     /// <summary>
     /// Registers the response returned when the specified GET endpoint is called.
@@ -238,8 +243,11 @@ public class StubApiHttpClient : IApiHttpClient
     }
 
     /// <summary>
-    /// Resets all registered responses and captured requests, keeping only the default responses.
+    /// Resets all registered responses and captured requests, and restores the default authorization response.
     /// </summary>
+    /// <remarks>
+    /// The default authorization response is an Administrator with every permission. Tests that need a different principal must set <see cref="AuthorizationResponse"/> after calling this method.
+    /// </remarks>
     public void Reset()
     {
         _getResponseFactories.Clear();
@@ -254,11 +262,22 @@ public class StubApiHttpClient : IApiHttpClient
         _deleteExceptions.Clear();
         _blobResponse = null;
         _blobException = null;
+        AuthorizationResponse = CreateDefaultAuthorizationResponse();
         AuthorizationException = null;
         GetEndpointsCalled.Clear();
         PostRequests.Clear();
         PutRequests.Clear();
         DeleteEndpointsCalled.Clear();
+        BlobEndpointsCalled.Clear();
+    }
+
+    /// <summary>
+    /// Creates the default authorization response, an Administrator with every permission.
+    /// </summary>
+    /// <returns>The default authorization response.</returns>
+    private static GetAuthorizationResponse CreateDefaultAuthorizationResponse()
+    {
+        return new(Guid.NewGuid(), "Admin", Enum.GetValues<AuthorizationPermission>());
     }
 
     /// <summary>
@@ -305,6 +324,7 @@ public class StubApiHttpClient : IApiHttpClient
     /// <returns>A model containing the raw blob bytes and their content type.</returns>
     public Task<BlobDataDto> GetBlobAsync(string endpoint, CancellationToken cancellationToken = default)
     {
+        BlobEndpointsCalled.Add(endpoint);
         if (_blobException is not null)
             throw _blobException;
         if (_blobResponse is not null)
