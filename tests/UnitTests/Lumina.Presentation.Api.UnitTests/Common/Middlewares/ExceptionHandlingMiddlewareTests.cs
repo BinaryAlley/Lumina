@@ -58,6 +58,7 @@ public class ExceptionHandlingMiddlewareTests
         string responseBody = await reader.ReadToEndAsync();
         ProblemDetails problemDetails = JsonSerializer.Deserialize<ProblemDetails>(responseBody, _jsonOptions)!;
         Assert.Equal(StatusCodes.Status500InternalServerError, problemDetails.Status);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.6.1", problemDetails.Type);
         Assert.Equal("InternalServerError", problemDetails.Title);
         Assert.Equal("An unexpected error occurred while processing the request.", problemDetails.Detail);
         Assert.False(string.IsNullOrEmpty(problemDetails.Extensions["traceId"]?.ToString()));

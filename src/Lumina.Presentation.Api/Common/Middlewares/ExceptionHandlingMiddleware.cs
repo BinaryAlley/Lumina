@@ -66,7 +66,7 @@ public class ExceptionHandlingMiddleware
     {
         ProblemDetails problemDetails = new()
         {
-            Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
+            Type = "https://tools.ietf.org/html/rfc9110#section-15.6.1",
             Title = "InternalServerError",
             Status = StatusCodes.Status500InternalServerError,
             Detail = "An unexpected error occurred while processing the request.",

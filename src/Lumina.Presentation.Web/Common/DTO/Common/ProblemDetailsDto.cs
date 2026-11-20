@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 namespace Lumina.Presentation.Web.Common.DTO.Common;
 
 /// <summary>
-/// Data transfer object that follows the RFC 7807 standard for problem details in HTTP APIs.
+/// Data transfer object that follows the RFC 9457 standard for problem details in HTTP APIs.
 /// </summary>
 [DebuggerDisplay("{Title} ({Status})")]
 public class ProblemDetailsDto
