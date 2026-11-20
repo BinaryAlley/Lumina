@@ -1,5 +1,7 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.Enums.Authorization;
 using Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.DeleteTheme;
+using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
@@ -17,6 +19,7 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Themes.Dele
 public class DeleteThemeEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
+    private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeleteThemeEndpointTests"/> class.
@@ -51,6 +54,7 @@ public class DeleteThemeEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "Admin", permissions: Enum.GetValues<AuthorizationPermission>());
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage deleteRequest = CreateDeleteRequest("test-theme");
 
@@ -59,6 +63,25 @@ public class DeleteThemeEndpointTests : IClassFixture<LuminaWebFactory>
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.DoesNotContain(_apiFactory.ApiClientStub.DeleteEndpointsCalled, endpoint => endpoint == "themes/test-theme");
+    }
+
+    [Fact]
+    public async Task DeleteTheme_WhenCalledByNonAdminUser_ShouldRedirectToAccessDenied()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "User", permissions: Enum.GetValues<AuthorizationPermission>());
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        HttpRequestMessage deleteRequest = CreateDeleteRequest("test-theme");
+        deleteRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(deleteRequest);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Equal("https://localhost/en-us/auth/access-denied", response.Headers.Location!.ToString());
         Assert.DoesNotContain(_apiFactory.ApiClientStub.DeleteEndpointsCalled, endpoint => endpoint == "themes/test-theme");
     }
 

@@ -1,7 +1,9 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.Enums.Authorization;
 using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Core.Endpoints.Plugins.InstallPlugin;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
+using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
@@ -19,6 +21,7 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Plugins.InstallPl
 public class InstallPluginEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
+    private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
     private readonly ProblemDetailsDtoFixture _problemDetailsDtoFixture = new();
 
     /// <summary>
@@ -35,6 +38,7 @@ public class InstallPluginEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "Admin", permissions: Enum.GetValues<AuthorizationPermission>());
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage installRequest = new(HttpMethod.Post, "/en-us/admin/manage-plugins/api-install-plugin")
         {
@@ -73,10 +77,34 @@ public class InstallPluginEndpointTests : IClassFixture<LuminaWebFactory>
     }
 
     [Fact]
+    public async Task InstallPlugin_WhenCalledByNonAdminUser_ShouldRedirectToAccessDenied()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "User", permissions: Enum.GetValues<AuthorizationPermission>());
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        HttpRequestMessage installRequest = new(HttpMethod.Post, "/en-us/admin/manage-plugins/api-install-plugin")
+        {
+            Content = CreateMultipartContent("plugin.zip")
+        };
+        installRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        installRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(installRequest);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Equal("https://localhost/en-us/auth/access-denied", response.Headers.Location!.ToString());
+        Assert.DoesNotContain(_apiFactory.ApiClientStub.PostRequests, postRequest => postRequest.Endpoint == "plugins");
+    }
+
+    [Fact]
     public async Task InstallPlugin_WhenCalledWithoutFilePart_ShouldRejectRequest()
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "Admin", permissions: Enum.GetValues<AuthorizationPermission>());
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage installRequest = new(HttpMethod.Post, "/en-us/admin/manage-plugins/api-install-plugin")
         {
@@ -98,6 +126,7 @@ public class InstallPluginEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "Admin", permissions: Enum.GetValues<AuthorizationPermission>());
         _apiFactory.ApiClientStub.RegisterPostException("plugins", new ApiException(
             _problemDetailsDtoFixture.Create(title: "General.Failure", detail: "PluginArchiveNotReadable"),
             HttpStatusCode.Forbidden));
