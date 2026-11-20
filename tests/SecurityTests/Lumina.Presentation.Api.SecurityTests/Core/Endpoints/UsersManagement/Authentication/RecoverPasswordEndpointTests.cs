@@ -77,7 +77,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
         Assert.NotNull(problemDetails);
         Assert.Equal(StatusCodes.Status429TooManyRequests, problemDetails!["status"].GetInt32());
-        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.5.29", problemDetails["type"].GetString());
+        Assert.Equal("https://tools.ietf.org/html/rfc6585#section-4", problemDetails["type"].GetString());
         Assert.Equal("TooManyRequests", problemDetails["title"].GetString());
         Assert.Equal("TooManyRequests", problemDetails["detail"].GetString());
         Assert.Equal("900", problemDetails["retryAfter"].GetString());

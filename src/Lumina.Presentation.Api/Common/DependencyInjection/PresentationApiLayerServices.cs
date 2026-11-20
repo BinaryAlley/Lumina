@@ -96,7 +96,7 @@ public static class PresentationApiLayerServices
 
                 var problem = new
                 {
-                    type = "https://tools.ietf.org/html/rfc7231#section-6.5.29",
+                    type = "https://tools.ietf.org/html/rfc6585#section-4",
                     title = "TooManyRequests", 
                     status = StatusCodes.Status429TooManyRequests,
                     detail = "TooManyRequests",

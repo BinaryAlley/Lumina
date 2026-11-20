@@ -85,10 +85,10 @@ public class RecoverPasswordEndpointSummary : Summary<RecoverPasswordEndpoint, R
         Response(429, "The request failed due to a more than 10 requests to this endpoint in less than 15 minutes.", "application/problem+json",
             example: new
             {
-                type = "https://tools.ietf.org/html/rfc7231#section-6.5.29",
+                type = "https://tools.ietf.org/html/rfc6585#section-4",
                 title = "TooManyRequests",
                 status = 429,
-                detail = "Too many attempts. Please try again later.",
+                detail = "TooManyRequests",
                 retryAfter = "900"
             }
         );
