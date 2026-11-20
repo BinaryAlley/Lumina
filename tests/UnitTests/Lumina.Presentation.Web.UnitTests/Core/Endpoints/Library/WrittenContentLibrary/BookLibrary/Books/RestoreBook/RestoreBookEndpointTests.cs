@@ -40,18 +40,14 @@ public class RestoreBookEndpointTests
         Guid bookId = Guid.NewGuid();
         Guid libraryId = Guid.NewGuid();
         ConfigureRequest(bookId.ToString(), libraryId);
-        _mockApiHttpClient.PostAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(
-            Arg.Any<string>(), Arg.Any<Web.Common.Requests.Common.EmptyRequest>(), Arg.Any<CancellationToken>())
-            .Returns(new Web.Common.Requests.Common.EmptyRequest());
 
         // Act
         IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
         string body = await JsonResultTestHelper.GetResponseBodyAsync(result);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PostAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PostIgnoringResponseAsync(
             BuildExpectedEndpoint(libraryId, bookId),
-            Arg.Any<Web.Common.Requests.Common.EmptyRequest>(),
             Arg.Any<CancellationToken>());
         using JsonDocument jsonDocument = JsonDocument.Parse(body);
         Assert.True(jsonDocument.RootElement.GetProperty("success").GetBoolean());
@@ -64,17 +60,13 @@ public class RestoreBookEndpointTests
         // Arrange
         Guid libraryId = Guid.NewGuid();
         ConfigureRequest("not-a-guid", libraryId);
-        _mockApiHttpClient.PostAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(
-            Arg.Any<string>(), Arg.Any<Web.Common.Requests.Common.EmptyRequest>(), Arg.Any<CancellationToken>())
-            .Returns(new Web.Common.Requests.Common.EmptyRequest());
 
         // Act
         await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PostAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PostIgnoringResponseAsync(
             BuildExpectedEndpoint(libraryId, Guid.Empty),
-            Arg.Any<Web.Common.Requests.Common.EmptyRequest>(),
             Arg.Any<CancellationToken>());
     }
 
@@ -84,17 +76,13 @@ public class RestoreBookEndpointTests
         // Arrange
         Guid bookId = Guid.NewGuid();
         ConfigureRequest(bookId.ToString(), "not-a-guid");
-        _mockApiHttpClient.PostAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(
-            Arg.Any<string>(), Arg.Any<Web.Common.Requests.Common.EmptyRequest>(), Arg.Any<CancellationToken>())
-            .Returns(new Web.Common.Requests.Common.EmptyRequest());
 
         // Act
         await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PostAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PostIgnoringResponseAsync(
             BuildExpectedEndpoint(Guid.Empty, bookId),
-            Arg.Any<Web.Common.Requests.Common.EmptyRequest>(),
             Arg.Any<CancellationToken>());
     }
 

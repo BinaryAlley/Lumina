@@ -16,7 +16,7 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibra
 /// <summary>
 /// API endpoint for the <c>/libraries/{libraryId}/artists/{artistId}/albums/{albumId}</c> route.
 /// </summary>
-public class GetAlbumEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult>
+public class GetAlbumEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
     private readonly IQueryHandler<GetAlbumQuery, Result<AlbumResponse>> _getAlbumQueryHandler;
 
@@ -45,7 +45,7 @@ public class GetAlbumEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult
     /// </summary>
     /// <param name="request">The request object.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public override async Task<IResult> ExecuteAsync(FastEndpoints.EmptyRequest request, CancellationToken cancellationToken)
+    public override async Task<IResult> ExecuteAsync(EmptyRequest request, CancellationToken cancellationToken)
     {
         // Take unique identifiers from the route.
         string? libraryId = HttpContext.Request.RouteValues["libraryId"]?.ToString();

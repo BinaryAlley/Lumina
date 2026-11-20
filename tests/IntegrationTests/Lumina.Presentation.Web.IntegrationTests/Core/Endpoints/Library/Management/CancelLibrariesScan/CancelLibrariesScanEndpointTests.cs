@@ -35,7 +35,7 @@ public class CancelLibrariesScanEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
-        _apiFactory.ApiClientStub.RegisterPostResponseFactory("libraries/scans/cancel", _ => new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPostSuccess("libraries/scans/cancel");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage cancelRequest = CreateCancelRequest("/en-us/libraries/manage/api-cancel-libraries-scan");
         cancelRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);

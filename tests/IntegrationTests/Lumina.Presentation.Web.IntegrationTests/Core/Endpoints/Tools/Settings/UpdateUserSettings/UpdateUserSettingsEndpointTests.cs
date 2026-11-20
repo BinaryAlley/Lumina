@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DTO.UsersManagement;
 using Lumina.Presentation.Web.Common.Enums.AudioLibrary;
-using Lumina.Presentation.Web.Common.Requests.Common;
 using Lumina.Presentation.Web.Core.Endpoints.Tools.Settings.UpdateUserSettings;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.UsersManagement;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
@@ -40,7 +39,7 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
-        _apiFactory.ApiClientStub.RegisterPutResponseFactory("users/me/settings", _ => new EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPutPayload<UserSettingsDto>("users/me/settings");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         UserSettingsDto settings = _userSettingsDtoFixture.Create(isThemeCachingEnabled: true);
 
@@ -62,7 +61,7 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
-        _apiFactory.ApiClientStub.RegisterPutResponseFactory("users/me/settings", _ => new EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPutPayload<UserSettingsDto>("users/me/settings");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         UserSettingsDto settings = _userSettingsDtoFixture.Create(
             vuMeterOrientation: VuMeterOrientation.Horizontal,

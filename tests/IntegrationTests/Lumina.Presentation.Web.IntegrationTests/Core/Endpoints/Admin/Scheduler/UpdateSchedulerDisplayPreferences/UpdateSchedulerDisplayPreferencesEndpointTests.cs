@@ -39,7 +39,7 @@ public class UpdateSchedulerDisplayPreferencesEndpointTests : IClassFixture<Lumi
         // Arrange
         _apiFactory.ApiClientStub.Reset();
         UpdateSchedulerDisplayPreferencesRequest request = _updateSchedulerDisplayPreferencesRequestFixture.Create();
-        _apiFactory.ApiClientStub.RegisterPutResponseFactory("scheduled-jobs/display-preferences", _ => new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPutPayload<UpdateSchedulerDisplayPreferencesRequest>("scheduled-jobs/display-preferences");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage updateRequest = new(HttpMethod.Put, "/en-us/admin/api-scheduled-jobs/display-preferences")
         {

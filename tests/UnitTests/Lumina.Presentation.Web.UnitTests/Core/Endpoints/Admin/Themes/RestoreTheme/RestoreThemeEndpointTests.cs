@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Themes;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.RestoreTheme;
 using Lumina.Presentation.Web.Core.Themes;
@@ -65,7 +64,7 @@ public class RestoreThemeEndpointTests
         await _sut.ExecuteAsync(_restoreThemeRequestFixture.Create(themeId: themeId), CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PostAsync<ThemeResponseDto, object>(expectedEndpoint, Arg.Any<object>(), Arg.Any<CancellationToken>());
+        await _mockApiHttpClient.Received(1).PostIgnoringResponseAsync(expectedEndpoint, Arg.Any<CancellationToken>());
     }
 
     [Theory]
@@ -80,6 +79,6 @@ public class RestoreThemeEndpointTests
         // Assert
         ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
         Assert.Equal(StatusCodes.Status400BadRequest, problemResult.StatusCode);
-        await _mockApiHttpClient.DidNotReceive().PostAsync<ThemeResponseDto, object>(Arg.Any<string>(), Arg.Any<object>(), Arg.Any<CancellationToken>());
+        await _mockApiHttpClient.DidNotReceive().PostIgnoringResponseAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 }

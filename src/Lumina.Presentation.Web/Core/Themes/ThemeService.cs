@@ -3,6 +3,7 @@ using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
 using Lumina.Presentation.Web.Common.DTO.Themes;
 using Lumina.Presentation.Web.Common.Enums.Themes;
+using Lumina.Presentation.Web.Common.Requests.Themes;
 using Lumina.Presentation.Web.Common.Routes;
 using System.Collections.Generic;
 using System.IO;
@@ -68,7 +69,7 @@ public sealed class ThemeService
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public async Task SetCurrentThemeAsync(string themeId, CancellationToken cancellationToken = default)
     {
-        await _apiHttpClient.PutAsync<ThemeResponseDto, object>(ApiRoutes.Themes.SET_CURRENT_THEME, new { ThemeId = themeId }, cancellationToken).ConfigureAwait(false);
+        await _apiHttpClient.PutIgnoringResponseAsync<SetCurrentThemeRequest>(ApiRoutes.Themes.SET_CURRENT_THEME, new SetCurrentThemeRequest(themeId), cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -101,7 +102,7 @@ public sealed class ThemeService
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public async Task RestoreThemeAsync(string themeId, CancellationToken cancellationToken = default)
     {
-        await _apiHttpClient.PostAsync<ThemeResponseDto, object>(ApiRoutes.Themes.RESTORE_THEME.Replace("{themeId}", themeId), new { }, cancellationToken).ConfigureAwait(false);
+        await _apiHttpClient.PostIgnoringResponseAsync(ApiRoutes.Themes.RESTORE_THEME.Replace("{themeId}", themeId), cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>

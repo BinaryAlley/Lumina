@@ -46,7 +46,7 @@ public class UpdateSchedulerDisplayPreferencesEndpointTests
         string body = await JsonResultTestHelper.GetResponseBodyAsync(result);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PutAsync<Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest, UpdateSchedulerDisplayPreferencesRequest>(
+        await _mockApiHttpClient.Received(1).PutIgnoringResponseAsync<UpdateSchedulerDisplayPreferencesRequest>(
             ApiRoutes.ScheduledJobs.UPDATE_DISPLAY_PREFERENCES,
             Arg.Is<UpdateSchedulerDisplayPreferencesRequest>(forwardedRequest =>
                 forwardedRequest.JobTypeFilter == request.JobTypeFilter &&

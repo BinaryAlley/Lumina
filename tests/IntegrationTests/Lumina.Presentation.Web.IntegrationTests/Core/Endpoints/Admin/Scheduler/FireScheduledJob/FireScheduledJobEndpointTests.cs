@@ -4,7 +4,6 @@ using Lumina.Presentation.Web.Core.Endpoints.Admin.Scheduler.FireScheduledJob;
 using Lumina.Presentation.Web.Fixtures.Common.Requests.Scheduling;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -41,11 +40,11 @@ public class FireScheduledJobEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         FireScheduledJobRequest request = _fireScheduledJobRequestFixture.Create();
         string expectedEndpoint = $"scheduled-jobs/{request.ScheduledJobId}/fire";
-        _apiFactory.ApiClientStub.RegisterPutResponseFactory(expectedEndpoint, _ => new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPutPayload<FireScheduledJobRequest>(expectedEndpoint);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage fireRequest = new(HttpMethod.Put, $"/en-us/admin/api-scheduled-jobs/{request.ScheduledJobId}/fire")
         {
-            Content = JsonContent.Create(new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest())
+            Content = JsonContent.Create(request)
         };
         fireRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         fireRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

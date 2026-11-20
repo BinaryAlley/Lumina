@@ -3,7 +3,6 @@ using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading;
@@ -59,9 +58,8 @@ public class RestoreMusicTrackEndpoint : BaseEndpoint<EmptyRequest, IResult>
         string queryLibraryId = HttpContext.Request.Query["libraryId"].ToString();
         string libraryId = Guid.TryParse(queryLibraryId, out Guid parsedLibraryId) ? parsedLibraryId.ToString() : Guid.Empty.ToString();
 
-        await _apiHttpClient.PostAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(
+        await _apiHttpClient.PostIgnoringResponseAsync(
             ApiRoutes.Music.RESTORE_TRACK.Replace("{libraryId}", libraryId).Replace("{artistId}", artistId).Replace("{albumId}", albumId).Replace("{trackId}", trackId),
-            new Web.Common.Requests.Common.EmptyRequest(),
             cancellationToken).ConfigureAwait(false);
         return JsonSuccess(new { isRestored = true });
     }

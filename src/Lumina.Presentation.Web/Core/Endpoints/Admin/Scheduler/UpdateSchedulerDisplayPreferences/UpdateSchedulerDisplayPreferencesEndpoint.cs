@@ -5,7 +5,6 @@ using Lumina.Presentation.Web.Common.Authorization;
 using Lumina.Presentation.Web.Common.Requests.Scheduling;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,7 +49,7 @@ public class UpdateSchedulerDisplayPreferencesEndpoint : BaseEndpoint<UpdateSche
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(UpdateSchedulerDisplayPreferencesRequest request, CancellationToken cancellationToken)
     {
-        await _apiHttpClient.PutAsync<Web.Common.Requests.Common.EmptyRequest, UpdateSchedulerDisplayPreferencesRequest>(ApiRoutes.ScheduledJobs.UPDATE_DISPLAY_PREFERENCES, request, cancellationToken).ConfigureAwait(false);
+        await _apiHttpClient.PutIgnoringResponseAsync<UpdateSchedulerDisplayPreferencesRequest>(ApiRoutes.ScheduledJobs.UPDATE_DISPLAY_PREFERENCES, request, cancellationToken).ConfigureAwait(false);
         return JsonSuccess();
     }
 }

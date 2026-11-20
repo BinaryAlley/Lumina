@@ -1,11 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Themes;
+using Lumina.Presentation.Web.Common.Requests.Themes;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.SetCurrentTheme;
 using Lumina.Presentation.Web.Core.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
 using Lumina.Presentation.Web.Fixtures.Common.Requests.Themes;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
@@ -26,7 +25,6 @@ public class SetCurrentThemeEndpointTests
 {
     private readonly IApiHttpClient _mockApiHttpClient;
     private readonly SetCurrentThemeEndpoint _sut;
-    private readonly ThemeResponseDtoFixture _themeResponseDtoFixture = new();
     private readonly SetCurrentThemeRequestFixture _setCurrentThemeRequestFixture = new();
 
     /// <summary>
@@ -44,8 +42,8 @@ public class SetCurrentThemeEndpointTests
     {
         // Arrange
         string themeId = "editorial-paper";
-        _mockApiHttpClient.PutAsync<ThemeResponseDto, object>(Arg.Any<string>(), Arg.Any<object>(), Arg.Any<CancellationToken>())
-            .Returns(_themeResponseDtoFixture.Create());
+        _mockApiHttpClient.PutIgnoringResponseAsync<SetCurrentThemeRequest>(Arg.Any<string>(), Arg.Any<SetCurrentThemeRequest>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
 
         // Act
         IResult result = await _sut.ExecuteAsync(_setCurrentThemeRequestFixture.Create(themeId: themeId), CancellationToken.None);
@@ -55,9 +53,9 @@ public class SetCurrentThemeEndpointTests
         using (System.Text.Json.JsonDocument jsonDocument = System.Text.Json.JsonDocument.Parse(body))
             Assert.True(jsonDocument.RootElement.GetProperty("success").GetBoolean());
 
-        await _mockApiHttpClient.Received(1).PutAsync<ThemeResponseDto, object>(
+        await _mockApiHttpClient.Received(1).PutIgnoringResponseAsync<SetCurrentThemeRequest>(
             ApiRoutes.Themes.SET_CURRENT_THEME,
-            Arg.Is<object>(payload => (payload.GetType().GetProperty("ThemeId")!.GetValue(payload) as string) == themeId),
+            Arg.Is<SetCurrentThemeRequest>(payload => payload.ThemeId == themeId),
             Arg.Any<CancellationToken>());
     }
 
@@ -73,6 +71,6 @@ public class SetCurrentThemeEndpointTests
         // Assert
         ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
         Assert.Equal(StatusCodes.Status400BadRequest, problemResult.StatusCode);
-        await _mockApiHttpClient.DidNotReceive().PutAsync<ThemeResponseDto, object>(Arg.Any<string>(), Arg.Any<object>(), Arg.Any<CancellationToken>());
+        await _mockApiHttpClient.DidNotReceive().PutIgnoringResponseAsync<SetCurrentThemeRequest>(Arg.Any<string>(), Arg.Any<SetCurrentThemeRequest>(), Arg.Any<CancellationToken>());
     }
 }

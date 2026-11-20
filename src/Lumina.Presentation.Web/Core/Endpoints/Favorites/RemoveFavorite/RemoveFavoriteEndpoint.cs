@@ -4,7 +4,6 @@ using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Enums.Favorites;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading;
@@ -16,7 +15,7 @@ namespace Lumina.Presentation.Web.Core.Endpoints.Favorites.RemoveFavorite;
 /// <summary>
 /// API endpoint for the <c>/{culture}/favorites/{mediaKind}/{mediaItemId}/api-remove-favorite</c> route.
 /// </summary>
-public class RemoveFavoriteEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult>
+public class RemoveFavoriteEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
     // A value that is not a name of FavoriteMediaKind, so the API rejects a crafted route value with its own validation error.
     private const string INVALID_MEDIA_KIND_PLACEHOLDER = "Invalid";
@@ -50,7 +49,7 @@ public class RemoveFavoriteEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, I
     /// </summary>
     /// <param name="request">The request object.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public override async Task<IResult> ExecuteAsync(FastEndpoints.EmptyRequest request, CancellationToken cancellationToken)
+    public override async Task<IResult> ExecuteAsync(EmptyRequest request, CancellationToken cancellationToken)
     {
         // The route values are normalized before they are substituted into the upstream URL, so that a crafted value can never escape its URL segment.
         // The media kind must be the name of a FavoriteMediaKind member, which also rejects numeric strings and comma separated flag lists, and the Id must be a Guid.

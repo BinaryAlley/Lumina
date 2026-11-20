@@ -27,9 +27,15 @@ public class StubApiHttpClient : IApiHttpClient
     private readonly Dictionary<string, Func<object>> _getResponseFactories = [];
     private readonly Dictionary<string, Func<object, object>> _postResponseFactories = [];
     private readonly Dictionary<string, Func<object, object>> _putResponseFactories = [];
+    private readonly Dictionary<string, ApiException> _postExceptions = [];
+    private readonly Dictionary<string, ApiException> _putExceptions = [];
+    private readonly HashSet<string> _postBodylessSuccessEndpoints = [];
+    private readonly Dictionary<string, Type> _postPayloadTypes = [];
+    private readonly Dictionary<string, Type> _putPayloadTypes = [];
     private readonly HashSet<string> _deleteSuccessEndpoints = [];
     private readonly Dictionary<string, ApiException> _deleteExceptions = [];
     private BlobDataDto? _blobResponse;
+    private ApiException? _blobException;
 
     /// <summary>
     /// Gets the authorization response returned for the <c>auth/get-authorization</c> endpoint.
@@ -121,7 +127,7 @@ public class StubApiHttpClient : IApiHttpClient
     /// <param name="exception">The exception to throw.</param>
     public void RegisterPostException(string endpoint, ApiException exception)
     {
-        _postResponseFactories[endpoint] = _ => throw exception;
+        _postExceptions[endpoint] = exception;
     }
 
     /// <summary>
@@ -141,7 +147,7 @@ public class StubApiHttpClient : IApiHttpClient
     /// <param name="exception">The exception to throw.</param>
     public void RegisterPutException(string endpoint, ApiException exception)
     {
-        _putResponseFactories[endpoint] = _ => throw exception;
+        _putExceptions[endpoint] = exception;
     }
 
     /// <summary>
@@ -194,6 +200,44 @@ public class StubApiHttpClient : IApiHttpClient
     }
 
     /// <summary>
+    /// Registers the exception thrown when a blob endpoint is called.
+    /// </summary>
+    /// <param name="exception">The exception to throw.</param>
+    public void RegisterBlobException(ApiException exception)
+    {
+        _blobException = exception;
+    }
+
+    /// <summary>
+    /// Registers the specified POST endpoint as accepting a bodyless request without returning a response body.
+    /// </summary>
+    /// <param name="endpoint">The API endpoint for which to register success.</param>
+    public void RegisterPostSuccess(string endpoint)
+    {
+        _postBodylessSuccessEndpoints.Add(endpoint);
+    }
+
+    /// <summary>
+    /// Registers the specified POST endpoint as accepting a payload of type <typeparamref name="TModel"/> without returning a response body.
+    /// </summary>
+    /// <typeparam name="TModel">The expected type of the payload content.</typeparam>
+    /// <param name="endpoint">The API endpoint for which to register the payload type.</param>
+    public void RegisterPostPayload<TModel>(string endpoint)
+    {
+        _postPayloadTypes[endpoint] = typeof(TModel);
+    }
+
+    /// <summary>
+    /// Registers the specified PUT endpoint as accepting a payload of type <typeparamref name="TModel"/> without returning a response body.
+    /// </summary>
+    /// <typeparam name="TModel">The expected type of the payload content.</typeparam>
+    /// <param name="endpoint">The API endpoint for which to register the payload type.</param>
+    public void RegisterPutPayload<TModel>(string endpoint)
+    {
+        _putPayloadTypes[endpoint] = typeof(TModel);
+    }
+
+    /// <summary>
     /// Resets all registered responses and captured requests, keeping only the default responses.
     /// </summary>
     public void Reset()
@@ -201,9 +245,15 @@ public class StubApiHttpClient : IApiHttpClient
         _getResponseFactories.Clear();
         _postResponseFactories.Clear();
         _putResponseFactories.Clear();
+        _postExceptions.Clear();
+        _putExceptions.Clear();
+        _postBodylessSuccessEndpoints.Clear();
+        _postPayloadTypes.Clear();
+        _putPayloadTypes.Clear();
         _deleteSuccessEndpoints.Clear();
         _deleteExceptions.Clear();
         _blobResponse = null;
+        _blobException = null;
         AuthorizationException = null;
         GetEndpointsCalled.Clear();
         PostRequests.Clear();
@@ -252,9 +302,11 @@ public class StubApiHttpClient : IApiHttpClient
     /// </summary>
     /// <param name="endpoint">The API endpoint where the request is being sent.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    /// <returns>A model containing the deserialized blob.</returns>
+    /// <returns>A model containing the raw blob bytes and their content type.</returns>
     public Task<BlobDataDto> GetBlobAsync(string endpoint, CancellationToken cancellationToken = default)
     {
+        if (_blobException is not null)
+            throw _blobException;
         if (_blobResponse is not null)
             return Task.FromResult(_blobResponse);
         throw new NotSupportedException("Blob retrieval is not supported by the test stub.");
@@ -276,17 +328,36 @@ public class StubApiHttpClient : IApiHttpClient
     }
 
     /// <summary>
+    /// Sends a PUT request to the specified <paramref name="endpoint"/> as an asynchronous operation, discarding the response content.
+    /// </summary>
+    /// <typeparam name="TModel">The expected type of the payload content.</typeparam>
+    /// <param name="endpoint">The API endpoint where the request is being sent.</param>
+    /// <param name="data">The data to be serialized and sent to the API.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    public Task PutIgnoringResponseAsync<TModel>(string endpoint, TModel data, CancellationToken cancellationToken = default)
+    {
+        PutRequests.Add((endpoint, data));
+        if (_putExceptions.TryGetValue(endpoint, out ApiException? exception))
+            throw exception;
+        if (_putPayloadTypes.TryGetValue(endpoint, out Type? expectedType) && expectedType == typeof(TModel))
+            return Task.CompletedTask;
+        throw new InvalidOperationException($"No PUT payload of type '{typeof(TModel).Name}' is registered for the endpoint '{endpoint}'.");
+    }
+
+    /// <summary>
     /// Sends a PUT request to the specified <paramref name="endpoint"/> as an asynchronous operation and returns the result.
     /// </summary>
     /// <typeparam name="TResponse">The expected type of the response content.</typeparam>
     /// <typeparam name="TModel">The expected type of the payload content.</typeparam>
     /// <param name="endpoint">The API endpoint where the request is being sent.</param>
-    /// <param name="data">The data to be serialized and send to the API.</param>
+    /// <param name="data">The data to be serialized and sent to the API.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>The deserialized response containing the result of the PUT request.</returns>
     public Task<TResponse> PutAsync<TResponse, TModel>(string endpoint, TModel data, CancellationToken cancellationToken = default)
     {
         PutRequests.Add((endpoint, data));
+        if (_putExceptions.TryGetValue(endpoint, out ApiException? exception))
+            throw exception;
         if (_putResponseFactories.TryGetValue(endpoint, out Func<object, object>? responseFactory))
             return Task.FromResult((TResponse)responseFactory(data!));
         throw new InvalidOperationException($"No PUT response is registered for the endpoint '{endpoint}'.");
@@ -305,6 +376,8 @@ public class StubApiHttpClient : IApiHttpClient
     public Task<TResponse> PutMultipartAsync<TResponse>(string endpoint, Stream? fileStream, string? fileName, string fieldName, CancellationToken cancellationToken = default)
     {
         PutRequests.Add((endpoint, fileName));
+        if (_putExceptions.TryGetValue(endpoint, out ApiException? exception))
+            throw exception;
         if (_putResponseFactories.TryGetValue(endpoint, out Func<object, object>? responseFactory))
             return Task.FromResult((TResponse)responseFactory(fileName));
         throw new InvalidOperationException($"No PUT response is registered for the endpoint '{endpoint}'.");
@@ -323,9 +396,62 @@ public class StubApiHttpClient : IApiHttpClient
     public Task<TResponse> PostMultipartAsync<TResponse>(string endpoint, Stream fileStream, string fileName, string fieldName, CancellationToken cancellationToken = default)
     {
         PostRequests.Add((endpoint, fileName));
+        if (_postExceptions.TryGetValue(endpoint, out ApiException? exception))
+            throw exception;
         if (_postResponseFactories.TryGetValue(endpoint, out Func<object, object>? responseFactory))
             return Task.FromResult((TResponse)responseFactory(fileName));
         throw new InvalidOperationException($"No POST response is registered for the endpoint '{endpoint}'.");
+    }
+
+    /// <summary>
+    /// Sends a POST request without a payload to the specified <paramref name="endpoint"/> as an asynchronous operation, discarding the response content.
+    /// </summary>
+    /// <param name="endpoint">The API endpoint where the request is being sent.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    public Task PostIgnoringResponseAsync(string endpoint, CancellationToken cancellationToken = default)
+    {
+        PostRequests.Add((endpoint, null));
+        if (_postExceptions.TryGetValue(endpoint, out ApiException? exception))
+            throw exception;
+        if (_postBodylessSuccessEndpoints.Contains(endpoint))
+            return Task.CompletedTask;
+        throw new InvalidOperationException($"No bodyless POST success is registered for the endpoint '{endpoint}'.");
+    }
+
+    /// <summary>
+    /// Sends a POST request without a payload to the specified <paramref name="endpoint"/> as an asynchronous operation and returns the result.
+    /// </summary>
+    /// <typeparam name="TResponse">The expected type of the response content.</typeparam>
+    /// <param name="endpoint">The API endpoint where the request is being sent.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>The registered response.</returns>
+    public Task<TResponse> PostAsync<TResponse>(string endpoint, CancellationToken cancellationToken = default)
+    {
+        PostRequests.Add((endpoint, null));
+        if (_postExceptions.TryGetValue(endpoint, out ApiException? exception))
+            throw exception;
+        if (_postResponseFactories.TryGetValue(endpoint, out Func<object, object>? responseFactory))
+            return Task.FromResult((TResponse)responseFactory(new object()));
+        if (endpoint == ApiRoutes.Authentication.LOGIN_ACCOUNT)
+            return Task.FromResult((TResponse)(object)LoginResponse);
+        throw new InvalidOperationException($"No POST response is registered for the endpoint '{endpoint}'.");
+    }
+
+    /// <summary>
+    /// Sends a POST request to the specified <paramref name="endpoint"/> as an asynchronous operation, discarding the response content.
+    /// </summary>
+    /// <typeparam name="TModel">The expected type of the payload content.</typeparam>
+    /// <param name="endpoint">The API endpoint where the request is being sent.</param>
+    /// <param name="data">The data to be serialized and sent to the API.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    public Task PostIgnoringResponseAsync<TModel>(string endpoint, TModel data, CancellationToken cancellationToken = default)
+    {
+        PostRequests.Add((endpoint, data));
+        if (_postExceptions.TryGetValue(endpoint, out ApiException? exception))
+            throw exception;
+        if (_postPayloadTypes.TryGetValue(endpoint, out Type? expectedType) && expectedType == typeof(TModel))
+            return Task.CompletedTask;
+        throw new InvalidOperationException($"No POST payload of type '{typeof(TModel).Name}' is registered for the endpoint '{endpoint}'.");
     }
 
     /// <summary>
@@ -334,12 +460,14 @@ public class StubApiHttpClient : IApiHttpClient
     /// <typeparam name="TResponse">The expected type of the response content.</typeparam>
     /// <typeparam name="TModel">The expected type of the payload content.</typeparam>
     /// <param name="endpoint">The API endpoint where the request is being sent.</param>
-    /// <param name="data">The data to be serialized and send to the API.</param>
+    /// <param name="data">The data to be serialized and sent to the API.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>The deserialized response containing the result of the POST request.</returns>
     public Task<TResponse> PostAsync<TResponse, TModel>(string endpoint, TModel data, CancellationToken cancellationToken = default)
     {
         PostRequests.Add((endpoint, data));
+        if (_postExceptions.TryGetValue(endpoint, out ApiException? exception))
+            throw exception;
         if (_postResponseFactories.TryGetValue(endpoint, out Func<object, object>? responseFactory))
             return Task.FromResult((TResponse)responseFactory(data!));
         if (endpoint == ApiRoutes.Authentication.LOGIN_ACCOUNT)
