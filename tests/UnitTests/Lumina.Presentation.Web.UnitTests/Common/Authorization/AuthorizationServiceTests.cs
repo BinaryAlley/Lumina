@@ -148,7 +148,6 @@ public class AuthorizationServiceTests
     [Theory]
     [InlineData(HttpStatusCode.Unauthorized)]
     [InlineData(HttpStatusCode.Forbidden)]
-    [InlineData(HttpStatusCode.NotFound)]
     public async Task HasPermissionAsync_WhenTheApiReturnsAnAuthorizationStatusDuringAPageNavigation_ShouldRethrow(HttpStatusCode statusCode)
     {
         // Arrange
@@ -158,6 +157,18 @@ public class AuthorizationServiceTests
 
         // Act & Assert
         await Assert.ThrowsAsync<ApiException>(() => _sut.HasPermissionAsync(AuthorizationPermission.CanCreateLibraries, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task HasPermissionAsync_WhenTheApiReturnsNotFoundDuringAPageNavigation_ShouldThrowCurrentUserAuthorizationException()
+    {
+        // Arrange
+        _httpContext.Request.Headers.Accept = "text/html";
+        _mockApiHttpClient.GetAsync<GetAuthorizationResponse>(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<GetAuthorizationResponse>(new ApiException(null, HttpStatusCode.NotFound, "/api/v1/auth/get-authorization?userId=1")));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<CurrentUserAuthorizationException>(() => _sut.HasPermissionAsync(AuthorizationPermission.CanCreateLibraries, CancellationToken.None));
     }
 
     [Fact]

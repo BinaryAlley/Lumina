@@ -2,7 +2,6 @@
 using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.DTO.UsersManagement;
-using Lumina.Presentation.Web.Common.Requests.Common;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Tools.Settings.UpdatePlaybackState;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.UsersManagement;
@@ -13,7 +12,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using WebEmptyRequest = Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest;
 #endregion
 
 namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Tools.Settings.UpdatePlaybackState;
@@ -42,15 +40,15 @@ public class UpdatePlaybackStateEndpointTests
     {
         // Arrange
         PlaybackStateDto request = _playbackStateDtoFixture.Create(volume: 0.35, isMuted: true);
-        _mockApiHttpClient.PutAsync<WebEmptyRequest, PlaybackStateDto>(Arg.Any<string>(), Arg.Any<PlaybackStateDto>(), Arg.Any<CancellationToken>())
-            .Returns(new WebEmptyRequest());
+        _mockApiHttpClient.PutIgnoringResponseAsync<PlaybackStateDto>(Arg.Any<string>(), Arg.Any<PlaybackStateDto>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, CancellationToken.None);
         string body = await JsonResultTestHelper.GetResponseBodyAsync(result);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PutAsync<WebEmptyRequest, PlaybackStateDto>(
+        await _mockApiHttpClient.Received(1).PutIgnoringResponseAsync<PlaybackStateDto>(
             ApiRoutes.Users.UPDATE_PLAYBACK_STATE,
             Arg.Is<PlaybackStateDto>(state => state.Volume == 0.35 && state.IsMuted == true),
             Arg.Any<CancellationToken>());
@@ -64,14 +62,14 @@ public class UpdatePlaybackStateEndpointTests
     {
         // Arrange
         PlaybackStateDto request = _playbackStateDtoFixture.Create(volume: 0.0, isMuted: false);
-        _mockApiHttpClient.PutAsync<WebEmptyRequest, PlaybackStateDto>(Arg.Any<string>(), Arg.Any<PlaybackStateDto>(), Arg.Any<CancellationToken>())
-            .Returns(new WebEmptyRequest());
+        _mockApiHttpClient.PutIgnoringResponseAsync<PlaybackStateDto>(Arg.Any<string>(), Arg.Any<PlaybackStateDto>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
 
         // Act
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PutAsync<WebEmptyRequest, PlaybackStateDto>(
+        await _mockApiHttpClient.Received(1).PutIgnoringResponseAsync<PlaybackStateDto>(
             ApiRoutes.Users.UPDATE_PLAYBACK_STATE,
             Arg.Is<PlaybackStateDto>(state => state.Volume == 0.0 && state.IsMuted == false),
             Arg.Any<CancellationToken>());
@@ -82,14 +80,14 @@ public class UpdatePlaybackStateEndpointTests
     {
         // Arrange
         PlaybackStateDto request = _playbackStateDtoFixture.Create(includeVolume: false, includeIsMuted: false);
-        _mockApiHttpClient.PutAsync<WebEmptyRequest, PlaybackStateDto>(Arg.Any<string>(), Arg.Any<PlaybackStateDto>(), Arg.Any<CancellationToken>())
-            .Returns(new WebEmptyRequest());
+        _mockApiHttpClient.PutIgnoringResponseAsync<PlaybackStateDto>(Arg.Any<string>(), Arg.Any<PlaybackStateDto>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
 
         // Act
         await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PutAsync<WebEmptyRequest, PlaybackStateDto>(
+        await _mockApiHttpClient.Received(1).PutIgnoringResponseAsync<PlaybackStateDto>(
             ApiRoutes.Users.UPDATE_PLAYBACK_STATE,
             Arg.Is<PlaybackStateDto>(state => state.Volume == null && state.IsMuted == null),
             Arg.Any<CancellationToken>());

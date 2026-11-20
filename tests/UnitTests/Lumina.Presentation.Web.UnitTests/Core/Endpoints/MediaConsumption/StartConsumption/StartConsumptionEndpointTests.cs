@@ -47,7 +47,7 @@ public class StartConsumptionEndpointTests
         // Arrange
         ConsumptionRecordDto expectedRecord = _consumptionRecordDtoFixture.Create(status: ConsumptionStatus.InProgress);
         SetRouteValues(s_libraryId, nameof(MediaKind.MusicTrack), s_mediaItemId);
-        _mockApiHttpClient.PostAsync<ConsumptionRecordDto, EmptyRequest>(Arg.Any<string>(), Arg.Any<EmptyRequest>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.PostAsync<ConsumptionRecordDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(expectedRecord);
 
         // Act
@@ -77,16 +77,15 @@ public class StartConsumptionEndpointTests
         // Arrange
         ConsumptionRecordDto expectedRecord = _consumptionRecordDtoFixture.Create();
         SetRouteValues(s_libraryId, nameof(MediaKind.MusicTrack), s_mediaItemId);
-        _mockApiHttpClient.PostAsync<ConsumptionRecordDto, EmptyRequest>(Arg.Any<string>(), Arg.Any<EmptyRequest>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.PostAsync<ConsumptionRecordDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(expectedRecord);
 
         // Act
         await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PostAsync<ConsumptionRecordDto, EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PostAsync<ConsumptionRecordDto>(
             Arg.Is<string>(endpoint => endpoint == $"libraries/{s_libraryId}/media-items/MusicTrack/{s_mediaItemId}/consumption-records"),
-            Arg.Any<EmptyRequest>(),
             Arg.Any<CancellationToken>());
     }
 
@@ -98,16 +97,15 @@ public class StartConsumptionEndpointTests
         _sut.HttpContext.Request.RouteValues["libraryId"] = s_libraryId;
         _sut.HttpContext.Request.RouteValues["mediaKind"] = nameof(MediaKind.Book);
         _sut.HttpContext.Request.RouteValues["mediaItemId"] = s_mediaItemId;
-        _mockApiHttpClient.PostAsync<ConsumptionRecordDto, EmptyRequest>(Arg.Any<string>(), Arg.Any<EmptyRequest>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.PostAsync<ConsumptionRecordDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(expectedRecord);
 
         // Act
         await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PostAsync<ConsumptionRecordDto, EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PostAsync<ConsumptionRecordDto>(
             Arg.Is<string>(endpoint => endpoint == $"libraries/{s_libraryId}/media-items/Book/{s_mediaItemId}/consumption-records"),
-            Arg.Any<EmptyRequest>(),
             Arg.Any<CancellationToken>());
     }
 
@@ -117,16 +115,15 @@ public class StartConsumptionEndpointTests
         // Arrange
         ConsumptionRecordDto expectedRecord = _consumptionRecordDtoFixture.Create();
         SetRouteValues("not-a-guid", nameof(MediaKind.MusicTrack), s_mediaItemId);
-        _mockApiHttpClient.PostAsync<ConsumptionRecordDto, EmptyRequest>(Arg.Any<string>(), Arg.Any<EmptyRequest>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.PostAsync<ConsumptionRecordDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(expectedRecord);
 
         // Act
         await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PostAsync<ConsumptionRecordDto, EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PostAsync<ConsumptionRecordDto>(
             Arg.Is<string>(endpoint => endpoint == $"libraries/{ZERO_GUID}/media-items/MusicTrack/{s_mediaItemId}/consumption-records"),
-            Arg.Any<EmptyRequest>(),
             Arg.Any<CancellationToken>());
     }
 
@@ -136,16 +133,15 @@ public class StartConsumptionEndpointTests
         // Arrange
         ConsumptionRecordDto expectedRecord = _consumptionRecordDtoFixture.Create();
         SetRouteValues(s_libraryId, nameof(MediaKind.MusicTrack), "not-a-guid");
-        _mockApiHttpClient.PostAsync<ConsumptionRecordDto, EmptyRequest>(Arg.Any<string>(), Arg.Any<EmptyRequest>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.PostAsync<ConsumptionRecordDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(expectedRecord);
 
         // Act
         await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PostAsync<ConsumptionRecordDto, EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PostAsync<ConsumptionRecordDto>(
             Arg.Is<string>(endpoint => endpoint == $"libraries/{s_libraryId}/media-items/MusicTrack/{ZERO_GUID}/consumption-records"),
-            Arg.Any<EmptyRequest>(),
             Arg.Any<CancellationToken>());
     }
 
@@ -154,16 +150,15 @@ public class StartConsumptionEndpointTests
     {
         // Arrange
         ConsumptionRecordDto expectedRecord = _consumptionRecordDtoFixture.Create();
-        _mockApiHttpClient.PostAsync<ConsumptionRecordDto, EmptyRequest>(Arg.Any<string>(), Arg.Any<EmptyRequest>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.PostAsync<ConsumptionRecordDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(expectedRecord);
 
         // Act
         await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PostAsync<ConsumptionRecordDto, EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PostAsync<ConsumptionRecordDto>(
             Arg.Is<string>(endpoint => endpoint == $"libraries/{ZERO_GUID}/media-items/Invalid/{ZERO_GUID}/consumption-records"),
-            Arg.Any<EmptyRequest>(),
             Arg.Any<CancellationToken>());
     }
 
@@ -179,16 +174,15 @@ public class StartConsumptionEndpointTests
         // Arrange
         ConsumptionRecordDto expectedRecord = _consumptionRecordDtoFixture.Create();
         SetRouteValues(s_libraryId, routeMediaKind, s_mediaItemId);
-        _mockApiHttpClient.PostAsync<ConsumptionRecordDto, EmptyRequest>(Arg.Any<string>(), Arg.Any<EmptyRequest>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.PostAsync<ConsumptionRecordDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(expectedRecord);
 
         // Act
         await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PostAsync<ConsumptionRecordDto, EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PostAsync<ConsumptionRecordDto>(
             Arg.Is<string>(endpoint => endpoint == $"libraries/{s_libraryId}/media-items/{expectedMediaKind}/{s_mediaItemId}/consumption-records"),
-            Arg.Any<EmptyRequest>(),
             Arg.Any<CancellationToken>());
     }
 
@@ -206,16 +200,15 @@ public class StartConsumptionEndpointTests
         // Arrange
         ConsumptionRecordDto expectedRecord = _consumptionRecordDtoFixture.Create();
         SetRouteValues(s_libraryId, routeMediaKind, s_mediaItemId);
-        _mockApiHttpClient.PostAsync<ConsumptionRecordDto, EmptyRequest>(Arg.Any<string>(), Arg.Any<EmptyRequest>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.PostAsync<ConsumptionRecordDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(expectedRecord);
 
         // Act
         await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PostAsync<ConsumptionRecordDto, EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PostAsync<ConsumptionRecordDto>(
             Arg.Is<string>(endpoint => endpoint == $"libraries/{s_libraryId}/media-items/Invalid/{s_mediaItemId}/consumption-records"),
-            Arg.Any<EmptyRequest>(),
             Arg.Any<CancellationToken>());
     }
 
@@ -225,7 +218,7 @@ public class StartConsumptionEndpointTests
         // Arrange
         ConsumptionRecordDto expectedRecord = _consumptionRecordDtoFixture.Create();
         SetRouteValues(s_libraryId, nameof(MediaKind.MusicTrack), s_mediaItemId);
-        _mockApiHttpClient.PostAsync<ConsumptionRecordDto, EmptyRequest>(Arg.Any<string>(), Arg.Any<EmptyRequest>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.PostAsync<ConsumptionRecordDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(expectedRecord);
 
         // Act
@@ -245,14 +238,14 @@ public class StartConsumptionEndpointTests
         TaskCompletionSource<bool> operationStarted = new();
         TaskCompletionSource<bool> cancellationRequested = new();
         SetRouteValues(s_libraryId, nameof(MediaKind.MusicTrack), s_mediaItemId);
-        _mockApiHttpClient.PostAsync<ConsumptionRecordDto, EmptyRequest>(Arg.Any<string>(), Arg.Any<EmptyRequest>(), Arg.Any<CancellationToken>())
+        _mockApiHttpClient.PostAsync<ConsumptionRecordDto>(Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => Task.Run(async () =>
             {
                 operationStarted.SetResult(true);
                 await cancellationRequested.Task;
-                callInfo.ArgAt<CancellationToken>(2).ThrowIfCancellationRequested();
+                callInfo.ArgAt<CancellationToken>(1).ThrowIfCancellationRequested();
                 return expectedRecord;
-            }, callInfo.ArgAt<CancellationToken>(2)));
+            }, callInfo.ArgAt<CancellationToken>(1)));
 
         // Act
         Task<IResult> operationTask = _sut.ExecuteAsync(EmptyRequest.Instance, cts.Token);

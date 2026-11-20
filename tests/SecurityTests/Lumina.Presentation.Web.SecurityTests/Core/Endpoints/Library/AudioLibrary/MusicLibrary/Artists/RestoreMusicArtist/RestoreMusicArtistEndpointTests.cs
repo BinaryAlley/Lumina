@@ -40,7 +40,7 @@ public class RestoreMusicArtistEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         Guid libraryId = Guid.NewGuid();
         string normalizedId = Guid.Empty.ToString();
-        _apiFactory.ApiClientStub.RegisterPostResponse<object>($"libraries/{libraryId}/artists/{normalizedId}/restore", new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPostSuccess($"libraries/{libraryId}/artists/{normalizedId}/restore");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage restoreRequest = CreateRestoreRequest(maliciousId, libraryId.ToString());
         restoreRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
@@ -66,7 +66,7 @@ public class RestoreMusicArtistEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         Guid artistId = Guid.NewGuid();
         string normalizedId = Guid.Empty.ToString();
-        _apiFactory.ApiClientStub.RegisterPostResponse<object>($"libraries/{normalizedId}/artists/{artistId}/restore", new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPostSuccess($"libraries/{normalizedId}/artists/{artistId}/restore");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage restoreRequest = CreateRestoreRequest(artistId.ToString(), maliciousLibraryId);
         restoreRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);

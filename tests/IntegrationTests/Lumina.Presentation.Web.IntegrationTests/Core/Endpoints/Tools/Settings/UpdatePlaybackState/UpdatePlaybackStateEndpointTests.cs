@@ -1,6 +1,5 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DTO.UsersManagement;
-using Lumina.Presentation.Web.Common.Requests.Common;
 using Lumina.Presentation.Web.Core.Endpoints.Tools.Settings.UpdatePlaybackState;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.UsersManagement;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
@@ -39,7 +38,7 @@ public class UpdatePlaybackStateEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
-        _apiFactory.ApiClientStub.RegisterPutResponseFactory("users/me/settings/playback-state", _ => new EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPutPayload<PlaybackStateDto>("users/me/settings/playback-state");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         PlaybackStateDto state = _playbackStateDtoFixture.Create(volume: 0.35, isMuted: true);
 
@@ -61,7 +60,7 @@ public class UpdatePlaybackStateEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
-        _apiFactory.ApiClientStub.RegisterPutResponseFactory("users/me/settings/playback-state", _ => new EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPutPayload<PlaybackStateDto>("users/me/settings/playback-state");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         PlaybackStateDto state = _playbackStateDtoFixture.Create(volume: 0.0, isMuted: false);
 

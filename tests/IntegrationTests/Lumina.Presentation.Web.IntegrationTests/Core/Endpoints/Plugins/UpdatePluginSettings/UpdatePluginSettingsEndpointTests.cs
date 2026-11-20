@@ -40,7 +40,7 @@ public class UpdatePluginSettingsEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         UpdatePluginSettingsRequest request = _updatePluginSettingsRequestFixture.Create();
         string expectedEndpoint = $"plugins/{request.PluginId}/settings";
-        _apiFactory.ApiClientStub.RegisterPutResponseFactory(expectedEndpoint, _ => new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPutPayload<UpdatePluginSettingsRequest>(expectedEndpoint);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage updateRequest = new(HttpMethod.Put, "/en-us/admin/manage-plugins/api-update-plugin-settings")
         {

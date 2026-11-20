@@ -5,7 +5,6 @@ using Lumina.Presentation.Web.Common.DTO.UsersManagement;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Common.Services;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Security.Claims;
@@ -54,7 +53,7 @@ public class UpdateUserSettingsEndpoint : BaseEndpoint<UserSettingsDto, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(UserSettingsDto request, CancellationToken cancellationToken)
     {
-        await _apiHttpClient.PutAsync<Web.Common.Requests.Common.EmptyRequest, UserSettingsDto>(ApiRoutes.Users.UPDATE_USER_SETTINGS, request, cancellationToken).ConfigureAwait(false);
+        await _apiHttpClient.PutIgnoringResponseAsync<UserSettingsDto>(ApiRoutes.Users.UPDATE_USER_SETTINGS, request, cancellationToken).ConfigureAwait(false);
 
         // Keep the per-user theme cache preference in sync with the stored settings, so the handler applies it immediately.
         Guid? userId = GetCurrentUserId();

@@ -5,7 +5,6 @@ using Lumina.Presentation.Web.Common.Authorization;
 using Lumina.Presentation.Web.Common.Requests.Plugins;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,7 +49,7 @@ public class UpdatePluginSettingsEndpoint : BaseEndpoint<UpdatePluginSettingsReq
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(UpdatePluginSettingsRequest request, CancellationToken cancellationToken)
     {
-        await _apiHttpClient.PutAsync<Web.Common.Requests.Common.EmptyRequest, UpdatePluginSettingsRequest>(ApiRoutes.Plugins.UPDATE_PLUGIN_SETTINGS.Replace("{pluginId}", request.PluginId.ToString()), request, cancellationToken).ConfigureAwait(false);
+        await _apiHttpClient.PutIgnoringResponseAsync<UpdatePluginSettingsRequest>(ApiRoutes.Plugins.UPDATE_PLUGIN_SETTINGS.Replace("{pluginId}", request.PluginId.ToString()), request, cancellationToken).ConfigureAwait(false);
         return JsonSuccess();
     }
 }

@@ -1,11 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Themes;
+using Lumina.Presentation.Web.Common.Requests.Themes;
 using Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.SetCurrentTheme;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
 using Lumina.Presentation.Web.Fixtures.Common.Requests.Themes;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -24,7 +22,6 @@ namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Themes.S
 public class SetCurrentThemeEndpointTests : IClassFixture<LuminaWebFactory>
 {
     private readonly LuminaWebFactory _apiFactory;
-    private readonly ThemeResponseDtoFixture _themeResponseDtoFixture = new();
     private readonly SetCurrentThemeRequestFixture _setCurrentThemeRequestFixture = new();
 
     /// <summary>
@@ -42,7 +39,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<LuminaWebFactory>
         // Arrange
         _apiFactory.ApiClientStub.Reset();
         const string THEME_ID = "test-theme";
-        _apiFactory.ApiClientStub.RegisterPutResponse("themes/current", _themeResponseDtoFixture.Create());
+        _apiFactory.ApiClientStub.RegisterPutPayload<SetCurrentThemeRequest>("themes/current");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage setCurrentThemeRequest = new(HttpMethod.Put, "/en-us/admin/themes/api-set-current-theme")
         {

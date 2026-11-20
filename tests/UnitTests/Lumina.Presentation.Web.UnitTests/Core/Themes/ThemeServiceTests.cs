@@ -2,6 +2,7 @@
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.DTO.Themes;
 using Lumina.Presentation.Web.Common.Enums.Themes;
+using Lumina.Presentation.Web.Common.Requests.Themes;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Themes;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
@@ -120,16 +121,16 @@ public class ThemeServiceTests
     {
         // Arrange
         string themeId = "editorial-paper";
-        _mockApiHttpClient.PutAsync<ThemeResponseDto, object>(Arg.Any<string>(), Arg.Any<object>(), Arg.Any<CancellationToken>())
-            .Returns(_themeResponseDtoFixture.Create());
+        _mockApiHttpClient.PutIgnoringResponseAsync<SetCurrentThemeRequest>(Arg.Any<string>(), Arg.Any<SetCurrentThemeRequest>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
 
         // Act
         await _sut.SetCurrentThemeAsync(themeId, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PutAsync<ThemeResponseDto, object>(
+        await _mockApiHttpClient.Received(1).PutIgnoringResponseAsync<SetCurrentThemeRequest>(
             ApiRoutes.Themes.SET_CURRENT_THEME,
-            Arg.Is<object>(payload => payload.GetType().GetProperty("ThemeId")!.GetValue(payload)!.ToString()! == themeId),
+            Arg.Is<SetCurrentThemeRequest>(payload => payload.ThemeId == themeId),
             Arg.Any<CancellationToken>());
     }
 

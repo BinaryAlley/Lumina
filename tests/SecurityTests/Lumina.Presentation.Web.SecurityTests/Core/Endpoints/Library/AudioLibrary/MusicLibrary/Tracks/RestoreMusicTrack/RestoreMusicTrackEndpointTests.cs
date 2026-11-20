@@ -2,14 +2,10 @@
 using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.RestoreMusicTrack;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.RestoreMusicTrack;
@@ -40,7 +36,7 @@ public class RestoreMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         Guid libraryId = Guid.NewGuid();
         string normalizedId = Guid.Empty.ToString();
-        _apiFactory.ApiClientStub.RegisterPostResponse<object>($"libraries/{libraryId}/artists/{normalizedId}/albums/{normalizedId}/tracks/{normalizedId}/restore", new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPostSuccess($"libraries/{libraryId}/artists/{normalizedId}/albums/{normalizedId}/tracks/{normalizedId}/restore");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage restoreRequest = CreateRestoreRequest(maliciousId, maliciousId, maliciousId, libraryId.ToString());
         restoreRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
@@ -68,7 +64,7 @@ public class RestoreMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
         Guid albumId = Guid.NewGuid();
         Guid trackId = Guid.NewGuid();
         string normalizedId = Guid.Empty.ToString();
-        _apiFactory.ApiClientStub.RegisterPostResponse<object>($"libraries/{normalizedId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}/restore", new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPostSuccess($"libraries/{normalizedId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}/restore");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage restoreRequest = CreateRestoreRequest(artistId.ToString(), albumId.ToString(), trackId.ToString(), maliciousLibraryId);
         restoreRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);

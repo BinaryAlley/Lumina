@@ -36,7 +36,7 @@ public class RestoreBookEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         Guid libraryId = Guid.NewGuid();
         string normalizedId = Guid.Empty.ToString();
-        _apiFactory.ApiClientStub.RegisterPostResponse<object>($"libraries/{libraryId}/books/{normalizedId}/restore", new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPostSuccess($"libraries/{libraryId}/books/{normalizedId}/restore");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage restoreRequest = CreateRestoreRequest(maliciousId, libraryId.ToString());
         restoreRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
@@ -62,7 +62,7 @@ public class RestoreBookEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         Guid bookId = Guid.NewGuid();
         string normalizedId = Guid.Empty.ToString();
-        _apiFactory.ApiClientStub.RegisterPostResponse<object>($"libraries/{normalizedId}/books/{bookId}/restore", new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPostSuccess($"libraries/{normalizedId}/books/{bookId}/restore");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage restoreRequest = CreateRestoreRequest(bookId.ToString(), maliciousLibraryId);
         restoreRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);

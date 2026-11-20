@@ -3,7 +3,6 @@ using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,7 +46,7 @@ public class CancelLibrariesScanEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest request, CancellationToken cancellationToken)
     {
-        await _apiHttpClient.PostAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(ApiRoutes.Libraries.CANCEL_LIBRARIES_SCAN, new Web.Common.Requests.Common.EmptyRequest(), cancellationToken).ConfigureAwait(false);
+        await _apiHttpClient.PostIgnoringResponseAsync(ApiRoutes.Libraries.CANCEL_LIBRARIES_SCAN, cancellationToken).ConfigureAwait(false);
         return JsonSuccess();
     }
 }

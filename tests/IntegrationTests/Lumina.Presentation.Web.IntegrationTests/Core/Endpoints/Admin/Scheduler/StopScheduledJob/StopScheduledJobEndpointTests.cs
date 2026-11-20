@@ -40,11 +40,11 @@ public class StopScheduledJobEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         StopScheduledJobRequest request = _stopScheduledJobRequestFixture.Create();
         string expectedEndpoint = $"scheduled-jobs/{request.ScheduledJobId}/stop";
-        _apiFactory.ApiClientStub.RegisterPutResponseFactory(expectedEndpoint, _ => new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPutPayload<StopScheduledJobRequest>(expectedEndpoint);
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage stopRequest = new(HttpMethod.Put, $"/en-us/admin/api-scheduled-jobs/{request.ScheduledJobId}/stop")
         {
-            Content = JsonContent.Create(new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest())
+            Content = JsonContent.Create(request)
         };
         stopRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         stopRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

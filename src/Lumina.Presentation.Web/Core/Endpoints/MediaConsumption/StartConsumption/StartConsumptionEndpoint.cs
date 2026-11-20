@@ -5,7 +5,6 @@ using Lumina.Presentation.Web.Common.DTO.MediaConsumption;
 using Lumina.Presentation.Web.Common.Enums.MediaConsumption;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading;
@@ -72,7 +71,7 @@ public class StartConsumptionEndpoint : BaseEndpoint<EmptyRequest, IResult>
             .Replace("{libraryId}", libraryId, StringComparison.Ordinal)
             .Replace("{mediaKind}", mediaKind, StringComparison.Ordinal)
             .Replace("{mediaItemId}", mediaItemId, StringComparison.Ordinal);
-        ConsumptionRecordDto record = await _apiHttpClient.PostAsync<ConsumptionRecordDto, EmptyRequest>(endpoint, request, cancellationToken).ConfigureAwait(false);
+        ConsumptionRecordDto record = await _apiHttpClient.PostAsync<ConsumptionRecordDto>(endpoint, cancellationToken).ConfigureAwait(false);
         return JsonSuccess(record);
     }
 }

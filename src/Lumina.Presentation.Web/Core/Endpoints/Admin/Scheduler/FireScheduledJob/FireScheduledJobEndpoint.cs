@@ -5,7 +5,6 @@ using Lumina.Presentation.Web.Common.Authorization;
 using Lumina.Presentation.Web.Common.Requests.Scheduling;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,7 +49,7 @@ public class FireScheduledJobEndpoint : BaseEndpoint<FireScheduledJobRequest, IR
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(FireScheduledJobRequest request, CancellationToken cancellationToken)
     {
-        await _apiHttpClient.PutAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(ApiRoutes.ScheduledJobs.FIRE_SCHEDULED_JOB.Replace("{scheduledJobId}", request.ScheduledJobId.ToString()), new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest(), cancellationToken).ConfigureAwait(false);
+        await _apiHttpClient.PutIgnoringResponseAsync<FireScheduledJobRequest>(ApiRoutes.ScheduledJobs.FIRE_SCHEDULED_JOB.Replace("{scheduledJobId}", request.ScheduledJobId.ToString()), request, cancellationToken).ConfigureAwait(false);
         return JsonSuccess();
     }
 }

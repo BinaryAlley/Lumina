@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Polly.CircuitBreaker;
 using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading;
@@ -73,6 +74,13 @@ public class AuthorizationService : IAuthorizationService
         try
         {
             return await _apiHttpClient.GetAsync<GetAuthorizationResponse>($"auth/get-authorization?userId={Uri.EscapeDataString(userId)}", cancellationToken);
+        }
+        catch (ApiException exception) when (exception.HttpStatusCode == HttpStatusCode.NotFound)
+        {
+            // This is the only place that knows the request was the current-user authorization check. Convert a 404 here into an explicit exception, so the middleware can
+            // invalidate the stale session without guessing from the request path. Do not move this classification into the middleware: it only sees a generic ApiException,
+            // and a caller-controlled path can contain the authorization route text.
+            throw new CurrentUserAuthorizationException(exception.ProblemDetails, exception.HttpStatusCode, exception.RequestPath);
         }
         catch (Exception exception)
         {

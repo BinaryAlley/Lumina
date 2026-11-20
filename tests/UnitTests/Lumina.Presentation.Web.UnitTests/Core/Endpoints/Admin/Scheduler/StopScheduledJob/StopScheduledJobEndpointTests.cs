@@ -47,9 +47,9 @@ public class StopScheduledJobEndpointTests
 
         // Assert
         string expectedEndpoint = ApiRoutes.ScheduledJobs.STOP_SCHEDULED_JOB.Replace("{scheduledJobId}", request.ScheduledJobId.ToString());
-        await _mockApiHttpClient.Received(1).PutAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PutIgnoringResponseAsync<StopScheduledJobRequest>(
             expectedEndpoint,
-            Arg.Any<Web.Common.Requests.Common.EmptyRequest>(),
+            Arg.Is<StopScheduledJobRequest>(forwardedRequest => forwardedRequest.ScheduledJobId == request.ScheduledJobId),
             Arg.Any<CancellationToken>());
         using JsonDocument jsonDocument = JsonDocument.Parse(body);
         Assert.True(jsonDocument.RootElement.GetProperty("success").GetBoolean());

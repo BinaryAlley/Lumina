@@ -220,7 +220,7 @@ public class ExceptionHandlingMiddlewareTests
     {
         // Arrange
         DefaultHttpContext httpContext = CreateHttpContext(isApiRequest: true, user: CreateAuthenticatedUser(), requestServices: CreateServiceProvider());
-        _nextDelegate = _ => throw new ApiException(_problemDetailsDtoFixture.Create(), HttpStatusCode.NotFound, "/api/v1/auth/get-authorization?userId=1");
+        _nextDelegate = _ => throw new CurrentUserAuthorizationException(_problemDetailsDtoFixture.Create(), HttpStatusCode.NotFound, "/api/v1/auth/get-authorization?userId=1");
 
         // Act
         await _sut.InvokeAsync(httpContext);
@@ -237,7 +237,7 @@ public class ExceptionHandlingMiddlewareTests
         // Arrange
         DefaultHttpContext httpContext = CreateHttpContext(isApiRequest: false, culture: null, user: CreateAuthenticatedUser(), requestServices: CreateServiceProvider());
         httpContext.Request.Path = "/dashboard";
-        _nextDelegate = _ => throw new ApiException(_problemDetailsDtoFixture.Create(), HttpStatusCode.NotFound, "/api/v1/auth/get-authorization?userId=1");
+        _nextDelegate = _ => throw new CurrentUserAuthorizationException(_problemDetailsDtoFixture.Create(), HttpStatusCode.NotFound, "/api/v1/auth/get-authorization?userId=1");
 
         // Act
         await _sut.InvokeAsync(httpContext);
@@ -246,6 +246,24 @@ public class ExceptionHandlingMiddlewareTests
         Assert.Equal(StatusCodes.Status302Found, httpContext.Response.StatusCode);
         Assert.Equal("/en-us/auth/login?returnUrl=%2Fdashboard", httpContext.Response.Headers.Location.ToString());
         await _mockAuthenticationService.Received(1).SignOutAsync(httpContext, CookieAuthenticationDefaults.AuthenticationScheme, Arg.Any<AuthenticationProperties?>());
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenApiExceptionNotFoundWithCraftedAuthorizationPathAndAuthenticatedPageRequest_ShouldNotSignOut()
+    {
+        // Arrange
+        DefaultHttpContext httpContext = CreateHttpContext(isApiRequest: false, culture: "en-us", user: CreateAuthenticatedUser(), requestServices: CreateServiceProvider());
+        httpContext.Request.Headers.Accept = "text/html";
+        httpContext.Request.Path = "/en-us/theme-assets/test-theme/auth/get-authorization";
+        _nextDelegate = _ => throw new ApiException(_problemDetailsDtoFixture.Create(), HttpStatusCode.NotFound, "/api/v1/themes/test-theme/assets/auth/get-authorization");
+
+        // Act
+        await _sut.InvokeAsync(httpContext);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status302Found, httpContext.Response.StatusCode);
+        Assert.Equal("/en-us/not-found", httpContext.Response.Headers.Location.ToString());
+        await _mockAuthenticationService.DidNotReceive().SignOutAsync(Arg.Any<HttpContext>(), Arg.Any<string?>(), Arg.Any<AuthenticationProperties?>());
     }
 
     [Fact]

@@ -1,10 +1,13 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.DTO.Common;
+using Lumina.Presentation.Web.Common.Exceptions;
 using Lumina.Presentation.Web.Core.Endpoints.Themes.ThemeAssets;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Net.Http.Headers;
 #endregion
 
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Themes.ThemeAssets;
@@ -45,6 +48,27 @@ public class ThemeAssetsEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("image/png", response.Content.Headers.ContentType!.MediaType);
         Assert.Equal(expectedBytes, content);
+    }
+
+    [Fact]
+    public async Task ThemeAssets_WhenCraftedPathLooksLikeAuthorizationCheck_ShouldNotSignOutAuthenticatedUser()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.RegisterBlobException(new ApiException(
+            new ProblemDetailsDto { Title = "General.NotFound", Status = 404, Detail = "ThemeNotFound" },
+            HttpStatusCode.NotFound,
+            "/api/v1/themes/test-theme/assets/auth/get-authorization"));
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        HttpRequestMessage request = new(HttpMethod.Get, "/theme-assets/test-theme/auth/get-authorization");
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/html"));
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Equal("/en-us/not-found", response.Headers.Location!.ToString());
     }
 
     [Theory]

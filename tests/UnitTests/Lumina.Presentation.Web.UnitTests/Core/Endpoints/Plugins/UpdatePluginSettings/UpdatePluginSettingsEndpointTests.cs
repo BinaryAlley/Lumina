@@ -40,8 +40,8 @@ public class UpdatePluginSettingsEndpointTests
     {
         // Arrange
         UpdatePluginSettingsRequest request = _updatePluginSettingsRequestFixture.Create();
-        _mockApiHttpClient.PutAsync<Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest, UpdatePluginSettingsRequest>(Arg.Any<string>(), Arg.Any<UpdatePluginSettingsRequest>(), Arg.Any<CancellationToken>())
-            .Returns(new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest());
+        _mockApiHttpClient.PutIgnoringResponseAsync<UpdatePluginSettingsRequest>(Arg.Any<string>(), Arg.Any<UpdatePluginSettingsRequest>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, CancellationToken.None);
@@ -49,7 +49,7 @@ public class UpdatePluginSettingsEndpointTests
 
         // Assert
         string expectedEndpoint = ApiRoutes.Plugins.UPDATE_PLUGIN_SETTINGS.Replace("{pluginId}", request.PluginId.ToString());
-        await _mockApiHttpClient.Received(1).PutAsync<Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest, UpdatePluginSettingsRequest>(
+        await _mockApiHttpClient.Received(1).PutIgnoringResponseAsync<UpdatePluginSettingsRequest>(
             expectedEndpoint,
             Arg.Is<UpdatePluginSettingsRequest>(settings => settings.PluginId == request.PluginId),
             Arg.Any<CancellationToken>());

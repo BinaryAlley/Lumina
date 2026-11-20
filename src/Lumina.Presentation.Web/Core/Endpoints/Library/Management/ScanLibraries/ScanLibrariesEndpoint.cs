@@ -4,7 +4,6 @@ using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.DTO.Libraries;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,7 +47,7 @@ public class ScanLibrariesEndpoint : BaseEndpoint<EmptyRequest, IResult>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(EmptyRequest request, CancellationToken cancellationToken)
     {
-        ScanLibraryDto[] response = await _apiHttpClient.PostAsync<ScanLibraryDto[], Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest>(ApiRoutes.Libraries.SCAN_LIBRARIES, new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest(), cancellationToken).ConfigureAwait(false);
+        ScanLibraryDto[] response = await _apiHttpClient.PostAsync<ScanLibraryDto[]>(ApiRoutes.Libraries.SCAN_LIBRARIES, cancellationToken).ConfigureAwait(false);
         return JsonSuccess(response);
     }
 }

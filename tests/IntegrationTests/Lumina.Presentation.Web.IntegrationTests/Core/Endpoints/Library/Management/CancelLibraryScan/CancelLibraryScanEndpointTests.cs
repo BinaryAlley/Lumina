@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Presentation.Web.Common.Requests.Library.Management;
 using Lumina.Presentation.Web.Core.Endpoints.Library.Management.CancelLibraryScan;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
@@ -38,7 +39,7 @@ public class CancelLibraryScanEndpointTests : IClassFixture<LuminaWebFactory>
         _apiFactory.ApiClientStub.Reset();
         Guid libraryId = Guid.NewGuid();
         Guid scanId = Guid.NewGuid();
-        _apiFactory.ApiClientStub.RegisterPostResponseFactory($"libraries/{libraryId}/scans/{scanId}/cancel", _ => new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPostPayload<CancelLibraryScanRequest>($"libraries/{libraryId}/scans/{scanId}/cancel");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage cancelRequest = CreateCancelRequest($"/en-us/libraries/manage/{libraryId}/api-cancel-library-scan/{scanId}");
         cancelRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
@@ -52,7 +53,11 @@ public class CancelLibraryScanEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using JsonDocument json = JsonDocument.Parse(content);
         Assert.True(json.RootElement.GetProperty("success").GetBoolean());
-        Assert.Contains(_apiFactory.ApiClientStub.PostRequests, postRequest => postRequest.Endpoint == $"libraries/{libraryId}/scans/{scanId}/cancel");
+        Assert.Contains(_apiFactory.ApiClientStub.PostRequests, postRequest =>
+            postRequest.Endpoint == $"libraries/{libraryId}/scans/{scanId}/cancel" &&
+            postRequest.Data is CancelLibraryScanRequest forwardedRequest &&
+            forwardedRequest.LibraryId == libraryId &&
+            forwardedRequest.ScanId == scanId);
     }
 
     /// <summary>

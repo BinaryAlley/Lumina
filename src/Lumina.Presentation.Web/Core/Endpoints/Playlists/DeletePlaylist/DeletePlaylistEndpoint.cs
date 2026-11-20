@@ -3,7 +3,6 @@ using FastEndpoints;
 using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading;
@@ -15,7 +14,7 @@ namespace Lumina.Presentation.Web.Core.Endpoints.Playlists.DeletePlaylist;
 /// <summary>
 /// API endpoint for the <c>/{culture}/playlists/item/{playlistId}/api-delete-playlist</c> route.
 /// </summary>
-public class DeletePlaylistEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, IResult>
+public class DeletePlaylistEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
     private readonly IApiHttpClient _apiHttpClient;
 
@@ -46,7 +45,7 @@ public class DeletePlaylistEndpoint : BaseEndpoint<FastEndpoints.EmptyRequest, I
     /// </summary>
     /// <param name="request">The request object.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
-    public override async Task<IResult> ExecuteAsync(FastEndpoints.EmptyRequest request, CancellationToken cancellationToken)
+    public override async Task<IResult> ExecuteAsync(EmptyRequest request, CancellationToken cancellationToken)
     {
         // The route value is normalized to a Guid before it is substituted into the upstream URL, so that a crafted value can never escape its URL segment.
         string routePlaylistId = HttpContext.Request.RouteValues["playlistId"]?.ToString() ?? string.Empty;

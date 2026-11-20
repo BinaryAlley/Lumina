@@ -4,7 +4,6 @@ using Lumina.Presentation.Web.Common.Api;
 using Lumina.Presentation.Web.Common.DTO.UsersManagement;
 using Lumina.Presentation.Web.Common.Routes;
 using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,7 +47,7 @@ public class UpdatePlaybackStateEndpoint : BaseEndpoint<PlaybackStateDto, IResul
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     public override async Task<IResult> ExecuteAsync(PlaybackStateDto request, CancellationToken cancellationToken)
     {
-        await _apiHttpClient.PutAsync<Web.Common.Requests.Common.EmptyRequest, PlaybackStateDto>(ApiRoutes.Users.UPDATE_PLAYBACK_STATE, request, cancellationToken).ConfigureAwait(false);
+        await _apiHttpClient.PutIgnoringResponseAsync<PlaybackStateDto>(ApiRoutes.Users.UPDATE_PLAYBACK_STATE, request, cancellationToken).ConfigureAwait(false);
         return JsonSuccess(new { isUpdated = true });
     }
 }

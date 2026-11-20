@@ -1,17 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Presentation.Web.Common.DTO.UsersManagement;
-using Lumina.Presentation.Web.Common.Requests.Common;
 using Lumina.Presentation.Web.Core.Endpoints.Tools.Settings.UpdatePlaybackState;
 using Lumina.Presentation.Web.Fixtures.Common.DTO.UsersManagement;
 using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
 using Lumina.Presentation.Web.SecurityTests.Common.Setup;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 #endregion
 
 namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Tools.Settings.UpdatePlaybackState;
@@ -88,7 +84,7 @@ public class UpdatePlaybackStateEndpointTests : IClassFixture<LuminaWebFactory>
     {
         // Arrange
         _apiFactory.ApiClientStub.Reset();
-        _apiFactory.ApiClientStub.RegisterPutResponseFactory("users/me/settings/playback-state", _ => new EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPutPayload<PlaybackStateDto>("users/me/settings/playback-state");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         PlaybackStateDto state = _playbackStateDtoFixture.Create(volume: 0.35, isMuted: true);
         HttpRequestMessage updateRequest = new(HttpMethod.Post, "/en-us/tools/settings/api-update-playback-state")

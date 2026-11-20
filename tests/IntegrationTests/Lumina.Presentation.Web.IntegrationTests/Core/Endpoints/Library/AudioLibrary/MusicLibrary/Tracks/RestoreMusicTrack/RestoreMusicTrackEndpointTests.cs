@@ -41,7 +41,7 @@ public class RestoreMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
         Guid artistId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         Guid trackId = Guid.NewGuid();
-        _apiFactory.ApiClientStub.RegisterPostResponse<object>($"libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}/restore", new Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest());
+        _apiFactory.ApiClientStub.RegisterPostSuccess($"libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}/restore");
         AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
         HttpRequestMessage restoreRequest = CreateRestoreRequest(artistId, albumId, trackId, libraryId);
         restoreRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);

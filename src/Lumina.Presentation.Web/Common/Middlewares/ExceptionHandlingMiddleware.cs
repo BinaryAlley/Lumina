@@ -137,9 +137,10 @@ public class ExceptionHandlingMiddleware
     /// </summary>
     private async Task HandleNotFoundAsync(HttpContext context, ApiException apiException)
     {
-        // When the API reports the currently logged-in user no longer exists (404 from the current-user authorization check),
-        // the stored session is stale: sign out and send the user to the login page instead of the not-found page.
-        if (context.User?.Identity?.IsAuthenticated == true && IsCurrentUserAuthorizationCheck(apiException))
+        // When the API reports the currently logged-in user no longer exists, the stored session is stale: sign out and send the user
+        // to the login page instead of the not-found page. The condition is signaled by the authorization check itself, never inferred
+        // from the URL of the failed request, because a caller-controlled path can contain the same text.
+        if (context.User?.Identity?.IsAuthenticated == true && apiException is CurrentUserAuthorizationException)
         {
             await HandleUnauthorizedAsync(context).ConfigureAwait(false);
             return;
@@ -412,13 +413,4 @@ public class ExceptionHandlingMiddleware
         }
     }
 
-    /// <summary>
-    /// Determines whether the API exception originated from the authorization check of the currently logged in user.
-    /// </summary>
-    /// <param name="apiException">The API exception to inspect.</param>
-    /// <returns><see langword="true"/> if the exception came from the current-user authorization endpoint, <see langword="false"/> otherwise.</returns>
-    private static bool IsCurrentUserAuthorizationCheck(ApiException apiException)
-    {
-        return apiException.RequestPath?.Contains("/auth/get-authorization", StringComparison.OrdinalIgnoreCase) == true;
-    }
 }

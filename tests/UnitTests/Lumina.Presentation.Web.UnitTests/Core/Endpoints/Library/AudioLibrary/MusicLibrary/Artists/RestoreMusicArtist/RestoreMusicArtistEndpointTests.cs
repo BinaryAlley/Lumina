@@ -30,11 +30,6 @@ public class RestoreMusicArtistEndpointTests
     public RestoreMusicArtistEndpointTests()
     {
         _mockApiHttpClient = Substitute.For<IApiHttpClient>();
-        // The restore endpoints forward a bodyless POST upstream; returning an empty request lets every test that is not about
-        // cancellation focus on the URL construction instead of repeating the upstream stub.
-        _mockApiHttpClient.PostAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(
-            Arg.Any<string>(), Arg.Any<Web.Common.Requests.Common.EmptyRequest>(), Arg.Any<CancellationToken>())
-            .Returns(new Web.Common.Requests.Common.EmptyRequest());
         _sut = Factory.Create<RestoreMusicArtistEndpoint>(_mockApiHttpClient);
     }
 
@@ -55,9 +50,8 @@ public class RestoreMusicArtistEndpointTests
         string body = await JsonResultTestHelper.GetResponseBodyAsync(result);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PostAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PostIgnoringResponseAsync(
             BuildExpectedEndpoint(libraryId, artistId),
-            Arg.Any<Web.Common.Requests.Common.EmptyRequest>(),
             Arg.Any<CancellationToken>());
         using JsonDocument jsonDocument = JsonDocument.Parse(body);
         Assert.True(jsonDocument.RootElement.GetProperty("success").GetBoolean());
@@ -75,9 +69,8 @@ public class RestoreMusicArtistEndpointTests
         await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PostAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PostIgnoringResponseAsync(
             BuildExpectedEndpoint(libraryId, Guid.Empty),
-            Arg.Any<Web.Common.Requests.Common.EmptyRequest>(),
             Arg.Any<CancellationToken>());
     }
 
@@ -92,9 +85,8 @@ public class RestoreMusicArtistEndpointTests
         await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PostAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PostIgnoringResponseAsync(
             BuildExpectedEndpoint(libraryId, Guid.Empty),
-            Arg.Any<Web.Common.Requests.Common.EmptyRequest>(),
             Arg.Any<CancellationToken>());
     }
 
@@ -109,9 +101,8 @@ public class RestoreMusicArtistEndpointTests
         await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PostAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PostIgnoringResponseAsync(
             BuildExpectedEndpoint(Guid.Empty, artistId),
-            Arg.Any<Web.Common.Requests.Common.EmptyRequest>(),
             Arg.Any<CancellationToken>());
     }
 
@@ -126,9 +117,8 @@ public class RestoreMusicArtistEndpointTests
         await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PostAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PostIgnoringResponseAsync(
             BuildExpectedEndpoint(Guid.Empty, artistId),
-            Arg.Any<Web.Common.Requests.Common.EmptyRequest>(),
             Arg.Any<CancellationToken>());
     }
 
@@ -141,9 +131,9 @@ public class RestoreMusicArtistEndpointTests
         ConfigureRequest(artistId.ToString(), libraryId.ToString());
         using CancellationTokenSource cancellationTokenSource = new();
         cancellationTokenSource.Cancel();
-        _mockApiHttpClient.PostAsync<Web.Common.Requests.Common.EmptyRequest, Web.Common.Requests.Common.EmptyRequest>(
-            Arg.Any<string>(), Arg.Any<Web.Common.Requests.Common.EmptyRequest>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromCanceled<Web.Common.Requests.Common.EmptyRequest>(cancellationTokenSource.Token));
+        _mockApiHttpClient.PostIgnoringResponseAsync(
+            Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromCanceled(cancellationTokenSource.Token));
 
         // Act & Assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(

@@ -55,15 +55,15 @@ public class UpdateUserSettingsEndpointTests
     {
         // Arrange
         UserSettingsDto request = _userSettingsDtoFixture.Create();
-        _mockApiHttpClient.PutAsync<Web.Common.Requests.Common.EmptyRequest, UserSettingsDto>(Arg.Any<string>(), Arg.Any<UserSettingsDto>(), Arg.Any<CancellationToken>())
-            .Returns(new Web.Common.Requests.Common.EmptyRequest());
+        _mockApiHttpClient.PutIgnoringResponseAsync<UserSettingsDto>(Arg.Any<string>(), Arg.Any<UserSettingsDto>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, CancellationToken.None);
         string body = await JsonResultTestHelper.GetResponseBodyAsync(result);
 
         // Assert
-        await _mockApiHttpClient.Received(1).PutAsync<Web.Common.Requests.Common.EmptyRequest, UserSettingsDto>(
+        await _mockApiHttpClient.Received(1).PutIgnoringResponseAsync<UserSettingsDto>(
             ApiRoutes.Users.UPDATE_USER_SETTINGS,
             Arg.Is<UserSettingsDto>(settings => settings.ItemsPerPage == request.ItemsPerPage && settings.IsPaginationEnabled == request.IsPaginationEnabled),
             Arg.Any<CancellationToken>());
@@ -86,15 +86,15 @@ public class UpdateUserSettingsEndpointTests
             vuMeterPeakHoldDurationInMilliseconds: 1200,
             vuMeterReleasePerSecond: 7.5,
             vuMeterPeakReleasePerSecond: 0.25);
-        _mockApiHttpClient.PutAsync<Web.Common.Requests.Common.EmptyRequest, UserSettingsDto>(Arg.Any<string>(), Arg.Any<UserSettingsDto>(), Arg.Any<CancellationToken>())
-            .Returns(new Web.Common.Requests.Common.EmptyRequest());
+        _mockApiHttpClient.PutIgnoringResponseAsync<UserSettingsDto>(Arg.Any<string>(), Arg.Any<UserSettingsDto>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
 
         // Act
         IResult result = await _sut.ExecuteAsync(request, CancellationToken.None);
 
         // Assert
         Assert.NotNull(result);
-        await _mockApiHttpClient.Received(1).PutAsync<Web.Common.Requests.Common.EmptyRequest, UserSettingsDto>(
+        await _mockApiHttpClient.Received(1).PutIgnoringResponseAsync<UserSettingsDto>(
             ApiRoutes.Users.UPDATE_USER_SETTINGS,
             Arg.Is<UserSettingsDto>(settings =>
                 settings.VuMeterOrientation == VuMeterOrientation.Horizontal &&

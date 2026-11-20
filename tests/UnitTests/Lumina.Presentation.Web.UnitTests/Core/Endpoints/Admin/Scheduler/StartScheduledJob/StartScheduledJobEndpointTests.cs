@@ -47,9 +47,9 @@ public class StartScheduledJobEndpointTests
 
         // Assert
         string expectedEndpoint = ApiRoutes.ScheduledJobs.START_SCHEDULED_JOB.Replace("{scheduledJobId}", request.ScheduledJobId.ToString());
-        await _mockApiHttpClient.Received(1).PutAsync<Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest, Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest>(
+        await _mockApiHttpClient.Received(1).PutIgnoringResponseAsync<StartScheduledJobRequest>(
             expectedEndpoint,
-            Arg.Any<Lumina.Presentation.Web.Common.Requests.Common.EmptyRequest>(),
+            Arg.Is<StartScheduledJobRequest>(forwardedRequest => forwardedRequest.ScheduledJobId == request.ScheduledJobId),
             Arg.Any<CancellationToken>());
         using JsonDocument jsonDocument = JsonDocument.Parse(body);
         Assert.True(jsonDocument.RootElement.GetProperty("success").GetBoolean());

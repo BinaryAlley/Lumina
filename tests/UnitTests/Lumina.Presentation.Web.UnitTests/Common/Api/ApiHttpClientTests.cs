@@ -118,6 +118,91 @@ public class ApiHttpClientTests
     }
 
     [Fact]
+    public async Task PostAsync_WhenCalledWithoutPayload_ShouldDeserializeResponse()
+    {
+        // Arrange
+        TestApiHttpMessageHandler messageHandler = new(_ => CreateJsonResponse(HttpStatusCode.OK, """{"success":true}"""));
+        ApiHttpClient sut = CreateSut(messageHandler);
+
+        // Act
+        SuccessResponse result = await sut.PostAsync<SuccessResponse>("libraries", CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal(HttpMethod.Post, messageHandler.Requests[0].Method);
+        Assert.Null(messageHandler.Requests[0].Content);
+    }
+
+    [Fact]
+    public async Task PostIgnoringResponseAsync_WhenCalledWithoutPayload_ShouldSendBodylessRequestAndIgnoreNonEmptyResponse()
+    {
+        // Arrange
+        TestApiHttpMessageHandler messageHandler = new(_ => CreateJsonResponse(HttpStatusCode.OK, "{}"));
+        ApiHttpClient sut = CreateSut(messageHandler);
+
+        // Act
+        await sut.PostIgnoringResponseAsync("libraries/1", CancellationToken.None);
+
+        // Assert
+        Assert.Equal(HttpMethod.Post, messageHandler.Requests[0].Method);
+        Assert.Null(messageHandler.Requests[0].Content);
+    }
+
+    [Fact]
+    public async Task PostIgnoringResponseAsync_WhenUserHasTokenClaim_ShouldSendAuthorizationHeader()
+    {
+        // Arrange
+        TestApiHttpMessageHandler messageHandler = new(_ => CreateJsonResponse(HttpStatusCode.OK, "{}"));
+        ApiHttpClient sut = CreateSut(messageHandler, token: "test-jwt-token");
+
+        // Act
+        await sut.PostIgnoringResponseAsync("libraries/1", CancellationToken.None);
+
+        // Assert
+        Assert.Equal("Bearer", messageHandler.Requests[0].Headers.Authorization!.Scheme);
+        Assert.Equal("test-jwt-token", messageHandler.Requests[0].Headers.Authorization!.Parameter);
+    }
+
+    [Fact]
+    public async Task PutIgnoringResponseAsync_WhenCalledWithPayload_ShouldSerializePayloadAndIgnoreNonEmptyResponse()
+    {
+        // Arrange
+        TestApiHttpMessageHandler messageHandler = new(_ => CreateJsonResponse(HttpStatusCode.OK, """{"updated":true}"""));
+        ApiHttpClient sut = CreateSut(messageHandler);
+
+        // Act
+        await sut.PutIgnoringResponseAsync("libraries/1", new { title = "Library One" }, CancellationToken.None);
+
+        // Assert
+        Assert.Contains("Library One", messageHandler.RequestBodies[0]);
+    }
+
+    [Fact]
+    public async Task PostIgnoringResponseAsync_WhenApiReturnsError_ShouldThrowApiExceptionWithProblemDetails()
+    {
+        // Arrange
+        string problemDetailsJson = """
+        {
+            "type": "https://tools.ietf.org/html/rfc9110#section-15.6.1",
+            "title": "General.Failure",
+            "status": 500,
+            "detail": "UnexpectedFailure"
+        }
+        """;
+        TestApiHttpMessageHandler messageHandler = new(_ => CreateJsonResponse(HttpStatusCode.InternalServerError, problemDetailsJson));
+        ApiHttpClient sut = CreateSut(messageHandler);
+
+        // Act
+        ApiException exception = await Assert.ThrowsAsync<ApiException>(() => sut.PostIgnoringResponseAsync("libraries/1", CancellationToken.None));
+
+        // Assert
+        Assert.Equal(HttpStatusCode.InternalServerError, exception.HttpStatusCode);
+        Assert.NotNull(exception.ProblemDetails);
+        Assert.Equal("General.Failure", exception.ProblemDetails!.Title);
+        Assert.Equal("UnexpectedFailure", exception.ProblemDetails.Detail);
+    }
+
+    [Fact]
     public async Task DeleteAsync_WhenApiReturnsError_ShouldThrowApiException()
     {
         // Arrange
