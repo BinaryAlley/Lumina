@@ -63,17 +63,9 @@ public static class BookMapping
                 Id = Guid.CreateVersion7(),
                 BookId = domainEntity.Id.Value,
                 MediaContributorId = contributor.ContributorId.Value,
-                Role = contributor.Role,
-                CreatedOnUtc = domainEntity.CreatedOnUtc,
-                CreatedBy = Guid.Empty,
-                UpdatedBy = null
+                Role = contributor.Role
             })],
-            Ratings = [.. domainEntity.Ratings.ToRepositoryEntities()],
-            CreatedOnUtc = domainEntity.CreatedOnUtc,
-            CreatedBy = Guid.Empty,
-            // The audit columns are owned by the auditing interceptor, which stamps only the rows that actually changed, so they are never mapped here.
-            UpdatedOnUtc = null,
-            UpdatedBy = null,
+            Ratings = [.. domainEntity.Ratings.ToRepositoryEntities()]
         };
     }
 
@@ -114,7 +106,5 @@ public static class BookMapping
         entity.GoogleBooksId = domainEntity.GoogleBooksId.HasValue ? domainEntity.GoogleBooksId.Value : null;
         entity.BarnesAndNobleId = domainEntity.BarnesAndNobleId.HasValue ? domainEntity.BarnesAndNobleId.Value : null;
         entity.AppleBooksId = domainEntity.AppleBooksId.HasValue ? domainEntity.AppleBooksId.Value : null;
-        entity.UpdatedOnUtc = DateTime.UtcNow;
-        entity.UpdatedBy = Guid.CreateVersion7();
     }
 }

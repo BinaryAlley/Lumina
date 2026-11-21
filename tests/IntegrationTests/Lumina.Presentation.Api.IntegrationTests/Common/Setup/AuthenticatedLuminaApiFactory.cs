@@ -138,9 +138,9 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
         await dbContext.SaveChangesAsync();
 
         // Set up admin permissions and roles.
-        await dataSeedService.SetDefaultAuthorizationPermissionsAsync(user.Id, CancellationToken.None);
-        await dataSeedService.SetDefaultAuthorizationRolesAsync(user.Id, CancellationToken.None);
-        await dataSeedService.SetAdminRolePermissionsAsync(user.Id, CancellationToken.None);
+        await dataSeedService.SetDefaultAuthorizationPermissionsAsync(CancellationToken.None);
+        await dataSeedService.SetDefaultAuthorizationRolesAsync(CancellationToken.None);
+        await dataSeedService.SetAdminRolePermissionsAsync(CancellationToken.None);
         await dataSeedService.SetAdminRoleToAdministratorAccount(user.Id, CancellationToken.None);
 
         // Authenticate user.

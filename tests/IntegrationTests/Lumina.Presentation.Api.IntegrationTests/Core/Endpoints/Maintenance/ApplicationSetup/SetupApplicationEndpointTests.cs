@@ -1,5 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Common.DataAccess.Entities.Common;
+using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
@@ -193,22 +195,34 @@ public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedLuminaAp
         Assert.Contains(permissions, p => p.PermissionName == AuthorizationPermission.CanViewUsers);
         Assert.Contains(permissions, p => p.PermissionName == AuthorizationPermission.CanDeleteUsers);
         Assert.Contains(permissions, p => p.PermissionName == AuthorizationPermission.CanRegisterUsers);
+        Assert.All(permissions, permission => Assert.Equal(AuditIdentities.s_systemUserId, permission.CreatedBy));
 
         // Verify default roles.
         List<RoleEntity> roles = await dbContext.Roles.ToListAsync();
         RoleEntity? adminRole = roles.FirstOrDefault(r => r.RoleName == "Admin");
         Assert.NotNull(adminRole);
+        Assert.Equal(AuditIdentities.s_systemUserId, adminRole!.CreatedBy);
 
         // Verify admin role permissions.
         List<RolePermissionEntity> rolePermissions = await dbContext.RolePermissions
-            .Where(rp => rp.RoleId == adminRole!.Id)
+            .Where(rp => rp.RoleId == adminRole.Id)
             .ToListAsync();
         Assert.NotEmpty(rolePermissions);
         Assert.Contains(rolePermissions, rp => permissions.Any(p => p.Id == rp.PermissionId));
+        Assert.All(rolePermissions, rolePermission => Assert.Equal(AuditIdentities.s_systemUserId, rolePermission.CreatedBy));
 
         // Verify user has admin role.
-        UserRoleEntity? userRole = await dbContext.UserRoles.FirstOrDefaultAsync(ur => ur.UserId == userId && ur.RoleId == adminRole!.Id);
+        UserRoleEntity? userRole = await dbContext.UserRoles.FirstOrDefaultAsync(ur => ur.UserId == userId && ur.RoleId == adminRole.Id);
         Assert.NotNull(userRole);
+        Assert.Equal(AuditIdentities.s_systemUserId, userRole!.CreatedBy);
+
+        // Verify the admin account and the default scheduled jobs were created by the initialization flow, which is anonymous.
+        UserEntity? adminUser = await dbContext.Users.FirstOrDefaultAsync(user => user.Id == userId);
+        Assert.NotNull(adminUser);
+        Assert.Equal(AuditIdentities.s_systemUserId, adminUser!.CreatedBy);
+        List<ScheduledJobEntity> scheduledJobs = await dbContext.ScheduledJobs.ToListAsync();
+        Assert.NotEmpty(scheduledJobs);
+        Assert.All(scheduledJobs, scheduledJob => Assert.Equal(AuditIdentities.s_systemUserId, scheduledJob.CreatedBy));
     }
 
     private async Task<UserEntity> CreateTestUser()

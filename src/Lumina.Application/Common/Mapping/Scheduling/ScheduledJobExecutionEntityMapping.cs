@@ -44,11 +44,7 @@ public static class ScheduledJobExecutionEntityMapping
             IsCycleRun = repositoryEntity.IsCycleRun,
             WasCycleActive = repositoryEntity.WasCycleActive,
             StartedOnUtc = repositoryEntity.StartedOnUtc,
-            CompletedOnUtc = completedOnUtc,
-            CreatedOnUtc = repositoryEntity.CreatedOnUtc,
-            CreatedBy = repositoryEntity.CreatedBy,
-            UpdatedOnUtc = repositoryEntity.UpdatedOnUtc,
-            UpdatedBy = repositoryEntity.UpdatedBy
+            CompletedOnUtc = completedOnUtc
         };
     }
 }

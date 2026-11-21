@@ -197,6 +197,12 @@ public class LuminaDbContext : DbContext
     public virtual DbSet<MediaResumePointEntity> MediaResumePoints { get; set; } = null!;
 
     /// <summary>
+    /// Gets or sets whether the changes are being saved by the one-time application initialization, whose audit values are provided explicitly instead of
+    /// being stamped by the auditing interceptor.
+    /// </summary>
+    internal bool IsInitializationSave { get; set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="LuminaDbContext"/> class.
     /// </summary>
     /// <param name="options">The options for configuring the database context.</param>

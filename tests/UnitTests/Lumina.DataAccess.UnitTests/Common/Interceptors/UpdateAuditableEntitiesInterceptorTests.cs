@@ -1,4 +1,5 @@
 #region ========================================================================= USING =====================================================================================
+using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.Infrastructure.Authentication;
@@ -83,7 +84,7 @@ public class UpdateAuditableEntitiesInterceptorTests
     }
 
     [Fact]
-    public async Task SavingChangesAsync_WhenNoUserIsAuthenticated_ShouldUseGuidEmptyForCreationAndSystemUserForModification()
+    public async Task SavingChangesAsync_WhenNoUserIsAuthenticated_ShouldLeaveCreationAndModificationUnattributed()
     {
         // Arrange
         _mockCurrentUserService.UserId.Returns((Guid?)null);
@@ -98,8 +99,33 @@ public class UpdateAuditableEntitiesInterceptorTests
 
         // Assert
         Assert.Equal(Guid.Empty, book.CreatedBy);
-        Assert.Equal(Guid.Parse("11111111-1111-1111-1111-111111111111"), book.UpdatedBy);
+        Assert.Equal(Guid.Empty, book.UpdatedBy);
         Assert.Equal(_fixedUtcNow, book.UpdatedOnUtc);
+    }
+
+    [Fact]
+    public async Task SavingChangesAsync_WhenInitializationSave_ShouldPreserveTheExplicitAuditValues()
+    {
+        // Arrange
+        LuminaDbContext context = CreateContext();
+        BookEntity book = _bookEntityFixture.Create();
+        DateTime initializationUtcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        book.CreatedOnUtc = initializationUtcNow;
+        book.CreatedBy = AuditIdentities.s_systemUserId;
+        book.UpdatedOnUtc = null;
+        book.UpdatedBy = null;
+
+        // Act
+        context.IsInitializationSave = true;
+        context.Books.Add(book);
+        await context.SaveChangesAsync();
+        context.IsInitializationSave = false;
+
+        // Assert
+        Assert.Equal(initializationUtcNow, book.CreatedOnUtc);
+        Assert.Equal(AuditIdentities.s_systemUserId, book.CreatedBy);
+        Assert.Null(book.UpdatedOnUtc);
+        Assert.Null(book.UpdatedBy);
     }
 
     [Fact]

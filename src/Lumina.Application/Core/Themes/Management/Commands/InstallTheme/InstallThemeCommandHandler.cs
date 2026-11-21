@@ -103,11 +103,7 @@ public class InstallThemeCommandHandler : ICommandHandler<InstallThemeCommand, R
                 IsCurrent = existingTheme.IsCurrent,
                 // Reinstalling a theme must bring it back even if it was soft deleted before, so the uploaded pack becomes visible again.
                 IsDeleted = false,
-                InstalledAtUtc = DateTime.UtcNow,
-                CreatedOnUtc = existingTheme.CreatedOnUtc,
-                CreatedBy = existingTheme.CreatedBy,
-                UpdatedOnUtc = DateTime.UtcNow,
-                UpdatedBy = userId
+                InstalledAtUtc = DateTime.UtcNow
             };
 
             Result<Updated> updateResult = await _unitOfWork.ThemeRepository.UpdateAsync(themeEntity, cancellationToken).ConfigureAwait(false);
@@ -126,10 +122,7 @@ public class InstallThemeCommandHandler : ICommandHandler<InstallThemeCommand, R
                 Version = manifest.Version,
                 PreviewPath = manifest.Preview,
                 InstallSource = ThemeInstallSource.Uploaded,
-                InstalledAtUtc = DateTime.UtcNow,
-                CreatedOnUtc = DateTime.UtcNow,
-                CreatedBy = userId,
-                UpdatedBy = userId
+                InstalledAtUtc = DateTime.UtcNow
             };
 
             Result<Created> insertResult = await _unitOfWork.ThemeRepository.InsertAsync(themeEntity, cancellationToken).ConfigureAwait(false);

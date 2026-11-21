@@ -54,8 +54,8 @@ public class LibraryMappingTests
         Assert.Equal(library.LibraryType, result.LibraryType);
         Assert.Equal(library.ContentLocations.Select(l => l.Path), result.ContentLocations.Select(l => l.Path));
         Assert.Equal(library.CoverImage.HasValue ? library.CoverImage.Value : null, result.CoverImage);
-        Assert.Equal(library.CreatedOnUtc, result.CreatedOnUtc);
-        Assert.Equal(library.UpdatedOnUtc.HasValue ? library.UpdatedOnUtc.Value : null, result.UpdatedOnUtc);
+        Assert.Equal(default, result.CreatedOnUtc);
+        Assert.Null(result.UpdatedOnUtc);
         Assert.True(result.IsEnabled);
         Assert.False(result.IsLocked);
         Assert.True(result.CanDownloadMetadataFromWeb);

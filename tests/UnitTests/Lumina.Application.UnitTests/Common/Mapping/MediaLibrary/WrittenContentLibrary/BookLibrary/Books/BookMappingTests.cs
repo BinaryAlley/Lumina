@@ -68,8 +68,8 @@ public class BookMappingTests
         Assert.Equal(book.AppleBooksId.HasValue ? book.AppleBooksId.Value : null, result.AppleBooksId);
         Assert.Equal(book.ISBNs.ToRepositoryEntities(), result.ISBNs);
         Assert.Equal(book.Ratings.ToRepositoryEntities(), result.Ratings);
-        Assert.Equal(book.CreatedOnUtc, result.CreatedOnUtc);
-        Assert.Equal(book.UpdatedOnUtc.HasValue ? book.UpdatedOnUtc.Value : null, result.UpdatedOnUtc);
+        Assert.Equal(default, result.CreatedOnUtc);
+        Assert.Null(result.UpdatedOnUtc);
     }
 
     [Fact]
@@ -79,6 +79,8 @@ public class BookMappingTests
         Book book = _bookFixture.Create();
         BookEntity entity = _bookEntityFixture.Create();
         BookEntity expectedEntity = book.ToRepositoryEntity();
+        DateTime? initialUpdatedOnUtc = entity.UpdatedOnUtc;
+        Guid? initialUpdatedBy = entity.UpdatedBy;
 
         // Act
         entity.ApplyMetadataToEntity(book);
@@ -113,8 +115,8 @@ public class BookMappingTests
         Assert.Equal(expectedEntity.GoogleBooksId, entity.GoogleBooksId);
         Assert.Equal(expectedEntity.BarnesAndNobleId, entity.BarnesAndNobleId);
         Assert.Equal(expectedEntity.AppleBooksId, entity.AppleBooksId);
-        Assert.NotNull(entity.UpdatedOnUtc);
-        Assert.NotNull(entity.UpdatedBy);
+        Assert.Equal(initialUpdatedOnUtc, entity.UpdatedOnUtc);
+        Assert.Equal(initialUpdatedBy, entity.UpdatedBy);
     }
 
     [Fact]

@@ -26,7 +26,7 @@ public class FavoriteMappingTests
     private readonly MediaItemIdFixture _mediaItemIdFixture = new();
 
     [Fact]
-    public void ToRepositoryEntity_WhenUpdatedOnUtcIsPresent_ShouldMapEveryFieldAndTheAuditColumns()
+    public void ToRepositoryEntity_WhenUpdatedOnUtcIsPresent_ShouldMapEveryFieldWithoutTheAuditColumns()
     {
         // Arrange
         Guid id = Guid.NewGuid();
@@ -50,10 +50,9 @@ public class FavoriteMappingTests
         Assert.Equal(userId, entity.UserId);
         Assert.Equal(FavoriteMediaKind.Book, entity.MediaKind);
         Assert.Equal(mediaItemId, entity.MediaItemId);
-        Assert.Equal(createdOnUtc, entity.CreatedOnUtc);
+        Assert.Equal(default, entity.CreatedOnUtc);
         Assert.Equal(Guid.Empty, entity.CreatedBy);
-        Assert.True(entity.UpdatedOnUtc.HasValue);
-        Assert.Equal(updatedOnUtc, entity.UpdatedOnUtc.Value);
+        Assert.Null(entity.UpdatedOnUtc);
         Assert.Null(entity.UpdatedBy);
     }
 

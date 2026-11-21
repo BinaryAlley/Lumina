@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Repositories.Authorization;
@@ -49,10 +50,10 @@ public class DataSeedServiceTests
     public DataSeedServiceTests()
     {
         _mockUnitOfWork = Substitute.For<IUnitOfWork>();
-        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
+        _mockUnitOfWork.SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
         _mockPermissionRepository = Substitute.For<IPermissionRepository>();
-        _fixedUtcNow = DateTime.UtcNow;
+        _fixedUtcNow = new DateTime(2026, 1, 15, 10, 30, 0, DateTimeKind.Utc);
 
         _mockDateTimeProvider.UtcNow.Returns(_fixedUtcNow);
         _mockUnitOfWork.PermissionRepository.Returns(_mockPermissionRepository);
@@ -64,13 +65,12 @@ public class DataSeedServiceTests
     public async Task SetDefaultAuthorizationPermissionsAsync_WhenSuccessful_ShouldInsertAllPermissionsAndReturnCreated()
     {
         // Arrange
-        Guid adminId = Guid.NewGuid();
         _mockPermissionRepository
             .InsertAsync(Arg.Any<PermissionEntity>(), Arg.Any<CancellationToken>())
             .Returns(Result.Created);
 
         // Act
-        Result<Created> result = await _sut.SetDefaultAuthorizationPermissionsAsync(adminId, CancellationToken.None);
+        Result<Created> result = await _sut.SetDefaultAuthorizationPermissionsAsync(CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -80,38 +80,36 @@ public class DataSeedServiceTests
             .Received(4)
             .InsertAsync(
                 Arg.Is<PermissionEntity>(p =>
-                    p.CreatedBy == adminId &&
+                    p.CreatedBy == AuditIdentities.s_systemUserId &&
                     p.CreatedOnUtc == _fixedUtcNow),
                 Arg.Any<CancellationToken>());
 
-        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task SetDefaultAuthorizationPermissionsAsync_WhenInsertFails_ShouldReturnError()
     {
         // Arrange
-        Guid adminId = Guid.NewGuid();
         Error expectedError = Error.Conflict("Permission.Conflict", "Permission already exists");
         _mockPermissionRepository
             .InsertAsync(Arg.Any<PermissionEntity>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 
         // Act
-        Result<Created> result = await _sut.SetDefaultAuthorizationPermissionsAsync(adminId, CancellationToken.None);
+        Result<Created> result = await _sut.SetDefaultAuthorizationPermissionsAsync(CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(expectedError, result.FirstError);
 
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task SetDefaultAuthorizationPermissionsAsync_ShouldCreateAllDefaultPermissions()
     {
         // Arrange
-        Guid adminId = Guid.NewGuid();
         List<AuthorizationPermission> capturedPermissions = [];
 
         _mockPermissionRepository
@@ -120,7 +118,7 @@ public class DataSeedServiceTests
             .AndDoes(info => capturedPermissions.Add(info.Arg<PermissionEntity>().PermissionName));
 
         // Act
-        await _sut.SetDefaultAuthorizationPermissionsAsync(adminId, CancellationToken.None);
+        await _sut.SetDefaultAuthorizationPermissionsAsync(CancellationToken.None);
 
         // Assert
         Assert.Equal(new[]
@@ -136,7 +134,6 @@ public class DataSeedServiceTests
     public async Task SetDefaultAuthorizationRolesAsync_WhenSuccessful_ShouldInsertAllRolesAndReturnCreated()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
         _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
         mockRoleRepository
@@ -144,7 +141,7 @@ public class DataSeedServiceTests
             .Returns(Result.Created);
 
         // Act
-        Result<Created> result = await _sut.SetDefaultAuthorizationRolesAsync(userId, CancellationToken.None);
+        Result<Created> result = await _sut.SetDefaultAuthorizationRolesAsync(CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -154,19 +151,18 @@ public class DataSeedServiceTests
             .Received(1)
             .InsertAsync(
                 Arg.Is<RoleEntity>(r =>
-                    r.CreatedBy == userId &&
+                    r.CreatedBy == AuditIdentities.s_systemUserId &&
                     r.CreatedOnUtc == _fixedUtcNow &&
                     r.RoleName == "Admin"),
                 Arg.Any<CancellationToken>());
 
-        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task SetDefaultAuthorizationRolesAsync_WhenInsertFails_ShouldReturnError()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
         _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
 
@@ -176,20 +172,19 @@ public class DataSeedServiceTests
             .Returns(expectedError);
 
         // Act
-        Result<Created> result = await _sut.SetDefaultAuthorizationRolesAsync(userId, CancellationToken.None);
+        Result<Created> result = await _sut.SetDefaultAuthorizationRolesAsync(CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(expectedError, result.FirstError);
 
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task SetDefaultAuthorizationRolesAsync_WhenCalled_ShouldCreateDefaultAdminRole()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
         List<string> capturedRoleNames = [];
 
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
@@ -201,17 +196,16 @@ public class DataSeedServiceTests
             .AndDoes(info => capturedRoleNames.Add(info.Arg<RoleEntity>().RoleName));
 
         // Act
-        await _sut.SetDefaultAuthorizationRolesAsync(userId, CancellationToken.None);
+        await _sut.SetDefaultAuthorizationRolesAsync(CancellationToken.None);
 
         // Assert
         Assert.Equal(new[] { "Admin" }, capturedRoleNames);
     }
 
     [Fact]
-    public async Task SetDefaultAuthorizationRolesAsync_WhenCalled_ShouldSetCorrectAuditProperties()
+    public async Task SetDefaultAuthorizationRolesAsync_WhenCalled_ShouldSetTheSystemAuditProperties()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
         RoleEntity? capturedRole = null;
 
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
@@ -223,11 +217,11 @@ public class DataSeedServiceTests
             .AndDoes(info => capturedRole = info.Arg<RoleEntity>());
 
         // Act
-        await _sut.SetDefaultAuthorizationRolesAsync(userId, CancellationToken.None);
+        await _sut.SetDefaultAuthorizationRolesAsync(CancellationToken.None);
 
         // Assert
         Assert.NotNull(capturedRole);
-        Assert.Equal(userId, capturedRole!.CreatedBy);
+        Assert.Equal(AuditIdentities.s_systemUserId, capturedRole!.CreatedBy);
         Assert.Equal(_fixedUtcNow, capturedRole.CreatedOnUtc);
         Assert.Null(capturedRole.UpdatedBy);
         Assert.Null(capturedRole.UpdatedOnUtc);
@@ -237,7 +231,6 @@ public class DataSeedServiceTests
     public async Task SetAdminRolePermissionsAsync_WhenSuccessful_ShouldAssignAllPermissionsToAdminRole()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
         RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
         List<PermissionEntity> permissions =
         [
@@ -267,7 +260,7 @@ public class DataSeedServiceTests
         mockRolePermissionRepository.InsertAsync(Arg.Any<RolePermissionEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Created);
 
         // Act
-        Result<Created> result = await _sut.SetAdminRolePermissionsAsync(userId, CancellationToken.None);
+        Result<Created> result = await _sut.SetAdminRolePermissionsAsync(CancellationToken.None);
 
         // Assert
         Assert.False(result.IsFailure);
@@ -278,18 +271,17 @@ public class DataSeedServiceTests
             .InsertAsync(
                 Arg.Is<RolePermissionEntity>(rp =>
                     rp.RoleId == adminRole.Id &&
-                    rp.CreatedBy == userId &&
+                    rp.CreatedBy == AuditIdentities.s_systemUserId &&
                     rp.CreatedOnUtc == _fixedUtcNow),
                 Arg.Any<CancellationToken>());
 
-        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task SetAdminRolePermissionsAsync_WhenAdminRoleNotFound_ShouldReturnError()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
         _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
 
@@ -298,19 +290,18 @@ public class DataSeedServiceTests
             .Returns((RoleEntity?)null);
 
         // Act
-        Result<Created> result = await _sut.SetAdminRolePermissionsAsync(userId, CancellationToken.None);
+        Result<Created> result = await _sut.SetAdminRolePermissionsAsync(CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.AdminAccountNotFound, result.FirstError);
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task SetAdminRolePermissionsAsync_WhenGetPermissionsFails_ShouldReturnError()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
         RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
         Error expectedError = Error.Failure("Permissions.NotFound", "Failed to retrieve permissions");
 
@@ -324,20 +315,19 @@ public class DataSeedServiceTests
         mockPermissionRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(expectedError);
 
         // Act
-        Result<Created> result = await _sut.SetAdminRolePermissionsAsync(userId, CancellationToken.None);
+        Result<Created> result = await _sut.SetAdminRolePermissionsAsync(CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(expectedError, result.FirstError);
 
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task SetAdminRolePermissionsAsync_WhenInsertRolePermissionFails_ShouldReturnError()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
         RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
         List<PermissionEntity> permissions = [_permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanViewUsers)];
         Error expectedError = Error.Failure("RolePermission.InsertFailed", "Failed to insert role permission");
@@ -363,20 +353,19 @@ public class DataSeedServiceTests
         mockRolePermissionRepository.InsertAsync(Arg.Any<RolePermissionEntity>(), Arg.Any<CancellationToken>()).Returns(expectedError);
 
         // Act
-        Result<Created> result = await _sut.SetAdminRolePermissionsAsync(userId, CancellationToken.None);
+        Result<Created> result = await _sut.SetAdminRolePermissionsAsync(CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(expectedError, result.FirstError);
 
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task SetAdminRolePermissionsAsync_WhenGetAdminRoleFails_ShouldReturnError()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
         Error expectedError = Error.Failure("Role.NotFound", "Failed to retrieve admin role");
 
         IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
@@ -387,13 +376,13 @@ public class DataSeedServiceTests
             .Returns(expectedError);
 
         // Act
-        Result<Created> result = await _sut.SetAdminRolePermissionsAsync(userId, CancellationToken.None);
+        Result<Created> result = await _sut.SetAdminRolePermissionsAsync(CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(expectedError, result.FirstError);
 
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -431,11 +420,11 @@ public class DataSeedServiceTests
                 Arg.Is<UserRoleEntity>(ur =>
                     ur.UserId == userId &&
                     ur.RoleId == adminRole.Id &&
-                    ur.CreatedBy == userId &&
+                    ur.CreatedBy == AuditIdentities.s_systemUserId &&
                     ur.CreatedOnUtc == _fixedUtcNow),
                 Arg.Any<CancellationToken>());
 
-        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -456,7 +445,7 @@ public class DataSeedServiceTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.AdminRoleNotFound, result.FirstError);
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -482,7 +471,7 @@ public class DataSeedServiceTests
         Assert.True(result.IsFailure);
         Assert.Equal(Errors.Authorization.AdminAccountNotFound, result.FirstError);
 
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -514,7 +503,7 @@ public class DataSeedServiceTests
         Assert.True(result.IsFailure);
         Assert.Equal(expectedError, result.FirstError);
 
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -538,7 +527,7 @@ public class DataSeedServiceTests
         Assert.True(result.IsFailure);
         Assert.Equal(expectedError, result.FirstError);
 
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -565,7 +554,7 @@ public class DataSeedServiceTests
         Assert.True(result.IsFailure);
         Assert.Equal(expectedError, result.FirstError);
 
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -589,7 +578,7 @@ public class DataSeedServiceTests
         Assert.Equal(6, capturedScheduledJobs.Count);
         Assert.All(capturedScheduledJobs, scheduledJob => Assert.Equal(ScheduledJobStatus.Active, scheduledJob.Status));
         Assert.All(capturedScheduledJobs, scheduledJob => Assert.Equal(adminUserId, scheduledJob.OwnerUserId));
-        Assert.All(capturedScheduledJobs, scheduledJob => Assert.Equal(adminUserId, scheduledJob.CreatedBy));
+        Assert.All(capturedScheduledJobs, scheduledJob => Assert.Equal(AuditIdentities.s_systemUserId, scheduledJob.CreatedBy));
         Assert.All(capturedScheduledJobs, scheduledJob => Assert.Equal(_fixedUtcNow, scheduledJob.CreatedOnUtc));
         Assert.Contains(capturedScheduledJobs, scheduledJob => scheduledJob.TaskType == ScheduledTaskType.ScanMediaLibraries && scheduledJob.ScheduleType == ScheduleType.DailyAtHourAndMinute && scheduledJob.Hour == 0 && scheduledJob.Minute == 0);
         Assert.Contains(capturedScheduledJobs, scheduledJob => scheduledJob.TaskType == ScheduledTaskType.CleanTemporaryFiles && scheduledJob.ScheduleType == ScheduleType.OnceAtStartup);
@@ -599,7 +588,7 @@ public class DataSeedServiceTests
         Assert.Contains(capturedScheduledJobs, scheduledJob => scheduledJob.TaskType == ScheduledTaskType.TechnicalDataCleanup && scheduledJob.ScheduleType == ScheduleType.OnceAtStartup);
 
         await mockScheduledJobRepository.Received(6).InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>());
-        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
         await mockScheduledJobRepository.DidNotReceive().GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>());
     }
 
@@ -620,6 +609,135 @@ public class DataSeedServiceTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(expectedError, result.FirstError);
-        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SetDefaultAuthorizationPermissionsAsync_WhenSaveChangesFails_ShouldReturnError()
+    {
+        // Arrange
+        Error expectedError = Error.Failure("Persistence.SaveFailed", "The changes could not be saved.");
+        _mockPermissionRepository
+            .InsertAsync(Arg.Any<PermissionEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockUnitOfWork
+            .SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>())
+            .Returns(expectedError);
+
+        // Act
+        Result<Created> result = await _sut.SetDefaultAuthorizationPermissionsAsync(CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(expectedError, result.FirstError);
+    }
+
+    [Fact]
+    public async Task SetDefaultAuthorizationRolesAsync_WhenSaveChangesFails_ShouldReturnError()
+    {
+        // Arrange
+        Error expectedError = Error.Failure("Persistence.SaveFailed", "The changes could not be saved.");
+        IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
+        mockRoleRepository
+            .InsertAsync(Arg.Any<RoleEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockUnitOfWork
+            .SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>())
+            .Returns(expectedError);
+
+        // Act
+        Result<Created> result = await _sut.SetDefaultAuthorizationRolesAsync(CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(expectedError, result.FirstError);
+    }
+
+    [Fact]
+    public async Task SetAdminRolePermissionsAsync_WhenSaveChangesFails_ShouldReturnError()
+    {
+        // Arrange
+        Error expectedError = Error.Failure("Persistence.SaveFailed", "The changes could not be saved.");
+        RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
+        List<PermissionEntity> permissions = [_permissionEntityFixture.Create(permissionName: AuthorizationPermission.CanViewUsers)];
+        IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
+        IPermissionRepository mockPermissionRepository = Substitute.For<IPermissionRepository>();
+        IRolePermissionRepository mockRolePermissionRepository = Substitute.For<IRolePermissionRepository>();
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
+        _mockUnitOfWork.PermissionRepository.Returns(mockPermissionRepository);
+        _mockUnitOfWork.RolePermissionRepository.Returns(mockRolePermissionRepository);
+        mockRoleRepository.GetByNameAsync("Admin", Arg.Any<CancellationToken>()).Returns(adminRole);
+        mockPermissionRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(new PaginatedResultDto<PermissionEntity>
+            {
+                Data = permissions,
+                CurrentPage = 1,
+                PerPage = permissions.Count,
+                Count = permissions.Count,
+                NumberOfPages = 1
+            });
+        mockRolePermissionRepository.InsertAsync(Arg.Any<RolePermissionEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Created);
+        _mockUnitOfWork
+            .SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>())
+            .Returns(expectedError);
+
+        // Act
+        Result<Created> result = await _sut.SetAdminRolePermissionsAsync(CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(expectedError, result.FirstError);
+    }
+
+    [Fact]
+    public async Task SetAdminRoleToAdministratorAccount_WhenSaveChangesFails_ShouldReturnError()
+    {
+        // Arrange
+        Error expectedError = Error.Failure("Persistence.SaveFailed", "The changes could not be saved.");
+        RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
+        UserEntity adminUser = _userEntityFixture.Create();
+        IRoleRepository mockRoleRepository = Substitute.For<IRoleRepository>();
+        IUserRepository mockUserRepository = Substitute.For<IUserRepository>();
+        IUserRoleRepository mockUserRoleRepository = Substitute.For<IUserRoleRepository>();
+        _mockUnitOfWork.RoleRepository.Returns(mockRoleRepository);
+        _mockUnitOfWork.UserRepository.Returns(mockUserRepository);
+        _mockUnitOfWork.UserRoleRepository.Returns(mockUserRoleRepository);
+        mockRoleRepository.GetByNameAsync("Admin", Arg.Any<CancellationToken>()).Returns(adminRole);
+        mockUserRepository.GetByIdAsync(adminUser.Id, cancellationToken: Arg.Any<CancellationToken>()).Returns(adminUser);
+        mockUserRoleRepository.InsertAsync(Arg.Any<UserRoleEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Created);
+        _mockUnitOfWork
+            .SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>())
+            .Returns(expectedError);
+
+        // Act
+        Result<Created> result = await _sut.SetAdminRoleToAdministratorAccount(adminUser.Id, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(expectedError, result.FirstError);
+    }
+
+    [Fact]
+    public async Task SetDefaultScheduledJobsAsync_WhenSaveChangesFails_ShouldReturnError()
+    {
+        // Arrange
+        Guid adminUserId = Guid.NewGuid();
+        Error expectedError = Error.Failure("Persistence.SaveFailed", "The changes could not be saved.");
+        IScheduledJobRepository mockScheduledJobRepository = Substitute.For<IScheduledJobRepository>();
+        _mockUnitOfWork.ScheduledJobRepository.Returns(mockScheduledJobRepository);
+        mockScheduledJobRepository
+            .InsertAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockUnitOfWork
+            .SaveChangesAsInitializationAsync(Arg.Any<CancellationToken>())
+            .Returns(expectedError);
+
+        // Act
+        Result<Created> result = await _sut.SetDefaultScheduledJobsAsync(adminUserId, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(expectedError, result.FirstError);
     }
 }

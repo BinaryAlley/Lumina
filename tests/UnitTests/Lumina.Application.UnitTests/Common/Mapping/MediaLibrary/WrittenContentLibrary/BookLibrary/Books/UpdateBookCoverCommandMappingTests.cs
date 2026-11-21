@@ -25,13 +25,12 @@ public class UpdateBookCoverCommandMappingTests
     public void ToRepositoryEntity_WhenBookHasNoCover_ShouldReturnANewEnrichedCoverArtwork()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
         UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create(bookId: bookId.ToString());
         string storedCoverPath = "/media/books/cover.jpg";
 
         // Act
-        BookArtworkEntity cover = command.ToRepositoryEntity(null, bookId, storedCoverPath, userId);
+        BookArtworkEntity cover = command.ToRepositoryEntity(null, bookId, storedCoverPath);
 
         // Assert
         Assert.Equal(bookId, cover.BookId);
@@ -39,8 +38,8 @@ public class UpdateBookCoverCommandMappingTests
         Assert.Equal(0, cover.Ordinal);
         Assert.Equal(storedCoverPath, cover.FileName);
         Assert.Equal(ArtworkStatus.Enriched, cover.Status);
-        Assert.Equal(userId, cover.CreatedBy);
-        Assert.NotEqual(default, cover.CreatedOnUtc);
+        Assert.Equal(Guid.Empty, cover.CreatedBy);
+        Assert.Equal(default, cover.CreatedOnUtc);
         Assert.Null(cover.UpdatedBy);
     }
 
@@ -48,21 +47,22 @@ public class UpdateBookCoverCommandMappingTests
     public void ToRepositoryEntity_WhenBookHasAnExistingCover_ShouldReplaceAndReturnTheStoredCover()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
         Guid bookId = Guid.NewGuid();
         UpdateBookCoverCommand command = _updateBookCoverCommandFixture.Create(bookId: bookId.ToString());
         BookArtworkEntity existingCover = _bookArtworkEntityFixture.Create(bookId: bookId, artworkType: ArtworkType.Cover, fileName: "/media/books/old-cover.jpg", status: ArtworkStatus.Pending);
+        DateTime? initialUpdatedOnUtc = existingCover.UpdatedOnUtc;
+        Guid? initialUpdatedBy = existingCover.UpdatedBy;
         string storedCoverPath = "/media/books/cover.jpg";
 
         // Act
-        BookArtworkEntity cover = command.ToRepositoryEntity(existingCover, bookId, storedCoverPath, userId);
+        BookArtworkEntity cover = command.ToRepositoryEntity(existingCover, bookId, storedCoverPath);
 
         // Assert
         Assert.Same(existingCover, cover);
         Assert.Equal(storedCoverPath, cover.FileName);
         Assert.Equal(ArtworkStatus.Enriched, cover.Status);
-        Assert.Equal(userId, cover.UpdatedBy);
-        Assert.NotNull(cover.UpdatedOnUtc);
+        Assert.Equal(initialUpdatedOnUtc, cover.UpdatedOnUtc);
+        Assert.Equal(initialUpdatedBy, cover.UpdatedBy);
         Assert.NotNull(cover.LastUpdateUtc);
     }
 }

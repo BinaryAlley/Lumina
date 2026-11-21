@@ -82,7 +82,7 @@ public class TrackMappingTests
         Assert.Equal(track.Moods.ToRepositoryEntities(), result.Moods);
         Assert.Equal(track.Isrcs.ToRepositoryEntities(), result.Isrcs);
         Assert.Equal(track.Ratings.ToRepositoryEntities(), result.Ratings);
-        Assert.Equal(track.CreatedOnUtc, result.CreatedOnUtc);
+        Assert.Equal(default, result.CreatedOnUtc);
         Assert.Equal(Guid.Empty, result.CreatedBy);
         Assert.Null(result.UpdatedOnUtc);
         Assert.Null(result.UpdatedBy);
@@ -108,7 +108,7 @@ public class TrackMappingTests
             Assert.Equal(contributor.ContributorId.Value, contributorEntity.MediaContributorId);
             Assert.Equal(contributor.Role, contributorEntity.Role);
             Assert.Equal(track.Id.Value, contributorEntity.TrackId);
-            Assert.Equal(track.CreatedOnUtc, contributorEntity.CreatedOnUtc);
+            Assert.Equal(default, contributorEntity.CreatedOnUtc);
             Assert.Equal(Guid.Empty, contributorEntity.CreatedBy);
             Assert.Null(contributorEntity.UpdatedOnUtc);
             Assert.Null(contributorEntity.UpdatedBy);

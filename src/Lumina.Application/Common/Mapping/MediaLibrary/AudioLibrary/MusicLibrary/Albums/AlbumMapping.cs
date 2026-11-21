@@ -69,18 +69,10 @@ public static class AlbumMapping
                 Id = Guid.CreateVersion7(),
                 AlbumId = domainEntity.Id.Value,
                 MediaContributorId = contributor.ContributorId.Value,
-                Role = contributor.Role,
-                CreatedOnUtc = domainEntity.CreatedOnUtc,
-                CreatedBy = Guid.Empty,
-                UpdatedBy = null
+                Role = contributor.Role
             })],
             Ratings = [.. domainEntity.Ratings.ToRepositoryEntities()],
-            Tracks = [.. domainEntity.Tracks.Select(track => track.ToRepositoryEntity(domainEntity.Id.Value, libraryId))],
-            CreatedOnUtc = domainEntity.CreatedOnUtc,
-            CreatedBy = Guid.Empty,
-            // The audit columns are owned by the auditing interceptor, which stamps only the rows that actually changed, so they are never mapped here.
-            UpdatedOnUtc = null,
-            UpdatedBy = null
+            Tracks = [.. domainEntity.Tracks.Select(track => track.ToRepositoryEntity(domainEntity.Id.Value, libraryId))]
         };
     }
 }

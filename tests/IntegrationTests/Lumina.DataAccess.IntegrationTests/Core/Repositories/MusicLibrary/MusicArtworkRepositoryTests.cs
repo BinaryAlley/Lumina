@@ -1,6 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.Application.Common.Infrastructure.Authentication;
+using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Lumina.DataAccess.Common.Interceptors;
 using Lumina.DataAccess.Core.Repositories.MusicLibrary;
 using Lumina.DataAccess.Core.UoW;
 using Lumina.Domain.Common.Primitives;
@@ -8,6 +11,7 @@ using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -227,24 +231,31 @@ public class MusicArtworkRepositoryTests : IDisposable
     {
         // Arrange
         Guid ownerId = Guid.NewGuid();
-        DateTime before = DateTime.UtcNow;
+        Guid actingUserId = Guid.NewGuid();
+        DateTime insertedOnUtc = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-musicartworkrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        // The context is built with the auditing interceptor attached, so the cover insert is stamped exactly like in production.
+        using LuminaDbContext auditedContext = CreateAuditedContext(anchorConnection, actingUserId, insertedOnUtc);
+        MusicArtworkRepository sut = new(auditedContext);
 
         // Act
-        Result<Updated> result = await _sut.UpsertCoverAsync(MusicArtworkOwnerType.Album, ownerId, "covers/new.jpg", CancellationToken.None);
-        await _context.SaveChangesAsync();
+        Result<Updated> result = await sut.UpsertCoverAsync(MusicArtworkOwnerType.Album, ownerId, "covers/new.jpg", CancellationToken.None);
+        await auditedContext.SaveChangesAsync();
 
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(Result.Updated, result.Value);
-        MusicArtworkEntity cover = Assert.Single(await _context.MusicArtwork.ToListAsync());
+        MusicArtworkEntity cover = Assert.Single(await auditedContext.MusicArtwork.ToListAsync());
         Assert.Equal(MusicArtworkOwnerType.Album, cover.OwnerType);
         Assert.Equal(ownerId, cover.OwnerId);
         Assert.Equal(ArtworkType.Cover, cover.ArtworkType);
         Assert.Equal(0, cover.Ordinal);
         Assert.Equal("covers/new.jpg", cover.FileName);
         Assert.Equal(ArtworkStatus.Enriched, cover.Status);
-        Assert.Equal(Guid.Empty, cover.CreatedBy);
-        Assert.True(cover.CreatedOnUtc >= before);
+        Assert.Equal(insertedOnUtc, cover.CreatedOnUtc);
+        Assert.Equal(actingUserId, cover.CreatedBy);
+        Assert.Null(cover.UpdatedOnUtc);
         Assert.Null(cover.UpdatedBy);
     }
 
@@ -463,6 +474,27 @@ public class MusicArtworkRepositoryTests : IDisposable
     {
         LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
+            .Options);
+        context.Database.EnsureCreated();
+        return context;
+    }
+
+    /// <summary>
+    /// Creates a real SQLite backed context with the auditing interceptor attached, so that audit columns behave exactly like in production.
+    /// </summary>
+    /// <param name="anchorConnection">The open in-memory SQLite connection that keeps the database alive for the duration of the test.</param>
+    /// <param name="userId">The Id of the user reported as the current user.</param>
+    /// <param name="utcNow">The current UTC time reported by the time provider.</param>
+    /// <returns>The created context.</returns>
+    private static LuminaDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
+    {
+        ICurrentUserService currentUserService = Substitute.For<ICurrentUserService>();
+        currentUserService.UserId.Returns(userId);
+        IDateTimeProvider dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        dateTimeProvider.UtcNow.Returns(utcNow);
+        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+            .UseSqlite(anchorConnection.ConnectionString)
+            .AddInterceptors(new UpdateAuditableEntitiesInterceptor(currentUserService, dateTimeProvider))
             .Options);
         context.Database.EnsureCreated();
         return context;

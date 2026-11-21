@@ -37,12 +37,7 @@ public static class MediaResumePointMapping
                 : null,
             LastProgressFraction = domainEntity.LastProgressFraction,
             LastConsumedOnUtc = domainEntity.LastConsumedOnUtc,
-            Version = 1,
-            CreatedOnUtc = domainEntity.CreatedOnUtc,
-            CreatedBy = Guid.Empty,
-            // The audit columns are owned by the auditing interceptor, so they are never mapped here.
-            UpdatedOnUtc = null,
-            UpdatedBy = null
+            Version = 1
         };
     }
 

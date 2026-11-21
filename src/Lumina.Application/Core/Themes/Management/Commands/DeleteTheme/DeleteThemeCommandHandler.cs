@@ -119,8 +119,6 @@ public class DeleteThemeCommandHandler : ICommandHandler<DeleteThemeCommand, Res
             // Bundled themes are soft deleted, so they can be restored automatically later, as long as the user did not delete them.
             theme.IsDeleted = true;
             theme.IsCurrent = null;
-            theme.UpdatedOnUtc = DateTime.UtcNow;
-            theme.UpdatedBy = userId;
             await _unitOfWork.ThemeRepository.UpdateAsync(theme, cancellationToken).ConfigureAwait(false);
         }
         else

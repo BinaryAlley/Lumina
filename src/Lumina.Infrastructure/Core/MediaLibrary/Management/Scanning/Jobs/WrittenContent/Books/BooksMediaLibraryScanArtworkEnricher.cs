@@ -209,8 +209,6 @@ internal sealed class BooksMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
             else
             {
                 coverArtwork.Status = ArtworkStatus.Failed;
-                coverArtwork.UpdatedOnUtc = DateTime.UtcNow;
-                coverArtwork.UpdatedBy = Guid.CreateVersion7();
             }
             return;
         }
@@ -239,8 +237,6 @@ internal sealed class BooksMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
                 else
                 {
                     existingCoverArtwork.Status = ArtworkStatus.Failed;
-                    existingCoverArtwork.UpdatedOnUtc = DateTime.UtcNow;
-                    existingCoverArtwork.UpdatedBy = Guid.CreateVersion7();
                 }
                 return;
             }
@@ -261,8 +257,6 @@ internal sealed class BooksMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
                 existingCoverArtwork.Status = ArtworkStatus.Enriched;
                 existingCoverArtwork.Provider = resolvedArtwork.ProviderName;
                 existingCoverArtwork.LastUpdateUtc = DateTime.UtcNow;
-                existingCoverArtwork.UpdatedOnUtc = DateTime.UtcNow;
-                existingCoverArtwork.UpdatedBy = Guid.CreateVersion7();
             }
         }
         else
@@ -271,8 +265,6 @@ internal sealed class BooksMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
             existingCoverArtwork!.Status = ArtworkStatus.Enriched;
             existingCoverArtwork.Provider = resolvedArtwork.ProviderName;
             existingCoverArtwork.LastUpdateUtc = DateTime.UtcNow;
-            existingCoverArtwork.UpdatedOnUtc = DateTime.UtcNow;
-            existingCoverArtwork.UpdatedBy = Guid.CreateVersion7();
         }
     }
 
@@ -340,10 +332,7 @@ internal sealed class BooksMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
             ContentHash = contentHash,
             Status = status,
             Provider = provider,
-            LastUpdateUtc = lastUpdateUtc,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.Empty,
-            UpdatedBy = null
+            LastUpdateUtc = lastUpdateUtc
         };
     }
 

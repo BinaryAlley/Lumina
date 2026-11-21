@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Favorites;
 using Lumina.Domain.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate;
-using System;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.Favorites;
@@ -23,11 +22,7 @@ public static class FavoriteMapping
             Id = domainEntity.Id.Value,
             UserId = domainEntity.UserId.Value,
             MediaKind = domainEntity.MediaKind,
-            MediaItemId = domainEntity.MediaItemId.Value,
-            CreatedOnUtc = domainEntity.CreatedOnUtc,
-            CreatedBy = Guid.Empty,
-            UpdatedOnUtc = domainEntity.UpdatedOnUtc.HasValue ? domainEntity.UpdatedOnUtc.Value : null,
-            UpdatedBy = null
+            MediaItemId = domainEntity.MediaItemId.Value
         };
     }
 }

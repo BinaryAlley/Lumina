@@ -238,7 +238,7 @@ public class SetCurrentThemeCommandHandlerTests
             Arg.Is<ThemeEntity>(entity => entity.Id == currentTheme.Id && entity.IsCurrent == null),
             Arg.Any<CancellationToken>());
         await _mockThemeRepository.Received(1).UpdateAsync(
-            Arg.Is<ThemeEntity>(entity => entity.Id == theme.Id && entity.IsCurrent == true && entity.UpdatedBy == _userId),
+            Arg.Is<ThemeEntity>(entity => entity.Id == theme.Id && entity.IsCurrent == true),
             Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
@@ -290,7 +290,7 @@ public class SetCurrentThemeCommandHandlerTests
         Assert.Equal(theme.Id, result.Value.Id);
         Assert.True(result.Value.IsCurrent);
         await _mockThemeRepository.Received(1).UpdateAsync(
-            Arg.Is<ThemeEntity>(entity => entity.Id == theme.Id && entity.IsCurrent == true && entity.UpdatedBy == _userId),
+            Arg.Is<ThemeEntity>(entity => entity.Id == theme.Id && entity.IsCurrent == true),
             Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }

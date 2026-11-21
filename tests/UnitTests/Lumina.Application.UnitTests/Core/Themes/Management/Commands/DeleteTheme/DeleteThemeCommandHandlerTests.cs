@@ -267,7 +267,7 @@ public class DeleteThemeCommandHandlerTests
         // Assert
         Assert.False(result.IsFailure);
         await _mockThemeRepository.Received(1).UpdateAsync(
-            Arg.Is<ThemeEntity>(entity => entity.Id == theme.Id && entity.IsDeleted && entity.IsCurrent == null && entity.UpdatedBy == _userId),
+            Arg.Is<ThemeEntity>(entity => entity.Id == theme.Id && entity.IsDeleted && entity.IsCurrent == null),
             Arg.Any<CancellationToken>());
         await _mockThemeRepository.DidNotReceive().DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());

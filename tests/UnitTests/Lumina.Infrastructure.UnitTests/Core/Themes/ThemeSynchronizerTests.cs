@@ -443,7 +443,7 @@ public class ThemeSynchronizerTests : IDisposable
     }
 
     [Fact]
-    public async Task SynchronizeAsync_WhenTheBundledThemeVersionDiffers_ShouldRefreshTheVersionTimestampAndUpdater()
+    public async Task SynchronizeAsync_WhenTheBundledThemeVersionDiffers_ShouldRefreshTheVersion()
     {
         // Arrange
         ThemeManifestDto manifest = _themeManifestDtoFixture.Create(version: "3.0.0");
@@ -458,6 +458,8 @@ public class ThemeSynchronizerTests : IDisposable
             updatedOnUtc: DateTime.UtcNow.AddDays(-1),
             includeUpdatedBy: true,
             updatedBy: Guid.NewGuid());
+        DateTime? initialUpdatedOnUtc = installedTheme.UpdatedOnUtc;
+        Guid? initialUpdatedBy = installedTheme.UpdatedBy;
         _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: [installedTheme], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
         string archivePath = CreateArchiveFile();
         _mockThemeService.GetBundledThemeArchivePaths().Returns([archivePath]);
@@ -470,8 +472,8 @@ public class ThemeSynchronizerTests : IDisposable
 
         // Assert
         Assert.Equal("3.0.0", installedTheme.Version);
-        Assert.NotNull(installedTheme.UpdatedOnUtc);
-        Assert.Null(installedTheme.UpdatedBy);
+        Assert.Equal(initialUpdatedOnUtc, installedTheme.UpdatedOnUtc);
+        Assert.Equal(initialUpdatedBy, installedTheme.UpdatedBy);
         await _mockThemeRepository.Received(1).UpdateAsync(
             Arg.Is<ThemeEntity>(theme => theme.Id == installedTheme.Id && theme.Version == "3.0.0"),
             Arg.Any<CancellationToken>());

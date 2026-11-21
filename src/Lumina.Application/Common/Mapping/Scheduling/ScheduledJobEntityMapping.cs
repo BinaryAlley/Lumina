@@ -99,11 +99,7 @@ public static class ScheduledJobEntityMapping
             Status = status,
             OwnerUserId = repositoryEntity.OwnerUserId,
             LastStartedOnUtc = lastStartedOnUtc,
-            LastCompletedOnUtc = lastCompletedOnUtc,
-            CreatedOnUtc = repositoryEntity.CreatedOnUtc,
-            CreatedBy = repositoryEntity.CreatedBy,
-            UpdatedOnUtc = repositoryEntity.UpdatedOnUtc,
-            UpdatedBy = repositoryEntity.UpdatedBy
+            LastCompletedOnUtc = lastCompletedOnUtc
         };
     }
 

@@ -220,8 +220,6 @@ internal sealed class BooksMediaLibraryScanMetadataEnricher : IMediaLibraryScanM
         {
             // No metadata provider returned usable metadata, so the book is marked as failed to enrich, keeping its previous metadata.
             bookEntity.MetadataStatus = MetadataStatus.Failed;
-            bookEntity.UpdatedOnUtc = DateTime.UtcNow;
-            bookEntity.UpdatedBy = Guid.CreateVersion7();
             return;
         }
 
@@ -247,10 +245,7 @@ internal sealed class BooksMediaLibraryScanMetadataEnricher : IMediaLibraryScanM
                 Id = Guid.CreateVersion7(),
                 BookId = bookEntity.Id,
                 MediaContributorId = contributorEntity.Id,
-                Role = role,
-                CreatedOnUtc = DateTime.UtcNow,
-                CreatedBy = Guid.Empty,
-                UpdatedBy = null
+                Role = role
             });
             domainContributors.Add(BookMediaContributor.Create(MediaContributorId.Create(contributorEntity.Id), role).Value);
         }

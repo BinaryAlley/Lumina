@@ -146,8 +146,6 @@ internal sealed class MediaLibraryScanProviderConfigurationInvalidationJob : Med
                 library.MetadataProvidersConfigurationFingerprint = metadataFingerprint;
                 library.ArtworkProvidersConfigurationFingerprint = artworkFingerprint;
                 library.PathTemplateFingerprint = pathTemplateFingerprint;
-                library.UpdatedOnUtc = DateTime.UtcNow;
-                library.UpdatedBy = Guid.CreateVersion7();
 
                 Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                 if (saveChangesResult.IsFailure)

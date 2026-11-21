@@ -122,7 +122,7 @@ public class UpdateBookCoverCommandHandler : ICommandHandler<UpdateBookCoverComm
 
         // Map the newly stored cover image onto the artwork of the book, replacing the existing cover or adding a new one.
         BookArtworkEntity? existingCover = existingBook.Artwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover);
-        BookArtworkEntity coverArtwork = command.ToRepositoryEntity(existingCover, bookId, storeArtworkResult.Value, userId);
+        BookArtworkEntity coverArtwork = command.ToRepositoryEntity(existingCover, bookId, storeArtworkResult.Value);
         if (existingCover is null)
             existingBook.Artwork.Add(coverArtwork);
 

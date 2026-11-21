@@ -114,6 +114,45 @@ public class UnitOfWorkTests
     }
 
     [Fact]
+    public async Task SaveChangesAsInitializationAsync_WhenCalled_ShouldResetTheFlagAfterTheSave()
+    {
+        // Arrange
+        DbContextOptions<LuminaDbContext> options = new DbContextOptionsBuilder<LuminaDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
+        LuminaDbContext dbContext = new(options);
+        UnitOfWork unitOfWork = new(dbContext, Substitute.For<IDateTimeProvider>());
+        dbContext.Roles.Add(_roleEntityFixture.Create(roleName: "TestRole"));
+
+        // Act
+        Result<Success> result = await unitOfWork.SaveChangesAsInitializationAsync(CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal(Result.Success, result.Value);
+        Assert.False(dbContext.IsInitializationSave);
+    }
+
+    [Fact]
+    public async Task SaveChangesAsInitializationAsync_WhenSaveIsCancelled_ShouldResetTheFlag()
+    {
+        // Arrange
+        DbContextOptions<LuminaDbContext> options = new DbContextOptionsBuilder<LuminaDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
+        LuminaDbContext dbContext = new(options);
+        UnitOfWork unitOfWork = new(dbContext, Substitute.For<IDateTimeProvider>());
+        dbContext.Roles.Add(_roleEntityFixture.Create(roleName: "TestRole"));
+        CancellationToken cancellationToken = new(canceled: true);
+
+        // Act
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => unitOfWork.SaveChangesAsInitializationAsync(cancellationToken));
+
+        // Assert
+        Assert.False(dbContext.IsInitializationSave);
+    }
+
+    [Fact]
     public async Task ClearTrackedEntities_WhenCalled_ShouldDetachAllTrackedEntities()
     {
         // Arrange

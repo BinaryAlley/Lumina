@@ -647,10 +647,7 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
             ContentHash = contentHash,
             Status = status,
             Provider = provider,
-            LastUpdateUtc = DateTime.UtcNow,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.Empty,
-            UpdatedBy = null
+            LastUpdateUtc = DateTime.UtcNow
         };
     }
 

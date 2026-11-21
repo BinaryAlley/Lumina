@@ -69,7 +69,7 @@ public class AlbumMappingTests
         Assert.Equal(album.MusicBrainzReleaseGroupId.HasValue ? album.MusicBrainzReleaseGroupId.Value.Value : null, result.MusicBrainzReleaseGroupId);
         Assert.Equal(album.MusicBrainzReleaseArtistId.HasValue ? album.MusicBrainzReleaseArtistId.Value.Value : null, result.MusicBrainzReleaseArtistId);
         Assert.Equal(album.Ratings.ToRepositoryEntities(), result.Ratings);
-        Assert.Equal(album.CreatedOnUtc, result.CreatedOnUtc);
+        Assert.Equal(default, result.CreatedOnUtc);
         Assert.Equal(Guid.Empty, result.CreatedBy);
         Assert.Null(result.UpdatedOnUtc);
         Assert.Null(result.UpdatedBy);
@@ -95,7 +95,7 @@ public class AlbumMappingTests
             Assert.Equal(contributor.ContributorId.Value, contributorEntity.MediaContributorId);
             Assert.Equal(contributor.Role, contributorEntity.Role);
             Assert.Equal(album.Id.Value, contributorEntity.AlbumId);
-            Assert.Equal(album.CreatedOnUtc, contributorEntity.CreatedOnUtc);
+            Assert.Equal(default, contributorEntity.CreatedOnUtc);
             Assert.Equal(Guid.Empty, contributorEntity.CreatedBy);
             Assert.Null(contributorEntity.UpdatedBy);
         }

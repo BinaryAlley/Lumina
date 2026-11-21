@@ -86,7 +86,7 @@ public class MediaConsumptionRecordMappingTests
         Assert.Equal(0.75, result.LastProgressFraction);
         Assert.Equal(0, result.ConsecutivePagesRead);
         Assert.Equal(1L, result.Version);
-        Assert.Equal(startedOnUtc, result.CreatedOnUtc);
+        Assert.Equal(default, result.CreatedOnUtc);
         Assert.Equal(Guid.Empty, result.CreatedBy);
         Assert.Null(result.UpdatedOnUtc);
         Assert.Null(result.UpdatedBy);
