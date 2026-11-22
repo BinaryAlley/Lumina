@@ -1,7 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Utilities;
-using Lumina.Domain.Common.Errors;
+using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
@@ -18,10 +19,10 @@ public class GetThumbnailQueryValidator : AbstractValidator<GetThumbnailQuery>
     {
         RuleFor(query => query.Path)
             .NotEmpty()
-            .WithError(Errors.FileSystemManagement.PathCannotBeEmpty);
+            .WithError(DomainErrors.FileSystemManagement.PathCannotBeEmpty);
         
         RuleFor(query => query.Quality)
             .InclusiveBetween(0, 100)
-            .WithError(Errors.Thumbnails.ImageQualityMustBeBetweenZeroAndOneHundred);
+            .WithError(ApplicationErrors.Thumbnails.ImageQualityMustBeBetweenZeroAndOneHundred);
     }
 }

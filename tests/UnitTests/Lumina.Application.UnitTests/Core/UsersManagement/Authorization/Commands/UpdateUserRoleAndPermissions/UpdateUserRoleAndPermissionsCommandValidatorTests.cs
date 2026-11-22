@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
@@ -34,7 +33,7 @@ public class UpdateUserRoleAndPermissionsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(DomainErrors.Users.UserIdCannotBeEmpty);
+        result.ShouldHaveValidationError(ApplicationErrors.Users.UserIdCannotBeEmpty);
     }
 
     [Fact]

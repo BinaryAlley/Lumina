@@ -2,10 +2,11 @@
 using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
 using Lumina.Application.Fixtures.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
@@ -29,7 +30,7 @@ public class GetThumbnailQueryValidatorTests
         List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
+        result.ShouldHaveValidationError(DomainErrors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -42,7 +43,7 @@ public class GetThumbnailQueryValidatorTests
         List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
+        result.ShouldHaveValidationError(DomainErrors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -55,7 +56,7 @@ public class GetThumbnailQueryValidatorTests
         List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.FileSystemManagement.PathCannotBeEmpty);
+        result.ShouldNotHaveValidationError(DomainErrors.FileSystemManagement.PathCannotBeEmpty);
     }
 
     [Fact]
@@ -68,7 +69,7 @@ public class GetThumbnailQueryValidatorTests
         List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.Thumbnails.ImageQualityMustBeBetweenZeroAndOneHundred);
+        result.ShouldHaveValidationError(ApplicationErrors.Thumbnails.ImageQualityMustBeBetweenZeroAndOneHundred);
     }
 
     [Fact]
@@ -81,7 +82,7 @@ public class GetThumbnailQueryValidatorTests
         List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.Thumbnails.ImageQualityMustBeBetweenZeroAndOneHundred);
+        result.ShouldHaveValidationError(ApplicationErrors.Thumbnails.ImageQualityMustBeBetweenZeroAndOneHundred);
     }
 
     [Fact]
@@ -94,7 +95,7 @@ public class GetThumbnailQueryValidatorTests
         List<Error> result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.Thumbnails.ImageQualityMustBeBetweenZeroAndOneHundred);
+        result.ShouldNotHaveValidationError(ApplicationErrors.Thumbnails.ImageQualityMustBeBetweenZeroAndOneHundred);
     }
 
 }

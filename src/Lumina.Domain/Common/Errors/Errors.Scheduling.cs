@@ -78,10 +78,5 @@ public static partial class Errors
         /// Gets the error that reports that the schedule type is not a defined value.
         /// </summary>
         public static Error InvalidScheduleType => Error.Validation(description: nameof(InvalidScheduleType));
-
-        /// <summary>
-        /// Gets the error that reports that the scheduler display time span must be a positive value.
-        /// </summary>
-        public static Error SchedulerDisplayTimeSpanMustBePositive => Error.Validation(description: nameof(SchedulerDisplayTimeSpanMustBePositive));
     }
 }
