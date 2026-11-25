@@ -93,8 +93,6 @@ public class RestoreThemeCommandHandler : ICommandHandler<RestoreThemeCommand, R
 
         theme.IsDeleted = false;
         theme.IsCurrent = null;
-        theme.UpdatedOnUtc = DateTime.UtcNow;
-        theme.UpdatedBy = userId;
         Result<Updated> updateResult = await _unitOfWork.ThemeRepository.UpdateAsync(theme, cancellationToken).ConfigureAwait(false);
         if (updateResult.IsFailure)
             return updateResult.Errors;

@@ -44,12 +44,7 @@ public static class MediaConsumptionRecordMapping
                 : null,
             LastProgressFraction = domainEntity.LastProgressFraction,
             ConsecutivePagesRead = domainEntity.ConsecutivePagesRead,
-            Version = 1,
-            CreatedOnUtc = domainEntity.CreatedOnUtc,
-            CreatedBy = Guid.Empty,
-            // The audit columns are owned by the auditing interceptor, so they are never mapped here.
-            UpdatedOnUtc = null,
-            UpdatedBy = null
+            Version = 1
         };
     }
 

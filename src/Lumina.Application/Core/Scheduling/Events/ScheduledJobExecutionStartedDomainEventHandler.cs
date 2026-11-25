@@ -72,11 +72,7 @@ public class ScheduledJobExecutionStartedDomainEventHandler : IDomainEventHandle
             IsCycleRun = domainEvent.IsCycleRun,
             WasCycleActive = wasCycleActive,
             StartedOnUtc = domainEvent.StartedOnUtc,
-            CompletedOnUtc = null,
-            CreatedOnUtc = scheduledJob.CreatedOnUtc,
-            CreatedBy = scheduledJob.CreatedBy,
-            UpdatedOnUtc = null,
-            UpdatedBy = null
+            CompletedOnUtc = null
         };
         Result<Created> insertExecutionResult = await _unitOfWork.ScheduledJobExecutionRepository.InsertAsync(execution, cancellationToken).ConfigureAwait(false);
         if (insertExecutionResult.IsFailure)

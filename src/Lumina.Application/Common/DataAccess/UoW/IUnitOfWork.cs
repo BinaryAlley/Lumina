@@ -186,6 +186,14 @@ public interface IUnitOfWork
     Task<Result<Success>> SaveChangesAsync(CancellationToken cancellationToken);
 
     /// <summary>
+    /// Saves the changes made during the one-time application initialization, whose audit values are provided explicitly by the bootstrap code instead of
+    /// being stamped by the auditing interceptor.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Success>> SaveChangesAsInitializationAsync(CancellationToken cancellationToken);
+
+    /// <summary>
     /// Detaches all the entities tracked by the unit of work, freeing the memory they occupy.
     /// </summary>
     void ClearTrackedEntities();

@@ -51,17 +51,9 @@ public static class ArtistMapping
                 Id = Guid.CreateVersion7(),
                 ArtistId = domainEntity.Id.Value,
                 MediaContributorId = contributor.ContributorId.Value,
-                Role = contributor.Role,
-                CreatedOnUtc = domainEntity.CreatedOnUtc,
-                CreatedBy = Guid.Empty,
-                UpdatedBy = null
+                Role = contributor.Role
             })],
-            Albums = [.. domainEntity.Albums.Select(album => album.ToRepositoryEntity(domainEntity.Id.Value, domainEntity.LibraryId.Value))],
-            CreatedOnUtc = domainEntity.CreatedOnUtc,
-            CreatedBy = Guid.Empty,
-            // The audit columns are owned by the auditing interceptor, which stamps only the rows that actually changed, so they are never mapped here.
-            UpdatedOnUtc = null,
-            UpdatedBy = null
+            Albums = [.. domainEntity.Albums.Select(album => album.ToRepositoryEntity(domainEntity.Id.Value, domainEntity.LibraryId.Value))]
         };
     }
 }

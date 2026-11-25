@@ -413,7 +413,7 @@ public class StartConsumptionEndpointTests : IClassFixture<AuthenticatedLuminaAp
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         IDataSeedService dataSeedService = scope.ServiceProvider.GetRequiredService<IDataSeedService>();
-        await dataSeedService.SetDefaultAuthorizationRolesAsync(userId, CancellationToken.None);
+        await dataSeedService.SetDefaultAuthorizationRolesAsync(CancellationToken.None);
         await dataSeedService.SetAdminRoleToAdministratorAccount(userId, CancellationToken.None);
     }
 

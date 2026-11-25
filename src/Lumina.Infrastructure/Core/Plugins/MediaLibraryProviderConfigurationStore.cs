@@ -295,9 +295,6 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
                 LibraryId = libraryId,
                 PluginId = pluginId,
                 IsEnabled = false,
-                CreatedOnUtc = default,
-                CreatedBy = default,
-                UpdatedBy = default
             };
             Result<Updated> upsertResult = await _unitOfWork.LibraryBookReaderConfigurationRepository.UpsertAsync(configuration, cancellationToken).ConfigureAwait(false);
             if (upsertResult.IsFailure)
@@ -337,9 +334,6 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
                 LibraryId = libraryId,
                 PluginId = pluginId,
                 IsEnabled = false,
-                CreatedOnUtc = default,
-                CreatedBy = default,
-                UpdatedBy = default
             };
             Result<Updated> upsertResult = await _unitOfWork.LibraryBookReaderConfigurationRepository.UpsertAsync(configuration, cancellationToken).ConfigureAwait(false);
             if (upsertResult.IsFailure)
@@ -389,9 +383,6 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
                 PluginId = pluginId,
                 IsEnabled = false,
                 Rank = nextRank,
-                CreatedOnUtc = default,
-                CreatedBy = default,
-                UpdatedBy = default
             };
             Result<Updated> upsertResult = await _unitOfWork.LibraryMetadataProviderConfigurationRepository.UpsertAsync(configuration, cancellationToken).ConfigureAwait(false);
             if (upsertResult.IsFailure)
@@ -442,9 +433,6 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
                 PluginId = pluginId,
                 IsEnabled = false,
                 Rank = nextRank,
-                CreatedOnUtc = default,
-                CreatedBy = default,
-                UpdatedBy = default
             };
             Result<Updated> upsertResult = await _unitOfWork.ArtworkProviderConfigurationRepository.UpsertAsync(configuration, cancellationToken).ConfigureAwait(false);
             if (upsertResult.IsFailure)
@@ -484,9 +472,6 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
                 PluginId = pluginId,
                 IsEnabled = false,
                 Rank = nextRank,
-                CreatedOnUtc = default,
-                CreatedBy = default,
-                UpdatedBy = default
             };
             Result<Updated> upsertResult = await _unitOfWork.LibraryMetadataProviderConfigurationRepository.UpsertAsync(configuration, cancellationToken).ConfigureAwait(false);
             if (upsertResult.IsFailure)
@@ -526,9 +511,6 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
                 PluginId = pluginId,
                 IsEnabled = false,
                 Rank = nextRank,
-                CreatedOnUtc = default,
-                CreatedBy = default,
-                UpdatedBy = default
             };
             Result<Updated> upsertResult = await _unitOfWork.ArtworkProviderConfigurationRepository.UpsertAsync(configuration, cancellationToken).ConfigureAwait(false);
             if (upsertResult.IsFailure)
@@ -583,9 +565,6 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
                 PluginId = pluginId,
                 IsEnabled = isEnabled,
                 Rank = index + 1,
-                CreatedOnUtc = default,
-                CreatedBy = default,
-                UpdatedBy = default
             };
             configuration.IsEnabled = isEnabled;
             configuration.Rank = index + 1;
@@ -641,9 +620,6 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
                 PluginId = pluginId,
                 IsEnabled = isEnabled,
                 Rank = index + 1,
-                CreatedOnUtc = default,
-                CreatedBy = default,
-                UpdatedBy = default
             };
             configuration.IsEnabled = isEnabled;
             configuration.Rank = index + 1;
@@ -697,9 +673,6 @@ internal sealed class MediaLibraryProviderConfigurationStore : IMediaLibraryProv
                 LibraryId = libraryId,
                 PluginId = pluginId,
                 IsEnabled = isEnabled,
-                CreatedOnUtc = default,
-                CreatedBy = default,
-                UpdatedBy = default
             };
             configuration.IsEnabled = isEnabled;
             Result<Updated> upsertResult = await _unitOfWork.LibraryBookReaderConfigurationRepository.UpsertAsync(configuration, cancellationToken).ConfigureAwait(false);

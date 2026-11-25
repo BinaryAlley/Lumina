@@ -75,7 +75,7 @@ public class MediaResumePointMappingTests
         Assert.Equal(0.6, result.LastProgressFraction);
         Assert.Equal(lastConsumedOnUtc, result.LastConsumedOnUtc);
         Assert.Equal(1L, result.Version);
-        Assert.Equal(createdOnUtc, result.CreatedOnUtc);
+        Assert.Equal(default, result.CreatedOnUtc);
         Assert.Equal(Guid.Empty, result.CreatedBy);
         Assert.Null(result.UpdatedOnUtc);
         Assert.Null(result.UpdatedBy);

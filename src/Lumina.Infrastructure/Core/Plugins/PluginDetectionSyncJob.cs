@@ -74,10 +74,7 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
                 Author = plugin.Author,
                 Version = plugin.Version.ToString(),
                 Description = plugin.Description,
-                LoadStatus = PluginLoadStatus.Loaded,
-                CreatedOnUtc = DateTime.UtcNow,
-                CreatedBy = default,
-                UpdatedBy = default
+                LoadStatus = PluginLoadStatus.Loaded
             };
             Result<Updated> upsertResult = await unitOfWork.PluginRepository.UpsertAsync(pluginEntity, stoppingToken).ConfigureAwait(false);
             if (upsertResult.IsFailure)
@@ -98,10 +95,7 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
                 Version = string.Empty,
                 Description = string.Empty,
                 LoadStatus = PluginLoadStatus.FailedToLoad,
-                LoadError = loadError.ErrorMessage,
-                CreatedOnUtc = DateTime.UtcNow,
-                CreatedBy = default,
-                UpdatedBy = default
+                LoadError = loadError.ErrorMessage
             };
             Result<Updated> upsertResult = await unitOfWork.PluginRepository.UpsertAsync(pluginEntity, stoppingToken).ConfigureAwait(false);
             if (upsertResult.IsFailure)

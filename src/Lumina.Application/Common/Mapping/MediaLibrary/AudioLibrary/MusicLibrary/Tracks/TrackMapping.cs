@@ -75,10 +75,7 @@ public static class TrackMapping
                 Id = Guid.CreateVersion7(),
                 TrackId = domainEntity.Id.Value,
                 MediaContributorId = contributor.ContributorId.Value,
-                Role = contributor.Role,
-                CreatedOnUtc = domainEntity.CreatedOnUtc,
-                CreatedBy = Guid.Empty,
-                UpdatedBy = null
+                Role = contributor.Role
             })],
             Moods = [.. domainEntity.Moods.ToRepositoryEntities()],
             Isrcs = [.. domainEntity.Isrcs.ToRepositoryEntities()],
@@ -88,12 +85,7 @@ public static class TrackMapping
             WorkIswcs = domainEntity.Work.HasValue
                 ? [.. domainEntity.Work.Value.Iswcs.Select(iswc => new TrackWorkIswcEntity(iswc))]
                 : [],
-            Ratings = [.. domainEntity.Ratings.ToRepositoryEntities()],
-            CreatedOnUtc = domainEntity.CreatedOnUtc,
-            CreatedBy = Guid.Empty,
-            // The audit columns are owned by the auditing interceptor, which stamps only the rows that actually changed, so they are never mapped here.
-            UpdatedOnUtc = null,
-            UpdatedBy = null
+            Ratings = [.. domainEntity.Ratings.ToRepositoryEntities()]
         };
     }
 }

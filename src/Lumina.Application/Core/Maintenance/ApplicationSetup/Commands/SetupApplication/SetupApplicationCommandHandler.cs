@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.CQRS;
+using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Seed;
@@ -107,7 +108,7 @@ public class SetupApplicationCommandHandler : ICommandHandler<SetupApplicationCo
             Libraries = [],
             UserPermissions = [],
             UserRole = null,
-            CreatedBy = id,
+            CreatedBy = AuditIdentities.s_systemUserId,
             LibraryScans = [],
         };
         // If the user enabled two factor auth, include a QR with the totp secret.
@@ -124,20 +125,20 @@ public class SetupApplicationCommandHandler : ICommandHandler<SetupApplicationCo
         Result<Created> insertUserResult = await _unitOfWork.UserRepository.InsertAsync(user, cancellationToken).ConfigureAwait(false);
         if (insertUserResult.IsFailure)
             return insertUserResult.Errors;
-        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsInitializationAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)
             return saveChangesResult.Errors;
 
         // Set the default permissions, roles, roles permissions.
-        Result<Created> setPermissionsResult = await _dataSeedService.SetDefaultAuthorizationPermissionsAsync(id, cancellationToken).ConfigureAwait(false);
+        Result<Created> setPermissionsResult = await _dataSeedService.SetDefaultAuthorizationPermissionsAsync(cancellationToken).ConfigureAwait(false);
         if (setPermissionsResult.IsFailure)
             return setPermissionsResult.Errors;
 
-        Result<Created> setRoleResult = await _dataSeedService.SetDefaultAuthorizationRolesAsync(id, cancellationToken).ConfigureAwait(false);
+        Result<Created> setRoleResult = await _dataSeedService.SetDefaultAuthorizationRolesAsync(cancellationToken).ConfigureAwait(false);
         if (setRoleResult.IsFailure)
             return setRoleResult.Errors;
 
-        Result<Created> setRolePermissionResult = await _dataSeedService.SetAdminRolePermissionsAsync(id, cancellationToken).ConfigureAwait(false);
+        Result<Created> setRolePermissionResult = await _dataSeedService.SetAdminRolePermissionsAsync(cancellationToken).ConfigureAwait(false);
         if (setRolePermissionResult.IsFailure)
             return setRolePermissionResult.Errors;
 

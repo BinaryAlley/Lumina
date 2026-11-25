@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
-using System;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.MediaLibrary.Management;
@@ -25,11 +24,7 @@ public static class LibraryScanMapping
             LibraryId = domainEntity.LibraryId.Value,
             Status = domainEntity.Status,
             User = null!,
-            Library = null!,
-            CreatedOnUtc = domainEntity.CreatedOnUtc,
-            CreatedBy = Guid.Empty,
-            UpdatedOnUtc = domainEntity.UpdatedOnUtc.HasValue ? domainEntity.UpdatedOnUtc.Value : null,
-            UpdatedBy = Guid.Empty
+            Library = null!
         };
     }
 }

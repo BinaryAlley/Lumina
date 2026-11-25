@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Playlists;
 using Lumina.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate;
-using System;
 using System.Linq;
 #endregion
 
@@ -30,11 +29,7 @@ public static class PlaylistMapping
                 .OrderBy(entry => entry.Position)
                 .Select(entry => entry.ToRepositoryEntity(domainEntity.Id.Value))],
             // This is the correct count for an insert. The update path deliberately keeps the stored count, because details edits never load the entries and must not overwrite it.
-            EntryCount = domainEntity.Entries.Count,
-            CreatedOnUtc = domainEntity.CreatedOnUtc,
-            CreatedBy = Guid.Empty,
-            UpdatedOnUtc = domainEntity.UpdatedOnUtc.HasValue ? domainEntity.UpdatedOnUtc.Value : null,
-            UpdatedBy = null
+            EntryCount = domainEntity.Entries.Count
         };
     }
 }

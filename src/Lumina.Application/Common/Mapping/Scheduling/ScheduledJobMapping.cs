@@ -3,7 +3,6 @@ using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Contracts.Responses.Scheduling;
 using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
 using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
-using System;
 #endregion
 
 namespace Lumina.Application.Common.Mapping.Scheduling;
@@ -32,11 +31,7 @@ public static class ScheduledJobMapping
             Status = domainEntity.Status,
             OwnerUserId = domainEntity.OwnerUserId.Value,
             LastStartedOnUtc = domainEntity.LastStartedOnUtc.HasValue ? domainEntity.LastStartedOnUtc.Value : null,
-            LastCompletedOnUtc = domainEntity.LastCompletedOnUtc.HasValue ? domainEntity.LastCompletedOnUtc.Value : null,
-            CreatedOnUtc = domainEntity.CreatedOnUtc,
-            CreatedBy = Guid.Empty,
-            UpdatedOnUtc = domainEntity.UpdatedOnUtc.HasValue ? domainEntity.UpdatedOnUtc.Value : null,
-            UpdatedBy = Guid.Empty
+            LastCompletedOnUtc = domainEntity.LastCompletedOnUtc.HasValue ? domainEntity.LastCompletedOnUtc.Value : null
         };
     }
 

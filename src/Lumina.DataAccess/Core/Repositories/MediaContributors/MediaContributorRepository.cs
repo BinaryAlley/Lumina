@@ -89,10 +89,7 @@ internal sealed class MediaContributorRepository : IMediaContributorRepository
         {
             Id = Guid.CreateVersion7(),
             DisplayName = displayName,
-            LegalName = legalName,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.Empty,
-            UpdatedBy = null
+            LegalName = legalName
         };
         _luminaDbContext.MediaContributors.Add(contributor);
         return contributor;

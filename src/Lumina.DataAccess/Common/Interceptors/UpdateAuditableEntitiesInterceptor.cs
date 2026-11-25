@@ -2,6 +2,7 @@
 using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Time;
+using Lumina.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -64,6 +65,9 @@ public sealed class UpdateAuditableEntitiesInterceptor : SaveChangesInterceptor
     {
         if (context is null)
             return;
+        // Initialization is the one save whose audit identity is provided explicitly, because no user account exists yet.
+        if (context is LuminaDbContext luminaDbContext && luminaDbContext.IsInitializationSave)
+            return;
 
         Guid? userId = _currentUserService.UserId;
         DateTime utcNow = _dateTimeProvider.UtcNow;
@@ -106,6 +110,6 @@ public sealed class UpdateAuditableEntitiesInterceptor : SaveChangesInterceptor
 
         // Set modification properties.
         entry.Entity.UpdatedOnUtc = utcNow;
-        entry.Entity.UpdatedBy = userId ?? Guid.Parse("11111111-1111-1111-1111-111111111111"); // "SYSTEM" user Id.
+        entry.Entity.UpdatedBy = userId ?? default;
     }
 }

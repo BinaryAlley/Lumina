@@ -46,8 +46,8 @@ public class PlaylistMappingTests
         Assert.Equal("Focus", result.Name);
         Assert.Equal("Deep work", result.Description);
         Assert.Equal(PlaylistType.Music, result.Type);
-        Assert.Equal(createdOnUtc, result.CreatedOnUtc);
-        Assert.Equal(updatedOnUtc, result.UpdatedOnUtc);
+        Assert.Equal(default, result.CreatedOnUtc);
+        Assert.Null(result.UpdatedOnUtc);
         Assert.Equal(Guid.Empty, result.CreatedBy);
         Assert.Null(result.UpdatedBy);
     }

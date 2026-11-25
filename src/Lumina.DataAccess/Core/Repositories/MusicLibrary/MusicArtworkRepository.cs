@@ -173,12 +173,7 @@ internal sealed class MusicArtworkRepository : IMusicArtworkRepository
                 ArtworkType = ArtworkType.Cover,
                 Ordinal = 0,
                 FileName = fileName,
-                Status = ArtworkStatus.Enriched,
-                CreatedOnUtc = now,
-                CreatedBy = Guid.Empty,
-                // The audit columns are owned by the auditing interceptor, which stamps only the rows that actually changed, so they are never mapped here.
-                UpdatedOnUtc = null,
-                UpdatedBy = null
+                Status = ArtworkStatus.Enriched
             });
         }
         else

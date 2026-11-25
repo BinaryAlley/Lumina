@@ -21,9 +21,8 @@ public static class UpdateBookCoverCommandMapping
     /// <param name="existingCover">The existing cover artwork of the book, or <see langword="null"/> when the book has none.</param>
     /// <param name="bookId">The Id of the book the cover belongs to.</param>
     /// <param name="storedCoverPath">The relative path of the stored cover image.</param>
-    /// <param name="userId">The Id of the user that stored the cover image.</param>
     /// <returns>The cover artwork of the book, carrying the stored cover image.</returns>
-    public static BookArtworkEntity ToRepositoryEntity(this UpdateBookCoverCommand command, BookArtworkEntity? existingCover, Guid bookId, string storedCoverPath, Guid userId)
+    public static BookArtworkEntity ToRepositoryEntity(this UpdateBookCoverCommand command, BookArtworkEntity? existingCover, Guid bookId, string storedCoverPath)
     {
         if (existingCover is null)
         {
@@ -34,18 +33,13 @@ public static class UpdateBookCoverCommandMapping
                 ArtworkType = ArtworkType.Cover,
                 Ordinal = 0,
                 FileName = storedCoverPath,
-                Status = ArtworkStatus.Enriched,
-                CreatedOnUtc = DateTime.UtcNow,
-                CreatedBy = userId,
-                UpdatedBy = null
+                Status = ArtworkStatus.Enriched
             };
         }
 
         existingCover.FileName = storedCoverPath;
         existingCover.Status = ArtworkStatus.Enriched;
         existingCover.LastUpdateUtc = DateTime.UtcNow;
-        existingCover.UpdatedOnUtc = DateTime.UtcNow;
-        existingCover.UpdatedBy = userId;
         return existingCover;
     }
 }

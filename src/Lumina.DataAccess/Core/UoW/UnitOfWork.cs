@@ -468,6 +468,35 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Success>> SaveChangesAsync(CancellationToken cancellationToken)
     {
+        return await SaveChangesCoreAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Saves the changes made during the one-time application initialization, whose audit values are provided explicitly by the bootstrap code instead of
+    /// being stamped by the auditing interceptor.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Success>> SaveChangesAsInitializationAsync(CancellationToken cancellationToken)
+    {
+        _luminaDbContext.IsInitializationSave = true;
+        try
+        {
+            return await SaveChangesCoreAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _luminaDbContext.IsInitializationSave = false;
+        }
+    }
+
+    /// <summary>
+    /// Saves the changes made to the database, reporting expected persistence conflicts as failure results.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    private async Task<Result<Success>> SaveChangesCoreAsync(CancellationToken cancellationToken)
+    {
         try
         {
             await _luminaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

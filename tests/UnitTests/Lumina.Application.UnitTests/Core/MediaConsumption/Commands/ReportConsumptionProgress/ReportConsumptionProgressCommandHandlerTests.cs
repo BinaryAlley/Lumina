@@ -529,7 +529,6 @@ public class ReportConsumptionProgressCommandHandlerTests
         await _mockMediaResumePointRepository.Received(1).UpsertForUserAsync(
             Arg.Is<MediaResumePointEntity>(resumePoint =>
                 resumePoint.Id == existingResumePoint.Id &&
-                resumePoint.CreatedOnUtc == existingResumePoint.CreatedOnUtc &&
                 resumePoint.LastPositionTimeOffsetMilliseconds == 600_000 &&
                 resumePoint.LastProgressFraction == 0.4),
             _userId,

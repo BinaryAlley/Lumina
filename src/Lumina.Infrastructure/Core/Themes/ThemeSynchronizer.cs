@@ -84,8 +84,6 @@ internal static class ThemeSynchronizer
                     if (!string.Equals(existingTheme.Version, manifestResult.Value.Version, StringComparison.Ordinal))
                     {
                         existingTheme.Version = manifestResult.Value.Version;
-                        existingTheme.UpdatedOnUtc = DateTime.UtcNow;
-                        existingTheme.UpdatedBy = default;
                         Result<Updated> updateResult = await unitOfWork.ThemeRepository.UpdateAsync(existingTheme, cancellationToken).ConfigureAwait(false);
                         if (updateResult.IsFailure)
                             logger.LogWarning("Failed to update the version of theme '{ThemeId}': {Error}", existingTheme.ThemeId, updateResult.FirstError.Description);
@@ -103,10 +101,7 @@ internal static class ThemeSynchronizer
                     Version = manifestResult.Value.Version,
                     PreviewPath = manifestResult.Value.Preview,
                     InstallSource = ThemeInstallSource.Bundled,
-                    InstalledAtUtc = DateTime.UtcNow,
-                    CreatedOnUtc = DateTime.UtcNow,
-                    CreatedBy = default,
-                    UpdatedBy = default
+                    InstalledAtUtc = DateTime.UtcNow
                 };
 
                 Result<Created> insertResult = await unitOfWork.ThemeRepository.InsertAsync(themeEntity, cancellationToken).ConfigureAwait(false);
@@ -174,8 +169,6 @@ internal static class ThemeSynchronizer
                     // A bundled theme whose files could not be recovered is soft deleted, so it is not shown anymore, but can be restored later.
                     brokenTheme.IsDeleted = true;
                     brokenTheme.IsCurrent = null;
-                    brokenTheme.UpdatedOnUtc = DateTime.UtcNow;
-                    brokenTheme.UpdatedBy = default;
                     Result<Updated> updateResult = await unitOfWork.ThemeRepository.UpdateAsync(brokenTheme, cancellationToken).ConfigureAwait(false);
                     if (updateResult.IsFailure)
                         logger.LogWarning("Failed to delete theme '{ThemeId}': {Error}", brokenTheme.ThemeId, updateResult.FirstError.Description);
@@ -227,8 +220,6 @@ internal static class ThemeSynchronizer
             return;
 
         defaultTheme.IsCurrent = true;
-        defaultTheme.UpdatedOnUtc = DateTime.UtcNow;
-        defaultTheme.UpdatedBy = default;
         Result<Updated> updateResult = await unitOfWork.ThemeRepository.UpdateAsync(defaultTheme, cancellationToken).ConfigureAwait(false);
         if (updateResult.IsFailure)
             logger.LogWarning("Failed to activate theme '{ThemeId}': {Error}", defaultTheme.ThemeId, updateResult.FirstError.Description);

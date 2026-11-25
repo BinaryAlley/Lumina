@@ -261,10 +261,7 @@ internal sealed class MusicMediaLibraryScanItemMaterializer : IMediaLibraryScanI
             LibraryId = libraryId,
             Name = name,
             MusicBrainzArtistId = musicBrainzArtistId,
-            MetadataStatus = MetadataStatus.Pending,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.Empty,
-            UpdatedBy = null
+            MetadataStatus = MetadataStatus.Pending
         };
     }
 
@@ -293,10 +290,7 @@ internal sealed class MusicMediaLibraryScanItemMaterializer : IMediaLibraryScanI
             MusicBrainzReleaseArtistId = musicBrainzReleaseArtistId,
             ReleaseTypes = firstStagedItem.ReleaseType is null ? [] : [new AlbumReleaseTypeEntity(firstStagedItem.ReleaseType.Value)],
             OriginalReleaseYear = firstStagedItem.ReleaseYear,
-            MetadataStatus = MetadataStatus.Pending,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.Empty,
-            UpdatedBy = null
+            MetadataStatus = MetadataStatus.Pending
         };
     }
 
@@ -335,10 +329,7 @@ internal sealed class MusicMediaLibraryScanItemMaterializer : IMediaLibraryScanI
             MusicBrainzTrackId = stagedItem.MusicBrainzTrackId,
             MusicBrainzWorkId = stagedItem.MusicBrainzWorkId,
             WorkTitle = stagedItem.WorkTitle,
-            MetadataStatus = MetadataStatus.Pending,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.Empty,
-            UpdatedBy = null
+            MetadataStatus = MetadataStatus.Pending
         };
     }
 }

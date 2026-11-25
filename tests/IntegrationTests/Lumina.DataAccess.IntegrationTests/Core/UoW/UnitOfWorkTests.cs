@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.Favorites;
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
@@ -368,6 +369,95 @@ public class UnitOfWorkTests
                 Assert.Equal(userId, storedFavorite.CreatedBy);
                 Assert.Null(storedFavorite.UpdatedOnUtc);
                 Assert.Null(storedFavorite.UpdatedBy);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task SaveChangesAsInitializationAsync_WhenExplicitAuditValuesAreProvided_ShouldPreserveThemThroughTheAuditInterceptor()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        DateTime currentUtcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        DateTime initializationUtcNow = new(2025, 1, 2, 12, 0, 0, DateTimeKind.Utc);
+        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateAuditedSqliteContext(userId, currentUtcNow);
+        using (anchorConnection)
+        {
+            using (dbContext)
+            {
+                UnitOfWork sut = new(dbContext, Substitute.For<IDateTimeProvider>());
+                RoleEntity role = _roleEntityFixture.Create(roleName: "Admin");
+                role.CreatedOnUtc = initializationUtcNow;
+                role.CreatedBy = AuditIdentities.s_systemUserId;
+                role.UpdatedOnUtc = null;
+                role.UpdatedBy = null;
+                dbContext.Roles.Add(role);
+
+                // Act
+                Result<Success> result = await sut.SaveChangesAsInitializationAsync(CancellationToken.None);
+
+                // Assert
+                Assert.False(result.IsFailure);
+                dbContext.ChangeTracker.Clear();
+                RoleEntity storedRole = await dbContext.Roles.AsNoTracking().SingleAsync(candidate => candidate.Id == role.Id);
+                Assert.Equal(initializationUtcNow, storedRole.CreatedOnUtc);
+                Assert.Equal(AuditIdentities.s_systemUserId, storedRole.CreatedBy);
+                Assert.Null(storedRole.UpdatedOnUtc);
+                Assert.Null(storedRole.UpdatedBy);
+                Assert.False(dbContext.IsInitializationSave);
+
+                RoleEntity normalRole = _roleEntityFixture.Create(roleName: "NormalRole");
+                dbContext.Roles.Add(normalRole);
+                Result<Success> normalSaveResult = await sut.SaveChangesAsync(CancellationToken.None);
+                Assert.False(normalSaveResult.IsFailure);
+
+                dbContext.ChangeTracker.Clear();
+                RoleEntity storedNormalRole = await dbContext.Roles.AsNoTracking().SingleAsync(candidate => candidate.Id == normalRole.Id);
+                Assert.Equal(currentUtcNow, storedNormalRole.CreatedOnUtc);
+                Assert.Equal(userId, storedNormalRole.CreatedBy);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task SaveChangesAsInitializationAsync_WhenSaveFails_ShouldResetTheFlagAndStampTheNextNormalSave()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        DateTime currentUtcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
+        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateAuditedSqliteContext(userId, currentUtcNow);
+        using (anchorConnection)
+        {
+            using (dbContext)
+            {
+                UnitOfWork sut = new(dbContext, Substitute.For<IDateTimeProvider>());
+                Guid libraryId = Guid.NewGuid();
+                BookEntity firstBook = _bookEntityFixture.Create();
+                firstBook.LibraryId = libraryId;
+                firstBook.Path = "/books/duplicate.epub";
+                BookEntity secondBook = _bookEntityFixture.Create();
+                secondBook.LibraryId = libraryId;
+                secondBook.Path = "/books/duplicate.epub";
+                dbContext.Books.AddRange(firstBook, secondBook);
+
+                // Act
+                Result<Success> result = await sut.SaveChangesAsInitializationAsync(CancellationToken.None);
+
+                // Assert
+                Assert.True(result.IsFailure);
+                Assert.Equal(ApplicationErrors.Persistence.UniqueConstraintViolation, result.FirstError);
+                Assert.False(dbContext.IsInitializationSave);
+
+                dbContext.ChangeTracker.Clear();
+                RoleEntity role = _roleEntityFixture.Create(roleName: "NormalRole");
+                dbContext.Roles.Add(role);
+                Result<Success> normalSaveResult = await sut.SaveChangesAsync(CancellationToken.None);
+                Assert.False(normalSaveResult.IsFailure);
+
+                dbContext.ChangeTracker.Clear();
+                RoleEntity storedRole = await dbContext.Roles.AsNoTracking().SingleAsync(candidate => candidate.Id == role.Id);
+                Assert.Equal(currentUtcNow, storedRole.CreatedOnUtc);
+                Assert.Equal(userId, storedRole.CreatedBy);
             }
         }
     }

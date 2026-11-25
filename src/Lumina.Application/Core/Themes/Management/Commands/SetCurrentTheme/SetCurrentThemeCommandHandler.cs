@@ -96,8 +96,6 @@ public class SetCurrentThemeCommandHandler : ICommandHandler<SetCurrentThemeComm
 
         // Activate the requested theme and persist its update.
         theme.IsCurrent = true;
-        theme.UpdatedOnUtc = DateTime.UtcNow;
-        theme.UpdatedBy = userId;
         await _unitOfWork.ThemeRepository.UpdateAsync(theme, cancellationToken).ConfigureAwait(false);
 
         Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

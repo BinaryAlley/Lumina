@@ -46,12 +46,12 @@ public class MediaContributorEntity : IStorageEntity, IAuditableEntity
     /// <summary>
     /// Gets or sets the time and date when the entity was added.
     /// </summary>
-    public required DateTime CreatedOnUtc { get; set; }
+    public DateTime CreatedOnUtc { get; set; }
 
     /// <summary>
     /// Gets or sets the Id of the user that created the entity.
     /// </summary>
-    public required Guid CreatedBy { get; set; }
+    public Guid CreatedBy { get; set; }
 
     /// <summary>
     /// Gets or sets the optional time and date when the entity was updated.
@@ -61,5 +61,5 @@ public class MediaContributorEntity : IStorageEntity, IAuditableEntity
     /// <summary>
     /// Gets or sets the optional Id of the user that updated the entity.
     /// </summary>
-    public required Guid? UpdatedBy { get; set; }
+    public Guid? UpdatedBy { get; set; }
 }

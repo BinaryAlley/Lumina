@@ -5,7 +5,6 @@ using Lumina.Application.Common.DataAccess.UoW;
 using Lumina.Application.Common.Errors;
 using Lumina.Application.Common.Infrastructure.Authentication;
 using Lumina.Application.Common.Infrastructure.Security;
-using Lumina.Application.Common.Infrastructure.Time;
 using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
 using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
@@ -33,7 +32,6 @@ public class RegisterUserCommandHandlerTests
     private readonly ITotpTokenGenerator _mockTotpTokenGenerator;
     private readonly IQRCodeGenerator _mockQRCodeGenerator;
     private readonly IUserRepository _mockUserRepository;
-    private readonly IDateTimeProvider _mockDateTimeProvider;
     private readonly RegisterUserCommandHandler _sut;
     private readonly RegisterUserCommandFixture _registerUserCommandFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
@@ -50,10 +48,8 @@ public class RegisterUserCommandHandlerTests
         _mockTotpTokenGenerator = Substitute.For<ITotpTokenGenerator>();
         _mockQRCodeGenerator = Substitute.For<IQRCodeGenerator>();
         _mockUserRepository = Substitute.For<IUserRepository>();
-        _mockDateTimeProvider = Substitute.For<IDateTimeProvider>();
 
         _mockUnitOfWork.UserRepository.Returns(_mockUserRepository);
-        _mockDateTimeProvider.UtcNow.Returns(DateTime.UtcNow);
 
         IValidator<RegisterUserCommand> mockValidator = Substitute.For<IValidator<RegisterUserCommand>>();
         mockValidator.Validate(Arg.Any<RegisterUserCommand>())
@@ -64,7 +60,6 @@ public class RegisterUserCommandHandlerTests
             _mockCryptographyService,
             _mockTotpTokenGenerator,
             _mockQRCodeGenerator,
-            _mockDateTimeProvider,
             mockValidator);
     }
 

@@ -191,11 +191,7 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
                 Status = ScheduledJobStatus.Active,
                 OwnerUserId = ownerUserId,
                 LastStartedOnUtc = null,
-                LastCompletedOnUtc = null,
-                CreatedOnUtc = DateTime.UtcNow,
-                CreatedBy = ownerUserId,
-                UpdatedOnUtc = null,
-                UpdatedBy = null
+                LastCompletedOnUtc = null
             };
             Result<Created> insertScheduledJobResult = await unitOfWork.ScheduledJobRepository.InsertAsync(technicalDataCleanupJob, cancellationToken).ConfigureAwait(false);
             if (insertScheduledJobResult.IsFailure)

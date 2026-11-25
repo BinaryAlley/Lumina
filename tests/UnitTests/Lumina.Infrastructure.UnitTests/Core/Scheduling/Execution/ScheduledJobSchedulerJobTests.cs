@@ -461,8 +461,7 @@ public class ScheduledJobSchedulerJobTests
                 scheduledJob.TaskType == ScheduledTaskType.TechnicalDataCleanup &&
                 scheduledJob.ScheduleType == ScheduleType.OnceAtStartup &&
                 scheduledJob.Status == ScheduledJobStatus.Active &&
-                scheduledJob.OwnerUserId == ownerUserId &&
-                scheduledJob.CreatedBy == ownerUserId),
+                scheduledJob.OwnerUserId == ownerUserId),
             Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }

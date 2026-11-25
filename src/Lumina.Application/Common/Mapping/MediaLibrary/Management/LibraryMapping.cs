@@ -1,7 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
-using System;
 using System.Linq;
 #endregion
 
@@ -51,16 +50,8 @@ public static class LibraryMapping
                 UserId = domainEntity.UserId.Value, // Rest of properties will be populated by EF Core.
                 Status = default,
                 User = null!,
-                Library = null!,
-                CreatedBy = default,
-                CreatedOnUtc = default,
-                UpdatedBy = default,
-            })],
-            CreatedOnUtc = domainEntity.CreatedOnUtc,
-            CreatedBy = Guid.Empty,
-            // The audit columns are owned by the auditing interceptor, which stamps only the rows that actually changed, so they are never mapped here.
-            UpdatedOnUtc = null,
-            UpdatedBy = null
+                Library = null!
+            })]
         };
     }
 }

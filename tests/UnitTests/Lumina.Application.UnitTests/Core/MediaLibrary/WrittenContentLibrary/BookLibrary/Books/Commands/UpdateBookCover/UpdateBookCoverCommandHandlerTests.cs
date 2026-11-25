@@ -145,7 +145,6 @@ public class UpdateBookCoverCommandHandlerTests
         Assert.Single(existingBook.Artwork);
         Assert.Equal(result.Value.CoverPath, existingCover.FileName);
         Assert.Equal(ArtworkStatus.Enriched, existingCover.Status);
-        Assert.Equal(_userId, existingCover.UpdatedBy);
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 

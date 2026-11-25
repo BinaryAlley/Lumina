@@ -71,11 +71,7 @@ public class UpdateSchedulerDisplayPreferencesCommandHandler : ICommandHandler<U
             UserId = userId,
             JobTypeFilter = command.JobTypeFilter,
             DisplayTimeSpan = command.DisplayTimeSpan,
-            DisplayTimeUnit = command.DisplayTimeUnit,
-            CreatedOnUtc = default,
-            CreatedBy = default,
-            UpdatedOnUtc = null,
-            UpdatedBy = null
+            DisplayTimeUnit = command.DisplayTimeUnit
         };
         Result<Updated> upsertResult = await _unitOfWork.SchedulerDisplayPreferencesRepository.UpsertAsync(displayPreferences, cancellationToken).ConfigureAwait(false);
         if (upsertResult.IsFailure)

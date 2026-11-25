@@ -1,5 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Common.DataAccess.Entities.Authorization;
+using Lumina.Application.Common.DataAccess.Entities.Common;
 using Lumina.Application.Common.DataAccess.Entities.Scheduling;
 using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
 using Lumina.Application.Common.DataAccess.Seed;
@@ -41,18 +42,17 @@ public class DataSeedService : IDataSeedService
     /// <summary>
     /// Sets up default authorization permissions in the system.
     /// </summary>
-    /// <param name="adminId">The unique identifier of the admin admin user who will own these permissions.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<Result<Created>> SetDefaultAuthorizationPermissionsAsync(Guid adminId, CancellationToken cancellationToken)
+    public async Task<Result<Created>> SetDefaultAuthorizationPermissionsAsync(CancellationToken cancellationToken)
     {
         // Create the default authorization permissions and add them to the repository.
         PermissionEntity[] defaultPermissions =
         [
-            new() { PermissionName = AuthorizationPermission.CanViewUsers, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow },
-            new() { PermissionName = AuthorizationPermission.CanDeleteUsers, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow },
-            new() { PermissionName = AuthorizationPermission.CanRegisterUsers, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow },
-            new() { PermissionName = AuthorizationPermission.CanCreateLibraries, CreatedBy = adminId, CreatedOnUtc = _dateTimeProvider.UtcNow }
+            new() { PermissionName = AuthorizationPermission.CanViewUsers, CreatedOnUtc = _dateTimeProvider.UtcNow, CreatedBy = AuditIdentities.s_systemUserId },
+            new() { PermissionName = AuthorizationPermission.CanDeleteUsers, CreatedOnUtc = _dateTimeProvider.UtcNow, CreatedBy = AuditIdentities.s_systemUserId },
+            new() { PermissionName = AuthorizationPermission.CanRegisterUsers, CreatedOnUtc = _dateTimeProvider.UtcNow, CreatedBy = AuditIdentities.s_systemUserId },
+            new() { PermissionName = AuthorizationPermission.CanCreateLibraries, CreatedOnUtc = _dateTimeProvider.UtcNow, CreatedBy = AuditIdentities.s_systemUserId }
         ];
         foreach (PermissionEntity permission in defaultPermissions)
         {
@@ -60,7 +60,7 @@ public class DataSeedService : IDataSeedService
             if (insertPermissionResult.IsFailure)
                 return insertPermissionResult.Errors;
         }
-        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsInitializationAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)
             return saveChangesResult.Errors;
         return Result.Created;
@@ -69,15 +69,14 @@ public class DataSeedService : IDataSeedService
     /// <summary>
     /// Sets up default authorization roles in the system.
     /// </summary>
-    /// <param name="userId">The unique identifier of the admin user for whom roles will be set.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<Result<Created>> SetDefaultAuthorizationRolesAsync(Guid userId, CancellationToken cancellationToken)
+    public async Task<Result<Created>> SetDefaultAuthorizationRolesAsync(CancellationToken cancellationToken)
     {
         // Create the default authorization roles and add them to the repository.
         RoleEntity[] defaultRoles =
         [
-            new() { RoleName = AuthorizationRoles.ADMIN, CreatedBy = userId, CreatedOnUtc = _dateTimeProvider.UtcNow }
+            new() { RoleName = AuthorizationRoles.ADMIN, CreatedOnUtc = _dateTimeProvider.UtcNow, CreatedBy = AuditIdentities.s_systemUserId }
         ];
         foreach (RoleEntity role in defaultRoles)
         {
@@ -85,7 +84,7 @@ public class DataSeedService : IDataSeedService
             if (insertRoleResult.IsFailure)
                 return insertRoleResult.Errors;
         }
-        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsInitializationAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)
             return saveChangesResult.Errors;
         return Result.Created;
@@ -94,10 +93,9 @@ public class DataSeedService : IDataSeedService
     /// <summary>
     /// Assigns admin role permissions to the admin user.
     /// </summary>
-    /// <param name="userId">The unique identifier of the admin user to receive admin role permissions.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    public async Task<Result<Created>> SetAdminRolePermissionsAsync(Guid userId, CancellationToken cancellationToken)
+    public async Task<Result<Created>> SetAdminRolePermissionsAsync(CancellationToken cancellationToken)
     {
         // Get the admin role.
         Result<RoleEntity?> getAdminRoleResult = await _unitOfWork.RoleRepository.GetByNameAsync(AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false);
@@ -121,14 +119,14 @@ public class DataSeedService : IDataSeedService
                 PermissionId = permission.Id,
                 Role = getAdminRoleResult.Value,
                 RoleId = getAdminRoleResult.Value.Id,
-                CreatedBy = userId,
-                CreatedOnUtc = _dateTimeProvider.UtcNow
+                CreatedOnUtc = _dateTimeProvider.UtcNow,
+                CreatedBy = AuditIdentities.s_systemUserId
             };
             Result<Created> insertRolePermissionResult = await _unitOfWork.RolePermissionRepository.InsertAsync(rolePermissionEntity, cancellationToken).ConfigureAwait(false);
             if (insertRolePermissionResult.IsFailure)
                 return insertRolePermissionResult.Errors;
         }
-        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsInitializationAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)
             return saveChangesResult.Errors;
         return Result.Created;
@@ -161,18 +159,18 @@ public class DataSeedService : IDataSeedService
         // Add the admin role to the admin user.
         UserRoleEntity userRole = new()
         {
-            CreatedBy = userId,
-            CreatedOnUtc = _dateTimeProvider.UtcNow,
             Role = getAdminRoleResult.Value,
             RoleId = getAdminRoleResult.Value.Id,
             User = getUserResult.Value,
-            UserId = getUserResult.Value.Id
+            UserId = getUserResult.Value.Id,
+            CreatedOnUtc = _dateTimeProvider.UtcNow,
+            CreatedBy = AuditIdentities.s_systemUserId
         };
         Result<Created> insertUserRoleResult = await _unitOfWork.UserRoleRepository.InsertAsync(userRole, cancellationToken).ConfigureAwait(false);
         if (insertUserRoleResult.IsFailure)
             return insertUserRoleResult.Errors;
 
-        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsInitializationAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)
             return saveChangesResult.Errors;
         return Result.Created;
@@ -208,7 +206,7 @@ public class DataSeedService : IDataSeedService
             if (insertScheduledJobResult.IsFailure)
                 return insertScheduledJobResult.Errors;
         }
-        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsInitializationAsync(cancellationToken).ConfigureAwait(false);
         if (saveChangesResult.IsFailure)
             return saveChangesResult.Errors;
         return Result.Created;
@@ -241,9 +239,7 @@ public class DataSeedService : IDataSeedService
             LastStartedOnUtc = null,
             LastCompletedOnUtc = null,
             CreatedOnUtc = _dateTimeProvider.UtcNow,
-            CreatedBy = adminUserId,
-            UpdatedOnUtc = null,
-            UpdatedBy = null
+            CreatedBy = AuditIdentities.s_systemUserId
         };
     }
 }

@@ -94,3 +94,11 @@ Ordering is storage owned as well. The unique index on `(PlaylistId, Position)` 
 The playlist row now carries a denormalized `EntryCount`, maintained by the set-based append and removal operations in the same statement that updates the playlist activity time and concurrency token. Window reads, moves and the single-add read-back use that column instead of counting the entries of the playlist, so none of them scan an index proportional to the playlist size.
 
 Details edits still go through `EditableValuesCopier`, but the copier now compares the incoming value with the tracked value before assigning it and marks only an actual change as modified. `PlaylistRepository.UpdateAsync` also compares the tracked original values explicitly before it decides to increment the concurrency token, so a no-op save neither restamps the row nor bumps its version.
+
+## Amendment: Explicit Audit Identity for Application Initialization (2026-11-20)
+
+The one-time application initialization is the only save whose audit identity is provided explicitly instead of being stamped by the auditing interceptor. The setup handler creates the original administrator account before any user exists, and the seed service creates the default permissions, roles, role-permission grants, user-role link and scheduled jobs in the same anonymous flow. Those rows therefore cannot derive an actor from `ICurrentUserService`.
+
+The bootstrap code sets `CreatedBy` to the fixed SYSTEM audit identifier `11111111-1111-1111-1111-111111111111` and sets `CreatedOnUtc` from `IDateTimeProvider`, then saves through `SaveChangesAsInitializationAsync`. That method marks the save on the `LuminaDbContext` for its duration, and the interceptor skips its stamping only for that save. No other save path is affected.
+
+The SYSTEM identity is never inferred from a missing authenticated user. Ordinary anonymous creation and modification remain unattributed with `Guid.Empty`, and the interceptor is still the sole writer for every ordinary save. The initialization exception exists because the app has no user account to attribute the bootstrap rows to, and it is confined to the setup and seed code paths.

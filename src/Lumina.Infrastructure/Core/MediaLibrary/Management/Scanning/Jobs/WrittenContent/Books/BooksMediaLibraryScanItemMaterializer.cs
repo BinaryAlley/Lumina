@@ -176,10 +176,7 @@ internal sealed class BooksMediaLibraryScanItemMaterializer : IMediaLibraryScanI
             Path = path,
             Title = title,
             VolumeNumber = volumeNumber,
-            MetadataStatus = MetadataStatus.Pending,
-            CreatedOnUtc = DateTime.UtcNow,
-            CreatedBy = Guid.Empty,
-            UpdatedBy = null
+            MetadataStatus = MetadataStatus.Pending
         };
     }
 

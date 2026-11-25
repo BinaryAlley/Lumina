@@ -202,9 +202,7 @@ public class InstallThemeCommandHandlerTests
                 theme.Version == manifest.Version &&
                 theme.PreviewPath == manifest.Preview &&
                 theme.InstallSource == ThemeInstallSource.Uploaded &&
-                theme.IsDeleted == false &&
-                theme.CreatedBy == _userId &&
-                theme.UpdatedBy == _userId),
+                theme.IsDeleted == false),
             Arg.Any<CancellationToken>());
         await _mockThemeRepository.DidNotReceive().UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
@@ -268,10 +266,7 @@ public class InstallThemeCommandHandlerTests
                 theme.Name == manifest.Name &&
                 theme.InstallSource == existingTheme.InstallSource &&
                 theme.IsCurrent == existingTheme.IsCurrent &&
-                theme.IsDeleted == false &&
-                theme.CreatedOnUtc == existingTheme.CreatedOnUtc &&
-                theme.CreatedBy == existingTheme.CreatedBy &&
-                theme.UpdatedBy == _userId),
+                theme.IsDeleted == false),
             Arg.Any<CancellationToken>());
         await _mockThemeRepository.DidNotReceive().InsertAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());

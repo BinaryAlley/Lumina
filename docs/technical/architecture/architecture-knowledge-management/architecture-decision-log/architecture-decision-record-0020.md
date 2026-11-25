@@ -84,3 +84,7 @@ Construct the version 7 timestamp and random fields inside the bulk SQL statemen
 Migrate every stored primary key and foreign key to a version 7 value.
 
 **Rejected**: rewriting primary keys means rewriting every foreign key that references them, with a high risk of corruption and downtime, for no benefit to existing rows.
+
+## Amendment: Relocation of the SYSTEM Audit Identity (2026-11-25)
+
+The fixed SYSTEM audit identifier is no longer declared inline in `UpdateAuditableEntitiesInterceptor`. It is declared as the static readonly field `AuditIdentities.s_systemUserId` in `Lumina.Application/Common/DataAccess/Entities/Common/AuditIdentities.cs`. The identifier value and its behavior are unchanged.

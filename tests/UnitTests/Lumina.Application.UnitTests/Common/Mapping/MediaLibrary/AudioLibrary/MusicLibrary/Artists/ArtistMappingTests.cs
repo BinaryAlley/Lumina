@@ -43,7 +43,7 @@ public class ArtistMappingTests
         Assert.Equal(artist.Name, result.Name);
         Assert.Equal(artist.Website.Value, result.Website);
         Assert.Equal(artist.MusicBrainzArtistId.Value.Value, result.MusicBrainzArtistId);
-        Assert.Equal(artist.CreatedOnUtc, result.CreatedOnUtc);
+        Assert.Equal(default, result.CreatedOnUtc);
         Assert.Equal(Guid.Empty, result.CreatedBy);
         Assert.Null(result.UpdatedOnUtc);
         Assert.Null(result.UpdatedBy);
@@ -67,7 +67,7 @@ public class ArtistMappingTests
             Assert.Equal(contributor.ContributorId.Value, contributorEntity.MediaContributorId);
             Assert.Equal(contributor.Role, contributorEntity.Role);
             Assert.Equal(artist.Id.Value, contributorEntity.ArtistId);
-            Assert.Equal(artist.CreatedOnUtc, contributorEntity.CreatedOnUtc);
+            Assert.Equal(default, contributorEntity.CreatedOnUtc);
             Assert.Equal(Guid.Empty, contributorEntity.CreatedBy);
             Assert.Null(contributorEntity.UpdatedBy);
         }
