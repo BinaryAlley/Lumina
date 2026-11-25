@@ -2,11 +2,11 @@
 using Lumina.Application.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
 using Lumina.Application.Fixtures.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using Lumina.Domain.SharedKernel.Common.Enums.Playback;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
@@ -33,7 +33,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.ItemsPerPageMustBeGreaterThanZero);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.ItemsPerPageMustBeGreaterThanZero);
     }
 
     [Theory]
@@ -49,7 +49,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.UserSettings.ItemsPerPageMustBeGreaterThanZero);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.ItemsPerPageMustBeGreaterThanZero);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterOrientationCannotBeNull);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterOrientationCannotBeNull);
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterSegmentCountCannotBeNull);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterSegmentCountCannotBeNull);
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterSegmentGapCannotBeNull);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterSegmentGapCannotBeNull);
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterMediumThresholdCannotBeNull);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterMediumThresholdCannotBeNull);
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterHighThresholdCannotBeNull);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterHighThresholdCannotBeNull);
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterShowPeakCannotBeNull);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterShowPeakCannotBeNull);
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterPeakHoldDurationCannotBeNull);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterPeakHoldDurationCannotBeNull);
     }
 
     [Fact]
@@ -153,7 +153,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterReleasePerSecondCannotBeNull);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterReleasePerSecondCannotBeNull);
     }
 
     [Fact]
@@ -166,7 +166,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterPeakReleasePerSecondCannotBeNull);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterPeakReleasePerSecondCannotBeNull);
     }
 
     [Theory]
@@ -182,7 +182,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.InvalidVuMeterOrientation);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.InvalidVuMeterOrientation);
     }
 
     [Theory]
@@ -197,7 +197,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.UserSettings.InvalidVuMeterOrientation);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.InvalidVuMeterOrientation);
     }
 
     [Theory]
@@ -214,7 +214,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterSegmentCountMustBeBetweenOneAndOneHundredTwentyEight);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterSegmentCountMustBeBetweenOneAndOneHundredTwentyEight);
     }
 
     [Theory]
@@ -230,7 +230,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.UserSettings.VuMeterSegmentCountMustBeBetweenOneAndOneHundredTwentyEight);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.VuMeterSegmentCountMustBeBetweenOneAndOneHundredTwentyEight);
     }
 
     [Theory]
@@ -246,7 +246,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterSegmentGapMustBeBetweenZeroAndThirtyTwo);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterSegmentGapMustBeBetweenZeroAndThirtyTwo);
     }
 
     [Theory]
@@ -262,7 +262,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.UserSettings.VuMeterSegmentGapMustBeBetweenZeroAndThirtyTwo);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.VuMeterSegmentGapMustBeBetweenZeroAndThirtyTwo);
     }
 
     [Theory]
@@ -280,7 +280,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterMediumThresholdMustBeBetweenZeroAndOne);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterMediumThresholdMustBeBetweenZeroAndOne);
     }
 
     [Theory]
@@ -298,7 +298,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.UserSettings.VuMeterMediumThresholdMustBeBetweenZeroAndOne);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.VuMeterMediumThresholdMustBeBetweenZeroAndOne);
     }
 
     [Theory]
@@ -316,7 +316,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterHighThresholdMustBeBetweenZeroAndOne);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterHighThresholdMustBeBetweenZeroAndOne);
     }
 
     [Fact]
@@ -331,7 +331,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.UserSettings.VuMeterHighThresholdMustBeBetweenZeroAndOne);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.VuMeterHighThresholdMustBeBetweenZeroAndOne);
     }
 
     [Fact]
@@ -346,7 +346,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.UserSettings.VuMeterHighThresholdMustBeBetweenZeroAndOne);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.VuMeterHighThresholdMustBeBetweenZeroAndOne);
     }
 
     [Fact]
@@ -361,7 +361,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterHighThresholdMustBeGreaterThanOrEqualToMediumThreshold);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterHighThresholdMustBeGreaterThanOrEqualToMediumThreshold);
     }
 
     [Theory]
@@ -380,7 +380,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.UserSettings.VuMeterHighThresholdMustBeGreaterThanOrEqualToMediumThreshold);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.VuMeterHighThresholdMustBeGreaterThanOrEqualToMediumThreshold);
     }
 
     [Theory]
@@ -395,7 +395,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.UserSettings.VuMeterShowPeakCannotBeNull);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.VuMeterShowPeakCannotBeNull);
     }
 
     [Theory]
@@ -412,7 +412,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterPeakHoldDurationMustBeBetweenZeroAndTenThousandMilliseconds);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterPeakHoldDurationMustBeBetweenZeroAndTenThousandMilliseconds);
     }
 
     [Theory]
@@ -429,7 +429,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.UserSettings.VuMeterPeakHoldDurationMustBeBetweenZeroAndTenThousandMilliseconds);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.VuMeterPeakHoldDurationMustBeBetweenZeroAndTenThousandMilliseconds);
     }
 
     [Theory]
@@ -446,7 +446,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterReleasePerSecondMustBeBetweenZeroAndOneHundred);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterReleasePerSecondMustBeBetweenZeroAndOneHundred);
     }
 
     [Theory]
@@ -463,7 +463,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.UserSettings.VuMeterReleasePerSecondMustBeBetweenZeroAndOneHundred);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.VuMeterReleasePerSecondMustBeBetweenZeroAndOneHundred);
     }
 
     [Theory]
@@ -480,7 +480,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VuMeterPeakReleasePerSecondMustBeBetweenZeroAndOneHundred);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VuMeterPeakReleasePerSecondMustBeBetweenZeroAndOneHundred);
     }
 
     [Theory]
@@ -497,7 +497,7 @@ public class UpdateUserSettingsCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.UserSettings.VuMeterPeakReleasePerSecondMustBeBetweenZeroAndOneHundred);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.VuMeterPeakReleasePerSecondMustBeBetweenZeroAndOneHundred);
     }
 
     [Fact]

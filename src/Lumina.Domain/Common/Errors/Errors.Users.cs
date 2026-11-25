@@ -23,10 +23,5 @@ public static partial class Errors
         /// Gets the error that reports that the requested user does not exist.
         /// </summary>
         public static Error UserDoesNotExist => Error.NotFound(description: nameof(UserDoesNotExist));
-
-        /// <summary>
-        /// Gets the error that reports that the user identifier cannot be empty.
-        /// </summary>
-        public static Error UserIdCannotBeEmpty => Error.Validation(description: nameof(UserIdCannotBeEmpty));
     }
 }

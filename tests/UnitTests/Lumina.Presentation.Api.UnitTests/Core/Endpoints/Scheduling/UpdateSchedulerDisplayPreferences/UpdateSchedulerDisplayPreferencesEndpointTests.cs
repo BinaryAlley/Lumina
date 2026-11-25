@@ -13,7 +13,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Scheduling.UpdateSchedulerDisplayPreferences;
@@ -60,7 +59,7 @@ public class UpdateSchedulerDisplayPreferencesEndpointTests
         // Arrange
         UpdateSchedulerDisplayPreferencesRequest request = _updateSchedulerDisplayPreferencesRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        Error expectedError = DomainErrors.Scheduling.SchedulerDisplayTimeSpanMustBePositive;
+        Error expectedError = ApplicationErrors.Scheduling.SchedulerDisplayTimeSpanMustBePositive;
         _mockHandler.HandleAsync(Arg.Any<UpdateSchedulerDisplayPreferencesCommand>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 

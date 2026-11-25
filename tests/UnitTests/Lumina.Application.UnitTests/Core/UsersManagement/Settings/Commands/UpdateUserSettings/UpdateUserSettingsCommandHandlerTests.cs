@@ -14,7 +14,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
@@ -137,14 +136,14 @@ public class UpdateUserSettingsCommandHandlerTests
         // Arrange
         UpdateUserSettingsCommand command = _updateUserSettingsCommandFixture.Create();
         _mockValidator.Validate(Arg.Any<UpdateUserSettingsCommand>())
-            .Returns([DomainErrors.UserSettings.ItemsPerPageMustBeGreaterThanZero]);
+            .Returns([ApplicationErrors.UserSettings.ItemsPerPageMustBeGreaterThanZero]);
 
         // Act
         Result<Updated> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(DomainErrors.UserSettings.ItemsPerPageMustBeGreaterThanZero, result.FirstError);
+        Assert.Equal(ApplicationErrors.UserSettings.ItemsPerPageMustBeGreaterThanZero, result.FirstError);
         await _mockUserSettingsRepository.DidNotReceive().GetByUserIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUserSettingsRepository.DidNotReceive().InsertAsync(Arg.Any<UserSettingsEntity>(), Arg.Any<CancellationToken>());
         await _mockUserSettingsRepository.DidNotReceive().UpdateAsync(Arg.Any<UserSettingsEntity>(), Arg.Any<CancellationToken>());

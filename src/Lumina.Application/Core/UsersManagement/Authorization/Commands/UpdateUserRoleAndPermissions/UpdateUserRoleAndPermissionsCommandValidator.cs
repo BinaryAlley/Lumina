@@ -3,7 +3,6 @@ using Lumina.Application.Common.Infrastructure.Validation;
 using Lumina.Application.Common.Utilities;
 using System;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
@@ -20,9 +19,9 @@ public class UpdateUserRoleAndPermissionsCommandValidator : AbstractValidator<Up
     {
         RuleFor(command => command.UserId)
             .NotEmpty()
-            .WithError(DomainErrors.Users.UserIdCannotBeEmpty)
+            .WithError(ApplicationErrors.Users.UserIdCannotBeEmpty)
             .Must(id => id != Guid.Empty)
-            .WithError(DomainErrors.Users.UserIdCannotBeEmpty);
+            .WithError(ApplicationErrors.Users.UserIdCannotBeEmpty);
 
         // Validate each permission Id when the list is provided.
         RuleForEach(command => command.Permissions)

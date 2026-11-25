@@ -14,7 +14,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
@@ -60,14 +59,14 @@ public class UpdatePlaybackStateCommandHandlerTests
         // Arrange
         UpdatePlaybackStateCommand command = _updatePlaybackStateCommandFixture.Create();
         _mockValidator.Validate(Arg.Any<UpdatePlaybackStateCommand>())
-            .Returns([DomainErrors.UserSettings.VolumeMustBeBetweenZeroAndOne]);
+            .Returns([ApplicationErrors.UserSettings.VolumeMustBeBetweenZeroAndOne]);
 
         // Act
         Result<Updated> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(DomainErrors.UserSettings.VolumeMustBeBetweenZeroAndOne, result.FirstError);
+        Assert.Equal(ApplicationErrors.UserSettings.VolumeMustBeBetweenZeroAndOne, result.FirstError);
         await _mockUserSettingsRepository.DidNotReceive().GetByUserIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
         await _mockUserSettingsRepository.DidNotReceive().InsertAsync(Arg.Any<UserSettingsEntity>(), Arg.Any<CancellationToken>());
         await _mockUserSettingsRepository.DidNotReceive().UpdateAsync(Arg.Any<UserSettingsEntity>(), Arg.Any<CancellationToken>());

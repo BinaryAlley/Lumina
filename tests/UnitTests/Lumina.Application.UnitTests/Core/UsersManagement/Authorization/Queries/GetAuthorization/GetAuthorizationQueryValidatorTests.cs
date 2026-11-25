@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
 using Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetAuthorization;
+using Lumina.Application.Common.Errors;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;

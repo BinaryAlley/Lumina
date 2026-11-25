@@ -15,7 +15,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
@@ -89,14 +88,14 @@ public class UpdateSchedulerDisplayPreferencesCommandHandlerTests
         // Arrange
         UpdateSchedulerDisplayPreferencesCommand command = _updateSchedulerDisplayPreferencesCommandFixture.Create(displayTimeSpan: 0);
         _mockValidator.Validate(Arg.Any<UpdateSchedulerDisplayPreferencesCommand>())
-            .Returns([DomainErrors.Scheduling.SchedulerDisplayTimeSpanMustBePositive]);
+            .Returns([ApplicationErrors.Scheduling.SchedulerDisplayTimeSpanMustBePositive]);
 
         // Act
         Result<Updated> result = await _sut.HandleAsync(command, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(DomainErrors.Scheduling.SchedulerDisplayTimeSpanMustBePositive, result.FirstError);
+        Assert.Equal(ApplicationErrors.Scheduling.SchedulerDisplayTimeSpanMustBePositive, result.FirstError);
         await _mockSchedulerDisplayPreferencesRepository.DidNotReceive().UpsertAsync(Arg.Any<SchedulerDisplayPreferencesEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }

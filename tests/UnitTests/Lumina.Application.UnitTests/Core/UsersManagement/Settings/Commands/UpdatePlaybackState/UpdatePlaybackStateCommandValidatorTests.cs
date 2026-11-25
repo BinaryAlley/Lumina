@@ -2,10 +2,10 @@
 using Lumina.Application.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
 using Lumina.Application.Fixtures.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
 using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
 using Lumina.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
 #endregion
 
 namespace Lumina.Application.UnitTests.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
@@ -29,8 +29,8 @@ public class UpdatePlaybackStateCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VolumeCannotBeNull);
-        result.ShouldNotHaveValidationError(Errors.UserSettings.VolumeMustBeBetweenZeroAndOne);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VolumeCannotBeNull);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.VolumeMustBeBetweenZeroAndOne);
     }
 
     [Theory]
@@ -46,7 +46,7 @@ public class UpdatePlaybackStateCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VolumeMustBeBetweenZeroAndOne);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VolumeMustBeBetweenZeroAndOne);
     }
 
     [Theory]
@@ -62,7 +62,7 @@ public class UpdatePlaybackStateCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.VolumeMustBeBetweenZeroAndOne);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VolumeMustBeBetweenZeroAndOne);
     }
 
     [Theory]
@@ -78,8 +78,8 @@ public class UpdatePlaybackStateCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.UserSettings.VolumeMustBeBetweenZeroAndOne);
-        result.ShouldNotHaveValidationError(Errors.UserSettings.VolumeCannotBeNull);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.VolumeMustBeBetweenZeroAndOne);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.VolumeCannotBeNull);
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public class UpdatePlaybackStateCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldHaveValidationError(Errors.UserSettings.IsMutedCannotBeNull);
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.IsMutedCannotBeNull);
     }
 
     [Theory]
@@ -107,7 +107,7 @@ public class UpdatePlaybackStateCommandValidatorTests
         List<Error> result = _validator.TestValidate(command);
 
         // Assert
-        result.ShouldNotHaveValidationError(Errors.UserSettings.IsMutedCannotBeNull);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.IsMutedCannotBeNull);
     }
 
     [Fact]
