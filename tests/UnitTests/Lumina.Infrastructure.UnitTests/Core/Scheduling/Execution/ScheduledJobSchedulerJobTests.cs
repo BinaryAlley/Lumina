@@ -25,6 +25,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
@@ -49,6 +50,7 @@ public class ScheduledJobSchedulerJobTests
     private readonly IDomainEventPublisher _mockDomainEventPublisher;
     private readonly IScheduledTaskExecutorFactory _mockTaskExecutorFactory;
     private readonly IScheduledTaskExecutor _mockTaskExecutor;
+    private readonly ILogger<ScheduledJobSchedulerJob> _mockLogger;
     private readonly ScheduledJobRuntimeRegistry _runtimeRegistry;
     private readonly ScheduledJobSchedulerJob _sut;
     private readonly Dictionary<Type, object> _services;
@@ -95,8 +97,8 @@ public class ScheduledJobSchedulerJobTests
             .Returns(callInfo => _services.TryGetValue((Type)callInfo[0]!, out object? service) ? service : null);
 
         _runtimeRegistry = new ScheduledJobRuntimeRegistry();
-        ILogger<ScheduledJobSchedulerJob> logger = Substitute.For<ILogger<ScheduledJobSchedulerJob>>();
-        _sut = new ScheduledJobSchedulerJob(_runtimeRegistry, logger, _mockServiceScopeFactory);
+        _mockLogger = Substitute.For<ILogger<ScheduledJobSchedulerJob>>();
+        _sut = new ScheduledJobSchedulerJob(_runtimeRegistry, _mockLogger, _mockServiceScopeFactory);
     }
 
     [Fact]
@@ -555,6 +557,7 @@ public class ScheduledJobSchedulerJobTests
     public async Task ExecuteScheduledJobRunAsync_WhenTheTaskPayloadFails_ShouldLogTheFailureAndStillCompleteTheExecution()
     {
         // Arrange
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         ScheduledJobEntity addedJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Added, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(addedJob.Id);
         _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(addedJob);
@@ -568,12 +571,19 @@ public class ScheduledJobSchedulerJobTests
         // Assert
         await _mockTaskExecutor.Received(1).ExecutePayloadAsync(Arg.Any<ScheduledJob>(), Arg.Any<CancellationToken>());
         await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<ScheduledJobExecutionCompletedDomainEvent>(domainEvent => !domainEvent.IsCycleRun), Arg.Any<CancellationToken>());
+        _mockLogger.Received(1).Log(
+            LogLevel.Warning,
+            Arg.Any<EventId>(),
+            Arg.Is<object>(state => state.ToString()!.Contains("failed:")),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<object, Exception?, string>>());
     }
 
     [Fact]
     public async Task ExecuteScheduledJobRunAsync_WhenTheTaskPayloadThrows_ShouldLogTheExceptionAndStillCompleteTheExecution()
     {
         // Arrange
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         ScheduledJobEntity addedJob = _scheduledJobEntityFixture.Create(status: ScheduledJobStatus.Added, scheduleType: ScheduleType.WithIntervalInMinutes, intervalMinutes: 60);
         ScheduledJobId scheduledJobId = _scheduledJobIdFixture.Create(addedJob.Id);
         _mockScheduledJobRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>()).Returns(addedJob);
@@ -586,6 +596,12 @@ public class ScheduledJobSchedulerJobTests
 
         // Assert
         await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<ScheduledJobExecutionCompletedDomainEvent>(domainEvent => !domainEvent.IsCycleRun), Arg.Any<CancellationToken>());
+        _mockLogger.Received(1).Log(
+            LogLevel.Error,
+            Arg.Any<EventId>(),
+            Arg.Any<object>(),
+            Arg.Is<Exception>(exception => exception is InvalidOperationException && exception.Message == "The task threw."),
+            Arg.Any<Func<object, Exception?, string>>());
     }
 
     [Fact]

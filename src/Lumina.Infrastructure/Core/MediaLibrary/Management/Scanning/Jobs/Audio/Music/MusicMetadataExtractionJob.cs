@@ -311,7 +311,8 @@ internal sealed class MusicMetadataExtractionJob : MediaLibraryScanJob, IMusicMe
         {
             // A music file whose tags cannot be read still contributes the metadata derived from its path, but the failure is logged, so that a
             // systematic tagging failure of a whole library does not silently degrade every file to path only metadata.
-            _logger.LogWarning(exception, "Failed to read the embedded tags of the music file '{Path}'. Its metadata will be derived from the path only.", path);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning(exception, "Failed to read the embedded tags of the music file '{Path}'. Its metadata will be derived from the path only.", path);
         }
 
         if (string.IsNullOrWhiteSpace(trackTitle))

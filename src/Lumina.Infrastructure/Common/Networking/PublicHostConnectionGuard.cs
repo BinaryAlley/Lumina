@@ -79,13 +79,15 @@ internal static class PublicHostConnectionGuard
         catch (PublicHostRejectedException exception)
         {
             // The address policy refused the target. This is deterministic, so it is logged as a rejection rather than as a transport failure.
-            logger.LogWarning("Rejected the outbound connection to the host '{Host}' because {RejectionReason}. The connection was not made.", host, exception.RejectionReason);
+            if (logger.IsEnabled(LogLevel.Warning))
+                logger.LogWarning("Rejected the outbound connection to the host '{Host}' because {RejectionReason}. The connection was not made.", host, exception.RejectionReason);
             throw;
         }
         catch (PublicHostResolutionException)
         {
             // The host name could not be resolved. This is reported separately from a policy rejection because it can be transient.
-            logger.LogWarning("Could not resolve the outbound host '{Host}'. The connection was not made.", host);
+            if (logger.IsEnabled(LogLevel.Warning))
+                logger.LogWarning("Could not resolve the outbound host '{Host}'. The connection was not made.", host);
             throw;
         }
     }

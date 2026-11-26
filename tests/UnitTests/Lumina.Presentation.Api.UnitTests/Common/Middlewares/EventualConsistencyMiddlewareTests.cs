@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -154,6 +155,7 @@ public class EventualConsistencyMiddlewareTests
         httpContext.Request.Path = "/api/v1/probe";
         httpContext.Response.StatusCode = StatusCodes.Status200OK;
         ILogger<EventualConsistencyMiddleware> mockLogger = Substitute.For<ILogger<EventualConsistencyMiddleware>>();
+        mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         EventualConsistencyMiddleware sut = new(_ => Task.CompletedTask, mockLogger);
         IUnitOfWork mockUnitOfWork = Substitute.For<IUnitOfWork>();
         mockUnitOfWork
@@ -170,6 +172,12 @@ public class EventualConsistencyMiddlewareTests
         // The completion callback must never leave a transaction open after a failed commit, and it must never publish events that belong to a transaction that did not commit.
         await mockUnitOfWork.Received(1).RollbackTransactionAsync(Arg.Any<CancellationToken>());
         await mockPublisher.DidNotReceive().PublishAsync(Arg.Any<IDomainEvent>(), Arg.Any<CancellationToken>());
+        mockLogger.Received(1).Log(
+            LogLevel.Error,
+            Arg.Any<EventId>(),
+            Arg.Any<object>(),
+            Arg.Is<Exception>(exception => exception is InvalidOperationException && exception.Message == "commit failed"),
+            Arg.Any<Func<object, Exception?, string>>());
     }
 
     /// <summary>

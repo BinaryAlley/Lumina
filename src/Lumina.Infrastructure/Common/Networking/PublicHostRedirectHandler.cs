@@ -116,7 +116,8 @@ internal sealed class PublicHostRedirectHandler : DelegatingHandler
                 {
                     if (result.RejectionReason == OutboundRequestRejectionReason.HostCouldNotBeResolved)
                     {
-                        _logger.LogWarning("Could not resolve the outbound redirect host '{Host}'. The request was not sent.", redirectUri.IdnHost);
+                        if (_logger.IsEnabled(LogLevel.Warning))
+                            _logger.LogWarning("Could not resolve the outbound redirect host '{Host}'. The request was not sent.", redirectUri.IdnHost);
                         throw new PublicHostResolutionException(redirectUri.IdnHost);
                     }
                     throw Reject(redirectUri.IdnHost, result.RejectionReason);
@@ -142,7 +143,8 @@ internal sealed class PublicHostRedirectHandler : DelegatingHandler
     /// <returns>The exception that reports the rejection.</returns>
     private PublicHostRejectedException Reject(string host, OutboundRequestRejectionReason rejectionReason)
     {
-        _logger.LogWarning("Rejected the outbound redirect to the host '{Host}' because {RejectionReason}. The request was not sent.", host, rejectionReason);
+        if (_logger.IsEnabled(LogLevel.Warning))
+            _logger.LogWarning("Rejected the outbound redirect to the host '{Host}' because {RejectionReason}. The request was not sent.", host, rejectionReason);
         return new PublicHostRejectedException(host, rejectionReason);
     }
 

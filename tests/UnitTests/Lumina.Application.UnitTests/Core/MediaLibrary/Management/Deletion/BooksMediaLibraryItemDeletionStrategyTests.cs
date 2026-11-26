@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -106,6 +107,7 @@ public class BooksMediaLibraryItemDeletionStrategyTests
     public async Task DeleteItemAsync_WhenDeleteArtworkFails_ShouldStillDeleteTheBook()
     {
         // Arrange
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         LibraryId libraryId = _libraryIdFixture.Create();
         BookEntity book = _bookEntityFixture.Create(path: "/books/deleted.epub");
         LibraryEntity library = _libraryEntityFixture.Create(id: libraryId.Value, title: "My Library");
@@ -129,6 +131,12 @@ public class BooksMediaLibraryItemDeletionStrategyTests
         Assert.True(result.IsSuccess);
         await _mockBookRepository.Received(1).DeleteByIdAsync(book.Id, Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        _mockLogger.Received(1).Log(
+            LogLevel.Warning,
+            Arg.Any<EventId>(),
+            Arg.Is<object>(state => state.ToString()!.Contains("Failed to delete the stored artwork of the book")),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<object, Exception?, string>>());
     }
 
     [Fact]

@@ -106,7 +106,8 @@ public class MediaLibraryScanTaskExecutor : IScheduledTaskExecutor
         foreach (IDomainEvent domainEvent in domainEvents)
             await _domainEventPublisher.PublishAsync(domainEvent, cancellationToken).ConfigureAwait(false);
 
-        _logger.LogInformation("Scanned all enabled media libraries on behalf of the scheduled job '{ScheduledJobName}'.", scheduledJob.Name);
+        if (_logger.IsEnabled(LogLevel.Information))
+            _logger.LogInformation("Scanned all enabled media libraries on behalf of the scheduled job '{ScheduledJobName}'.", scheduledJob.Name);
         return Result.Success;
     }
 }

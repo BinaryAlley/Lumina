@@ -78,7 +78,8 @@ internal sealed class TranscodingStartupInitializer : IHostedService
                             catch (OperationCanceledException)
                             {
                                 if (!cancellationToken.IsCancellationRequested)
-                                    _logger.LogWarning("The normalized audio cache cleanup did not finish within {CleanupTimeoutSeconds} seconds. Whatever remains is accounted for by the coordinator and is removed by the next cleanup.", CACHE_CLEANUP_TIMEOUT_SECONDS);
+                                    if (_logger.IsEnabled(LogLevel.Warning))
+                                        _logger.LogWarning("The normalized audio cache cleanup did not finish within {CleanupTimeoutSeconds} seconds. Whatever remains is accounted for by the coordinator and is removed by the next cleanup.", CACHE_CLEANUP_TIMEOUT_SECONDS);
                             }
                         }
                     }
@@ -90,13 +91,15 @@ internal sealed class TranscodingStartupInitializer : IHostedService
             }
             else
                 TranscodingCachePaths.EnsureDirectoryExists(cacheDirectory);
-            _logger.LogInformation("The normalized audio cache uses the directory '{CacheDirectory}'.", cacheDirectory);
+            if (_logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("The normalized audio cache uses the directory '{CacheDirectory}'.", cacheDirectory);
         }
         catch (Exception exception)
         {
             // A locked file, a read-only volume or a directory owned by another account must not stop the whole application; the coordinator accounts
             // for whatever remains and the service reports normalized playback as unavailable when the directory still cannot be used.
-            _logger.LogError(exception, "The normalized audio cache could not be initialized (configured directory: '{CacheDirectory}'). Normalized playback may be unavailable.", _settings.CacheDirectory ?? "(default)");
+            if (_logger.IsEnabled(LogLevel.Error))
+                _logger.LogError(exception, "The normalized audio cache could not be initialized (configured directory: '{CacheDirectory}'). Normalized playback may be unavailable.", _settings.CacheDirectory ?? "(default)");
         }
 
         try
@@ -145,7 +148,8 @@ internal sealed class TranscodingStartupInitializer : IHostedService
             if (!process.Start())
             {
                 _toolchainStatus.RecordUnavailable();
-                _logger.LogWarning("The ffmpeg binary '{FfmpegPath}' could not be started. Normalized playback will be unavailable.", _settings.FfmpegPath);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("The ffmpeg binary '{FfmpegPath}' could not be started. Normalized playback will be unavailable.", _settings.FfmpegPath);
                 return;
             }
 
@@ -173,7 +177,8 @@ internal sealed class TranscodingStartupInitializer : IHostedService
                     _logger.LogDebug(killException, "The ffmpeg startup probe process could not be stopped.");
                 }
                 if (!cancellationToken.IsCancellationRequested)
-                    _logger.LogWarning("The ffmpeg binary '{FfmpegPath}' did not respond to the startup probe.", _settings.FfmpegPath);
+                    if (_logger.IsEnabled(LogLevel.Warning))
+                        _logger.LogWarning("The ffmpeg binary '{FfmpegPath}' did not respond to the startup probe.", _settings.FfmpegPath);
                 _toolchainStatus.RecordUnavailable();
                 return;
             }
@@ -183,7 +188,8 @@ internal sealed class TranscodingStartupInitializer : IHostedService
             if (process.ExitCode != 0)
             {
                 _toolchainStatus.RecordUnavailable();
-                _logger.LogWarning("The ffmpeg binary '{FfmpegPath}' exited with code {ExitCode} during the startup probe. Normalized playback may be unavailable.", _settings.FfmpegPath, process.ExitCode);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("The ffmpeg binary '{FfmpegPath}' exited with code {ExitCode} during the startup probe. Normalized playback may be unavailable.", _settings.FfmpegPath, process.ExitCode);
                 return;
             }
 
@@ -195,16 +201,19 @@ internal sealed class TranscodingStartupInitializer : IHostedService
             {
                 // An unpinned distribution package can change the encoder set without changing the application build, so this is reported at startup instead of surfacing as a per track playback failure.
                 _toolchainStatus.RecordMissingEncoders(missingEncoders);
-                _logger.LogError("The ffmpeg binary '{FfmpegPath}' is missing the encoders {MissingEncoders}. Normalized playback for those formats will be unavailable.", _settings.FfmpegPath, string.Join(", ", missingEncoders));
+                if (_logger.IsEnabled(LogLevel.Error))
+                    _logger.LogError("The ffmpeg binary '{FfmpegPath}' is missing the encoders {MissingEncoders}. Normalized playback for those formats will be unavailable.", _settings.FfmpegPath, string.Join(", ", missingEncoders));
                 return;
             }
             _toolchainStatus.RecordAvailable();
-            _logger.LogInformation("The ffmpeg binary '{FfmpegPath}' provides every encoder the normalized audio pipeline uses.", _settings.FfmpegPath);
+            if (_logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("The ffmpeg binary '{FfmpegPath}' provides every encoder the normalized audio pipeline uses.", _settings.FfmpegPath);
         }
         catch (Exception exception) when (exception is Win32Exception or InvalidOperationException or IOException or UnauthorizedAccessException or NotSupportedException)
         {
             _toolchainStatus.RecordUnavailable();
-            _logger.LogWarning(exception, "The ffmpeg binary '{FfmpegPath}' could not be probed. Normalized playback will be unavailable.", _settings.FfmpegPath);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning(exception, "The ffmpeg binary '{FfmpegPath}' could not be probed. Normalized playback will be unavailable.", _settings.FfmpegPath);
         }
     }
 

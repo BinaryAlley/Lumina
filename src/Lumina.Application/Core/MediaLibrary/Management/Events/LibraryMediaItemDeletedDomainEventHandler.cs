@@ -61,7 +61,8 @@ public class LibraryMediaItemDeletedDomainEventHandler : IDomainEventHandler<Lib
         IMediaLibraryItemDeletionStrategy? deletionStrategy = _mediaLibraryItemDeletionStrategies.FirstOrDefault(strategy => strategy.SupportedLibraryType == libraryType);
         if (deletionStrategy is null)
         {
-            _logger.LogWarning("No deletion strategy exists for media library type '{LibraryType}', the item at path '{ItemPath}' was not deleted.", libraryType, domainEvent.Path);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning("No deletion strategy exists for media library type '{LibraryType}', the item at path '{ItemPath}' was not deleted.", libraryType, domainEvent.Path);
             return;
         }
 

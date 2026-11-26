@@ -68,7 +68,8 @@ internal sealed class MediaLibraryScanProcessorJob : BackgroundService
             catch (Exception exception)
             {
                 // A scan that fails must never stop the scans that are queued behind it, so its failure is logged and the queue keeps draining.
-                _logger.LogError(exception, "Failed to process the media library scan '{ScanId}'.", compositeId.ScanId.Value);
+                if (_logger.IsEnabled(LogLevel.Error))
+                    _logger.LogError(exception, "Failed to process the media library scan '{ScanId}'.", compositeId.ScanId.Value);
             }
         }
     }
@@ -105,7 +106,8 @@ internal sealed class MediaLibraryScanProcessorJob : BackgroundService
                     compositeId.ScanId.Value, shouldTrackEntities: false, cancellationToken: linkedSource.Token).ConfigureAwait(false);
                 if (getLibraryScanResult.IsFailure)
                 {
-                    _logger.LogError("Failed to read the media library scan '{ScanId}': {Error}", compositeId.ScanId.Value, getLibraryScanResult.FirstError.Description);
+                    if (_logger.IsEnabled(LogLevel.Error))
+                        _logger.LogError("Failed to read the media library scan '{ScanId}': {Error}", compositeId.ScanId.Value, getLibraryScanResult.FirstError.Description);
                     return;
                 }
 
@@ -142,13 +144,15 @@ internal sealed class MediaLibraryScanProcessorJob : BackgroundService
                 rootJob = startScanResult.Value;
             }
 
-            _logger.LogInformation("Started the media library scan '{ScanId}' of the media library '{LibraryId}'.", compositeId.ScanId.Value, libraryScan.LibraryId.Value);
+            if (_logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("Started the media library scan '{ScanId}' of the media library '{LibraryId}'.", compositeId.ScanId.Value, libraryScan.LibraryId.Value);
 
             // The file system discovery job is the only top level job of the scan job graph, and every job awaits its children, so awaiting it
             // completes the entire scan. The next queued scan is only dequeued once this call returns.
             await rootJob.ExecuteAsync(Guid.CreateVersion7(), new { }, linkedSource.Token).ConfigureAwait(false);
 
-            _logger.LogInformation("Completed the media library scan '{ScanId}' of the media library '{LibraryId}'.", compositeId.ScanId.Value, libraryScan.LibraryId.Value);
+            if (_logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("Completed the media library scan '{ScanId}' of the media library '{LibraryId}'.", compositeId.ScanId.Value, libraryScan.LibraryId.Value);
         }
         catch (OperationCanceledException)
         {
@@ -158,10 +162,10 @@ internal sealed class MediaLibraryScanProcessorJob : BackgroundService
         {
             // An unexpected preparation failure must still leave the scan failed instead of pending forever, and must not affect the scans queued behind it.
             // The failure is reported without a cancellation token, because the scan token may already be cancelled and the report must still be published.
-            if (libraryId is null)
-                _logger.LogError(exception, "Failed to process the media library scan '{ScanId}'.", compositeId.ScanId.Value);
-            else
+            if (libraryId is not null)
                 await ReportScanFailureAsync(compositeId, libraryId, exception, CancellationToken.None).ConfigureAwait(false);
+            else if (_logger.IsEnabled(LogLevel.Error))
+                _logger.LogError(exception, "Failed to process the media library scan '{ScanId}'.", compositeId.ScanId.Value);
         }
     }
 
@@ -175,7 +179,8 @@ internal sealed class MediaLibraryScanProcessorJob : BackgroundService
     /// <returns>A task that represents the asynchronous operation.</returns>
     private async Task ReportScanFailureAsync(MediaLibraryScanCompositeId compositeId, LibraryId libraryId, Exception exception, CancellationToken cancellationToken)
     {
-        _logger.LogError(exception, "Failed to start the media library scan '{ScanId}'.", compositeId.ScanId.Value);
+        if (_logger.IsEnabled(LogLevel.Error))
+            _logger.LogError(exception, "Failed to start the media library scan '{ScanId}'.", compositeId.ScanId.Value);
         await ScanFailurePublisher.PublishAsync(_serviceScopeFactory, libraryId, compositeId, exception, cancellationToken).ConfigureAwait(false);
     }
 }

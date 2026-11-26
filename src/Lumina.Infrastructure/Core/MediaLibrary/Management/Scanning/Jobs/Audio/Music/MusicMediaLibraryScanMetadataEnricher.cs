@@ -105,7 +105,8 @@ internal sealed class MusicMediaLibraryScanMetadataEnricher : IMediaLibraryScanM
                 .Where(provider => provider.SupportedLibraryTypes.Contains(LibraryType.Music)
                     && (canDownloadMetadataFromWeb || !provider.RequiresWebAccess))];
             if (configuredProviders.Count == 0)
-                _logger.LogWarning("No metadata provider was found for the configured plugin with Id '{PluginId}' and the {LibraryType} library type.", configuration.PluginId, LibraryType.Music);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("No metadata provider was found for the configured plugin with Id '{PluginId}' and the {LibraryType} library type.", configuration.PluginId, LibraryType.Music);
             providers.AddRange(configuredProviders);
         }
 
@@ -193,7 +194,10 @@ internal sealed class MusicMediaLibraryScanMetadataEnricher : IMediaLibraryScanM
                         // A unique constraint conflict on a shared lookup such as a media contributor can happen when two scans enrich concurrently;
                         // it must not abort the whole scan, so the artist is left unenriched and retried on the next scan, while the rest proceeds.
                         if (saveChangesResult.FirstError == Errors.Persistence.UniqueConstraintViolation)
-                            _logger.LogWarning("The enriched metadata of the artist '{ArtistName}' could not be persisted because of a unique constraint conflict; it will be retried on the next scan.", artistEntity.Name);
+                        {
+                            if (_logger.IsEnabled(LogLevel.Warning))
+                                _logger.LogWarning("The enriched metadata of the artist '{ArtistName}' could not be persisted because of a unique constraint conflict; it will be retried on the next scan.", artistEntity.Name);
+                        }
                         else
                             throw new InvalidOperationException(saveChangesResult.FirstError.Description);
                     }
@@ -209,7 +213,7 @@ internal sealed class MusicMediaLibraryScanMetadataEnricher : IMediaLibraryScanM
             if (publishFinalProgressResult.IsFailure)
                 throw new InvalidOperationException(publishFinalProgressResult.FirstError.Description);
         }
-        else
+        else if (_logger.IsEnabled(LogLevel.Warning))
             _logger.LogWarning("No metadata provider is configured for the media library with Id '{LibraryId}', the metadata enrichment will be skipped.", libraryId.Value);
     }
 
@@ -414,7 +418,8 @@ internal sealed class MusicMediaLibraryScanMetadataEnricher : IMediaLibraryScanM
             catch (Exception exception)
             {
                 // A failing metadata provider must not prevent the other providers from being tried, but the failure must be surfaced for diagnostics.
-                logger.LogWarning(exception, "The metadata provider '{ProviderName}' failed while resolving a {LookupType} lookup for '{Lookup}'.", metadataProvider.Name, typeof(TLookup).Name, lookup);
+                if (logger.IsEnabled(LogLevel.Warning))
+                    logger.LogWarning(exception, "The metadata provider '{ProviderName}' failed while resolving a {LookupType} lookup for '{Lookup}'.", metadataProvider.Name, typeof(TLookup).Name, lookup);
             }
         }
         return null;
@@ -456,7 +461,8 @@ internal sealed class MusicMediaLibraryScanMetadataEnricher : IMediaLibraryScanM
             catch (Exception exception)
             {
                 // A failing metadata provider must not prevent the other providers from being tried, but the failure must be surfaced for diagnostics.
-                logger.LogWarning(exception, "The metadata provider '{ProviderName}' failed while resolving a {LookupType} lookup for '{Lookup}'.", metadataProvider.Name, typeof(TLookup).Name, lookup);
+                if (logger.IsEnabled(LogLevel.Warning))
+                    logger.LogWarning(exception, "The metadata provider '{ProviderName}' failed while resolving a {LookupType} lookup for '{Lookup}'.", metadataProvider.Name, typeof(TLookup).Name, lookup);
             }
         }
 

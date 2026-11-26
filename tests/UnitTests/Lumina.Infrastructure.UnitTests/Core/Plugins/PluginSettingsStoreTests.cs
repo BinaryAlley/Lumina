@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Threading;
@@ -96,6 +97,7 @@ public class PluginSettingsStoreTests
     public async Task GetSettingsAsync_WhenRepositoryReturnsFailure_ShouldReturnNullAndLogWarning()
     {
         // Arrange
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         Guid pluginId = Guid.NewGuid();
         _mockPluginRepository.GetByIdAsync(pluginId, cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Database.Error", "Failed to retrieve the plugin"));
@@ -105,5 +107,11 @@ public class PluginSettingsStoreTests
 
         // Assert
         Assert.Null(result);
+        _mockLogger.Received(1).Log(
+            LogLevel.Warning,
+            Arg.Any<EventId>(),
+            Arg.Is<object>(state => state.ToString()!.Contains("Failed to read the settings of the plugin")),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<object, Exception?, string>>());
     }
 }

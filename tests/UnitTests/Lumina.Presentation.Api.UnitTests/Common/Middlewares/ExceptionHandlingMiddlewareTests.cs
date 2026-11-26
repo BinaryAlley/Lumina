@@ -33,6 +33,7 @@ public class ExceptionHandlingMiddlewareTests
     public ExceptionHandlingMiddlewareTests()
     {
         _mockLogger = Substitute.For<ILogger<ExceptionHandlingMiddleware>>();
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         _sut = new ExceptionHandlingMiddleware(context => _nextDelegate(context), _mockLogger);
     }
 
@@ -84,6 +85,30 @@ public class ExceptionHandlingMiddlewareTests
             Arg.Any<EventId>(),
             Arg.Any<object>(),
             Arg.Is<Exception>(exception => exception is InvalidOperationException && exception.Message == "sensitive internal details"),
+            Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenLoggingIsDisabledAndNextThrowsException_ShouldNotLogTheException()
+    {
+        // Arrange
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(false);
+        DefaultHttpContext context = new()
+        {
+            Response = { Body = new MemoryStream() }
+        };
+        _nextDelegate = _ => throw new InvalidOperationException("sensitive internal details");
+
+        // Act
+        await _sut.InvokeAsync(context);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status500InternalServerError, context.Response.StatusCode);
+        _mockLogger.DidNotReceive().Log(
+            LogLevel.Error,
+            Arg.Any<EventId>(),
+            Arg.Any<object>(),
+            Arg.Any<Exception?>(),
             Arg.Any<Func<object, Exception?, string>>());
     }
 

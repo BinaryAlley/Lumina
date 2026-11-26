@@ -41,6 +41,7 @@ public class ExceptionHandlingMiddlewareTests
     public ExceptionHandlingMiddlewareTests()
     {
         _mockLogger = Substitute.For<ILogger<ExceptionHandlingMiddleware>>();
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         _mockStringLocalizer = Substitute.For<IStringLocalizer<ExceptionHandlingMiddleware>>();
         _mockStringLocalizer[Arg.Any<string>()].Returns(callInfo => new LocalizedString(callInfo.Arg<string>(), $"localized:{callInfo.Arg<string>()}"));
         _mockAuthenticationService = Substitute.For<IAuthenticationService>();
@@ -88,6 +89,27 @@ public class ExceptionHandlingMiddlewareTests
             Arg.Any<EventId>(),
             Arg.Any<object>(),
             Arg.Is<Exception>(exception => exception is InvalidOperationException && exception.Message == "Unexpected failure"),
+            Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenLoggingIsDisabledAndNextThrowsNonApiExceptionAndApiRequest_ShouldNotLogError()
+    {
+        // Arrange
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(false);
+        DefaultHttpContext httpContext = CreateHttpContext(isApiRequest: true);
+        _nextDelegate = _ => throw new InvalidOperationException("Unexpected failure");
+
+        // Act
+        await _sut.InvokeAsync(httpContext);
+
+        // Assert
+        Assert.Contains("application/json", httpContext.Response.ContentType);
+        _mockLogger.DidNotReceive().Log(
+            LogLevel.Error,
+            Arg.Any<EventId>(),
+            Arg.Any<object>(),
+            Arg.Any<Exception?>(),
             Arg.Any<Func<object, Exception?, string>>());
     }
 

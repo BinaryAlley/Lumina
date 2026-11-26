@@ -40,7 +40,8 @@ public class TechnicalDataCleanupTaskExecutor : IScheduledTaskExecutor
         if (failInterruptedScansResult.IsFailure)
             return failInterruptedScansResult.Errors;
 
-        _logger.LogInformation("Cleaned the technical data on behalf of the scheduled job '{ScheduledJobName}'.", scheduledJob.Name);
+        if (_logger.IsEnabled(LogLevel.Information))
+            _logger.LogInformation("Cleaned the technical data on behalf of the scheduled job '{ScheduledJobName}'.", scheduledJob.Name);
         return Result.Success;
     }
 }

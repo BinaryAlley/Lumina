@@ -142,7 +142,8 @@ internal sealed class MusicMediaLibraryItemDeletionStrategy : IMediaLibraryItemD
 
             Result<Deleted> deleteStoredArtworkResult = _musicArtworkService.DeleteStoredArtwork(artwork.FileName);
             if (deleteStoredArtworkResult.IsFailure)
-                _logger.LogWarning("Failed to delete the stored {OwnerType} artwork at '{ArtworkPath}' of the music library item with Id '{OwnerId}', the file might remain orphaned.", ownerType, artwork.FileName, ownerId);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Failed to delete the stored {OwnerType} artwork at '{ArtworkPath}' of the music library item with Id '{OwnerId}', the file might remain orphaned.", ownerType, artwork.FileName, ownerId);
         }
 
         return await _unitOfWork.MusicArtworkRepository.DeleteByOwnerAsync(ownerType, ownerId, cancellationToken).ConfigureAwait(false);

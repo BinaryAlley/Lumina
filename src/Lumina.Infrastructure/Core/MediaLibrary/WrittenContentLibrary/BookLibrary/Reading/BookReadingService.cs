@@ -186,7 +186,8 @@ internal sealed class BookReadingService : IBookReadingService
                 }
                 catch (Exception exception)
                 {
-                    _logger.LogError(exception, "Failed to produce the resource '{ResourceKey}' of the book '{BookId}'.", resourceKey, bookId);
+                    if (_logger.IsEnabled(LogLevel.Error))
+                        _logger.LogError(exception, "Failed to produce the resource '{ResourceKey}' of the book '{BookId}'.", resourceKey, bookId);
                     return Error.Failure(code: "Reading.ResourceProductionFailed", description: "The resource of the book could not be produced.");
                 }
 
@@ -335,7 +336,8 @@ internal sealed class BookReadingService : IBookReadingService
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Failed to open the book '{BookId}' for reading.", bookId);
+            if (_logger.IsEnabled(LogLevel.Error))
+                _logger.LogError(exception, "Failed to open the book '{BookId}' for reading.", bookId);
             return Error.Failure(code: "Reading.ExtractionFailed", description: "The book could not be opened for reading.");
         }
     }

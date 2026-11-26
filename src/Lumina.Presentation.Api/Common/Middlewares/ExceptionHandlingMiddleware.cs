@@ -53,7 +53,8 @@ public class ExceptionHandlingMiddleware
             // Once the response has started, it is no longer possible to replace it with a ProblemDetails response.
             if (context.Response.HasStarted)
                 throw;
-            _logger.LogError(ex, "Unhandled exception occurred while processing request {Method} {Path}", context.Request.Method, context.Request.Path);
+            if (_logger.IsEnabled(LogLevel.Error))
+                _logger.LogError(ex, "Unhandled exception occurred while processing request {Method} {Path}", context.Request.Method, context.Request.Path);
             await WriteProblemDetailsResponseAsync(context).ConfigureAwait(false);
         }
     }

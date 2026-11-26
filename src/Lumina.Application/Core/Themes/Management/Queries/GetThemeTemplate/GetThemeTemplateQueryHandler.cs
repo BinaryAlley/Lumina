@@ -133,7 +133,8 @@ public class GetThemeTemplateQueryHandler : IQueryHandler<GetThemeTemplateQuery,
         {
             // The restore is best effort: an unexpected failure must not fail the request, so the caller falls back to
             // the application view instead of returning an error to the browser.
-            _logger.LogWarning(exception, "Failed to restore the files of bundled theme '{ThemeId}'.", theme.ThemeId);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning(exception, "Failed to restore the files of bundled theme '{ThemeId}'.", theme.ThemeId);
             return false;
         }
     }

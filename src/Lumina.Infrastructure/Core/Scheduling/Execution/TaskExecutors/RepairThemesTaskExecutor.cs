@@ -46,7 +46,8 @@ public class RepairThemesTaskExecutor : IScheduledTaskExecutor
         try
         {
             await ThemeSynchronizer.SynchronizeAsync(_themeService, _unitOfWork, _logger, cancellationToken).ConfigureAwait(false);
-            _logger.LogInformation("Repaired the themes on behalf of the scheduled job '{ScheduledJobName}'.", scheduledJob.Name);
+            if (_logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("Repaired the themes on behalf of the scheduled job '{ScheduledJobName}'.", scheduledJob.Name);
             return Result.Success;
         }
         catch (OperationCanceledException)
@@ -55,7 +56,8 @@ public class RepairThemesTaskExecutor : IScheduledTaskExecutor
         }
         catch (Exception exception)
         {
-            _logger.LogWarning(exception, "The themes could not be repaired on behalf of the scheduled job '{ScheduledJobName}'.", scheduledJob.Name);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning(exception, "The themes could not be repaired on behalf of the scheduled job '{ScheduledJobName}'.", scheduledJob.Name);
             return Error.Failure(description: nameof(RepairThemesTaskExecutor));
         }
     }

@@ -35,7 +35,8 @@ internal static class ThemeSynchronizer
         Result<PaginatedResultDto<ThemeEntity>> getThemesResult = await unitOfWork.ThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getThemesResult.IsFailure)
         {
-            logger.LogWarning("Failed to read the installed themes: {Error}", getThemesResult.FirstError.Description);
+            if (logger.IsEnabled(LogLevel.Warning))
+                logger.LogWarning("Failed to read the installed themes: {Error}", getThemesResult.FirstError.Description);
             return;
         }
 
@@ -47,7 +48,8 @@ internal static class ThemeSynchronizer
             Result<ThemeManifestDto> manifestResult = await themeService.ReadManifestFromArchiveAsync(archivePath, cancellationToken).ConfigureAwait(false);
             if (manifestResult.IsFailure)
             {
-                logger.LogWarning("Skipping bundled theme archive {ArchivePath}: {Error}", archivePath, manifestResult.FirstError.Description);
+                if (logger.IsEnabled(LogLevel.Warning))
+                    logger.LogWarning("Skipping bundled theme archive {ArchivePath}: {Error}", archivePath, manifestResult.FirstError.Description);
                 continue;
             }
 
@@ -74,7 +76,8 @@ internal static class ThemeSynchronizer
                 Result<ThemeManifestDto> installResult = await themeService.InstallAsync(archive, cancellationToken).ConfigureAwait(false);
                 if (installResult.IsFailure)
                 {
-                    logger.LogWarning("Failed to install bundled theme '{ThemeId}': {Error}", manifestResult.Value.Id, installResult.FirstError.Description);
+                    if (logger.IsEnabled(LogLevel.Warning))
+                        logger.LogWarning("Failed to install bundled theme '{ThemeId}': {Error}", manifestResult.Value.Id, installResult.FirstError.Description);
                     continue;
                 }
 
@@ -86,7 +89,8 @@ internal static class ThemeSynchronizer
                         existingTheme.Version = manifestResult.Value.Version;
                         Result<Updated> updateResult = await unitOfWork.ThemeRepository.UpdateAsync(existingTheme, cancellationToken).ConfigureAwait(false);
                         if (updateResult.IsFailure)
-                            logger.LogWarning("Failed to update the version of theme '{ThemeId}': {Error}", existingTheme.ThemeId, updateResult.FirstError.Description);
+                            if (logger.IsEnabled(LogLevel.Warning))
+                                logger.LogWarning("Failed to update the version of theme '{ThemeId}': {Error}", existingTheme.ThemeId, updateResult.FirstError.Description);
                     }
                     continue;
                 }
@@ -105,18 +109,20 @@ internal static class ThemeSynchronizer
                 };
 
                 Result<Created> insertResult = await unitOfWork.ThemeRepository.InsertAsync(themeEntity, cancellationToken).ConfigureAwait(false);
-                if (insertResult.IsFailure)
-                    logger.LogWarning("Failed to persist the detection of theme '{ThemeId}': {Error}", manifestResult.Value.Id, insertResult.FirstError.Description);
-                else
+                if (insertResult.IsSuccess)
                     themes.Add(themeEntity);
+                else if (logger.IsEnabled(LogLevel.Warning))
+                    logger.LogWarning("Failed to persist the detection of theme '{ThemeId}': {Error}", manifestResult.Value.Id, insertResult.FirstError.Description);
             }
             catch (IOException exception)
             {
-                logger.LogWarning(exception, "Failed to install bundled theme '{ThemeId}': the theme files could not be written.", manifestResult.Value.Id);
+                if (logger.IsEnabled(LogLevel.Warning))
+                    logger.LogWarning(exception, "Failed to install bundled theme '{ThemeId}': the theme files could not be written.", manifestResult.Value.Id);
             }
             catch (UnauthorizedAccessException exception)
             {
-                logger.LogWarning(exception, "Failed to install bundled theme '{ThemeId}': access to the theme files was denied.", manifestResult.Value.Id);
+                if (logger.IsEnabled(LogLevel.Warning))
+                    logger.LogWarning(exception, "Failed to install bundled theme '{ThemeId}': access to the theme files was denied.", manifestResult.Value.Id);
             }
         }
 
@@ -155,14 +161,16 @@ internal static class ThemeSynchronizer
                     if (restoreResult.IsSuccess)
                         continue;
 
-                    logger.LogWarning("Failed to restore the files of bundled theme '{ThemeId}': {Error}", brokenTheme.ThemeId, restoreResult.FirstError.Description);
+                    if (logger.IsEnabled(LogLevel.Warning))
+                        logger.LogWarning("Failed to restore the files of bundled theme '{ThemeId}': {Error}", brokenTheme.ThemeId, restoreResult.FirstError.Description);
 
                     // At least one bundled theme must always remain available, so the application never ends up without any theme;
                     // the last remaining bundled theme is kept even when its files cannot be recovered.
                     int availableBundledThemes = themes.Count(availableTheme => !availableTheme.IsDeleted && availableTheme.InstallSource == ThemeInstallSource.Bundled);
                     if (availableBundledThemes <= 1)
                     {
-                        logger.LogWarning("Bundled theme '{ThemeId}' is the last remaining bundled theme and its files could not be restored, so it is kept.", brokenTheme.ThemeId);
+                        if (logger.IsEnabled(LogLevel.Warning))
+                            logger.LogWarning("Bundled theme '{ThemeId}' is the last remaining bundled theme and its files could not be restored, so it is kept.", brokenTheme.ThemeId);
                         continue;
                     }
 
@@ -171,16 +179,19 @@ internal static class ThemeSynchronizer
                     brokenTheme.IsCurrent = null;
                     Result<Updated> updateResult = await unitOfWork.ThemeRepository.UpdateAsync(brokenTheme, cancellationToken).ConfigureAwait(false);
                     if (updateResult.IsFailure)
-                        logger.LogWarning("Failed to delete theme '{ThemeId}': {Error}", brokenTheme.ThemeId, updateResult.FirstError.Description);
+                        if (logger.IsEnabled(LogLevel.Warning))
+                            logger.LogWarning("Failed to delete theme '{ThemeId}': {Error}", brokenTheme.ThemeId, updateResult.FirstError.Description);
                 }
                 else
                 {
                     // A user theme has no shipped archive to restore from, so damage is permanent and the theme is removed entirely.
-                    logger.LogWarning("The stored files of user theme '{ThemeId}' are missing, so the theme is deleted.", brokenTheme.ThemeId);
+                    if (logger.IsEnabled(LogLevel.Warning))
+                        logger.LogWarning("The stored files of user theme '{ThemeId}' are missing, so the theme is deleted.", brokenTheme.ThemeId);
                     brokenTheme.IsCurrent = null;
                     Result<Deleted> deleteResult = await unitOfWork.ThemeRepository.DeleteByIdAsync(brokenTheme.Id, cancellationToken).ConfigureAwait(false);
                     if (deleteResult.IsFailure)
-                        logger.LogWarning("Failed to delete theme '{ThemeId}': {Error}", brokenTheme.ThemeId, deleteResult.FirstError.Description);
+                        if (logger.IsEnabled(LogLevel.Warning))
+                            logger.LogWarning("Failed to delete theme '{ThemeId}': {Error}", brokenTheme.ThemeId, deleteResult.FirstError.Description);
                 }
             }
             catch (OperationCanceledException)
@@ -190,7 +201,8 @@ internal static class ThemeSynchronizer
             catch (Exception exception)
             {
                 // Repairing a broken theme is best effort: an unexpected failure on one theme must not crash the host, so it is logged and the remaining broken themes are still processed.
-                logger.LogWarning(exception, "Failed to repair the broken theme '{ThemeId}'.", brokenTheme.ThemeId);
+                if (logger.IsEnabled(LogLevel.Warning))
+                    logger.LogWarning(exception, "Failed to repair the broken theme '{ThemeId}'.", brokenTheme.ThemeId);
             }
         }
     }
@@ -222,6 +234,7 @@ internal static class ThemeSynchronizer
         defaultTheme.IsCurrent = true;
         Result<Updated> updateResult = await unitOfWork.ThemeRepository.UpdateAsync(defaultTheme, cancellationToken).ConfigureAwait(false);
         if (updateResult.IsFailure)
-            logger.LogWarning("Failed to activate theme '{ThemeId}': {Error}", defaultTheme.ThemeId, updateResult.FirstError.Description);
+            if (logger.IsEnabled(LogLevel.Warning))
+                logger.LogWarning("Failed to activate theme '{ThemeId}': {Error}", defaultTheme.ThemeId, updateResult.FirstError.Description);
     }
 }

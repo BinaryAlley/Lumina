@@ -56,7 +56,8 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         foreach (PluginLoadErrorDto loadError in _loadErrors)
-            _logger.LogWarning("Plugin load failure: {LoadError}", loadError.ErrorMessage);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning("Plugin load failure: {LoadError}", loadError.ErrorMessage);
 
         await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
         IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -78,7 +79,8 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
             };
             Result<Updated> upsertResult = await unitOfWork.PluginRepository.UpsertAsync(pluginEntity, stoppingToken).ConfigureAwait(false);
             if (upsertResult.IsFailure)
-                _logger.LogError("Failed to persist the detection of plugin '{PluginName}': {Error}", plugin.Name, upsertResult.FirstError.Description);
+                if (_logger.IsEnabled(LogLevel.Error))
+                    _logger.LogError("Failed to persist the detection of plugin '{PluginName}': {Error}", plugin.Name, upsertResult.FirstError.Description);
         }
 
         foreach (PluginLoadErrorDto loadError in _loadErrors)
@@ -99,7 +101,8 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
             };
             Result<Updated> upsertResult = await unitOfWork.PluginRepository.UpsertAsync(pluginEntity, stoppingToken).ConfigureAwait(false);
             if (upsertResult.IsFailure)
-                _logger.LogError("Failed to persist the detection of plugin '{PluginName}': {Error}", loadError.AssemblyName, upsertResult.FirstError.Description);
+                if (_logger.IsEnabled(LogLevel.Error))
+                    _logger.LogError("Failed to persist the detection of plugin '{PluginName}': {Error}", loadError.AssemblyName, upsertResult.FirstError.Description);
         }
 
         // Remove the rows of the plugins that are no longer detected, so that each plugin assembly has exactly one row regardless of its load status,
@@ -116,10 +119,12 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
                     continue;
                 Result<Deleted> deleteResult = await unitOfWork.PluginRepository.DeleteByIdAsync(plugin.Id, stoppingToken).ConfigureAwait(false);
                 if (deleteResult.IsFailure)
-                    _logger.LogError("Failed to remove the stale detection of plugin '{PluginName}': {Error}", plugin.Name, deleteResult.FirstError.Description);
+                    if (_logger.IsEnabled(LogLevel.Error))
+                        _logger.LogError("Failed to remove the stale detection of plugin '{PluginName}': {Error}", plugin.Name, deleteResult.FirstError.Description);
                 Result<Deleted> removeConfigurationsResult = await providerConfigurationStore.RemoveProviderConfigurationsAsync(plugin.Id, stoppingToken).ConfigureAwait(false);
                 if (removeConfigurationsResult.IsFailure)
-                    _logger.LogError("Failed to remove the provider configurations of the removed plugin '{PluginName}': {Error}", plugin.Name, removeConfigurationsResult.FirstError.Description);
+                    if (_logger.IsEnabled(LogLevel.Error))
+                        _logger.LogError("Failed to remove the provider configurations of the removed plugin '{PluginName}': {Error}", plugin.Name, removeConfigurationsResult.FirstError.Description);
             }
         }
 
@@ -135,7 +140,8 @@ internal sealed class PluginDetectionSyncJob : BackgroundService
             {
                 Result<Success> ensureResult = await providerConfigurationStore.EnsureProviderConfigurationsAsync(library.Id, library.LibraryType, stoppingToken).ConfigureAwait(false);
                 if (ensureResult.IsFailure)
-                    _logger.LogError("Failed to seed the provider configurations of the media library '{LibraryTitle}': {Error}", library.Title, ensureResult.FirstError.Description);
+                    if (_logger.IsEnabled(LogLevel.Error))
+                        _logger.LogError("Failed to seed the provider configurations of the media library '{LibraryTitle}': {Error}", library.Title, ensureResult.FirstError.Description);
             }
         }
 
