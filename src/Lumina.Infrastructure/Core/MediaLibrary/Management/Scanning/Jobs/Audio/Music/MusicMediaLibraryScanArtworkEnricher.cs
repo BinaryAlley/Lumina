@@ -120,7 +120,8 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
                         .Where(provider => provider.SupportedLibraryTypes.Contains(LibraryType.Music)
                             && (canDownloadMetadataFromWeb || !provider.RequiresWebAccess))];
                     if (configuredProviders.Count == 0)
-                        _logger.LogWarning("No artwork provider was found for the configured plugin with Id '{PluginId}' and the {LibraryType} library type.", configuration.PluginId, LibraryType.Music);
+                        if (_logger.IsEnabled(LogLevel.Warning))
+                            _logger.LogWarning("No artwork provider was found for the configured plugin with Id '{PluginId}' and the {LibraryType} library type.", configuration.PluginId, LibraryType.Music);
                     artworkProviders.AddRange(configuredProviders);
                 }
             }
@@ -129,7 +130,8 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
         // When no artwork provider is available, the items must not be marked as failed to resolve, so the enrichment is skipped entirely.
         if (artworkProviders.Count == 0)
         {
-            _logger.LogWarning("No artwork provider is configured for the media library with Id '{LibraryId}', the artwork enrichment will be skipped.", libraryId.Value);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning("No artwork provider is configured for the media library with Id '{LibraryId}', the artwork enrichment will be skipped.", libraryId.Value);
             return;
         }
 
@@ -414,18 +416,19 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
         Result<Deleted> deleteStoredArtworkResult = deleteStoredArtwork();
         if (deleteStoredArtworkResult.IsFailure)
         {
-            _logger.LogWarning("Failed to clear the stored artwork files of the {OwnerType} '{OwnerDescription}'.", ownerType, ownerDescription);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning("Failed to clear the stored artwork files of the {OwnerType} '{OwnerDescription}'.", ownerType, ownerDescription);
 
             // Some files may have been deleted before the failure, so the stored records are dropped and the owner is marked as failed,
             // keeping it eligible for a retry without serving the paths of the files that no longer exist.
             Result<Deleted> deleteFailedEntitiesResult = await unitOfWork.MusicArtworkRepository.DeleteByOwnerAsync(ownerType, ownerId, cancellationToken).ConfigureAwait(false);
-            if (deleteFailedEntitiesResult.IsFailure)
-                _logger.LogWarning("Failed to clear the stored artwork records of the {OwnerType} '{OwnerDescription}'.", ownerType, ownerDescription);
-            else
+            if (deleteFailedEntitiesResult.IsSuccess)
             {
                 List<MusicArtworkEntity> failedArtworkEntities = [CreateArtworkEntity(ownerId, ownerType, ArtworkType.Cover, 0, null, 0, ArtworkStatus.Failed, null)];
                 await PersistArtworkAsync(unitOfWork, failedArtworkEntities, cancellationToken).ConfigureAwait(false);
             }
+            else if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning("Failed to clear the stored artwork records of the {OwnerType} '{OwnerDescription}'.", ownerType, ownerDescription);
 
             DeleteTemporaryArtworks(resolution.Artworks.Select(resolvedArtwork => resolvedArtwork.Artwork));
             return false;
@@ -433,7 +436,8 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
         Result<Deleted> deleteEntitiesResult = await unitOfWork.MusicArtworkRepository.DeleteByOwnerAsync(ownerType, ownerId, cancellationToken).ConfigureAwait(false);
         if (deleteEntitiesResult.IsFailure)
         {
-            _logger.LogWarning("Failed to clear the stored artwork records of the {OwnerType} '{OwnerDescription}'.", ownerType, ownerDescription);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning("Failed to clear the stored artwork records of the {OwnerType} '{OwnerDescription}'.", ownerType, ownerDescription);
             DeleteTemporaryArtworks(resolution.Artworks.Select(resolvedArtwork => resolvedArtwork.Artwork));
             return false;
         }
@@ -448,7 +452,8 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
                 Result<string> saveArtworkResult = await saveArtworkAsync(artwork, cancellationToken).ConfigureAwait(false);
                 if (saveArtworkResult.IsFailure)
                 {
-                    _logger.LogWarning("Failed to store the {ArtworkType} artwork of the {OwnerType} '{OwnerDescription}'.", artwork.Type, ownerType, ownerDescription);
+                    if (_logger.IsEnabled(LogLevel.Warning))
+                        _logger.LogWarning("Failed to store the {ArtworkType} artwork of the {OwnerType} '{OwnerDescription}'.", artwork.Type, ownerType, ownerDescription);
                     continue;
                 }
 
@@ -558,7 +563,8 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
             {
                 // A failing artwork provider must not prevent the other providers from being tried, but the failure must be surfaced for diagnostics.
                 hasFailed = true;
-                _logger.LogWarning(exception, "The artwork provider '{ProviderName}' failed while resolving the artwork of '{OwnerDescription}'.", provider.Name, ownerDescription);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning(exception, "The artwork provider '{ProviderName}' failed while resolving the artwork of '{OwnerDescription}'.", provider.Name, ownerDescription);
                 continue;
             }
 
@@ -601,7 +607,8 @@ internal sealed class MusicMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
             {
                 // A failing artwork provider must not prevent the other providers from being tried, but the failure must be surfaced for diagnostics.
                 hasFailed = true;
-                _logger.LogWarning(exception, "The artwork provider '{ProviderName}' failed while resolving the artwork of '{OwnerDescription}'.", provider.Name, ownerDescription);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning(exception, "The artwork provider '{ProviderName}' failed while resolving the artwork of '{OwnerDescription}'.", provider.Name, ownerDescription);
                 continue;
             }
 

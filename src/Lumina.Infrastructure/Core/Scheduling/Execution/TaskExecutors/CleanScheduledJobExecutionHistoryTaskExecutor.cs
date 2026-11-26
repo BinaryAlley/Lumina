@@ -46,7 +46,8 @@ public class CleanScheduledJobExecutionHistoryTaskExecutor : IScheduledTaskExecu
         if (deleteResult.IsFailure)
             return deleteResult.Errors;
 
-        _logger.LogInformation("Cleaned the execution history of the scheduled jobs on behalf of the scheduled job '{ScheduledJobName}'.", scheduledJob.Name);
+        if (_logger.IsEnabled(LogLevel.Information))
+            _logger.LogInformation("Cleaned the execution history of the scheduled jobs on behalf of the scheduled job '{ScheduledJobName}'.", scheduledJob.Name);
         return Result.Success;
     }
 }

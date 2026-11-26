@@ -43,6 +43,7 @@ public class TranscodingStartupInitializerTests : IDisposable
         _settings = _transcodingSettingsDtoFixture.Create(ffmpegPath: missingFfmpegPath, cacheDirectory: _cacheDirectory);
         _toolchainStatus = new TranscodingToolchainStatus();
         _mockLogger = Substitute.For<ILogger<TranscodingStartupInitializer>>();
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         _sut = new TranscodingStartupInitializer(Options.Create(_settings), _toolchainStatus, _mockLogger);
     }
 
@@ -95,6 +96,28 @@ public class TranscodingStartupInitializerTests : IDisposable
         Assert.False(TranscodingCachePaths.HasCacheMarker(_cacheDirectory));
         Assert.False(_toolchainStatus.IsTranscoderAvailable);
         _mockLogger.Received(1).Log(
+            LogLevel.Error,
+            Arg.Any<EventId>(),
+            Arg.Any<object>(),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    [Fact]
+    public async Task StartAsync_WhenLoggingIsDisabledAndTheDirectoryExistsNonEmptyWithoutTheMarker_ShouldNotLogAnError()
+    {
+        // Arrange
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(false);
+        Directory.CreateDirectory(_cacheDirectory);
+        File.WriteAllText(Path.Combine(_cacheDirectory, "operator-data.txt"), "operator data");
+
+        // Act
+        await _sut.StartAsync(CancellationToken.None);
+
+        // Assert
+        Assert.False(TranscodingCachePaths.HasCacheMarker(_cacheDirectory));
+        Assert.False(_toolchainStatus.IsTranscoderAvailable);
+        _mockLogger.DidNotReceive().Log(
             LogLevel.Error,
             Arg.Any<EventId>(),
             Arg.Any<object>(),

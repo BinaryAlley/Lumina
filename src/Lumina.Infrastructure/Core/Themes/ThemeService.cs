@@ -832,7 +832,8 @@ public sealed class ThemeService : IThemeService
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
             {
-                _logger.LogDebug(exception, "Could not remove stale theme staging path {StagingPath}.", path);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                    _logger.LogDebug(exception, "Could not remove stale theme staging path {StagingPath}.", path);
             }
         }
     }

@@ -103,7 +103,8 @@ internal sealed class BooksMediaLibraryScanMetadataEnricher : IMediaLibraryScanM
                     && provider.SupportedLibraryTypes.Contains(LibraryType.Book)
                     && (canDownloadMetadataFromWeb || !provider.RequiresWebAccess))];
             if (configuredProviders.Count == 0)
-                _logger.LogWarning("No metadata provider was found for the configured plugin with Id '{PluginId}' and the {LibraryType} library type.", configuration.PluginId, LibraryType.Book);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("No metadata provider was found for the configured plugin with Id '{PluginId}' and the {LibraryType} library type.", configuration.PluginId, LibraryType.Book);
             providers.AddRange(configuredProviders);
         }
 
@@ -180,7 +181,7 @@ internal sealed class BooksMediaLibraryScanMetadataEnricher : IMediaLibraryScanM
                 lastPath = booksPage[^1].Path;
             }
         }
-        else
+        else if (_logger.IsEnabled(LogLevel.Warning))
             _logger.LogWarning("No metadata provider is configured for the media library with Id '{LibraryId}', the metadata enrichment will be skipped.", libraryId.Value);
     }
 

@@ -105,7 +105,8 @@ internal sealed class BooksMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
                         .Where(provider => provider.SupportedLibraryTypes.Contains(LibraryType.Book)
                             && (canDownloadMetadataFromWeb || !provider.RequiresWebAccess))];
                     if (configuredProviders.Count == 0)
-                        _logger.LogWarning("No artwork provider was found for the configured plugin with Id '{PluginId}' and the {LibraryType} library type.", configuration.PluginId, LibraryType.Book);
+                        if (_logger.IsEnabled(LogLevel.Warning))
+                            _logger.LogWarning("No artwork provider was found for the configured plugin with Id '{PluginId}' and the {LibraryType} library type.", configuration.PluginId, LibraryType.Book);
                     artworkProviders.AddRange(configuredProviders);
                 }
             }
@@ -176,7 +177,7 @@ internal sealed class BooksMediaLibraryScanArtworkEnricher : IMediaLibraryScanAr
                 lastPath = booksPage[^1].Path;
             }
         }
-        else
+        else if (_logger.IsEnabled(LogLevel.Warning))
             _logger.LogWarning("No artwork provider is configured for the media library with Id '{LibraryId}', the artwork enrichment will be skipped.", libraryId.Value);
     }
 

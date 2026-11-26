@@ -76,11 +76,12 @@ public static class PresentationApiLayerServices
                     .FirstOrDefault()?.Split(',')[0].Trim()
                     ?? onRejectedContext.HttpContext.Connection.RemoteIpAddress?.ToString()
                     ?? "unknown";
-                logger.LogWarning(
-                    "Rate limit exceeded. IP: {IpAddress}, Route: {Route}, Lease Acquired: {IsAcquired}",
-                    clientIp,
-                    onRejectedContext.HttpContext.Request.Path,
-                    onRejectedContext.Lease.IsAcquired); // When False, the request was rejected because it exceeded rate limits.
+                if (logger.IsEnabled(LogLevel.Warning))
+                    logger.LogWarning(
+                        "Rate limit exceeded. IP: {IpAddress}, Route: {Route}, Lease Acquired: {IsAcquired}",
+                        clientIp,
+                        onRejectedContext.HttpContext.Request.Path,
+                        onRejectedContext.Lease.IsAcquired); // When False, the request was rejected because it exceeded rate limits.
 
                 onRejectedContext.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
                 onRejectedContext.HttpContext.Response.ContentType = "application/problem+json";

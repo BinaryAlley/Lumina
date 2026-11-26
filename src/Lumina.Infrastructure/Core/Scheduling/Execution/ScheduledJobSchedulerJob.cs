@@ -133,7 +133,8 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
             Result<IEnumerable<ScheduledJobEntity>> getScheduledJobsResult = await unitOfWork.ScheduledJobRepository.GetActiveOrRunningAsync(cancellationToken).ConfigureAwait(false);
             if (getScheduledJobsResult.IsFailure)
             {
-                _logger.LogWarning("Failed to read the scheduled jobs to decide whether the themes must be synchronized: {Error}", getScheduledJobsResult.FirstError.Description);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Failed to read the scheduled jobs to decide whether the themes must be synchronized: {Error}", getScheduledJobsResult.FirstError.Description);
                 return;
             }
             // When an active "Repair themes at startup" job exists, its cycle is resumed below and it runs the synchronization.
@@ -170,7 +171,8 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
                 .GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
             if (getScheduledJobsResult.IsFailure)
             {
-                _logger.LogWarning("Failed to read the scheduled jobs to ensure the technical data cleanup job: {Error}", getScheduledJobsResult.FirstError.Description);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Failed to read the scheduled jobs to ensure the technical data cleanup job: {Error}", getScheduledJobsResult.FirstError.Description);
                 return;
             }
 
@@ -196,13 +198,15 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
             Result<Created> insertScheduledJobResult = await unitOfWork.ScheduledJobRepository.InsertAsync(technicalDataCleanupJob, cancellationToken).ConfigureAwait(false);
             if (insertScheduledJobResult.IsFailure)
             {
-                _logger.LogWarning("Failed to insert the technical data cleanup scheduled job: {Error}", insertScheduledJobResult.FirstError.Description);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Failed to insert the technical data cleanup scheduled job: {Error}", insertScheduledJobResult.FirstError.Description);
                 return;
             }
             Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             if (saveChangesResult.IsFailure)
             {
-                _logger.LogWarning("Failed to save the technical data cleanup scheduled job: {Error}", saveChangesResult.FirstError.Description);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Failed to save the technical data cleanup scheduled job: {Error}", saveChangesResult.FirstError.Description);
                 return;
             }
             _logger.LogInformation("Created the default 'Technical data cleanup at startup' scheduled job.");
@@ -226,7 +230,8 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
         Result<IEnumerable<ScheduledJobEntity>> getScheduledJobsResult = await unitOfWork.ScheduledJobRepository.GetActiveOrRunningAsync(cancellationToken).ConfigureAwait(false);
         if (getScheduledJobsResult.IsFailure)
         {
-            _logger.LogWarning("Failed to read the scheduled jobs to resume: {Error}", getScheduledJobsResult.FirstError.Description);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning("Failed to read the scheduled jobs to resume: {Error}", getScheduledJobsResult.FirstError.Description);
             return;
         }
         foreach (ScheduledJobEntity scheduledJob in getScheduledJobsResult.Value)
@@ -311,7 +316,8 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
         catch (Exception exception)
         {
             // Failures of a single run are handled inside RunScheduledJobAsync, so an exception reaching this point is unexpected and ends the cycle.
-            _logger.LogError(exception, "The execution cycle of the scheduled job '{ScheduledJobId}' failed.", scheduledJobId.Value);
+            if (_logger.IsEnabled(LogLevel.Error))
+                _logger.LogError(exception, "The execution cycle of the scheduled job '{ScheduledJobId}' failed.", scheduledJobId.Value);
         }
         finally
         {
@@ -335,7 +341,8 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
         catch (OperationCanceledException) { }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "The one time execution of the scheduled job '{ScheduledJobId}' failed.", scheduledJobId.Value);
+            if (_logger.IsEnabled(LogLevel.Error))
+                _logger.LogError(exception, "The one time execution of the scheduled job '{ScheduledJobId}' failed.", scheduledJobId.Value);
         }
     }
 
@@ -360,7 +367,8 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "The execution of the scheduled job '{ScheduledJobId}' failed unexpectedly.", scheduledJobId.Value);
+            if (_logger.IsEnabled(LogLevel.Error))
+                _logger.LogError(exception, "The execution of the scheduled job '{ScheduledJobId}' failed unexpectedly.", scheduledJobId.Value);
             await ReconcileInterruptedRunAsync(scheduledJobId, CancellationToken.None).ConfigureAwait(false);
         }
         finally
@@ -410,7 +418,8 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
             IScheduledTaskExecutor taskExecutor = taskExecutorFactory.CreateExecutor(scheduledJob.TaskType);
             Result<Success> executePayloadResult = await taskExecutor.ExecutePayloadAsync(scheduledJob, cancellationToken).ConfigureAwait(false);
             if (executePayloadResult.IsFailure)
-                _logger.LogWarning("The task of the scheduled job '{ScheduledJobName}' failed: {Error}", scheduledJob.Name, executePayloadResult.FirstError.Description);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("The task of the scheduled job '{ScheduledJobName}' failed: {Error}", scheduledJob.Name, executePayloadResult.FirstError.Description);
         }
         catch (OperationCanceledException)
         {
@@ -418,7 +427,8 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "The task of the scheduled job '{ScheduledJobName}' threw an exception.", scheduledJob.Name);
+            if (_logger.IsEnabled(LogLevel.Error))
+                _logger.LogError(exception, "The task of the scheduled job '{ScheduledJobName}' threw an exception.", scheduledJob.Name);
         }
 
         if (cancellationToken.IsCancellationRequested)
@@ -461,7 +471,8 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
         catch (Exception exception)
         {
             // The completion failed after the execution was persisted as running, so the interrupted run is reconciled directly.
-            _logger.LogError(exception, "Failed to complete the execution of the scheduled job '{ScheduledJobId}'.", scheduledJob.Id.Value);
+            if (_logger.IsEnabled(LogLevel.Error))
+                _logger.LogError(exception, "Failed to complete the execution of the scheduled job '{ScheduledJobId}'.", scheduledJob.Id.Value);
             await ReconcileInterruptedRunAsync(scheduledJob.Id, CancellationToken.None).ConfigureAwait(false);
         }
     }
@@ -513,7 +524,8 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
             Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             if (saveChangesResult.IsFailure)
                 throw new InvalidOperationException(saveChangesResult.FirstError.Description);
-            _logger.LogInformation("The interrupted execution of the scheduled job '{ScheduledJobName}' was closed.", scheduledJob.Name);
+            if (_logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("The interrupted execution of the scheduled job '{ScheduledJobName}' was closed.", scheduledJob.Name);
             return reconciledStatus;
         }
         catch (OperationCanceledException)
@@ -522,7 +534,8 @@ public sealed class ScheduledJobSchedulerJob : BackgroundService, IScheduledJobS
         }
         catch (Exception exception)
         {
-            _logger.LogWarning(exception, "Failed to reconcile the interrupted execution of the scheduled job '{ScheduledJobId}'.", scheduledJobId.Value);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning(exception, "Failed to reconcile the interrupted execution of the scheduled job '{ScheduledJobId}'.", scheduledJobId.Value);
             return ScheduledJobStatus.Added;
         }
     }

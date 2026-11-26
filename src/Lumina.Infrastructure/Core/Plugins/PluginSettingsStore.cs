@@ -44,7 +44,8 @@ internal sealed class PluginSettingsStore : IPluginSettingsStore
         Result<PluginEntity?> getPluginResult = await _unitOfWork.PluginRepository.GetByIdAsync(pluginId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (getPluginResult.IsFailure)
         {
-            _logger.LogWarning("Failed to read the settings of the plugin with Id '{PluginId}': {Error}", pluginId, getPluginResult.FirstError.Description);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning("Failed to read the settings of the plugin with Id '{PluginId}': {Error}", pluginId, getPluginResult.FirstError.Description);
             return null;
         }
 

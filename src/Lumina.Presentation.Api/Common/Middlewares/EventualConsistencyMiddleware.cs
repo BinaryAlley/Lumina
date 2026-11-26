@@ -80,7 +80,8 @@ public class EventualConsistencyMiddleware
             }
             catch (Exception ex) // The response is already complete, so this failure cannot reach the client. It is logged, and the transaction is still closed by the rollback below.
             {                
-                _logger.LogError(ex, "Failed to complete the request transaction for {Path}", context.Request.Path);
+                if (_logger.IsEnabled(LogLevel.Error))
+                    _logger.LogError(ex, "Failed to complete the request transaction for {Path}", context.Request.Path);
             }
             finally
             {
@@ -93,7 +94,8 @@ public class EventualConsistencyMiddleware
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to roll back the request transaction for {Path}", context.Request.Path);
+                    if (_logger.IsEnabled(LogLevel.Error))
+                        _logger.LogError(ex, "Failed to roll back the request transaction for {Path}", context.Request.Path);
                 }
             }
         });

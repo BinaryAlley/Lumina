@@ -72,7 +72,8 @@ internal sealed class BooksMediaLibraryItemDeletionStrategy : IMediaLibraryItemD
 
         Result<Deleted> deleteArtworkResult = _bookArtworkService.DeleteBookArtwork(libraryId, book.Id, library.Title, authorName, book.Title);
         if (deleteArtworkResult.IsFailure)
-            _logger.LogWarning("Failed to delete the stored artwork of the book with Id '{BookId}' at path '{BookPath}', the artwork might remain orphaned.", book.Id, book.Path);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning("Failed to delete the stored artwork of the book with Id '{BookId}' at path '{BookPath}', the artwork might remain orphaned.", book.Id, book.Path);
 
         // Delete the book, whose stored artwork and participations are removed by the database cascade.
         Result<Deleted> deleteBookResult = await _unitOfWork.BookRepository.DeleteByIdAsync(book.Id, cancellationToken).ConfigureAwait(false);

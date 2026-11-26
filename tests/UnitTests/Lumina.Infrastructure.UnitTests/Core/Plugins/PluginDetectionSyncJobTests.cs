@@ -23,6 +23,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
@@ -120,6 +121,7 @@ public class PluginDetectionSyncJobTests
     public async Task StartAsync_WhenUpsertFails_ShouldLogErrorAndContinueWithOtherPlugins()
     {
         // Arrange
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         IPlugin failingPlugin = CreatePlugin(Guid.NewGuid(), "Failing Plugin", new Version(1, 0, 0));
         IPlugin successfulPlugin = CreatePlugin(Guid.NewGuid(), "Successful Plugin", new Version(1, 0, 0));
         _mockPluginManager.GetPlugins().Returns([failingPlugin, successfulPlugin]);
@@ -139,6 +141,12 @@ public class PluginDetectionSyncJobTests
         // Assert
         await _mockPluginRepository.Received(1).UpsertAsync(Arg.Is<PluginEntity>(plugin => plugin.Id == successfulPlugin.Id), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        _mockLogger.Received(1).Log(
+            LogLevel.Error,
+            Arg.Any<EventId>(),
+            Arg.Is<object>(state => state.ToString()!.Contains("Failed to persist the detection of plugin")),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<object, Exception?, string>>());
     }
 
     [Fact]

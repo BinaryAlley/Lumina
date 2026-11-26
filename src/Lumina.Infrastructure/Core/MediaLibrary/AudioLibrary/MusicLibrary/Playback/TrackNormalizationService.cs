@@ -545,7 +545,8 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            _logger.LogError(exception, "The normalized audio cache directory '{CacheDirectory}' is not available for track {TrackId} in cache entry {CacheId}.", _cacheRoot, request.TrackId, cacheId);
+            if (_logger.IsEnabled(LogLevel.Error))
+                _logger.LogError(exception, "The normalized audio cache directory '{CacheDirectory}' is not available for track {TrackId} in cache entry {CacheId}.", _cacheRoot, request.TrackId, cacheId);
             return Errors.Playback.NormalizationUnavailable;
         }
 
@@ -588,7 +589,8 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
         catch (Exception exception)
         {
             // The production is shared by requests that are no longer necessarily waiting, so every failure is turned into a result and observed here.
-            _logger.LogError(exception, "The normalized audio of track {TrackId} in cache entry {CacheId} could not be produced.", request.TrackId, cacheId);
+            if (_logger.IsEnabled(LogLevel.Error))
+                _logger.LogError(exception, "The normalized audio of track {TrackId} in cache entry {CacheId} could not be produced.", request.TrackId, cacheId);
             return Errors.Playback.NormalizationFailed;
         }
     }
@@ -678,7 +680,8 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
                     return Errors.Playback.NormalizationFailed;
                 }
                 if (isKeptOverCapacity)
-                    _logger.LogWarning("The normalized audio of track {TrackId} in cache entry {CacheId} was produced successfully but exceeds the configured normalized audio cache limit. It is kept readable and will be evicted when it is no longer in use.", request.TrackId, cacheId);
+                    if (_logger.IsEnabled(LogLevel.Warning))
+                        _logger.LogWarning("The normalized audio of track {TrackId} in cache entry {CacheId} was produced successfully but exceeds the configured normalized audio cache limit. It is kept readable and will be evicted when it is no longer in use.", request.TrackId, cacheId);
 
                 return GetOrCreateTrackProjection(cacheId, index);
             }
@@ -688,7 +691,8 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException or NotSupportedException)
             {
-                _logger.LogWarning(exception, "The normalized audio of track {TrackId} in cache entry {CacheId} could not be cached.", request.TrackId, cacheId);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning(exception, "The normalized audio of track {TrackId} in cache entry {CacheId} could not be cached.", request.TrackId, cacheId);
                 return Errors.Playback.NormalizationFailed;
             }
             finally
@@ -748,7 +752,8 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
         }
         catch (Exception exception) when (exception is Win32Exception or InvalidOperationException or IOException)
         {
-            _logger.LogError(exception, "The audio transcoder for track {TrackId} in cache entry {CacheId} could not be started.", request.TrackId, cacheId);
+            if (_logger.IsEnabled(LogLevel.Error))
+                _logger.LogError(exception, "The audio transcoder for track {TrackId} in cache entry {CacheId} could not be started.", request.TrackId, cacheId);
             return Errors.Playback.NormalizationUnavailable;
         }
 
@@ -801,12 +806,16 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
                 return Errors.Playback.NormalizationTimedOut;
             if (process.ExitCode != 0)
             {
-                _logger.LogWarning("The audio transcoder for track {TrackId} in cache entry {CacheId} exited with code {ExitCode}.", request.TrackId, cacheId, process.ExitCode);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("The audio transcoder for track {TrackId} in cache entry {CacheId} exited with code {ExitCode}.", request.TrackId, cacheId, process.ExitCode);
                 if (!string.IsNullOrWhiteSpace(standardError))
                 {
                     // The bounded stderr can contain the source path and media metadata. It is only written at Debug and never returned to a client.
-                    string diagnostic = RedactPath(RedactPath(standardError, inputPath), request.SourcePath);
-                    _logger.LogDebug("The audio transcoder for track {TrackId} in cache entry {CacheId} reported: {StandardError}", request.TrackId, cacheId, diagnostic);
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                    {
+                        string diagnostic = RedactPath(RedactPath(standardError, inputPath), request.SourcePath);
+                        _logger.LogDebug("The audio transcoder for track {TrackId} in cache entry {CacheId} reported: {StandardError}", request.TrackId, cacheId, diagnostic);
+                    }
                 }
                 return Errors.Playback.NormalizationFailed;
             }
@@ -1013,7 +1022,8 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
         if (previousEndSeconds < expectedDurationSeconds - durationToleranceSeconds)
             return Errors.Playback.NormalizationFailed;
         if (previousEndSeconds > expectedDurationSeconds + durationToleranceSeconds)
-            _logger.LogInformation("The normalized audio of track {TrackId} in cache entry {CacheId} is longer than the probed duration: produced {ProducedSeconds} seconds, probed {ExpectedSeconds} seconds. The production is kept because only a shortfall is treated as truncation.", request.TrackId, cacheId, previousEndSeconds, expectedDurationSeconds);
+            if (_logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("The normalized audio of track {TrackId} in cache entry {CacheId} is longer than the probed duration: produced {ProducedSeconds} seconds, probed {ExpectedSeconds} seconds. The production is kept because only a shortfall is treated as truncation.", request.TrackId, cacheId, previousEndSeconds, expectedDurationSeconds);
 
         // The index advertises the produced end, rounded up to the next second, instead of the probed duration. A probe can underestimate a variable
         // bitrate file, and a seek map that is shorter than the audio would hide the tail of every segment after the underestimated end.
@@ -1311,7 +1321,8 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
                 long actualBytes = outputSizeTracker.GetCurrentSize();
                 if (!reservation.TryUpdate(actualBytes, _settings.MaxCacheBytes, _evictionGracePeriod))
                 {
-                    _logger.LogWarning("A normalization job for track {TrackId} in cache entry {CacheId} could not reserve enough space in the normalized audio cache and was stopped.", trackId, cacheId);
+                    if (_logger.IsEnabled(LogLevel.Warning))
+                        _logger.LogWarning("A normalization job for track {TrackId} in cache entry {CacheId} could not reserve enough space in the normalized audio cache and was stopped.", trackId, cacheId);
                     KillProcess(process);
                     return true;
                 }
@@ -1462,7 +1473,8 @@ internal sealed class TrackNormalizationService : ITrackNormalizationService, ID
         OnApplicationStopping(this, EventArgs.Empty);
         if (!_productionsDrained.Wait(TimeSpan.FromSeconds(PRODUCTION_DRAIN_TIMEOUT_SECONDS)))
         {
-            _logger.LogWarning("The normalized audio productions did not drain within {DrainTimeoutSeconds} seconds during shutdown. The process lifetime resources are left undisposed.", PRODUCTION_DRAIN_TIMEOUT_SECONDS);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning("The normalized audio productions did not drain within {DrainTimeoutSeconds} seconds during shutdown. The process lifetime resources are left undisposed.", PRODUCTION_DRAIN_TIMEOUT_SECONDS);
             return;
         }
         _cache.Release();

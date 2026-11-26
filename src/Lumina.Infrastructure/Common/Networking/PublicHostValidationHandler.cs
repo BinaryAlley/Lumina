@@ -55,11 +55,13 @@ internal sealed class PublicHostValidationHandler : DelegatingHandler
 
         if (result.RejectionReason == OutboundRequestRejectionReason.HostCouldNotBeResolved)
         {
-            _logger.LogWarning("Could not resolve the outbound host '{Host}'. The request was not sent.", requestUri.IdnHost);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning("Could not resolve the outbound host '{Host}'. The request was not sent.", requestUri.IdnHost);
             throw new PublicHostResolutionException(requestUri.IdnHost);
         }
 
-        _logger.LogWarning("Rejected the outbound request to the host '{Host}' because {RejectionReason}. The request was not sent.", requestUri.IdnHost, result.RejectionReason);
+        if (_logger.IsEnabled(LogLevel.Warning))
+            _logger.LogWarning("Rejected the outbound request to the host '{Host}' because {RejectionReason}. The request was not sent.", requestUri.IdnHost, result.RejectionReason);
         throw new PublicHostRejectedException(requestUri.IdnHost, result.RejectionReason);
     }
 

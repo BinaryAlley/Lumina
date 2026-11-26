@@ -121,7 +121,8 @@ internal sealed class MusicFileSystemDiscoveryJob : MediaLibraryScanJob, IMusicF
                 // When the library content is stored on a solid state drive, the file system reads of the scan run in parallel.
                 bool shouldParallelizeReads = domainLibraryResult.Value.IsContentOnSsd;
                 if (shouldParallelizeReads)
-                    _logger.LogDebug("The content of the media library with Id '{LibraryId}' is stored on a solid state drive, so its file system reads will run in parallel.", LibraryId.Value);
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                        _logger.LogDebug("The content of the media library with Id '{LibraryId}' is stored on a solid state drive, so its file system reads will run in parallel.", LibraryId.Value);
 
                 // Get the files for each of the media library content locations.
                 foreach (FileSystemPathId contentLocation in domainLibraryResult.Value.ContentLocations)
@@ -336,7 +337,8 @@ internal sealed class MusicFileSystemDiscoveryJob : MediaLibraryScanJob, IMusicF
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
                 {
                     // A file might become inaccessible between enumeration and processing, so it is skipped.
-                    _logger.LogWarning(ex, "Failed to read the metadata of the music file '{Path}', so it is skipped for this scan.", filesToProcess[index].Path);
+                    if (_logger.IsEnabled(LogLevel.Warning))
+                        _logger.LogWarning(ex, "Failed to read the metadata of the music file '{Path}', so it is skipped for this scan.", filesToProcess[index].Path);
                 }
             });
         }

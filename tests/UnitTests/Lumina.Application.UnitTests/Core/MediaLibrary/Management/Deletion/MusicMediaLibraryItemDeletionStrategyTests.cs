@@ -52,6 +52,7 @@ public class MusicMediaLibraryItemDeletionStrategyTests
         _mockMusicArtworkRepository = Substitute.For<IMusicArtworkRepository>();
         _mockMusicArtworkService = Substitute.For<IMusicArtworkService>();
         _mockLogger = Substitute.For<ILogger<MusicMediaLibraryItemDeletionStrategy>>();
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         _mockUnitOfWork.TrackRepository.Returns(_mockTrackRepository);
         _mockUnitOfWork.AlbumRepository.Returns(_mockAlbumRepository);
         _mockUnitOfWork.ArtistRepository.Returns(_mockArtistRepository);
@@ -289,6 +290,54 @@ public class MusicMediaLibraryItemDeletionStrategyTests
             LogLevel.Warning,
             Arg.Any<EventId>(),
             Arg.Is<object>(state => state.ToString()!.Contains("Failed to delete the stored")),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    [Fact]
+    public async Task DeleteItemAsync_WhenLoggingIsDisabledAndDeletingAStoredArtworkFileFails_ShouldNotLogAWarningButStillDeleteTheRow()
+    {
+        // Arrange
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(false);
+        LibraryId libraryId = _libraryIdFixture.Create();
+        Guid albumId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        TrackEntity track = _trackEntityFixture.Create(albumId: albumId, path: "/music/deleted.flac");
+        AlbumEntity album = _albumEntityFixture.Create(id: albumId, artistId: artistId, includeTracks: false);
+        AlbumEntity otherAlbum = _albumEntityFixture.Create(artistId: artistId, includeTracks: false);
+        MusicArtworkEntity trackArtwork = _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Track, ownerId: track.Id, fileName: "/media/music/track-cover.jpg");
+        _mockTrackRepository.GetByPathAsync(libraryId.Value, track.Path, Arg.Any<CancellationToken>())
+            .Returns(Result.From<TrackEntity?>(track));
+        _mockMusicArtworkRepository.GetByOwnerAsync(MusicArtworkOwnerType.Track, track.Id, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<MusicArtworkEntity>>([trackArtwork]));
+        _mockMusicArtworkService.DeleteStoredArtwork(trackArtwork.FileName!)
+            .Returns(Errors.FileSystemManagement.FileNotFound);
+        _mockMusicArtworkRepository.DeleteByOwnerAsync(MusicArtworkOwnerType.Track, track.Id, Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
+        _mockTrackRepository.DeleteByIdAsync(track.Id, Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Deleted));
+        _mockAlbumRepository.GetIncludingDeletedByIdAsync(albumId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<AlbumEntity?>(album));
+        _mockTrackRepository.GetByAlbumIdIncludingDeletedAsync(albumId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<TrackEntity>>([track]));
+        _mockMusicArtworkRepository.DeleteByOwnerAsync(MusicArtworkOwnerType.Album, albumId, Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
+        _mockAlbumRepository.DeleteByIdAsync(albumId, Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Deleted));
+        _mockAlbumRepository.GetByArtistIdIncludingDeletedAsync(artistId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<AlbumEntity>>([otherAlbum]));
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
+
+        // Act
+        Result<Success> result = await _sut.DeleteItemAsync(libraryId.Value, track.Path, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        await _mockMusicArtworkRepository.Received(1).DeleteByOwnerAsync(MusicArtworkOwnerType.Track, track.Id, Arg.Any<CancellationToken>());
+        _mockLogger.DidNotReceive().Log(
+            LogLevel.Warning,
+            Arg.Any<EventId>(),
+            Arg.Any<object>(),
             Arg.Any<Exception?>(),
             Arg.Any<Func<object, Exception?, string>>());
     }

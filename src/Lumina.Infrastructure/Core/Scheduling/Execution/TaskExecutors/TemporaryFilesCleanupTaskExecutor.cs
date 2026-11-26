@@ -45,7 +45,8 @@ public class TemporaryFilesCleanupTaskExecutor : IScheduledTaskExecutor
             !temporaryDirectoryRoot.StartsWith(applicationBaseDirectory, comparison) ||
             string.Equals(temporaryDirectoryRoot, applicationBaseDirectory, comparison))
         {
-            _logger.LogWarning("The temporary directory to clean could not be resolved safely, so the scheduled job '{ScheduledJobName}' was skipped.", scheduledJob.Name);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning("The temporary directory to clean could not be resolved safely, so the scheduled job '{ScheduledJobName}' was skipped.", scheduledJob.Name);
             return Result.Success;
         }
 
@@ -54,12 +55,14 @@ public class TemporaryFilesCleanupTaskExecutor : IScheduledTaskExecutor
             if (Directory.Exists(temporaryDirectoryRoot))
                 Directory.Delete(temporaryDirectoryRoot, recursive: true);
             Directory.CreateDirectory(temporaryDirectoryRoot);
-            _logger.LogInformation("Emptied the temporary directory '{TemporaryDirectory}'.", temporaryDirectoryRoot);
+            if (_logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("Emptied the temporary directory '{TemporaryDirectory}'.", temporaryDirectoryRoot);
             return Result.Success;
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            _logger.LogWarning(exception, "The temporary directory '{TemporaryDirectory}' could not be emptied.", temporaryDirectoryRoot);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning(exception, "The temporary directory '{TemporaryDirectory}' could not be emptied.", temporaryDirectoryRoot);
             return await Task.FromResult(Error.Failure(description: nameof(TemporaryFilesCleanupTaskExecutor)));
         }
     }

@@ -49,7 +49,8 @@ internal static class ApplicationHandlerTelemetry
     {
         activity?.SetStatus(ActivityStatusCode.Ok);
         RecordOutcome(activity, handlerName, handlerType, duration, isSuccess: true);
-        logger.LogDebug("Completed handling {HandlerType} {HandlerName} in {DurationMs}ms", handlerType, handlerName, duration.TotalMilliseconds);
+        if (logger.IsEnabled(LogLevel.Debug))
+            logger.LogDebug("Completed handling {HandlerType} {HandlerName} in {DurationMs}ms", handlerType, handlerName, duration.TotalMilliseconds);
     }
 
     /// <summary>
@@ -66,7 +67,8 @@ internal static class ApplicationHandlerTelemetry
         activity?.SetStatus(ActivityStatusCode.Error, error);
         RecordOutcome(activity, handlerName, handlerType, duration, isSuccess: false);
         // Business-rule failures are routine outcomes (e.g. failed logins), so log at Debug to avoid noise from high-frequency handlers.
-        logger.LogDebug("Failed handling {HandlerType} {HandlerName} in {DurationMs}ms: {Error}", handlerType, handlerName, duration.TotalMilliseconds, error);
+        if (logger.IsEnabled(LogLevel.Debug))
+            logger.LogDebug("Failed handling {HandlerType} {HandlerName} in {DurationMs}ms: {Error}", handlerType, handlerName, duration.TotalMilliseconds, error);
     }
 
     /// <summary>
@@ -82,7 +84,8 @@ internal static class ApplicationHandlerTelemetry
     {
         activity?.SetStatus(ActivityStatusCode.Error, exception.Message);
         RecordOutcome(activity, handlerName, handlerType, duration, isSuccess: false);
-        logger.LogError(exception, "Failed handling {HandlerType} {HandlerName} in {DurationMs}ms", handlerType, handlerName, duration.TotalMilliseconds);
+        if (logger.IsEnabled(LogLevel.Error))
+            logger.LogError(exception, "Failed handling {HandlerType} {HandlerName} in {DurationMs}ms", handlerType, handlerName, duration.TotalMilliseconds);
     }
 
     /// <summary>

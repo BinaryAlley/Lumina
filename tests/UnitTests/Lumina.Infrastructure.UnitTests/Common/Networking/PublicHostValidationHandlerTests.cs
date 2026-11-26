@@ -113,6 +113,7 @@ public class PublicHostValidationHandlerTests
     {
         // Arrange
         ILogger<PublicHostValidationHandler> mockLogger = Substitute.For<ILogger<PublicHostValidationHandler>>();
+        mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         StubHttpMessageHandler innerHandler = new();
         PublicHostValidationHandler handler = new(CreateValidator(), mockLogger) { InnerHandler = innerHandler };
         using HttpClient client = new(handler);

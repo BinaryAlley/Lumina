@@ -63,7 +63,8 @@ public class ExceptionHandlingMiddleware
         }
         catch (Exception ex) // Other cases.
         {
-            _logger.LogError(ex, "Unexpected exception occurred: {Message}", ex.Message);
+            if (_logger.IsEnabled(LogLevel.Error))
+                _logger.LogError(ex, "Unexpected exception occurred: {Message}", ex.Message);
             // Once the response has started, its status and headers are already on the wire, so they can no longer be replaced: the connection
             // is aborted instead, so that the client sees a failed transfer rather than a success response it cannot trust.
             if (context.Response.HasStarted)
@@ -105,13 +106,14 @@ public class ExceptionHandlingMiddleware
     private async Task HandleApiExceptionAsync(HttpContext context, ApiException apiException)
     {
         // Log all available details for debugging/monitoring.
-        _logger.LogError(
-            apiException,
-            "API Exception occurred. Status: {StatusCode}, Title: {Title}, Detail: {Detail}, Extensions: {Extensions}",
-            apiException.HttpStatusCode,
-            apiException.ProblemDetails?.Title,
-            apiException.ProblemDetails?.Detail,
-            apiException.ProblemDetails?.Extensions);
+        if (_logger.IsEnabled(LogLevel.Error))
+            _logger.LogError(
+                apiException,
+                "API Exception occurred. Status: {StatusCode}, Title: {Title}, Detail: {Detail}, Extensions: {Extensions}",
+                apiException.HttpStatusCode,
+                apiException.ProblemDetails?.Title,
+                apiException.ProblemDetails?.Detail,
+                apiException.ProblemDetails?.Extensions);
 
         // Once the response has started, its status and headers are already on the wire, so they can no longer be replaced: the connection
         // is aborted instead, so that the client sees a failed transfer rather than a redirect it could not follow or a body it would misread.
@@ -284,7 +286,8 @@ public class ExceptionHandlingMiddleware
             string culture = context.Request.RouteValues["culture"]?.ToString()?.ToLower() ?? "en-us";
             string returnUrl = $"{context.Request.Path}{context.Request.QueryString}";
             string loginUrl = $"/{culture}/auth/login?returnUrl={Uri.EscapeDataString(returnUrl)}";
-            _logger.LogInformation("Redirecting unauthorized user to {Url}", loginUrl);
+            if (_logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("Redirecting unauthorized user to {Url}", loginUrl);
             context.Response.Redirect(loginUrl); // Force an entire refresh of the current location, so that header and footer are re-rendered too.
         }
         else
@@ -310,7 +313,8 @@ public class ExceptionHandlingMiddleware
                 if (errorsObj.ValueKind == JsonValueKind.Object)
                     foreach (JsonProperty error in errorsObj.EnumerateObject())
                     {
-                        _logger.LogError("Validation error {Field}: {@ErrorValues}", error.Name, error.Value.EnumerateArray().Select(jsonElement => jsonElement.ToString()));
+                        if (_logger.IsEnabled(LogLevel.Error))
+                            _logger.LogError("Validation error {Field}: {@ErrorValues}", error.Name, error.Value.EnumerateArray().Select(jsonElement => jsonElement.ToString()));
                         if (error.Value.ValueKind == JsonValueKind.Array)
                             foreach (JsonElement errorValue in error.Value.EnumerateArray())
                                 errorMessage.AppendLine($"{_stringLocalizer[errorValue.ToString()]}<br>");

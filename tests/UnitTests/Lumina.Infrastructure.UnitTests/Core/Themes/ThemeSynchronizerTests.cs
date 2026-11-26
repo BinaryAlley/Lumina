@@ -52,6 +52,7 @@ public class ThemeSynchronizerTests : IDisposable
         _mockUnitOfWork.ThemeRepository.Returns(_mockThemeRepository);
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLogger = Substitute.For<ILogger>();
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         _mockThemeService.GetBundledThemeArchivePaths().Returns([]);
         _mockThemeService.HasThemePack(Arg.Any<string>()).Returns(true);
         _mockThemeService.DefaultThemeId.Returns("lumina-default");
@@ -77,6 +78,28 @@ public class ThemeSynchronizerTests : IDisposable
         // Assert
         await _mockThemeService.DidNotReceive().ReadManifestFromArchiveAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SynchronizeAsync_WhenLoggingIsDisabledAndTheInstalledThemesCannotBeRead_ShouldNotLogAWarning()
+    {
+        // Arrange
+        _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(false);
+        _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Error.Failure("Themes.NotFound", "Failed to read the installed themes"));
+        _mockThemeService.GetBundledThemeArchivePaths().Returns(["bundled.zip"]);
+
+        // Act
+        await ThemeSynchronizer.SynchronizeAsync(_mockThemeService, _mockUnitOfWork, _mockLogger, CancellationToken.None);
+
+        // Assert
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        _mockLogger.DidNotReceive().Log(
+            LogLevel.Warning,
+            Arg.Any<EventId>(),
+            Arg.Any<object>(),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<object, Exception?, string>>());
     }
 
     [Fact]
@@ -235,6 +258,12 @@ public class ThemeSynchronizerTests : IDisposable
         // Assert
         await _mockThemeRepository.Received(1).InsertAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        _mockLogger.Received(1).Log(
+            LogLevel.Warning,
+            Arg.Any<EventId>(),
+            Arg.Is<object>(state => state.ToString()!.Contains("Failed to persist the detection of theme")),
+            Arg.Any<Exception?>(),
+            Arg.Any<Func<object, Exception?, string>>());
     }
 
     [Fact]
