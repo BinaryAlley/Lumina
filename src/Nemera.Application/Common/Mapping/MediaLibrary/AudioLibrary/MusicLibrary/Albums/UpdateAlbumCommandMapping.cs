@@ -1,0 +1,95 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.Mapping.MediaContributors;
+using Nemera.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Common;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.UpdateAlbum;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
+using Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
+using Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
+#endregion
+
+namespace Nemera.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+
+/// <summary>
+/// Extension methods for converting <see cref="UpdateAlbumCommand"/>.
+/// </summary>
+public static class UpdateAlbumCommandMapping
+{
+    /// <summary>
+    /// Applies the editable data of <paramref name="command"/> to the album of <paramref name="artist"/> identified by the command, through the aggregate root.
+    /// </summary>
+    /// <param name="command">The command whose data is applied to the album.</param>
+    /// <param name="artist">The artist aggregate that owns the album.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either the successfully updated <see cref="Artist"/>, or an error message.
+    /// </returns>
+    public static Result<Artist> ToDomainEntity(this UpdateAlbumCommand command, Artist artist)
+    {
+        MusicAlbumMetadataDto metadata = command.Metadata!;
+        Result<AlbumMetadata> metadataResult = metadata.ToDomainValueObject();
+        if (metadataResult.IsFailure)
+            return metadataResult.Errors;
+
+        IEnumerable<Result<MusicMediaContributor>> domainContributorsResult = (command.Contributors ?? []).ToMusicDomainEntities();
+        List<Error> errors = [.. domainContributorsResult.Where(contributorResult => contributorResult.IsFailure).SelectMany(contributorResult => contributorResult.Errors)];
+        if (errors.Count > 0)
+            return errors;
+
+        IEnumerable<Result<AudioRating>> domainRatingsResult = (command.Ratings ?? []).ToDomainValueObjects();
+        errors = [.. domainRatingsResult.Where(ratingResult => ratingResult.IsFailure).SelectMany(ratingResult => ratingResult.Errors)];
+        if (errors.Count > 0)
+            return errors;
+
+        Optional<Barcode> barcode = Optional<Barcode>.None();
+        if (command.Barcode is not null)
+        {
+            Result<Barcode> barcodeResult = Barcode.Create(command.Barcode);
+            if (barcodeResult.IsFailure)
+                return barcodeResult.Errors;
+            barcode = barcodeResult.Value;
+        }
+
+        Optional<MusicBrainzId> musicBrainzReleaseId = Optional<MusicBrainzId>.None();
+        if (command.MusicBrainzReleaseId is not null)
+            musicBrainzReleaseId = MusicBrainzId.Create(command.MusicBrainzReleaseId.Value);
+        Optional<MusicBrainzId> musicBrainzReleaseGroupId = Optional<MusicBrainzId>.None();
+        if (command.MusicBrainzReleaseGroupId is not null)
+            musicBrainzReleaseGroupId = MusicBrainzId.Create(command.MusicBrainzReleaseGroupId.Value);
+        Optional<MusicBrainzId> musicBrainzReleaseArtistId = Optional<MusicBrainzId>.None();
+        if (command.MusicBrainzReleaseArtistId is not null)
+            musicBrainzReleaseArtistId = MusicBrainzId.Create(command.MusicBrainzReleaseArtistId.Value);
+
+        // The album is an entity inside the artist aggregate, so it is referenced by object, not by id; the aggregate member is located here and passed through.
+        Album? album = artist.Albums.FirstOrDefault(album => album.Id.Value == Guid.Parse(command.AlbumId!));
+        if (album is null)
+            return DomainErrors.Music.AlbumNotFound;
+
+        Result<Updated> updateResult = artist.UpdateAlbum(
+            album,
+            metadataResult.Value,
+            Optional<string>.FromNullable(metadata.Disambiguation),
+            Optional<MusicMediaFormat>.FromNullable(command.MediaFormat),
+            Optional<MusicReleasePackaging>.FromNullable(command.Packaging),
+            Optional<string>.FromNullable(metadata.Script),
+            barcode,
+            command.CatalogNumbers ?? [],
+            Optional<string>.FromNullable(command.Label),
+            Optional<string>.FromNullable(command.ASIN),
+            musicBrainzReleaseId,
+            musicBrainzReleaseGroupId,
+            musicBrainzReleaseArtistId,
+            [.. domainContributorsResult.Select(contributorResult => contributorResult.Value)],
+            [.. domainRatingsResult.Select(ratingResult => ratingResult.Value)]);
+        if (updateResult.IsFailure)
+            return updateResult.Errors;
+
+        return artist;
+    }
+}

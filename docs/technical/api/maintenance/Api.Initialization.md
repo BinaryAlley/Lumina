@@ -1,6 +1,6 @@
-# Lumina API
+# Nemera API
 
-- [Lumina API](#lumina-api)
+- [Nemera API](#nemera-api)
   - [Initialization](#initialization)
     - [Setup Application](#setup-application)
       - [Setup Application Request](#setup-application-request)

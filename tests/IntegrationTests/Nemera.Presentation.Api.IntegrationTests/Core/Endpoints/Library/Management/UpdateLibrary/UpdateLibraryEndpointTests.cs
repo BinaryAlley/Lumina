@@ -1,0 +1,574 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
+using Nemera.Contracts.Requests.MediaLibrary.Management;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Library.Management.UpdateLibrary;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Library.Management.UpdateLibrary;
+
+/// <summary>
+/// Contains integration tests for the <see cref="UpdateLibraryEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
+{
+    private HttpClient _client;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+    };
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly DirectoryScanFingerprintEntityFixture _directoryScanFingerprintEntityFixture = new();
+    private readonly UpdateLibraryRequestFixture _updateLibraryRequestFixture = new();
+    private readonly LibraryProviderSelectionRequestFixture _libraryProviderSelectionRequestFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateLibraryEndpointTests"/> class.
+    /// </summary>
+    /// <param name="apiFactory">Injected in-memory API factory.</param>
+    public UpdateLibraryEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
+    {
+        _client = apiFactory.CreateClient();
+        _apiFactory = apiFactory;
+    }
+
+    /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = await _apiFactory.CreateAuthenticatedClientAsync(AuthorizationPermission.CanCreateLibraries);
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenLibraryExists_ShouldUpdateIt()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId, "Original Title");
+        using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
+        {
+            NemeraDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+            seedDbContext.DirectoryScanFingerprints.Add(_directoryScanFingerprintEntityFixture.Create(libraryId: libraryId, path: "/fingerprint"));
+            await seedDbContext.SaveChangesAsync();
+        }
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: libraryId,
+            title: "Updated Title",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: true
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        LibraryResponse? library = await response.Content.ReadFromJsonAsync<LibraryResponse>(_jsonOptions);
+        Assert.NotNull(library);
+        Assert.Equal("Updated Title", library!.Title);
+        Assert.True(library.ShouldSkipHiddenFilesAndDirectoriesDuringScan);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(lib => lib.Id == libraryId);
+        Assert.NotNull(storedLibrary);
+        Assert.Equal("Updated Title", storedLibrary!.Title);
+        Assert.True(storedLibrary.ShouldSkipHiddenFilesAndDirectoriesDuringScan);
+        Assert.False(await dbContext.DirectoryScanFingerprints.AnyAsync(fingerprint => fingerprint.LibraryId == libraryId));
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenHiddenFilesSettingIsAbsent_ShouldKeepTheStoredValue()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId, "Original Title", shouldSkipHiddenFilesAndDirectoriesDuringScan: true);
+        using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
+        {
+            NemeraDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+            seedDbContext.DirectoryScanFingerprints.Add(_directoryScanFingerprintEntityFixture.Create(libraryId: libraryId, path: "/fingerprint"));
+            await seedDbContext.SaveChangesAsync();
+        }
+        Dictionary<string, object?> request = new()
+        {
+            ["id"] = libraryId,
+            ["title"] = "Updated Title",
+            ["libraryType"] = "EBook",
+            ["contentLocations"] = new[] { "C:/Media" },
+            ["coverImage"] = null,
+            ["isEnabled"] = true,
+            ["isLocked"] = false,
+            ["canDownloadMetadataFromWeb"] = true,
+            ["shouldSaveMetadataInMediaDirectories"] = false,
+            ["shouldSkipUnchangedDirectoriesDuringScan"] = false,
+            ["isContentOnSsd"] = false,
+            ["shouldTrackConsumptionProgress"] = null,
+            ["completionThresholdPercentage"] = null,
+            ["pathTemplateParts"] = null,
+            ["metadataProviders"] = null,
+            ["artworkProviders"] = null,
+            ["bookReaders"] = null
+        };
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        LibraryResponse? library = await response.Content.ReadFromJsonAsync<LibraryResponse>(_jsonOptions);
+        Assert.NotNull(library);
+        Assert.True(library!.ShouldSkipHiddenFilesAndDirectoriesDuringScan);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(lib => lib.Id == libraryId);
+        Assert.NotNull(storedLibrary);
+        Assert.True(storedLibrary!.ShouldSkipHiddenFilesAndDirectoriesDuringScan);
+        Assert.True(await dbContext.DirectoryScanFingerprints.AnyAsync(fingerprint => fingerprint.LibraryId == libraryId));
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenLibraryDoesNotExist_ShouldReturnNotFound()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: libraryId,
+            title: "Updated Title",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status404NotFound, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.5", problemDetails["type"].GetString());
+        Assert.Equal("General.NotFound", problemDetails["title"].GetString());
+        Assert.Equal("LibraryNotFound", problemDetails["detail"].GetString());
+        Assert.Equal($"/api/v1/libraries/{libraryId}", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenConsumptionSettingsAreSupplied_ShouldPersistAndReturnThem()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId, "Original Title", shouldTrackConsumptionProgress: false, completionThresholdPercentage: null);
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: libraryId,
+            title: "Updated Title",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 70
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        LibraryResponse? library = await response.Content.ReadFromJsonAsync<LibraryResponse>(_jsonOptions);
+        Assert.NotNull(library);
+        Assert.True(library!.ShouldTrackConsumptionProgress);
+        Assert.Equal(70, library.CompletionThresholdPercentage);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(candidate => candidate.Id == libraryId);
+        Assert.NotNull(storedLibrary);
+        Assert.True(storedLibrary!.ShouldTrackConsumptionProgress);
+        Assert.Equal(70, storedLibrary.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenConsumptionSettingsAreOmitted_ShouldKeepTheStoredSettings()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId, "Original Title", shouldTrackConsumptionProgress: true, completionThresholdPercentage: 70);
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: libraryId,
+            title: "Updated Title",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldTrackConsumptionProgress: null,
+            completionThresholdPercentage: null
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        LibraryResponse? library = await response.Content.ReadFromJsonAsync<LibraryResponse>(_jsonOptions);
+        Assert.NotNull(library);
+        Assert.True(library!.ShouldTrackConsumptionProgress);
+        Assert.Equal(70, library.CompletionThresholdPercentage);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(candidate => candidate.Id == libraryId);
+        Assert.NotNull(storedLibrary);
+        Assert.True(storedLibrary!.ShouldTrackConsumptionProgress);
+        Assert.Equal(70, storedLibrary.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenProgressTrackingIsDisabled_ShouldClearTheStoredThreshold()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId, "Original Title", shouldTrackConsumptionProgress: true, completionThresholdPercentage: 70);
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: libraryId,
+            title: "Updated Title",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: null
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        LibraryResponse? library = await response.Content.ReadFromJsonAsync<LibraryResponse>(_jsonOptions);
+        Assert.NotNull(library);
+        Assert.False(library!.ShouldTrackConsumptionProgress);
+        Assert.Null(library.CompletionThresholdPercentage);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(candidate => candidate.Id == libraryId);
+        Assert.NotNull(storedLibrary);
+        Assert.False(storedLibrary!.ShouldTrackConsumptionProgress);
+        Assert.Null(storedLibrary.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenTrackingIsEnabledWithoutThreshold_ShouldUseTheLibraryTypeDefault()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId, "Original Title", shouldTrackConsumptionProgress: false, completionThresholdPercentage: null);
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: libraryId,
+            title: "Updated Title",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: null
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        LibraryResponse? library = await response.Content.ReadFromJsonAsync<LibraryResponse>(_jsonOptions);
+        Assert.NotNull(library);
+        Assert.True(library!.ShouldTrackConsumptionProgress);
+        Assert.Equal(100, library.CompletionThresholdPercentage);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(candidate => candidate.Id == libraryId);
+        Assert.NotNull(storedLibrary);
+        Assert.True(storedLibrary!.ShouldTrackConsumptionProgress);
+        Assert.Equal(100, storedLibrary.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenThresholdIsAboveOneHundred_ShouldReturnValidationProblemAndKeepTheStoredSettings()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId, "Original Title", shouldTrackConsumptionProgress: true, completionThresholdPercentage: 70);
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: libraryId,
+            title: "Updated Title",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 101
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
+
+        // Assert
+        await AssertValidationProblemAsync(response, $"/api/v1/libraries/{libraryId}", "CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred");
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(candidate => candidate.Id == libraryId);
+        Assert.NotNull(storedLibrary);
+        Assert.True(storedLibrary!.ShouldTrackConsumptionProgress);
+        Assert.Equal(70, storedLibrary.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenThresholdIsSuppliedWhileProgressTrackingIsDisabled_ShouldReturnValidationProblemAndKeepTheStoredSettings()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId, "Original Title", shouldTrackConsumptionProgress: true, completionThresholdPercentage: 70);
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: libraryId,
+            title: "Updated Title",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: 50
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
+
+        // Assert
+        await AssertValidationProblemAsync(response, $"/api/v1/libraries/{libraryId}", "CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff");
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(candidate => candidate.Id == libraryId);
+        Assert.NotNull(storedLibrary);
+        Assert.True(storedLibrary!.ShouldTrackConsumptionProgress);
+        Assert.Equal(70, storedLibrary.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenAProviderChoiceNamesAnUnsupportedPlugin_ShouldReturnValidationProblemAndKeepTheStoredLibrary()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId, "Original Title", shouldTrackConsumptionProgress: true, completionThresholdPercentage: 70);
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: libraryId,
+            title: "Updated Title",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 70,
+            artworkProviders: [_libraryProviderSelectionRequestFixture.Create(isEnabled: true)]
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
+
+        // Assert
+        await AssertValidationProblemAsync(response, $"/api/v1/libraries/{libraryId}", "PluginNotSupportedForLibraryType");
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(candidate => candidate.Id == libraryId);
+        Assert.NotNull(storedLibrary);
+        Assert.Equal("Original Title", storedLibrary!.Title);
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenProviderChoicesAreEmpty_ShouldUpdateTheLibrary()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId, "Original Title", shouldTrackConsumptionProgress: true, completionThresholdPercentage: 70);
+        UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            id: libraryId,
+            title: "Updated Title",
+            libraryType: "EBook",
+            contentLocations: ["C:/Media"],
+            coverImage: null,
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 70,
+            metadataProviders: [],
+            artworkProviders: [],
+            bookReaders: []
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(candidate => candidate.Id == libraryId);
+        Assert.NotNull(storedLibrary);
+        Assert.Equal("Updated Title", storedLibrary!.Title);
+    }
+
+    /// <summary>
+    /// Asserts that <paramref name="response"/> carries the standard validation problem of the update library route.
+    /// </summary>
+    /// <param name="response">The response to assert.</param>
+    /// <param name="expectedInstance">The expected instance path of the problem.</param>
+    /// <param name="expectedErrorDescription">The error description expected under the validation errors.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    private async Task AssertValidationProblemAsync(HttpResponseMessage response, string expectedInstance, string expectedErrorDescription)
+    {
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
+        Assert.Equal("General.Validation", problemDetails["title"].GetString());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
+        Assert.Equal(expectedInstance, problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
+
+        Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors!.Keys);
+        Assert.Contains(expectedErrorDescription, errors["General.Validation"]);
+    }
+
+    /// <summary>
+    /// Seeds a <see cref="LibraryEntity"/> owned by <paramref name="userId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library to seed.</param>
+    /// <param name="userId">The Id of the user that owns the library.</param>
+    /// <param name="title">The title of the library.</param>
+    /// <param name="shouldTrackConsumptionProgress">Whether the seeded library tracks the consumption progress of its items.</param>
+    /// <param name="completionThresholdPercentage">The completion threshold percentage of the seeded library, if any.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    private async Task SeedLibraryAsync(
+        Guid libraryId,
+        Guid userId,
+        string title,
+        bool shouldTrackConsumptionProgress = false,
+        int? completionThresholdPercentage = null,
+        bool shouldSkipHiddenFilesAndDirectoriesDuringScan = false)
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        dbContext.Libraries.Add(_libraryEntityFixture.Create(
+            id: libraryId,
+            userId: userId,
+            title: title,
+            libraryType: LibraryType.EBook,
+            contentLocations: [],
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: shouldSkipHiddenFilesAndDirectoriesDuringScan,
+            shouldTrackConsumptionProgress: shouldTrackConsumptionProgress,
+            completionThresholdPercentage: completionThresholdPercentage));
+        await dbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Gets the Id of the currently authenticated test user.
+    /// </summary>
+    /// <returns>The Id of the authenticated test user.</returns>
+    private Guid GetCurrentUserId()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        UserEntity user = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername);
+        return user.Id;
+    }
+
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public async Task DisposeAsync()
+    {
+        await _apiFactory.RemoveTestUserAsync();
+    }
+}

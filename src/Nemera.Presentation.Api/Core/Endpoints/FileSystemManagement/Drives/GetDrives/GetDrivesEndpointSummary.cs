@@ -1,0 +1,61 @@
+#region ========================================================================= USING =====================================================================================
+using FastEndpoints;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
+using System.Diagnostics.CodeAnalysis;
+#endregion
+
+namespace Nemera.Presentation.Api.Core.Endpoints.FileSystemManagement.Drives.GetDrives;
+
+/// <summary>
+/// Class used for providing a textual description for the <see cref="GetDrivesEndpoint"/> API endpoint, for OpenAPI.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class GetDrivesEndpointSummary : Summary<GetDrivesEndpoint, EmptyRequest>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetDrivesEndpointSummary"/> class.
+    /// </summary>
+    public GetDrivesEndpointSummary()
+    {
+        Summary = "Retrieves the list of file system drives.";
+        Description = "Returns all available drives in the file system, on Windows, or the root path, on UNIX.";
+
+
+        Response(200, "The list of file system drives is returned.",
+            example: new FileSystemTreeNodeResponse[] {
+                new() { Path = "C:\\", Name = "C:\\", ItemType = FileSystemItemType.Root, IsHidden = false, IsExpanded = false, ChildrenLoaded = false, Children = [] },
+                new() { Path = "D:\\", Name = "D:\\", ItemType = FileSystemItemType.Root, IsHidden = false, IsExpanded = false, ChildrenLoaded = false, Children = [] }
+            });
+
+        Response(401, "Authentication required.", "application/problem+json",
+            example: new[]
+            {
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "Authentication failed",
+                    instance = "/api/v1/drives/get-drives"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token has expired",
+                    instance = "/api/v1/drives/get-drives"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token is invalid",
+                    instance = "/api/v1/drives/get-drives"
+                }
+            }
+        );
+    }
+}

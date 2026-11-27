@@ -1,0 +1,118 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
+using Nemera.Application.Fixtures.Core.FileSystemManagement.Drives.Queries.GetDrives;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
+using NSubstitute;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Application.UnitTests.Core.FileSystemManagement.Drives.Queries.GetDrives;
+
+/// <summary>
+/// Contains unit tests for the <see cref="GetDrivesQueryHandler"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class GetDrivesQueryHandlerTests
+{
+    private readonly IDriveService _mockDriveService;
+    private readonly GetDrivesQueryHandler _sut;
+    private readonly GetDrivesQueryFixture _getDrivesQueryFixture = new();
+    private readonly WindowsRootItemFixture _windowsRootItemFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetDrivesQueryHandlerTests"/> class.
+    /// </summary>
+    public GetDrivesQueryHandlerTests()
+    {
+        _mockDriveService = Substitute.For<IDriveService>();
+        _sut = new GetDrivesQueryHandler(_mockDriveService);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenCalled_ShouldReturnSuccessResult()
+    {
+        // Arrange
+        GetDrivesQuery getDrivesQuery = _getDrivesQueryFixture.Create();
+
+        IEnumerable<FileSystemItem> drives =
+        [
+            _windowsRootItemFixture.Create(path: "C:\\", name: "C:"),
+            _windowsRootItemFixture.Create(path: "D:\\", name: "D:")
+        ];
+
+        _mockDriveService.GetDrives()
+            .Returns(Result.From(drives));
+
+        // Act
+        Result<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(getDrivesQuery, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.IsAssignableFrom<IEnumerable<FileSystemTreeNodeResponse>>(result.Value);
+        Assert.Equal(drives.Count(), result.Value.Count());
+
+        List<FileSystemTreeNodeResponse> resultList = [.. result.Value];
+        List<FileSystemItem> drivesList = [.. drives];
+
+        for (int i = 0; i < resultList.Count; i++)
+        {
+            FileSystemTreeNodeResponse response = resultList[i];
+            WindowsRootItem drive = (WindowsRootItem)drivesList[i];
+
+            Assert.Equal(drive.Id.Path, response.Path);
+            Assert.Equal(drive.Name, response.Name);
+            Assert.Equal(FileSystemItemType.Root, response.ItemType);
+            Assert.False(response.IsExpanded);
+            Assert.False(response.ChildrenLoaded);
+            Assert.Empty(response.Children);
+        }
+
+        _mockDriveService.Received(1).GetDrives();
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenDriveServiceReturnsError_ShouldReturnFailureResult()
+    {
+        // Arrange
+        GetDrivesQuery query = _getDrivesQueryFixture.Create();
+        Error error = Error.Failure("DriveService.Error", "An error occurred");
+        _mockDriveService.GetDrives()
+            .Returns(error);
+
+        // Act
+        Result<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(error, result.FirstError);
+        _mockDriveService.Received(1).GetDrives();
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenDriveServiceReturnsEmptyList_ShouldReturnEmptySuccessResult()
+    {
+        // Arrange
+        GetDrivesQuery query = _getDrivesQueryFixture.Create();
+        Result<IEnumerable<FileSystemItem>> emptyList = Result.From(Enumerable.Empty<FileSystemItem>());
+        _mockDriveService.GetDrives()
+            .Returns(emptyList);
+
+        // Act
+        Result<IEnumerable<FileSystemTreeNodeResponse>> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Empty(result.Value);
+        _mockDriveService.Received(1).GetDrives();
+    }
+}

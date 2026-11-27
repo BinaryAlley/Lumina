@@ -1,0 +1,293 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.Mapping.Common.Metadata;
+using Nemera.Application.Common.Mapping.MediaLibrary.Management;
+using Nemera.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+#endregion
+
+namespace Nemera.Application.UnitTests.Common.Mapping.MediaLibrary.Management;
+
+/// <summary>
+/// Contains unit tests for the <see cref="LibraryMapping"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class LibraryMappingTests
+{
+    private readonly LibraryFixture _libraryFixture = new();
+    private readonly LibraryPathPartFixture _libraryPathPartFixture = new();
+    private readonly LibraryPathTemplateFixture _libraryPathTemplateFixture = new();
+    private readonly LibraryConsumptionSettingsFixture _libraryConsumptionSettingsFixture = new();
+
+    [Fact]
+    public void ToRepositoryEntity_WhenMappingValidLibrary_ShouldMapCorrectly()
+    {
+        // Arrange
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: ["C:/Books", "D:/Media/Books"],
+            coverImage: "D:/myPoster.jpg",
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false,
+            shouldSkipUnchangedDirectoriesDuringScan: false,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: true,
+            scanIds: [Guid.NewGuid()]);
+
+        // Act
+        LibraryEntity result = library.ToRepositoryEntity();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(library.Id.Value, result.Id);
+        Assert.Equal(library.UserId.Value, result.UserId);
+        Assert.Equal(library.Title, result.Title);
+        Assert.Equal(library.LibraryType, result.LibraryType);
+        Assert.Equal(library.ContentLocations.Select(l => l.Path), result.ContentLocations.Select(l => l.Path));
+        Assert.Equal(library.CoverImage.HasValue ? library.CoverImage.Value : null, result.CoverImage);
+        Assert.Equal(default, result.CreatedOnUtc);
+        Assert.Null(result.UpdatedOnUtc);
+        Assert.True(result.IsEnabled);
+        Assert.False(result.IsLocked);
+        Assert.True(result.CanDownloadMetadataFromWeb);
+        Assert.False(result.ShouldSaveMetadataInMediaDirectories);
+        Assert.True(result.ShouldSkipHiddenFilesAndDirectoriesDuringScan);
+        Assert.Equal(library.IsContentOnSsd, result.IsContentOnSsd);
+        Assert.Equal(library.ConsumptionSettings.ShouldTrackConsumptionProgress, result.ShouldTrackConsumptionProgress);
+        Assert.Equal(library.ConsumptionSettings.CompletionThresholdPercentage.HasValue ? library.ConsumptionSettings.CompletionThresholdPercentage.Value : null, result.CompletionThresholdPercentage);
+        Assert.Equal(library.ScanIds.Select(scanId => scanId.Value), result.LibraryScans.Select(libraryScan => libraryScan.Id));
+    }
+
+    [Fact]
+    public void ToRepositoryEntity_WhenMappingLibraryWithEmptyContentLocations_ShouldMapCorrectly()
+    {
+        // Arrange
+        Library library = _libraryFixture.Create(
+            title: "Empty Library",
+            libraryType: LibraryType.Book,
+            contentLocations: [],
+            coverImage: "D:/myPoster.jpg");
+
+        // Act
+        LibraryEntity result = library.ToRepositoryEntity();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result.ContentLocations);
+        Assert.Equal(library.CoverImage.HasValue ? library.CoverImage.Value : null, result.CoverImage);
+    }
+
+    [Theory]
+    [InlineData(LibraryType.Book)]
+    [InlineData(LibraryType.Movie)]
+    [InlineData(LibraryType.TvShow)]
+    [InlineData(LibraryType.Music)]
+    public void ToRepositoryEntity_WhenMappingDifferentLibraryTypes_ShouldMapCorrectly(LibraryType libraryType)
+    {
+        // Arrange
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: libraryType,
+            contentLocations: ["C:/Media"],
+            coverImage: "D:/myPoster.jpg",
+            isEnabled: true,
+            isLocked: false,
+            canDownloadMetadataFromWeb: true,
+            shouldSaveMetadataInMediaDirectories: false);
+
+        // Act
+        LibraryEntity result = library.ToRepositoryEntity();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(libraryType, result.LibraryType);
+        Assert.Equal(library.CoverImage.HasValue ? library.CoverImage.Value : null, result.CoverImage);
+        Assert.True(result.IsEnabled);
+        Assert.False(result.IsLocked);
+        Assert.True(result.CanDownloadMetadataFromWeb);
+        Assert.False(result.ShouldSaveMetadataInMediaDirectories);
+    }
+
+    [Fact]
+    public void ToRepositoryEntity_WhenMappingMultipleContentLocations_ShouldMapAllCorrectly()
+    {
+        // Arrange
+        List<string> contentLocations =
+        [
+            "C:/Media/Books",
+            "D:/Books",
+            "E:/Digital Library/Books",
+            "F:/Reading Material"
+        ];
+
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: contentLocations,
+            coverImage: "D:/myPoster.jpg");
+
+        // Act
+        LibraryEntity result = library.ToRepositoryEntity();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(library.ContentLocations.Select(l => l.Path), result.ContentLocations.Select(l => l.Path));
+        Assert.Equal(library.CoverImage.HasValue ? library.CoverImage.Value : null, result.CoverImage);
+    }
+
+    [Fact]
+    public void ToRepositoryEntity_WhenMappingNullCoverimage_ShouldMapCorrectly()
+    {
+        // Arrange
+        List<string> contentLocations =
+        [
+            "C:/Media/Books",
+            "D:/Books"
+        ];
+
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: contentLocations,
+            includeCoverImage: false);
+
+        // Act
+        LibraryEntity result = library.ToRepositoryEntity();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(library.ContentLocations.Select(l => l.Path), result.ContentLocations.Select(l => l.Path));
+        Assert.Null(result.CoverImage);
+    }
+
+    [Fact]
+    public void ToRepositoryEntity_WhenMappingEmptyScanList_ShouldMapCorrectly()
+    {
+        // Arrange
+        List<string> contentLocations =
+        [
+            "C:/Media/Books",
+            "D:/Books"
+        ];
+
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: contentLocations,
+            includeCoverImage: false,
+            scanIds: []);
+
+        // Act
+        LibraryEntity result = library.ToRepositoryEntity();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.NotNull(library.ScanIds);
+        Assert.NotNull(result.LibraryScans);
+    }
+
+    [Fact]
+    public void ToRepositoryEntity_WhenLibraryHasPathTemplateParts_ShouldMapPartsWithSequentialPositions()
+    {
+        // Arrange
+        LibraryPathPart literalPart = _libraryPathPartFixture.Create(
+            kind: LibraryPathPartKind.Literal,
+            representation: "Various Artists",
+            isOptional: false);
+        LibraryPathPart typedPart = _libraryPathPartFixture.Create(
+            kind: LibraryPathPartKind.Artist,
+            representation: "{0}",
+            isOptional: true);
+        LibraryPathTemplate pathTemplate = _libraryPathTemplateFixture.Create(parts: [literalPart, typedPart]);
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: ["C:/Books"],
+            pathTemplate: pathTemplate);
+
+        // Act
+        LibraryEntity result = library.ToRepositoryEntity();
+
+        // Assert
+        List<LibraryPathTemplatePartEntity> parts = [.. result.PathTemplateParts.OrderBy(part => part.Position)];
+        Assert.Equal(2, parts.Count);
+        Assert.Equal(0, parts[0].Position);
+        Assert.Equal(LibraryPathPartKind.Literal, parts[0].Kind);
+        Assert.Equal("Various Artists", parts[0].Representation);
+        Assert.False(parts[0].IsOptional);
+        Assert.Equal(1, parts[1].Position);
+        Assert.Equal(LibraryPathPartKind.Artist, parts[1].Kind);
+        Assert.Equal("{0}", parts[1].Representation);
+        Assert.True(parts[1].IsOptional);
+    }
+
+    [Fact]
+    public void ToRepositoryEntity_WhenLibraryHasNoPathTemplateParts_ShouldMapEmptyCollection()
+    {
+        // Arrange
+        LibraryPathTemplate pathTemplate = _libraryPathTemplateFixture.Create(includeParts: false);
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: ["C:/Books"],
+            pathTemplate: pathTemplate);
+
+        // Act
+        LibraryEntity result = library.ToRepositoryEntity();
+
+        // Assert
+        Assert.Empty(result.PathTemplateParts);
+    }
+
+    [Fact]
+    public void ToRepositoryEntity_WhenProgressTrackingIsEnabled_ShouldMapTrackingAndThreshold()
+    {
+        // Arrange
+        LibraryConsumptionSettings consumptionSettings = _libraryConsumptionSettingsFixture.Create(
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 70);
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: ["C:/Books"],
+            consumptionSettings: consumptionSettings);
+
+        // Act
+        LibraryEntity result = library.ToRepositoryEntity();
+
+        // Assert
+        Assert.True(result.ShouldTrackConsumptionProgress);
+        Assert.Equal(70, result.CompletionThresholdPercentage);
+    }
+
+    [Fact]
+    public void ToRepositoryEntity_WhenProgressTrackingIsDisabled_ShouldMapTrackingOffWithoutThreshold()
+    {
+        // Arrange
+        LibraryConsumptionSettings consumptionSettings = _libraryConsumptionSettingsFixture.Create(
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: 70);
+        Library library = _libraryFixture.Create(
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: ["C:/Books"],
+            consumptionSettings: consumptionSettings);
+
+        // Act
+        LibraryEntity result = library.ToRepositoryEntity();
+
+        // Assert
+        Assert.False(result.ShouldTrackConsumptionProgress);
+        Assert.Null(result.CompletionThresholdPercentage);
+    }
+}

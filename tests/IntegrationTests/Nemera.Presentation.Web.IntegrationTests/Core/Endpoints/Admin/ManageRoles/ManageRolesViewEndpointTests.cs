@@ -1,0 +1,98 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Presentation.Web.Common.DTO.Authorization;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.ManageRoles;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
+using Polly.CircuitBreaker;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.ManageRoles;
+
+/// <summary>
+/// Contains integration tests for the <see cref="ManageRolesViewEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class ManageRolesViewEndpointTests : IClassFixture<NemeraWebFactory>
+{
+    private readonly NemeraWebFactory _apiFactory;
+    private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
+    private readonly PermissionDtoFixture _permissionDtoFixture = new();
+    private readonly RoleDtoFixture _roleDtoFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ManageRolesViewEndpointTests"/> class.
+    /// </summary>
+    /// <param name="apiFactory">Injected Web application factory.</param>
+    public ManageRolesViewEndpointTests(NemeraWebFactory apiFactory)
+    {
+        _apiFactory = apiFactory;
+    }
+
+    [Fact]
+    public async Task ManageRoles_WhenCalledByAuthenticatedAdmin_ShouldRenderRolesManagementPage()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "Admin", permissions: []);
+        RoleDto[] expectedRoles = [.. _roleDtoFixture.CreateMany()];
+        PermissionDto[] expectedPermissions = [.. _permissionDtoFixture.CreateMany()];
+        _apiFactory.ApiClientStub.RegisterGetResponse("auth/roles", expectedRoles);
+        _apiFactory.ApiClientStub.RegisterGetResponse("auth/permissions", expectedPermissions);
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.GetAsync("/en-us/admin/manage-roles");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("text/html", response.Content.Headers.ContentType!.MediaType);
+    }
+
+    [Fact]
+    public async Task ManageRoles_WhenCalledByNonAdminUser_ShouldRedirectToAccessDenied()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationResponse = _getAuthorizationResponseFixture.Create(userId: Guid.NewGuid(), role: "User", permissions: []);
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.GetAsync("/en-us/admin/manage-roles");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Contains("access-denied", response.Headers.Location!.ToString());
+    }
+
+    [Fact]
+    public async Task ManageRoles_WhenTheApiIsUnreachableDuringAuthorization_ShouldRenderThePage()
+    {
+        // Arrange
+        // The policy handler runs under real endpoint routing, where the authorization resource is the endpoint, not the HttpContext.
+        _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.AuthorizationException = new BrokenCircuitException();
+        RoleDto[] expectedRoles = [.. _roleDtoFixture.CreateMany()];
+        PermissionDto[] expectedPermissions = [.. _permissionDtoFixture.CreateMany()];
+        _apiFactory.ApiClientStub.RegisterGetResponse("auth/roles", expectedRoles);
+        _apiFactory.ApiClientStub.RegisterGetResponse("auth/permissions", expectedPermissions);
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.GetAsync("/en-us/admin/manage-roles");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("text/html", response.Content.Headers.ContentType!.MediaType);
+        string content = await response.Content.ReadAsStringAsync();
+        Assert.Contains("data-server-unreachable-banner", content);
+    }
+}

@@ -1,0 +1,145 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.AddBook;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaContributors;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using System;
+using System.Diagnostics.CodeAnalysis;
+#endregion
+
+namespace Nemera.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+
+/// <summary>
+/// Contains unit tests for the <see cref="AddBookRequestMapping"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class AddBookRequestMappingTests
+{
+    private readonly AddBookRequestFixture _addBookRequestFixture = new();
+    private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
+    private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
+
+    [Fact]
+    public void ToCommand_WhenMappingCompleteRequest_ShouldMapAllPropertiesCorrectly()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        AddBookRequest request = _addBookRequestFixture.Create();
+
+        // Act
+        AddBookCommand result = request.ToCommand(libraryId.ToString());
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(libraryId.ToString(), result.LibraryId);
+        Assert.Equal(request.Path, result.Path);
+        Assert.Equal(request.Metadata, result.Metadata);
+        Assert.Equal(request.Format, result.Format);
+        Assert.Equal(request.Edition, result.Edition);
+        Assert.Equal(request.VolumeNumber, result.VolumeNumber);
+        Assert.Equal(request.Series, result.Series);
+        Assert.Equal(request.ASIN, result.ASIN);
+        Assert.Equal(request.GoodreadsId, result.GoodreadsId);
+        Assert.Equal(request.LCCN, result.LCCN);
+        Assert.Equal(request.OCLCNumber, result.OCLCNumber);
+        Assert.Equal(request.OpenLibraryId, result.OpenLibraryId);
+        Assert.Equal(request.LibraryThingId, result.LibraryThingId);
+        Assert.Equal(request.GoogleBooksId, result.GoogleBooksId);
+        Assert.Equal(request.BarnesAndNobleId, result.BarnesAndNobleId);
+        Assert.Equal(request.AppleBooksId, result.AppleBooksId);
+        Assert.Equal(request.ISBNs, result.ISBNs);
+        Assert.Equal(request.Contributors, result.Contributors);
+        Assert.Equal(request.Ratings, result.Ratings);
+    }
+
+    [Fact]
+    public void ToCommand_WhenMappingMinimalRequest_ShouldMapCorrectly()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        AddBookRequest request = _addBookRequestFixture.Create(
+            path: "/books/test.epub",
+            metadata: _writtenContentMetadataDtoFixture.Create(title: "Test Book"),
+            includeFormat: false,
+            includeEdition: false,
+            includeVolumeNumber: false,
+            includeAsin: false,
+            includeGoodreadsId: false,
+            includeLccn: false,
+            includeOclcNumber: false,
+            includeOpenLibraryId: false,
+            includeLibraryThingId: false,
+            includeGoogleBooksId: false,
+            includeBarnesAndNobleId: false,
+            includeAppleBooksId: false,
+            includeIsbns: false,
+            includeRatings: false,
+            includeContributors: false
+        );
+
+        // Act
+        AddBookCommand result = request.ToCommand(libraryId.ToString());
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(request.Metadata, result.Metadata);
+        Assert.Null(result.Format);
+        Assert.Null(result.Edition);
+        Assert.Null(result.VolumeNumber);
+        Assert.Null(result.Series);
+        Assert.Null(result.ASIN);
+        Assert.Null(result.GoodreadsId);
+        Assert.Null(result.LCCN);
+        Assert.Null(result.OCLCNumber);
+        Assert.Null(result.OpenLibraryId);
+        Assert.Null(result.LibraryThingId);
+        Assert.Null(result.GoogleBooksId);
+        Assert.Null(result.BarnesAndNobleId);
+        Assert.Null(result.AppleBooksId);
+        Assert.Null(result.ISBNs);
+        Assert.Null(result.Contributors);
+        Assert.Null(result.Ratings);
+    }
+
+    [Fact]
+    public void ToCommand_WhenMappingRequestWithCollections_ShouldMapCollectionsCorrectly()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        AddBookRequest request = _addBookRequestFixture.Create(
+            path: "/books/test.epub",
+            metadata: _writtenContentMetadataDtoFixture.Create(title: "Test Book"),
+            isbns: [new("978-0-123456-78-9", IsbnFormat.Isbn13)],
+            contributors:
+            [
+                _mediaContributorReferenceDtoFixture.Create(role: MediaContributorRole.Author)
+            ],
+            ratings: [new(4.5m, 5m, BookRatingSource.Goodreads, 1000)],
+            includeFormat: false,
+            includeEdition: false,
+            includeVolumeNumber: false,
+            includeAsin: false,
+            includeGoodreadsId: false,
+            includeLccn: false,
+            includeOclcNumber: false,
+            includeOpenLibraryId: false,
+            includeLibraryThingId: false,
+            includeGoogleBooksId: false,
+            includeBarnesAndNobleId: false,
+            includeAppleBooksId: false
+        );
+
+        // Act
+        AddBookCommand result = request.ToCommand(libraryId.ToString());
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(request.ISBNs, result.ISBNs);
+        Assert.Equal(request.Contributors, result.Contributors);
+        Assert.Equal(request.Ratings, result.Ratings);
+    }
+}

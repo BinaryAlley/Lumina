@@ -1,0 +1,38 @@
+@using Nemera.Presentation.Web.Common.DTO.Common
+@using Nemera.Presentation.Web.Common.Services
+@using Microsoft.Extensions.Localization
+
+@model ErrorViewDto
+@inject IStringLocalizerFactory _stringLocalizerFactory
+
+@{
+    ViewData["Title"] = "Error";
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+    var localizer = _stringLocalizerFactory.Create("Nemera.Presentation.Web.Views.Shared._Layout", "Nemera.Presentation.Web");
+}
+
+<div style="display: grid; grid-template-rows: auto 1fr;">
+    <div style="min-height: 1rem;"></div>
+    <div class="enlightenment-panel shadow-effect p-2 mx-auto panel w-55 mb-10" style="min-width: 320px;">
+        <div class="shine-effect"></div>
+        <div class="text-center w-100">
+            <p class="invalid-feedback f-18 w-100"><b>@localizer["Error"]</b></p>
+            <p class="invalid-feedback f-18 w-100"><b>@localizer["NavigationFailed"]</b></p>
+            @if (Model.ShouldShowRequestId)
+            {
+                <p class="text-disabled w-100">
+                    <strong>Request ID:</strong> <code>@Model.RequestId</code>
+                </p>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/plain" data-form="@scriptId">
+        // The page is the navigation failure fallback, so the user is told that the page could not be loaded. When a marker
+        // driven notification was already shown for this page, it is not repeated.
+        if (!window.isServerUnreachable)
+            notificationService.show(jsLocalizedMessages.navigationFailed, NotificationType.ERROR);
+    </script>
+}

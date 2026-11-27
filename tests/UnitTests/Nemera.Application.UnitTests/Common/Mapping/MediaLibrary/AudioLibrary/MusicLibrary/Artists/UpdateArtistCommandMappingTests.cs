@@ -1,0 +1,328 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.AddAlbum;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Commands.UpdateArtist;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.AddTrack;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.AddAlbum;
+using Nemera.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Commands.UpdateArtist;
+using Nemera.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.AddTrack;
+using Nemera.Contracts.Fixtures.Core.DTO.Common;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate;
+using Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+#endregion
+
+namespace Nemera.Application.UnitTests.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+
+/// <summary>
+/// Contains unit tests for the <see cref="UpdateArtistCommandMapping"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class UpdateArtistCommandMappingTests
+{
+    private readonly UpdateArtistCommandFixture _updateArtistCommandFixture = new();
+    private readonly AddAlbumCommandFixture _addAlbumCommandFixture = new();
+    private readonly AddTrackCommandFixture _addTrackCommandFixture = new();
+    private readonly ArtistEntityFixture _artistEntityFixture = new();
+    private readonly AlbumEntityFixture _albumEntityFixture = new();
+    private readonly TrackEntityFixture _trackEntityFixture = new();
+    private readonly MusicAlbumMetadataDtoFixture _musicAlbumMetadataDtoFixture = new();
+    private readonly MusicArtistMetadataDtoFixture _musicArtistMetadataDtoFixture = new();
+    private readonly MusicTrackMetadataDtoFixture _musicTrackMetadataDtoFixture = new();
+    private readonly GenreDtoFixture _genreDtoFixture = new();
+
+    [Fact]
+    public void ToDomainEntity_WhenMappingCompleteCommand_ShouldMapAllPropertiesCorrectly()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
+        string originalPath = artist.Albums.SelectMany(album => album.Tracks).First(track => track.Id.Value == trackId).Path;
+        string attemptedPath = "/music/queen/a-night-at-the-opera/03-you-re-my-best-friend.flac";
+        AddTrackCommand trackCommand = _addTrackCommandFixture.Create(trackId: trackId, path: attemptedPath, trackNumber: 7);
+        AddAlbumCommand albumCommand = _addAlbumCommandFixture.Create(albumId: albumId, tracks: [trackCommand]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(
+            libraryId: libraryId.ToString(),
+            artistId: artist.Id.Value.ToString(),
+            albums: [albumCommand]);
+
+        // Act
+        Result<Artist> result = command.ToDomainEntity(artist);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Same(artist, result.Value);
+        Assert.Equal(command.Metadata!.Name, result.Value.Name);
+        Assert.True(result.Value.Website.HasValue);
+        Assert.Equal(command.Website, result.Value.Website.Value);
+        Assert.True(result.Value.MusicBrainzArtistId.HasValue);
+        Assert.Equal(command.MusicBrainzArtistId, result.Value.MusicBrainzArtistId.Value.Value);
+        Assert.Equal(command.Contributors!.Count, result.Value.Contributors.Count);
+        Album updatedAlbum = result.Value.Albums.First(album => album.Id.Value == albumId);
+        Assert.Equal(albumCommand.Metadata!.Title, updatedAlbum.Metadata.Title);
+        Track updatedTrack = updatedAlbum.Tracks.First(track => track.Id.Value == trackId);
+        // The file system path of an existing track is never changed by the update, it is set only when the track is created.
+        Assert.Equal(originalPath, updatedTrack.Path);
+        Assert.NotEqual(attemptedPath, updatedTrack.Path);
+        Assert.Equal(7, updatedTrack.TrackNumber);
+        Assert.True(updatedTrack.DiscNumber.HasValue);
+        Assert.Equal(trackCommand.DiscNumber, updatedTrack.DiscNumber.Value);
+        Assert.Equal(trackCommand.Moods!.Count, updatedTrack.Moods.Count);
+        Assert.Equal(trackCommand.Isrcs!.Count, updatedTrack.Isrcs.Count);
+        Assert.Equal(trackCommand.Contributors!.Count, updatedTrack.Contributors.Count);
+        Assert.Equal(trackCommand.Ratings!.Count, updatedTrack.Ratings.Count);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenOptionalPropertiesAreMissing_ShouldMapTheRequiredPropertiesAndNones()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
+        AddTrackCommand trackCommand = _addTrackCommandFixture.Create(
+            trackId: trackId,
+            includeDiscNumber: false,
+            includeScript: false,
+            includeKey: false,
+            includeBpm: false,
+            includeWork: false,
+            includeMusicBrainzRecordingId: false,
+            includeMusicBrainzTrackId: false,
+            includeMoods: false,
+            includeIsrcs: false,
+            contributors: [],
+            ratings: []);
+        AddAlbumCommand albumCommand = _addAlbumCommandFixture.Create(albumId: albumId, tracks: [trackCommand]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(
+            libraryId: libraryId.ToString(),
+            artistId: artist.Id.Value.ToString(),
+            includeWebsite: false,
+            includeMusicBrainzArtistId: false,
+            contributors: [],
+            albums: [albumCommand]);
+
+        // Act
+        Result<Artist> result = command.ToDomainEntity(artist);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.False(result.Value.Website.HasValue);
+        Assert.False(result.Value.MusicBrainzArtistId.HasValue);
+        Assert.Empty(result.Value.Contributors);
+        Track updatedTrack = result.Value.Albums.First(album => album.Id.Value == albumId).Tracks.First(track => track.Id.Value == trackId);
+        Assert.False(updatedTrack.DiscNumber.HasValue);
+        Assert.False(updatedTrack.Script.HasValue);
+        Assert.False(updatedTrack.Key.HasValue);
+        Assert.False(updatedTrack.Bpm.HasValue);
+        Assert.False(updatedTrack.Work.HasValue);
+        Assert.Empty(updatedTrack.Moods);
+        Assert.Empty(updatedTrack.Isrcs);
+        Assert.Empty(updatedTrack.Contributors);
+        Assert.Empty(updatedTrack.Ratings);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenArtistNameIsEmpty_ShouldReturnError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
+        AddAlbumCommand albumCommand = _addAlbumCommandFixture.Create(albumId: albumId, tracks: []);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(
+            libraryId: libraryId.ToString(),
+            artistId: artist.Id.Value.ToString(),
+            metadata: _musicArtistMetadataDtoFixture.Create(name: string.Empty),
+            albums: [albumCommand]);
+
+        // Act
+        Result<Artist> result = command.ToDomainEntity(artist);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.ArtistNameCannotBeEmpty, result.FirstError);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenAlbumCreationFails_ShouldReturnError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
+        AddAlbumCommand invalidAlbum = _addAlbumCommandFixture.Create(
+            albumId: albumId,
+            metadata: _musicAlbumMetadataDtoFixture.Create(genres: [_genreDtoFixture.Create(name: string.Empty)]));
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(
+            libraryId: libraryId.ToString(),
+            artistId: artist.Id.Value.ToString(),
+            albums: [invalidAlbum]);
+
+        // Act
+        Result<Artist> result = command.ToDomainEntity(artist);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Contains(result.Errors, error => error.Description == Errors.Metadata.GenreNameCannotBeEmpty.Description);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenAllAlbumsAreRemoved_ShouldReturnError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(
+            libraryId: libraryId.ToString(),
+            artistId: artist.Id.Value.ToString(),
+            albums: []);
+
+        // Act
+        Result<Artist> result = command.ToDomainEntity(artist);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.ArtistMustHaveAtLeastOneAlbum, result.FirstError);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenAlbumIsNew_ShouldAddItAndRemoveTheStaleOne()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
+        AddAlbumCommand newAlbum = _addAlbumCommandFixture.Create();
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(
+            libraryId: libraryId.ToString(),
+            artistId: artist.Id.Value.ToString(),
+            albums: [newAlbum]);
+
+        // Act
+        Result<Artist> result = command.ToDomainEntity(artist);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Single(result.Value.Albums);
+        Assert.DoesNotContain(result.Value.Albums, album => album.Id.Value == albumId);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenTrackIsNew_ShouldAddItToTheExistingAlbum()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
+        Guid newTrackId = Guid.NewGuid();
+        AddTrackCommand existingTrack = _addTrackCommandFixture.Create(trackId: trackId);
+        AddTrackCommand newTrack = _addTrackCommandFixture.Create(trackId: newTrackId);
+        AddAlbumCommand albumCommand = _addAlbumCommandFixture.Create(albumId: albumId, tracks: [existingTrack, newTrack]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(
+            libraryId: libraryId.ToString(),
+            artistId: artist.Id.Value.ToString(),
+            albums: [albumCommand]);
+
+        // Act
+        Result<Artist> result = command.ToDomainEntity(artist);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Album updatedAlbum = result.Value.Albums.First(album => album.Id.Value == albumId);
+        Assert.Equal(2, updatedAlbum.Tracks.Count);
+        Assert.Contains(updatedAlbum.Tracks, track => track.Id.Value == newTrackId);
+        Assert.Contains(updatedAlbum.Tracks, track => track.Id.Value == trackId);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenTrackIsStale_ShouldRemoveItFromTheExistingAlbum()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
+        AddAlbumCommand albumCommand = _addAlbumCommandFixture.Create(albumId: albumId, tracks: []);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(
+            libraryId: libraryId.ToString(),
+            artistId: artist.Id.Value.ToString(),
+            albums: [albumCommand]);
+
+        // Act
+        Result<Artist> result = command.ToDomainEntity(artist);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Album updatedAlbum = result.Value.Albums.First(album => album.Id.Value == albumId);
+        Assert.Empty(updatedAlbum.Tracks);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenTrackHasDisambiguation_ShouldMapTheDisambiguationThrough()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
+        string disambiguation = "live at Wembley";
+        AddTrackCommand trackCommand = _addTrackCommandFixture.Create(
+            trackId: trackId,
+            metadata: _musicTrackMetadataDtoFixture.Create(disambiguation: disambiguation));
+        AddAlbumCommand albumCommand = _addAlbumCommandFixture.Create(albumId: albumId, tracks: [trackCommand]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(
+            libraryId: libraryId.ToString(),
+            artistId: artist.Id.Value.ToString(),
+            albums: [albumCommand]);
+
+        // Act
+        Result<Artist> result = command.ToDomainEntity(artist);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Track updatedTrack = result.Value.Albums.First(album => album.Id.Value == albumId).Tracks.First(track => track.Id.Value == trackId);
+        Assert.True(updatedTrack.Disambiguation.HasValue);
+        Assert.Equal(disambiguation, updatedTrack.Disambiguation.Value);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenTheTrackMetadataCarriesNoContainer_ShouldKeepTheTrackContainer()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        (Artist artist, Guid albumId, Guid trackId) = CreateDomainArtist(libraryId);
+        AddTrackCommand trackCommand = _addTrackCommandFixture.Create(trackId: trackId);
+        AddAlbumCommand albumCommand = _addAlbumCommandFixture.Create(albumId: albumId, tracks: [trackCommand]);
+        UpdateArtistCommand command = _updateArtistCommandFixture.Create(
+            libraryId: libraryId.ToString(),
+            artistId: artist.Id.Value.ToString(),
+            albums: [albumCommand]);
+
+        // Act
+        Result<Artist> result = command.ToDomainEntity(artist);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Track updatedTrack = result.Value.Albums.First(album => album.Id.Value == albumId).Tracks.First(track => track.Id.Value == trackId);
+        // The stored container is pinned to a known value, so the assertion cannot pass by coincidence.
+        // The container is captured from the file itself, so reconciling a track during an artist edit keeps the stored container.
+        Assert.Equal("FLAC", updatedTrack.Metadata.Container.Value);
+    }
+
+    /// <summary>
+    /// Creates a domain artist that owns a single album, which in turn owns a single track, all belonging to <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library the artist belongs to.</param>
+    /// <returns>The created domain artist, together with the Ids of its album and track.</returns>
+    private (Artist artist, Guid albumId, Guid trackId) CreateDomainArtist(Guid libraryId)
+    {
+        Guid albumId = Guid.NewGuid();
+        Guid trackId = Guid.NewGuid();
+        AlbumEntity albumEntity = _albumEntityFixture.Create(
+            id: albumId,
+            libraryId: libraryId,
+            tracks: [_trackEntityFixture.Create(id: trackId, albumId: albumId, libraryId: libraryId, container: "FLAC")]);
+        ArtistEntity artistEntity = _artistEntityFixture.Create(libraryId: libraryId, albums: [albumEntity]);
+        Result<Artist> artistResult = artistEntity.ToDomainEntity();
+        return (artistResult.Value, albumId, trackId);
+    }
+}

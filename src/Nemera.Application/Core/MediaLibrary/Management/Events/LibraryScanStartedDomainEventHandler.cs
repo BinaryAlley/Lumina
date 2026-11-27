@@ -1,0 +1,47 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Mapping.MediaLibrary.Management;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Exceptions;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Application.Core.MediaLibrary.Management.Events;
+
+/// <summary>
+/// Handler for the domain event raised when a media library scan is started.
+/// </summary>
+public class LibraryScanStartedDomainEventHandler : IDomainEventHandler<LibraryScanStartedDomainEvent>
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LibraryScanStartedDomainEventHandler"/> class.
+    /// </summary>
+    /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
+    public LibraryScanStartedDomainEventHandler(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    /// <summary>
+    /// Handles the event raised when a media library scan is started.
+    /// </summary>
+    /// <param name="domainEvent">The domain event to be handled.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    public async ValueTask HandleAsync(LibraryScanStartedDomainEvent domainEvent, CancellationToken cancellationToken)
+    {
+        // Update the status of the library scan in the repository.
+        Result<Updated> updateLibraryScanResult = await _unitOfWork.LibraryScanRepository.UpdateAsync(domainEvent.LibraryScan.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+        if (updateLibraryScanResult.IsFailure)
+            throw new EventualConsistencyException(updateLibraryScanResult.FirstError, updateLibraryScanResult.Errors);
+
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            throw new EventualConsistencyException(saveChangesResult.FirstError, saveChangesResult.Errors);
+    }
+}

@@ -1,0 +1,53 @@
+#region ========================================================================= USING =====================================================================================
+using FastEndpoints;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.MediaLibrary.Management.Queries.GetLibraries;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.Library.Management;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
+using Microsoft.AspNetCore.Http;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.Management.GetLibraries;
+
+/// <summary>
+/// API endpoint for the <c>/libraries</c> route.
+/// </summary>
+public class GetLibrariesEndpoint : BaseEndpoint<EmptyRequest, IResult>
+{
+    private readonly IQueryHandler<GetLibrariesQuery, Result<LibraryResponse[]>> _getLibrariesQueryHandler;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetLibrariesEndpoint"/> class.
+    /// </summary>
+    /// <param name="getLibrariesQueryHandler">Injected service for handling get libraries queries.</param>
+    public GetLibrariesEndpoint(IQueryHandler<GetLibrariesQuery, Result<LibraryResponse[]>> getLibrariesQueryHandler)
+    {
+        _getLibrariesQueryHandler = getLibrariesQueryHandler;
+    }
+
+    /// <summary>
+    /// Configures the API endpoint.
+    /// </summary>
+    public override void Configure()
+    {
+        Verbs(Http.GET);
+        Routes(ApiRoutes.Libraries.GET_LIBRARIES);
+        Version(1);
+        DontCatchExceptions();
+    }
+
+    /// <summary>
+    /// Gets the list of media libraries.
+    /// </summary>
+    /// <param name="_">The empty request, which carries no data.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    public override async Task<IResult> ExecuteAsync(EmptyRequest _, CancellationToken cancellationToken)
+    {
+        Result<LibraryResponse[]> result = await _getLibrariesQueryHandler.HandleAsync(new GetLibrariesQuery(), cancellationToken).ConfigureAwait(false);
+        return result.Match(success => TypedResults.Ok(success), Problem);
+    }
+}

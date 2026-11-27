@@ -1,0 +1,140 @@
+#region ========================================================================= USING =====================================================================================
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.ValueObjects.Metadata;
+using Nemera.Domain.Fixtures.Common.ValueObjects.Metadata;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+#endregion
+
+namespace Nemera.Domain.UnitTests.Common.ValueObjects.Metadata;
+
+/// <summary>
+/// Contains unit tests for the <see cref="Tag"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class TagTests
+{
+    private readonly TagFixture _tagFixture = new();
+
+    [Fact]
+    public void Create_WhenCalledWithValidName_ShouldCreateTagWithTrimmedLowercaseInvariantName()
+    {
+        // Act
+        Result<Tag> result = Tag.Create("  BeStSeLLeR  ");
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("bestseller", result.Value.Name);
+    }
+
+    [Theory]
+    [InlineData("  BeStSeLLeR  ", "bestseller")] // ASCII mixed case with surrounding whitespace.
+    [InlineData("ÉLECTRO", "électro")] // Non-ASCII Latin uppercase.
+    [InlineData("ЖАНР", "жанр")] // Non-Latin uppercase.
+    [InlineData("   indie   ", "indie")] // Surrounding whitespace.
+    public void Create_WhenNameHasMixedCaseOrSurroundingWhitespace_ShouldNormalizeIt(string name, string expectedName)
+    {
+        // Act
+        Result<Tag> result = Tag.Create(name);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(expectedName, result.Value.Name);
+    }
+
+    [Fact]
+    public void Create_WhenCurrentCultureIsTurkish_ShouldLowercaseWithTheInvariantCulture()
+    {
+        CultureInfo originalCulture = CultureInfo.CurrentCulture;
+        CultureInfo originalUiCulture = CultureInfo.CurrentUICulture;
+        try
+        {
+            // Arrange
+            CultureInfo.CurrentCulture = new CultureInfo("tr-TR");
+            CultureInfo.CurrentUICulture = new CultureInfo("tr-TR");
+
+            // Act
+            Result<Tag> result = Tag.Create("INDIE");
+
+            // Assert
+            Assert.False(result.IsFailure);
+            // The Turkish culture maps an uppercase I to a dotless lowercase i, so this proves the invariant culture is used.
+            Assert.Equal("indie", result.Value.Name);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+            CultureInfo.CurrentUICulture = originalUiCulture;
+        }
+    }
+
+    [Theory]
+    [InlineData(null)] // Null name.
+    [InlineData("")] // Empty name.
+    [InlineData("   ")] // Whitespace name.
+    public void Create_WhenNameIsNullOrWhitespace_ShouldReturnError(string? name)
+    {
+        // Act
+        Result<Tag> result = Tag.Create(name!);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.Metadata.TagNameCannotBeEmpty, result.FirstError);
+    }
+
+    [Fact]
+    public void Equals_WithSameName_ShouldReturnTrue()
+    {
+        // Arrange
+        Tag firstTag = _tagFixture.Create(name: "bestseller");
+        Tag secondTag = _tagFixture.Create(name: "bestseller");
+
+        // Act
+        bool result = firstTag.Equals(secondTag);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void Equals_WithNamesDifferingOnlyByCasing_ShouldReturnTrue()
+    {
+        // Arrange
+        Tag firstTag = _tagFixture.Create(name: "BestSeller");
+        Tag secondTag = _tagFixture.Create(name: "bestseller");
+
+        // Act
+        bool result = firstTag.Equals(secondTag);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void Equals_WithDifferentName_ShouldReturnFalse()
+    {
+        // Arrange
+        Tag firstTag = _tagFixture.Create(name: "bestseller");
+        Tag secondTag = _tagFixture.Create(name: "award-winning");
+
+        // Act
+        bool result = firstTag.Equals(secondTag);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void ToString_WhenCalled_ShouldReturnName()
+    {
+        // Arrange
+        Tag tag = _tagFixture.Create(name: "bestseller");
+
+        // Act
+        string result = tag.ToString();
+
+        // Assert
+        Assert.Equal("bestseller", result);
+    }
+}

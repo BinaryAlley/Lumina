@@ -6,7 +6,7 @@ There is a particular pleasure in building something yourself. Not the finished 
 
 I miss when that was simply what engineering was. I am not naive enough to think it was ever pure, or that everyone had the time to work that way. But the pleasure was the point. The understanding was the point.
 
-We do not get to go back to that world. AI is here, it is in the editors, in the browsers, in the issue trackers, and the genie is not going back into the bottle. The world has to adapt. Lumina has to adapt too. This document is about how.
+We do not get to go back to that world. AI is here, it is in the editors, in the browsers, in the issue trackers, and the genie is not going back into the bottle. The world has to adapt. Nemera has to adapt too. This document is about how.
 
 ## It is a tool
 
@@ -36,7 +36,7 @@ That is the whole policy, really. Everything below is just what it looks like in
 
 ## What I expect from contributors
 
-Lumina is a hobby project with professional standards. Contributions are welcome. They are not required, and they are not needed. Nobody owes this project a pull request. The project does not owe anybody a merge.
+Nemera is a hobby project with professional standards. Contributions are welcome. They are not required, and they are not needed. Nobody owes this project a pull request. The project does not owe anybody a merge.
 
 I know it is tempting to put a line on a resume or a green square on a chart, but before any of that, a pull request is a request for someone else's time - MY time. If you are here because you want to help build the thing, thank you! If you are here to produce output, this is the wrong project.
 
@@ -53,7 +53,7 @@ So:
 - Read every line. If you cannot defend it in review, DO. NOT. send it!
 - Build it and run the tests. Add tests that describe behavior. A test that only mirrors the implementation is decoration.
 - Check the names, the errors, the edge cases, the documentation. The model did not think about them. It does not know they exist.
-- Make it fit Lumina. The model does not know our conventions unless you feed them in, and it will drift anyway. Fitting it is your job. And, in case you haven't figured it out already, conventions, style and consistency are at the top of the list in this repository. Sorry, but not sorry: my repository, my rules.
+- Make it fit Nemera. The model does not know our conventions unless you feed them in, and it will drift anyway. Fitting it is your job. And, in case you haven't figured it out already, conventions, style and consistency are at the top of the list in this repository. Sorry, but not sorry: my repository, my rules.
 
 ## Keep your chatbot out of my inbox
 

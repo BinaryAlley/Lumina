@@ -1,0 +1,125 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
+using Nemera.Application.Fixtures.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Primitives;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+#endregion
+
+namespace Nemera.Application.UnitTests.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
+
+/// <summary>
+/// Contains unit tests for the <see cref="UpdatePlaybackStateCommandValidator"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class UpdatePlaybackStateCommandValidatorTests
+{
+    private readonly UpdatePlaybackStateCommandValidator _validator = new();
+    private readonly UpdatePlaybackStateCommandFixture _updatePlaybackStateCommandFixture = new();
+
+    [Fact]
+    public void Validate_WhenVolumeIsNull_ShouldHaveVolumeCannotBeNullErrorAndNoRangeError()
+    {
+        // Arrange
+        UpdatePlaybackStateCommand command = _updatePlaybackStateCommandFixture.Create(includeVolume: false);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VolumeCannotBeNull);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.VolumeMustBeBetweenZeroAndOne);
+    }
+
+    [Theory]
+    [InlineData(-0.01)] // Just below the minimum.
+    [InlineData(-1.0)] // Well below the minimum.
+    [InlineData(double.MinValue)] // Far below the minimum.
+    public void Validate_WhenVolumeIsBelowZero_ShouldHaveRangeError(double volume)
+    {
+        // Arrange
+        UpdatePlaybackStateCommand command = _updatePlaybackStateCommandFixture.Create(volume: volume);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VolumeMustBeBetweenZeroAndOne);
+    }
+
+    [Theory]
+    [InlineData(1.01)] // Just above the maximum.
+    [InlineData(2.0)] // Well above the maximum.
+    [InlineData(double.MaxValue)] // Far above the maximum.
+    public void Validate_WhenVolumeIsAboveOne_ShouldHaveRangeError(double volume)
+    {
+        // Arrange
+        UpdatePlaybackStateCommand command = _updatePlaybackStateCommandFixture.Create(volume: volume);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.VolumeMustBeBetweenZeroAndOne);
+    }
+
+    [Theory]
+    [InlineData(0.0)] // The minimum.
+    [InlineData(0.5)] // A middle value.
+    [InlineData(1.0)] // The maximum.
+    public void Validate_WhenVolumeIsInRange_ShouldNotHaveRangeError(double volume)
+    {
+        // Arrange
+        UpdatePlaybackStateCommand command = _updatePlaybackStateCommandFixture.Create(volume: volume);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.VolumeMustBeBetweenZeroAndOne);
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.VolumeCannotBeNull);
+    }
+
+    [Fact]
+    public void Validate_WhenIsMutedIsNull_ShouldHaveIsMutedCannotBeNullError()
+    {
+        // Arrange
+        UpdatePlaybackStateCommand command = _updatePlaybackStateCommandFixture.Create(includeIsMuted: false);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationError(ApplicationErrors.UserSettings.IsMutedCannotBeNull);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void Validate_WhenIsMutedIsSpecified_ShouldNotHaveIsMutedCannotBeNullError(bool isMuted)
+    {
+        // Arrange
+        UpdatePlaybackStateCommand command = _updatePlaybackStateCommandFixture.Create(isMuted: isMuted);
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldNotHaveValidationError(ApplicationErrors.UserSettings.IsMutedCannotBeNull);
+    }
+
+    [Fact]
+    public void Validate_WhenCommandIsValid_ShouldNotHaveAnyValidationError()
+    {
+        // Arrange
+        UpdatePlaybackStateCommand command = _updatePlaybackStateCommandFixture.Create();
+
+        // Act
+        List<Error> result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+}

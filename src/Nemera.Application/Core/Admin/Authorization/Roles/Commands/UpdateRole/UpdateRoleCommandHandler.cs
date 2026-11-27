@@ -1,0 +1,101 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Mapping.Authorization;
+using Nemera.Contracts.Responses.Authorization;
+using Nemera.Domain.Common.Primitives;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
+
+/// <summary>
+/// Handler for the command to update an authorization role.
+/// </summary>
+public class UpdateRoleCommandHandler : ICommandHandler<UpdateRoleCommand, Result<RolePermissionsResponse>>
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IAuthorizationService _authorizationService;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly IValidator<UpdateRoleCommand> _validator;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateRoleCommandHandler"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Injected service for authorization related functionality.</param>
+    /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
+    /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
+    /// <param name="validator">Injected validator for application validation rules.</param>
+    public UpdateRoleCommandHandler(IAuthorizationService authorizationService, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, IValidator<UpdateRoleCommand> validator)
+    {
+        _unitOfWork = unitOfWork;
+        _authorizationService = authorizationService;
+        _currentUserService = currentUserService;
+        _validator = validator;
+    }
+
+    /// <summary>
+    /// Handles the command to update an authorization role.
+    /// </summary>
+    /// <param name="command">The request to be handled.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either a successfully updated <see cref="RoleResponse"/>, or an error message.
+    /// </returns>
+    public async Task<Result<RolePermissionsResponse>> HandleAsync(UpdateRoleCommand command, CancellationToken cancellationToken)
+    {
+        List<Error> validationResult = _validator.Validate(command);
+        if (validationResult.Count > 0)
+            return validationResult;
+
+        // An authenticated request must always carry a user identity.
+        Guid? currentUserId = _currentUserService.UserId;
+        if (currentUserId is null)
+            return Errors.Authorization.NotAuthorized;
+        Guid userId = currentUserId.Value;
+
+        // Only admins can update authorization roles.
+        bool isAdmin = await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false);
+        if (!isAdmin)
+            return Errors.Authorization.NotAuthorized;
+
+        // Update the role and its permissions.
+        RoleEntity newRole = new()
+        {
+            Id = command.RoleId,
+            RoleName = command.RoleName,
+            RolePermissions = [.. command.Permissions.Select(permissionId => new RolePermissionEntity()
+            {
+                PermissionId = permissionId,
+                Permission = null!,
+                Role = null!,
+                RoleId = default
+            })]
+        };
+        // Save the updated role in the repository.
+        Result<Updated> updateRoleResult = await _unitOfWork.RoleRepository.UpdateAsync(newRole, cancellationToken).ConfigureAwait(false);
+        if (updateRoleResult.IsFailure)
+            return updateRoleResult.Errors;
+
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
+
+        // Retrieve the updated authorization role from the persistence medium and return it.
+        Result<RoleEntity?> getRoleResult = await _unitOfWork.RoleRepository.GetByIdAsync(command.RoleId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getRoleResult.IsFailure)
+            return getRoleResult.Errors;
+        if (getRoleResult.Value is null)
+            return Errors.Persistence.ErrorPersistingAuthorizationRole;
+        return getRoleResult.Value.ToRolePermissionsResponse();
+    }
+}

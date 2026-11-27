@@ -1,0 +1,284 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Common;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Contracts.Fixtures.Core.DTO.Common;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.AddBook;
+
+/// <summary>
+/// Contains security tests for the <see cref="AddBookEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class AddBookEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
+{
+    private readonly NemeraApiFactory _apiFactory;
+    private readonly HttpClient _client;
+    private readonly AddBookRequestFixture _addBookRequestFixture = new();
+    private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
+    private readonly GenreDtoFixture _genreDtoFixture = new();
+    private readonly TagDtoFixture _tagDtoFixture = new();
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly TagEntityFixture _tagEntityFixture = new();
+    private readonly GenreEntityFixture _genreEntityFixture = new();
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AddBookEndpointTests"/> class.
+    /// </summary>
+    /// <param name="apiFactory">Injected in-memory API factory.</param>
+    public AddBookEndpointTests(NemeraApiFactory apiFactory)
+    {
+        _apiFactory = apiFactory;
+        _client = apiFactory.CreateClient();
+    }
+
+    [Fact]
+    public async Task AddBook_WhenUnauthorized_ShouldReturnUnauthorizedResult()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        AddBookRequest request = _addBookRequestFixture.Create(contributors: []);
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync($"/api/v1/libraries/{libraryId}/books", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status401Unauthorized, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc7235#section-3.1", problemDetails["type"].GetString());
+        Assert.Equal("Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("Authentication failed", problemDetails["detail"].GetString());
+        Assert.Equal($"/api/v1/libraries/{libraryId}/books", problemDetails["instance"].GetProperty("value").GetString());
+    }
+
+    [Fact]
+    public async Task AddBook_WhenUserDoesNotOwnTheLibrary_ShouldReturnForbidden()
+    {
+        // Arrange
+        HttpClient ownerClient = _apiFactory.CreateClient();
+        (Guid ownerId, string ownerUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(ownerClient);
+        Guid libraryId = Guid.NewGuid();
+        await _apiFactory.SeedLibraryAsync(libraryId, ownerId);
+
+        (Guid _, string requesterUsername) = await _apiFactory.CreateAndAuthenticateUserAsync(_client);
+        AddBookRequest request = _addBookRequestFixture.Create(contributors: []);
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync($"/api/v1/libraries/{libraryId}/books", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+
+        await _apiFactory.RemoveTestUserAsync(ownerUsername);
+        await _apiFactory.RemoveTestUserAsync(requesterUsername);
+    }
+
+    [Theory]
+    [InlineData("'; DROP TABLE Books; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    public async Task AddBook_WithSQLInjectionInPath_ShouldNotCorruptOrDeleteData(string maliciousPath)
+    {
+        // Arrange
+        HttpClient client = _apiFactory.CreateClient();
+        (Guid userId, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        Guid libraryId = Guid.NewGuid();
+        string contentLocation = Path.GetTempPath();
+        string injectedPath = Path.Combine(contentLocation, $"{maliciousPath}.epub");
+        using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
+        {
+            NemeraDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+            seedDbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: [contentLocation]));
+            await seedDbContext.SaveChangesAsync();
+        }
+        AddBookRequest request = _addBookRequestFixture.Create(path: injectedPath, contributors: []);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsJsonAsync($"/api/v1/libraries/{libraryId}/books", request);
+
+        // Assert
+        // The malicious path passes the authenticated handler, reaches the parameterized insert, and is persisted
+        // verbatim: if it were concatenated into raw SQL, the insert would fail and the book would not be created.
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.DoesNotContain("SqliteException", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        Assert.Equal(1, await dbContext.Libraries.CountAsync(library => library.Id == libraryId));
+        // The single book in the library is the one inserted by this request, with the malicious path stored as data.
+        Assert.Equal(1, await dbContext.Books.CountAsync(book => book.LibraryId == libraryId));
+
+        await _apiFactory.RemoveTestUserAsync(username);
+    }
+
+    [Theory]
+    [InlineData("'; DROP TABLE Books; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    public async Task AddBook_WithSQLInjectionInBody_ShouldNotCorruptOrDeleteData(string maliciousTitle)
+    {
+        // Arrange
+        HttpClient client = _apiFactory.CreateClient();
+        (Guid userId, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        Guid libraryId = Guid.NewGuid();
+        string contentLocation = Path.GetTempPath();
+        using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
+        {
+            NemeraDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+            seedDbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: [contentLocation]));
+            await seedDbContext.SaveChangesAsync();
+        }
+        string bookPath = Path.Combine(contentLocation, $"{Guid.NewGuid()}.epub");
+        AddBookRequest request = _addBookRequestFixture.Create(path: bookPath, metadata: _writtenContentMetadataDtoFixture.Create(title: maliciousTitle), contributors: []);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsJsonAsync($"/api/v1/libraries/{libraryId}/books", request);
+
+        // Assert
+        // The malicious title passes the authenticated handler, reaches the parameterized insert, and is persisted
+        // verbatim: if it were concatenated into raw SQL, the insert would fail and the book would not be created.
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.DoesNotContain("SqliteException", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        BookEntity storedBook = await dbContext.Books.SingleAsync(book => book.LibraryId == libraryId);
+        Assert.Equal(maliciousTitle, storedBook.Title);
+
+        await _apiFactory.RemoveTestUserAsync(username);
+    }
+
+    [Theory]
+    [InlineData("'; DROP TABLE Tags; --")] // Destructive injection in a tag and genre name.
+    [InlineData("' OR '1'='1")] // Boolean-based injection in a tag and genre name.
+    public async Task AddBook_WithSQLInjectionInTagAndGenreNames_ShouldNotCorruptOrLeakData(string maliciousName)
+    {
+        // Arrange
+        HttpClient client = _apiFactory.CreateClient();
+        (Guid userId, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        Guid libraryId = Guid.NewGuid();
+        string contentLocation = Path.GetTempPath();
+        string suffix = Guid.NewGuid().ToString("N")[..8];
+        string seededTagName = $"seeded-tag-{suffix}";
+        string seededGenreName = $"seeded-genre-{suffix}";
+        using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
+        {
+            NemeraDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+            seedDbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: [contentLocation]));
+            seedDbContext.Set<TagEntity>().Add(_tagEntityFixture.Create(name: seededTagName));
+            seedDbContext.Set<GenreEntity>().Add(_genreEntityFixture.Create(name: seededGenreName));
+            await seedDbContext.SaveChangesAsync();
+        }
+        string injectedTagName = $"{maliciousName} {suffix}";
+        string injectedGenreName = $"{maliciousName} genre {suffix}";
+        AddBookRequest request = _addBookRequestFixture.Create(
+            path: Path.Combine(contentLocation, $"{Guid.NewGuid()}.epub"),
+            metadata: _writtenContentMetadataDtoFixture.Create(
+                genres: [_genreDtoFixture.Create(name: injectedGenreName)],
+                tags: [_tagDtoFixture.Create(name: injectedTagName)]),
+            contributors: []);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsJsonAsync($"/api/v1/libraries/{libraryId}/books", request);
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        // The malicious names are user data, not SQL: they must be stored verbatim (normalized) without breaking the request or the schema.
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.DoesNotContain("SQL", content, StringComparison.Ordinal);
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("StackTrace", content, StringComparison.OrdinalIgnoreCase);
+
+        using (IServiceScope scope = _apiFactory.Services.CreateScope())
+        {
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+            Assert.Equal(1, await dbContext.Libraries.CountAsync(library => library.Id == libraryId));
+            Assert.Equal(1, await dbContext.Books.CountAsync(book => book.LibraryId == libraryId));
+            // The join rows must still exist and point at the normalized tag and genre that the request supplied.
+            BookEntity storedBook = await dbContext.Books
+                .Include(book => book.Tags)
+                .Include(book => book.Genres)
+                .SingleAsync(book => book.LibraryId == libraryId);
+            Assert.Equal(injectedTagName.ToLowerInvariant(), Assert.Single(storedBook.Tags).Name);
+            Assert.Equal(injectedGenreName.ToLowerInvariant(), Assert.Single(storedBook.Genres).Name);
+            Assert.True(await dbContext.Set<TagEntity>().AnyAsync(tag => tag.Name == seededTagName));
+            Assert.True(await dbContext.Set<GenreEntity>().AnyAsync(genre => genre.Name == seededGenreName));
+            Assert.True(await dbContext.Set<TagEntity>().AnyAsync(tag => tag.Name == injectedTagName.ToLowerInvariant()));
+            Assert.True(await dbContext.Set<GenreEntity>().AnyAsync(genre => genre.Name == injectedGenreName.ToLowerInvariant()));
+        }
+
+        await _apiFactory.RemoveTestUserAsync(username);
+    }
+
+    [Theory]
+    [InlineData("'; DROP TABLE Books; --")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    public async Task AddBook_WithSQLInjectionInRouteId_ShouldNotCorruptOrLeakData(string maliciousLibraryId)
+    {
+        // Arrange
+        HttpClient client = _apiFactory.CreateClient();
+        (Guid _, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        AddBookRequest request = _addBookRequestFixture.Create(contributors: []);
+
+        // Act
+        HttpResponseMessage response = await client.PostAsJsonAsync($"/api/v1/libraries/{Uri.EscapeDataString(maliciousLibraryId)}/books", request);
+
+        // Assert
+        // The route is authoritative and its raw value is kept as a string, so an unparseable route Id reaches the command
+        // validator, which reports it as a clean validation error. The response must not leak stack traces, database details,
+        // or the injected payload.
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(maliciousLibraryId, content, StringComparison.Ordinal);
+        using JsonDocument problemDetails = JsonDocument.Parse(content);
+        Assert.Equal("General.Validation", problemDetails.RootElement.GetProperty("title").GetString());
+        Assert.Contains("LibraryIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
+
+        await _apiFactory.RemoveTestUserAsync(username);
+    }
+
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public void Dispose()
+    {
+        // Nothing to clean up: each test removes its own seeded rows.
+    }
+}

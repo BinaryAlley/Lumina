@@ -1,0 +1,54 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Repositories.Plugins;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Mapping.Plugins;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Infrastructure.Core.Plugins;
+
+/// <summary>
+/// Reads the settings persisted by the host for a plugin.
+/// </summary>
+internal sealed class PluginSettingsStore : IPluginSettingsStore
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<PluginSettingsStore> _logger;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PluginSettingsStore"/> class.
+    /// </summary>
+    /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
+    /// <param name="logger">Injected logger used to report the failures to read the plugin settings.</param>
+    public PluginSettingsStore(IUnitOfWork unitOfWork, ILogger<PluginSettingsStore> logger)
+    {
+        _unitOfWork = unitOfWork;
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// Gets the settings persisted by the host for the plugin identified by <paramref name="pluginId"/>.
+    /// </summary>
+    /// <param name="pluginId">The unique identifier of the plugin whose settings are read.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>The persisted settings keyed by setting key, or <see langword="null"/> when no settings were persisted for the plugin.</returns>
+    public async Task<IReadOnlyDictionary<string, string>?> GetSettingsAsync(Guid pluginId, CancellationToken cancellationToken)
+    {
+        Result<PluginEntity?> getPluginResult = await _unitOfWork.PluginRepository.GetByIdAsync(pluginId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getPluginResult.IsFailure)
+        {
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning("Failed to read the settings of the plugin with Id '{PluginId}': {Error}", pluginId, getPluginResult.FirstError.Description);
+            return null;
+        }
+
+        return getPluginResult.Value?.ToSettings();
+    }
+}

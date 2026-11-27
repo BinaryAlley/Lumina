@@ -1,0 +1,145 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.Mapping.Common.Metadata;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.Fixtures.Core.DTO.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.ValueObjects.Metadata;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+#endregion
+
+namespace Nemera.Application.UnitTests.Common.Mapping.Common.Metadata;
+
+/// <summary>
+/// Contains unit tests for the <see cref="TagDtoMapping"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class TagDtoMappingTests
+{
+    private readonly TagDtoFixture _tagDtoFixture = new();
+
+    [Fact]
+    public void ToDomainValueObject_WhenMappingValidTagDto_ShouldMapCorrectly()
+    {
+        // Arrange
+        TagDto tagDto = _tagDtoFixture.Create(name: "Indie");
+
+        // Act
+        Result<Tag> result = tagDto.ToDomainValueObject();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal("indie", result.Value.Name);
+    }
+
+    [Theory]
+    [InlineData("Indie")]
+    [InlineData("Electronic")]
+    [InlineData("Instrumental")]
+    [InlineData("Live")]
+    [InlineData("Acoustic")]
+    public void ToDomainValueObject_WhenMappingDifferentValidTagDtos_ShouldMapCorrectly(string name)
+    {
+        // Arrange
+        TagDto tagDto = _tagDtoFixture.Create(name: name);
+
+        // Act
+        Result<Tag> result = tagDto.ToDomainValueObject();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal(name.ToLowerInvariant(), result.Value.Name);
+    }
+
+    [Fact]
+    public void ToDomainValueObject_WhenTagNameHasSurroundingWhitespaceAndMixedCase_ShouldStoreTheTrimmedLowercaseInvariantName()
+    {
+        // Arrange
+        TagDto tagDto = _tagDtoFixture.Create(name: "  InDiE  ");
+
+        // Act
+        Result<Tag> result = tagDto.ToDomainValueObject();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal("indie", result.Value.Name);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData(null)]
+    public void ToDomainValueObject_WhenMappingInvalidTagDto_ShouldReturnError(string? invalidName)
+    {
+        // Arrange
+        TagDto tagDto = _tagDtoFixture.Create(name: invalidName, includeName: invalidName is not null);
+
+        // Act
+        Result<Tag> result = tagDto.ToDomainValueObject();
+
+        // Assert
+        Assert.True(result.IsFailure);
+    }
+
+    [Fact]
+    public void ToDomainModels_WhenMappingMultipleValidTagDtos_ShouldMapAllCorrectly()
+    {
+        // Arrange
+        List<TagDto> tagDtos =
+        [
+            _tagDtoFixture.Create(name: "Indie"),
+            _tagDtoFixture.Create(name: "Electronic"),
+            _tagDtoFixture.Create(name: "Instrumental"),
+            _tagDtoFixture.Create(name: "Live")
+        ];
+
+        // Act
+        IEnumerable<Result<Tag>> results = tagDtos.ToDomainValueObjects();
+
+        // Assert
+        Assert.NotNull(results);
+        Assert.Equal(tagDtos.Count, results.Count());
+
+        List<Result<Tag>> resultList = [.. results];
+        for (int i = 0; i < tagDtos.Count; i++)
+        {
+            Assert.False(resultList[i].IsFailure);
+            Assert.Equal(tagDtos[i].Name!.ToLowerInvariant(), resultList[i].Value.Name);
+        }
+    }
+
+    [Fact]
+    public void ToDomainModels_WhenMappingMixedValidAndInvalidTagDtos_ShouldReturnMixedResults()
+    {
+        // Arrange
+        List<TagDto> tagDtos =
+        [
+            _tagDtoFixture.Create(name: "Indie"),
+            _tagDtoFixture.Create(name: ""),
+            _tagDtoFixture.Create(name: "Electronic"),
+            _tagDtoFixture.Create(name: " ")
+        ];
+
+        // Act
+        IEnumerable<Result<Tag>> results = tagDtos.ToDomainValueObjects();
+
+        // Assert
+        Assert.NotNull(results);
+        Assert.Equal(tagDtos.Count, results.Count());
+
+        List<Result<Tag>> resultList = [.. results];
+        Assert.False(resultList[0].IsFailure);
+        Assert.Equal("indie", resultList[0].Value.Name);
+
+        Assert.True(resultList[1].IsFailure);
+
+        Assert.False(resultList[2].IsFailure);
+        Assert.Equal("electronic", resultList[2].Value.Name);
+
+        Assert.True(resultList[3].IsFailure);
+    }
+}

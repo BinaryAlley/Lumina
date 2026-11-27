@@ -1,9 +1,9 @@
 services:
-  lumina-api:
-    container_name: lumina-api
+  nemera-api:
+    container_name: nemera-api
     build:
       context: .
-      dockerfile: Lumina.Presentation.Api/Dockerfile
+      dockerfile: Nemera.Presentation.Api/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=5214
@@ -14,12 +14,12 @@ services:
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
-    command: "dotnet /app/Lumina.Presentation.Api.dll"
-  lumina-web:
-    container_name: lumina-web
+    command: "dotnet /app/Nemera.Presentation.Api.dll"
+  nemera-web:
+    container_name: nemera-web
     build:
       context: .
-      dockerfile: Lumina.Presentation.Web/Dockerfile
+      dockerfile: Nemera.Presentation.Web/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=5012
@@ -30,4 +30,4 @@ services:
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
-    command: "dotnet /app/Lumina.Presentation.Web.dll"
+    command: "dotnet /app/Nemera.Presentation.Web.dll"

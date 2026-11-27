@@ -1,0 +1,79 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Core.MediaLibrary.Management.Events;
+using Nemera.Domain.Common.Exceptions;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using NSubstitute;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Application.UnitTests.Core.MediaLibrary.Management.Events;
+
+/// <summary>
+/// Contains unit tests for the <see cref="LibraryScanStartedDomainEventHandler"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class LibraryScanStartedDomainEventHandlerTests
+{
+    private readonly IUnitOfWork _mockUnitOfWork;
+    private readonly ILibraryScanRepository _mockLibraryScanRepository;
+    private readonly LibraryScanStartedDomainEventHandler _sut;
+    private readonly LibraryScanStartedDomainEventFixture _libraryScanStartedDomainEventFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LibraryScanStartedDomainEventHandlerTests"/> class.
+    /// </summary>
+    public LibraryScanStartedDomainEventHandlerTests()
+    {
+        _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
+        _mockLibraryScanRepository = Substitute.For<ILibraryScanRepository>();
+        _mockUnitOfWork.LibraryScanRepository.Returns(_mockLibraryScanRepository);
+        _mockLibraryScanRepository.UpdateAsync(Arg.Any<LibraryScanEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Updated);
+
+        _sut = new LibraryScanStartedDomainEventHandler(_mockUnitOfWork);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenScanStarts_ShouldUpdateScanStatusAndSaveChanges()
+    {
+        // Arrange
+        LibraryScanStartedDomainEvent domainEvent = _libraryScanStartedDomainEventFixture.Create();
+
+        // Act
+        await _sut.HandleAsync(domainEvent, CancellationToken.None);
+
+        // Assert
+        await _mockLibraryScanRepository.Received(1).UpdateAsync(
+            Arg.Is<LibraryScanEntity>(scan => scan.Id == domainEvent.LibraryScan.Id.Value),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenUpdateFails_ShouldThrowEventualConsistencyException()
+    {
+        // Arrange
+        LibraryScanStartedDomainEvent domainEvent = _libraryScanStartedDomainEventFixture.Create();
+        Error error = Error.Failure(description: "Failed to update library scan");
+        _mockLibraryScanRepository.UpdateAsync(Arg.Any<LibraryScanEntity>(), Arg.Any<CancellationToken>())
+            .Returns(error);
+
+        // Act
+        EventualConsistencyException exception = await Assert.ThrowsAsync<EventualConsistencyException>(
+            () => _sut.HandleAsync(domainEvent, CancellationToken.None).AsTask());
+
+        // Assert
+        Assert.Equal(error, exception.EventualConsistencyError);
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+}

@@ -1,0 +1,14 @@
+#region ========================================================================= USING =====================================================================================
+using System.Diagnostics;
+#endregion
+
+namespace Nemera.Presentation.Web.Common.Requests.Themes;
+
+/// <summary>
+/// Represents a request to download the archive of a theme.
+/// </summary>
+/// <param name="ThemeId">The manifest id of the theme to download. Required.</param>
+[DebuggerDisplay("ThemeId: {ThemeId}")]
+public record GetThemeArchiveRequest(
+    string? ThemeId
+);

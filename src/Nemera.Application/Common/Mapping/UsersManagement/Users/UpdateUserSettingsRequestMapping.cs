@@ -1,0 +1,45 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
+using Nemera.Contracts.Requests.UsersManagement.Settings;
+#endregion
+
+namespace Nemera.Application.Common.Mapping.UsersManagement.Users;
+
+/// <summary>
+/// Extension methods for converting <see cref="UpdateUserSettingsRequest"/>.
+/// </summary>
+public static class UpdateUserSettingsRequestMapping
+{
+    /// <summary>
+    /// Converts <paramref name="request"/> to <see cref="UpdateUserSettingsCommand"/>.
+    /// </summary>
+    /// <param name="request">The request to be converted.</param>
+    /// <returns>The converted command.</returns>
+    public static UpdateUserSettingsCommand ToCommand(this UpdateUserSettingsRequest request)
+    {
+        return new UpdateUserSettingsCommand(
+            request.IsPaginationEnabled,
+            request.ItemsPerPage,
+            request.ShouldIgnoreThePrefixForAlphaPicker,
+            request.IsThemeCachingEnabled,
+            request.ShouldAggregateMetadataWhenMissing,
+            request.ShouldAggregateArtworkWhenMissing,
+            request.ShouldRenderPdfAsImages,
+            request.ShouldPreserveBookStyles,
+            request.ShouldKeepDownloadingWhilePaused,
+            request.ShouldAutoplay,
+            request.IsGaplessPlaybackEnabled,
+            request.ReplayGainMode,
+            request.StreamingQuality,
+            request.VuMeterOrientation,
+            request.VuMeterSegmentCount,
+            request.VuMeterSegmentGap,
+            request.VuMeterMediumThreshold,
+            request.VuMeterHighThreshold,
+            request.VuMeterShowPeak,
+            request.VuMeterPeakHoldDurationInMilliseconds,
+            request.VuMeterReleasePerSecond,
+            request.VuMeterPeakReleasePerSecond
+        );
+    }
+}

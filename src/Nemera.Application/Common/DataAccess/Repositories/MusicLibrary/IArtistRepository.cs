@@ -1,0 +1,121 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.Common.Actions;
+using Nemera.Application.Common.DataAccess.Repositories.Common.Base;
+using Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+using Nemera.Domain.Common.Primitives;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Application.Common.DataAccess.Repositories.MusicLibrary;
+
+/// <summary>
+/// Interface for the repository for artists.
+/// </summary>
+public interface IArtistRepository : IRepository<ArtistEntity>,
+                                     IInsertRepositoryAction<ArtistEntity>,
+                                     IUpdateRepositoryAction<ArtistEntity>,
+                                     IGetByIdRepositoryAction<ArtistEntity, Guid>,
+                                     IGetAllRepositoryAction<ArtistEntity>,
+                                     IGetAllLiteRepositoryAction<ArtistEntity, ArtistLiteRow>,
+                                     IDeleteByIdRepositoryAction<Guid>
+{
+    /// <summary>
+    /// Gets the artist of the library identified by <paramref name="libraryId"/> that has the provided <paramref name="name"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library whose artist is retrieved.</param>
+    /// <param name="name">The name of the artist to retrieve.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="ArtistEntity"/> with the provided name, or an error.</returns>
+    Task<Result<ArtistEntity?>> GetByNameAsync(Guid libraryId, string name, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets a page of the artists of the media library identified by <paramref name="libraryId"/> whose metadata has not been enriched yet,
+    /// together with their albums and tracks and the collections needed to enrich them, ordered by name, using keyset pagination.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artists are retrieved.</param>
+    /// <param name="lastName">The name of the last retrieved artist, used for keyset pagination. Pass <see langword="null"/> to get the first page.</param>
+    /// <param name="pageSize">The maximum number of artists to retrieve.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a page of artists needing their metadata enriched, or an error.</returns>
+    Task<Result<IReadOnlyList<ArtistEntity>>> GetArtistsNeedingMetadataAsync(Guid libraryId, string? lastName, int pageSize, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the number of artists of the media library identified by <paramref name="libraryId"/> whose metadata has not been enriched yet.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artists are counted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the number of artists needing their metadata enriched, or an error.</returns>
+    Task<Result<int>> GetArtistsNeedingMetadataCountAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the number of artists of the media library identified by <paramref name="libraryId"/> whose artwork has not been resolved yet.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artists are counted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the number of artists needing their artwork resolved, or an error.</returns>
+    Task<Result<int>> GetArtistsNeedingArtworkCountAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets a page of the artists of the media library identified by <paramref name="libraryId"/> whose artwork has not been resolved yet,
+    /// together with their albums and tracks, ordered by name, using keyset pagination.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artists are retrieved.</param>
+    /// <param name="lastName">The name of the last retrieved artist, used for keyset pagination. Pass <see langword="null"/> to get the first page.</param>
+    /// <param name="pageSize">The maximum number of artists to retrieve.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a page of artists needing their artwork resolved, or an error.</returns>
+    Task<Result<IReadOnlyList<ArtistEntity>>> GetArtistsNeedingArtworkAsync(Guid libraryId, string? lastName, int pageSize, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Resets the metadata enrichment status of all the artists of the media library identified by <paramref name="libraryId"/>,
+    /// so that they are re-enriched, because the metadata provider configuration of the library changed.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artists are reset.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> ResetMetadataStatusForLibraryAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Deletes all the artists of the media library identified by <paramref name="libraryId"/>, together with their albums and tracks and their related data.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose artists are deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the soft deleted artist identified by <paramref name="id"/>.
+    /// </summary>
+    /// <param name="id">The Id of the soft deleted artist to get.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted <see cref="ArtistEntity"/>, <see langword="null"/> when the artist does not exist or is not soft deleted, or an error.</returns>
+    Task<Result<ArtistEntity?>> GetSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the soft deleted artists of the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose soft deleted artists are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted artists, or an error.</returns>
+    Task<Result<IReadOnlyList<ArtistEntity>>> GetSoftDeletedByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Soft deletes the artist identified by <paramref name="id"/>, without removing its stored metadata or artwork.
+    /// </summary>
+    /// <param name="id">The Id of the artist to soft delete.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> SoftDeleteByIdAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Restores the soft deleted artist identified by <paramref name="id"/>.
+    /// </summary>
+    /// <param name="id">The Id of the artist to restore.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> RestoreSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken);
+}

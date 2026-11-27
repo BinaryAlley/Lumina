@@ -1,0 +1,269 @@
+@*
+    /
+    ?category=...  (optional quick-navigation filter: lists only the libraries of the category)
+*@
+
+@using Nemera.Presentation.Web.Common.DTO.Libraries
+@using Nemera.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@{
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+    // The optional quick-navigation category the page is filtered to; empty when the page lists every enabled library.
+    // The value is restricted to the known categories, so that an arbitrary query value is never reflected back into the page.
+    var category = Context.Request.Query["category"].ToString().ToLowerInvariant();
+    if (category != "books" && category != "music")
+        category = string.Empty;
+}
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+
+<div class="cotton-candy">
+    <div style="display: grid; grid-template-rows: auto 1fr;">
+        <!-- Container with two rows, one fixed, one filling remaining space. -->
+        <div style="min-height: 1rem;"></div><!-- The first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position. -->
+        <div id="libraries-container" class="cards-container justify-start pl-10 pr-10 w-100 h-100">
+            <p id="no-libraries" class="hidden">@_localizer["NoLibraries"]</p>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls (callApiGetAsync, callApiPostAsync, ...). site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
+    <script type="text/plain" data-form="@scriptId">
+        // Create cleanup registry for this view.
+        const cleanupFunctions = [];
+        let isInitialized = false;
+
+        // The category the page is filtered to, empty when it lists every enabled library.
+        const libraryCategory = '@category';
+        // Library types that have a browsing page in this application, mapped to it, so that the library cards link to their contents.
+        const libraryBrowseUrls = {
+            'Book': '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)',
+            'EBook': '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)',
+            'ComicBook': '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)',
+            'Manga': '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)',
+            'GraphicNovel': '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)',
+            'AcademicPaper': '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)',
+            'SheetMusic': '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)',
+            'Music': '@_urlService.GetAbsoluteUrl(WebRoutes.Music.ARTISTS_INDEX)'
+        };
+        // The quick-navigation categories of the navigation menu, mapped to the library types they list.
+        const libraryCategoryTypes = {
+            'books': ['Book', 'EBook', 'ComicBook', 'Manga', 'GraphicNovel', 'AcademicPaper', 'SheetMusic'],
+            'music': ['Music']
+        };
+
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
+        const librariesContainer = document.getElementById('libraries-container');
+        const noLibrariesMessage = document.getElementById('no-libraries');
+
+        const jsLocalizedStrings = {
+            actions: @Json.Serialize(_localizer["Actions"].Value),
+            play: @Json.Serialize(_localizer["Play"].Value),
+            shuffle: @Json.Serialize(_localizer["Shuffle"].Value),
+            addToPlaylist: @Json.Serialize(_localizer["AddToPlaylist"].Value)
+        };
+
+        // Closes the actions menus of all the music library cards.
+        function closeCardMenus() {
+            librariesContainer.querySelectorAll('.media-card.open').forEach(card => {
+                card.classList.remove('open');
+                const menu = card.querySelector('.card-actions-menu');
+                if (menu)
+                    menu.classList.remove('open');
+            });
+        }
+
+        // Toggles the actions menu of a music library card, opening it with its top left corner at the given viewport position.
+        function toggleCardMenu(card, anchor) {
+            const wasOpen = card.classList.contains('open');
+            closeCardMenus();
+            if (wasOpen)
+                return;
+            card.classList.add('open');
+            const menu = card.querySelector('.card-actions-menu');
+            if (menu) {
+                menu.classList.add('open');
+                positionActionsMenu(menu, anchor);
+            }
+        }
+
+        // Resolves the viewport point where the card actions menu opens.
+        function resolveMenuAnchor(event) {
+            if (event.clientX !== 0 || event.clientY !== 0)
+                return { x: event.clientX, y: event.clientY };
+            const triggerRect = event.currentTarget.getBoundingClientRect();
+            return { x: triggerRect.left, y: triggerRect.bottom };
+        }
+
+        // Places the card actions menu with its top left corner at the requested viewport point.
+        function positionActionsMenu(menu, anchor) {
+            const margin = 4;
+            const maxLeft = Math.max(margin, window.innerWidth - menu.offsetWidth - margin);
+            const maxTop = Math.max(margin, window.innerHeight - menu.offsetHeight - margin);
+            menu.style.position = 'fixed';
+            menu.style.left = `${Math.min(Math.max(margin, anchor.x), maxLeft)}px`;
+            menu.style.top = `${Math.min(Math.max(margin, anchor.y), maxTop)}px`;
+        }
+
+        // Closes the actions menus when clicking or pressing a key outside them.
+        function handleCardMenuDismiss(event) {
+            if (event.type === 'keydown' && event.key !== 'Escape')
+                return;
+            if (event.type === 'click' && event.target.closest('.card-actions-menu, .card-actions-trigger'))
+                return;
+            closeCardMenus();
+        }
+
+        // Adds the actions menu of a music library card, with the play and shuffle actions that start the whole library.
+        function createMusicLibraryMenu(card, library) {
+            const libraryCoverPath = library.coverImage
+                ? `/media/libraries/${library.id}/${library.coverImage.substring(library.coverImage.lastIndexOf('cover.'))}`
+                : '';
+            const trigger = document.createElement('button');
+            trigger.type = 'button';
+            trigger.className = 'card-actions-trigger';
+            trigger.setAttribute('aria-haspopup', 'menu');
+            trigger.setAttribute('aria-label', jsLocalizedStrings.actions);
+            trigger.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                toggleCardMenu(card, resolveMenuAnchor(event));
+            });
+
+            const menu = document.createElement('nav');
+            menu.className = 'card-actions-menu';
+            menu.setAttribute('role', 'menu');
+
+            const playAction = document.createElement('a');
+            playAction.setAttribute('role', 'menuitem');
+            playAction.href = '#';
+            playAction.className = 'card-action-play';
+            playAction.textContent = jsLocalizedStrings.play;
+            playAction.setAttribute('data-audio-player-play-library', '');
+            playAction.dataset.libraryId = library.id;
+            playAction.dataset.title = library.title || '';
+            if (libraryCoverPath)
+                playAction.dataset.coverArtPath = libraryCoverPath;
+            menu.appendChild(playAction);
+
+            const shuffleAction = document.createElement('a');
+            shuffleAction.setAttribute('role', 'menuitem');
+            shuffleAction.href = '#';
+            shuffleAction.className = 'card-action-shuffle';
+            shuffleAction.textContent = jsLocalizedStrings.shuffle;
+            shuffleAction.setAttribute('data-audio-player-play-library-shuffled', '');
+            shuffleAction.dataset.libraryId = library.id;
+            menu.appendChild(shuffleAction);
+
+            const addToPlaylistAction = document.createElement('a');
+            addToPlaylistAction.setAttribute('role', 'menuitem');
+            addToPlaylistAction.href = '#';
+            addToPlaylistAction.className = 'card-action-add-to-playlist';
+            addToPlaylistAction.textContent = jsLocalizedStrings.addToPlaylist;
+            addToPlaylistAction.addEventListener('click', async event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                closeCardMenus();
+                if (window.NemeraPlaylists)
+                    await window.NemeraPlaylists.showAddScopeDialogAsync({ libraryId: library.id, title: library.title || '', addToPlaylistLabel: jsLocalizedStrings.addToPlaylist, returnFocus: trigger });
+            });
+            menu.appendChild(addToPlaylistAction);
+
+            menu.addEventListener('click', event => {
+                // The global audio player delegation handles the play and shuffle actions; the menu only closes here.
+                if (event.target.closest('.card-action-play, .card-action-shuffle'))
+                    closeCardMenus();
+            });
+
+            card.appendChild(trigger);
+            card.appendChild(menu);
+            card.addEventListener('contextmenu', event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                toggleCardMenu(card, resolveMenuAnchor(event));
+            });
+            card.addEventListener('click', event => {
+                if (card.classList.contains('open') && !event.target.closest('.card-actions-menu'))
+                    closeCardMenus();
+            });
+        }
+
+        async function InitializeAsync() {
+            if (isInitialized)
+                return;
+            isInitialized = true;
+            // Get the media libraries.
+            // TODO: add setting check whether the user desires this feature or not.
+            const data = await callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.LibraryManagement.GET_ENABLED_LIBRARIES)');
+            // When the page is filtered to a category, only the libraries of the types of that category are listed; otherwise, every enabled library is listed.
+            const categoryTypes = libraryCategory ? (libraryCategoryTypes[libraryCategory] || null) : null;
+            const libraries = data && categoryTypes ? data.filter((library) => categoryTypes.includes(library.libraryType)) : data;
+            if (libraries && libraries.length > 0) {
+                noLibrariesMessage.classList.add('hidden');
+                librariesContainer.classList.remove('justify-center');
+                librariesContainer.classList.add('justify-start');
+                // Populate media library items.
+                libraries.forEach((library) => {
+                    // Libraries that have a browsing page are rendered as a link to it; the others are rendered as a plain panel.
+                    const browseBase = libraryBrowseUrls[library.libraryType] || null;
+                    const browseUrl = browseBase ? browseBase + '?libraryId=' + library.id : null;
+                    const isBrowsable = browseUrl !== null;
+
+                    const libraryElement = isBrowsable ? document.createElement('a') : document.createElement('div');
+                    libraryElement.className = isBrowsable ? 'media-panel nav-link no-underline' : 'media-panel';
+                    if (browseUrl)
+                        libraryElement.href = browseUrl;
+
+                    // The cover image is optional, so it is only rendered when the library has one.
+                    const coverImageHtml = library.coverImage
+                        ? `<img src="${globalConfiguration.serverBasePath}/media/libraries/${library.id}/${library.coverImage.substring(library.coverImage.lastIndexOf('cover.'))}" />`
+                        : '';
+
+                    libraryElement.innerHTML = `
+                        ${coverImageHtml}
+                        <span class="text-light-two"><strong>${library.title}</strong></span>
+                    `;
+
+                    // A music library gets a card actions menu with the play and shuffle actions for the whole library.
+                    if (library.libraryType === 'Music') {
+                        const card = document.createElement('div');
+                        card.className = 'media-card';
+                        card.appendChild(libraryElement);
+                        createMusicLibraryMenu(card, library);
+                        librariesContainer.appendChild(card);
+                    } else
+                        librariesContainer.appendChild(libraryElement);
+                });
+                // Bind the AJAX navigation behavior to the library links, which were created after the initial navigation binding.
+                bindNavigationLinks();
+            } else {
+                noLibrariesMessage.classList.remove('hidden');
+                librariesContainer.classList.remove('justify-start');
+                librariesContainer.classList.add('justify-center');
+            }
+        }
+
+        // Add listeners.
+        document.addEventListener('click', handleCardMenuDismiss);
+        document.addEventListener('keydown', handleCardMenuDismiss);
+        document.addEventListener('DOMContentLoaded', InitializeAsync);
+
+        // Register cleanup for these listeners.
+        cleanupFunctions.push(() => {
+            document.removeEventListener('click', handleCardMenuDismiss);
+            document.removeEventListener('keydown', handleCardMenuDismiss);
+            document.removeEventListener('DOMContentLoaded', InitializeAsync);
+        });
+
+        // Store all cleanups for this view on window object using the scriptId.
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

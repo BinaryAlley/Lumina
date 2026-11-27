@@ -1,0 +1,71 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Mapping.Scheduling;
+using Nemera.Application.Core.Scheduling.Notifications;
+using Nemera.Contracts.Responses.Scheduling;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Exceptions;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Application.Core.Scheduling.Events;
+
+/// <summary>
+/// Handler for the domain event raised when the execution of the task of a scheduled job is stopped while it is running.
+/// </summary>
+public class ScheduledJobExecutionStoppedDomainEventHandler : IDomainEventHandler<ScheduledJobExecutionStoppedDomainEvent>
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IScheduledJobNotifier _scheduledJobNotifier;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ScheduledJobExecutionStoppedDomainEventHandler"/> class.
+    /// </summary>
+    /// <param name="scheduledJobNotifier">Injected service for notifying the scheduled job changes to SignalR clients.</param>
+    /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
+    public ScheduledJobExecutionStoppedDomainEventHandler(IScheduledJobNotifier scheduledJobNotifier, IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+        _scheduledJobNotifier = scheduledJobNotifier;
+    }
+
+    /// <summary>
+    /// Handles the event raised when the execution of the task of a scheduled job is stopped while it is running.
+    /// </summary>
+    /// <param name="domainEvent">The domain event to be handled.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    public async ValueTask HandleAsync(ScheduledJobExecutionStoppedDomainEvent domainEvent, CancellationToken cancellationToken)
+    {
+        // Close the execution history row of the stopped execution, if it exists.
+        Result<ScheduledJobExecutionEntity?> getOpenExecutionResult = await _unitOfWork.ScheduledJobExecutionRepository
+            .GetOpenByScheduledJobIdAsync(domainEvent.ScheduledJobId.Value, cancellationToken).ConfigureAwait(false);
+        if (getOpenExecutionResult.IsFailure)
+            throw new EventualConsistencyException(getOpenExecutionResult.FirstError, getOpenExecutionResult.Errors);
+        if (getOpenExecutionResult.Value is not null)
+        {
+            ScheduledJobExecutionEntity execution = getOpenExecutionResult.Value;
+            ScheduledJobExecutionEntity updatedExecution = execution.ToUpdatedRepositoryEntity(domainEvent.OccurredOnUtc);
+            Result<Updated> updateExecutionResult = await _unitOfWork.ScheduledJobExecutionRepository.UpdateAsync(updatedExecution, cancellationToken).ConfigureAwait(false);
+            if (updateExecutionResult.IsFailure)
+                throw new EventualConsistencyException(updateExecutionResult.FirstError, updateExecutionResult.Errors);
+            Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            if (saveChangesResult.IsFailure)
+                throw new EventualConsistencyException(saveChangesResult.FirstError, saveChangesResult.Errors);
+        }
+
+        // Notify the SignalR clients about the current list of scheduled jobs.
+        Result<PaginatedResultDto<ScheduledJobEntity>> getScheduledJobsResult = await _unitOfWork.ScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getScheduledJobsResult.IsFailure)
+            throw new EventualConsistencyException(getScheduledJobsResult.FirstError, getScheduledJobsResult.Errors);
+        IReadOnlyList<ScheduledJobResponse> scheduledJobResponses = [.. getScheduledJobsResult.Value.Data.Select(scheduledJob => scheduledJob.ToResponse())];
+        await _scheduledJobNotifier.SendScheduledJobsAsync(scheduledJobResponses, cancellationToken).ConfigureAwait(false);
+    }
+}

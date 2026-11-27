@@ -1,0 +1,168 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
+using System;
+using System.Diagnostics;
+#endregion
+
+namespace Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+
+/// <summary>
+/// Repository entity for the settings of a user.
+/// </summary>
+[DebuggerDisplay("Id: {Id}; UserId: {UserId}")]
+public class UserSettingsEntity : IStorageEntity, IAuditableEntity
+{
+    /// <summary>
+    /// Gets the Id of these user settings.
+    /// </summary>
+    public required Guid Id { get; init; }
+
+    /// <summary>
+    /// Gets the Id of the user that owns these settings.
+    /// </summary>
+    public required Guid UserId { get; init; }
+
+    /// <summary>
+    /// Gets or sets whether pagination is enabled for the user, or not.
+    /// </summary>
+    public bool IsPaginationEnabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets the number of library items displayed per page when pagination is enabled.
+    /// </summary>
+    public int ItemsPerPage { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the "The" prefix of library item titles is ignored by the alpha picker, or not.
+    /// </summary>
+    public bool ShouldIgnoreThePrefixForAlphaPicker { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the theme data served to this user is cached, or not.
+    /// </summary>
+    public bool IsThemeCachingEnabled { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets whether the metadata of the media library items is aggregated from multiple providers, when fields are missing, or not.
+    /// </summary>
+    public bool ShouldAggregateMetadataWhenMissing { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the artwork of the media library items is aggregated from multiple providers, when it is missing, or not.
+    /// </summary>
+    public bool ShouldAggregateArtworkWhenMissing { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether PDF books are rendered as page images for the user, or not. Rendering PDFs as images preserves the
+    /// original layout, but the pages are not selectable or searchable, unlike their text layer.
+    /// </summary>
+    public bool ShouldRenderPdfAsImages { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the styles of the book content are preserved when it is rendered for the user, or not. Preserving them
+    /// keeps the original look of a book (its fonts, colors, and alignment), but the styles of a book can load resources from
+    /// external servers, which those servers could observe; stripping them removes that possibility, at the cost of the look of the book.
+    /// </summary>
+    public bool ShouldPreserveBookStyles { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the player keeps downloading a track while playback is paused, or not, up to the entire file.
+    /// </summary>
+    public bool ShouldKeepDownloadingWhilePaused { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets whether the player continues playback at the end of an album or artist, or not.
+    /// </summary>
+    public bool ShouldAutoplay { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets whether the player transitions between consecutive tracks without a gap, or not.
+    /// </summary>
+    public bool IsGaplessPlaybackEnabled { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the way ReplayGain normalization is applied to the tracks the user plays.
+    /// </summary>
+    public ReplayGainMode ReplayGainMode { get; set; }
+
+    /// <summary>
+    /// Gets or sets the quality cap applied to the audio the server normalizes for the user.
+    /// </summary>
+    public PlaybackStreamingQuality StreamingQuality { get; set; }
+
+    /// <summary>
+    /// Gets or sets the direction in which each channel of the VU meter of the audio player grows.
+    /// </summary>
+    public VuMeterOrientation VuMeterOrientation { get; set; }
+
+    /// <summary>
+    /// Gets or sets the number of segments each channel of the VU meter is divided into.
+    /// </summary>
+    public int VuMeterSegmentCount { get; set; } = 12;
+
+    /// <summary>
+    /// Gets or sets the gap, in pixels, between the segments and the channels of the VU meter.
+    /// </summary>
+    public int VuMeterSegmentGap { get; set; } = 1;
+
+    /// <summary>
+    /// Gets or sets the level, between 0 and 1, above which a segment of the VU meter is drawn with its medium state.
+    /// </summary>
+    public double VuMeterMediumThreshold { get; set; } = 0.6;
+
+    /// <summary>
+    /// Gets or sets the level, between 0 and 1, above which a segment of the VU meter is drawn with its high state.
+    /// </summary>
+    public double VuMeterHighThreshold { get; set; } = 0.8;
+
+    /// <summary>
+    /// Gets or sets whether the VU meter holds the peak level of each channel after it falls, or not.
+    /// </summary>
+    public bool VuMeterShowPeak { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the time, in milliseconds, a peak of the VU meter is held before it starts falling.
+    /// </summary>
+    public int VuMeterPeakHoldDurationInMilliseconds { get; set; } = 650;
+
+    /// <summary>
+    /// Gets or sets the number of level units the display of the VU meter falls per second when the input level drops.
+    /// </summary>
+    public double VuMeterReleasePerSecond { get; set; } = 3.0;
+
+    /// <summary>
+    /// Gets or sets the number of level units the peak of the VU meter falls per second after its hold time elapsed.
+    /// </summary>
+    public double VuMeterPeakReleasePerSecond { get; set; } = 0.65;
+
+    /// <summary>
+    /// Gets or sets the last volume the player reported for the user. Written automatically by the player, and not part of the settings the user edits.
+    /// </summary>
+    public double Volume { get; set; } = 1.0;
+
+    /// <summary>
+    /// Gets or sets the last mute state the player reported for the user. Written automatically by the player, and not part of the settings the user edits.
+    /// </summary>
+    public bool IsMuted { get; set; }
+
+    /// <summary>
+    /// Gets or sets the time and date when the entity was added.
+    /// </summary>
+    public DateTime CreatedOnUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Id of the user that created the entity.
+    /// </summary>
+    public Guid CreatedBy { get; set; }
+
+    /// <summary>
+    /// Gets or sets the optional time and date when the entity was updated.
+    /// </summary>
+    public DateTime? UpdatedOnUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the optional Id of the user that updated the entity.
+    /// </summary>
+    public Guid? UpdatedBy { get; set; }
+}

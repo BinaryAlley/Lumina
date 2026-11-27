@@ -1,0 +1,335 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.Infrastructure.Security;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.Authentication;
+using Nemera.Contracts.Requests.Authentication;
+using Nemera.Contracts.Responses.Authentication;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Infrastructure.Core.Authentication;
+using Nemera.Infrastructure.Core.Security;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using OtpNet;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagement.Authentication;
+
+/// <summary>
+/// Contains integration tests for the <see cref="LoginEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class LoginEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
+{
+    private HttpClient _client;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
+    private readonly PasswordHashService _hashService = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly LoginRequestFixture _loginRequestFixture = new();
+    private readonly ICryptographyService _cryptographyService;
+    private readonly TotpTokenGenerator _totpTokenGenerator = new();
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+    };
+    private readonly string _testUsername;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LoginEndpointTests"/> class.
+    /// </summary>
+    /// <param name="apiFactory">Injected in-memory API factory.</param>
+    public LoginEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
+    {
+        _client = apiFactory.CreateClient();
+        _apiFactory = apiFactory;
+        _testUsername = $"testuser_{Guid.NewGuid()}";
+
+        using IServiceScope scope = apiFactory.Services.CreateScope();
+        _cryptographyService = scope.ServiceProvider.GetRequiredService<ICryptographyService>();
+    }
+
+    /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = _apiFactory.CreateClient();
+        await Task.CompletedTask;
+    }
+
+    [Fact]
+    public async Task Login_WhenCalledWithValidCredentials_ShouldLoginSuccessfully()
+    {
+        // Arrange
+        UserEntity user = await CreateTestUser();
+        LoginRequest request = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "TestPass123!"
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/login", request);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        string content = await response.Content.ReadAsStringAsync();
+        LoginResponse? result = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
+
+        Assert.NotNull(result);
+        Assert.Equal(user.Username, result!.Username);
+        Assert.False(result.UsesTotp);
+        Assert.NotNull(result.Token);
+        Assert.NotEmpty(result.Token);
+    }
+
+    [Fact]
+    public async Task Login_WhenCalledWithValidCredentialsAndTotp_ShouldLoginSuccessfully()
+    {
+        // Arrange
+        UserEntity user = await CreateTestUserWithTotp();
+        byte[] totpSecret = Convert.FromBase64String(_cryptographyService.Decrypt(user.TotpSecret!));
+        Totp totp = new(totpSecret);
+        string validTotpCode = totp.ComputeTotp(DateTime.UtcNow);
+
+        LoginRequest request = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "TestPass123!",
+            totpCode: validTotpCode
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/login", request);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        string content = await response.Content.ReadAsStringAsync();
+        LoginResponse? result = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
+
+        Assert.NotNull(result);
+        Assert.Equal(user.Username, result!.Username);
+        Assert.True(result.UsesTotp);
+        Assert.NotNull(result.Token);
+        Assert.NotEmpty(result.Token);
+    }
+
+    [Fact]
+    public async Task Login_WhenCalledWithTempPassword_ShouldLoginSuccessfully()
+    {
+        // Arrange
+        UserEntity user = await CreateTestUserWithTempPassword();
+        LoginRequest request = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "TempPass123!"
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/login", request);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        string content = await response.Content.ReadAsStringAsync();
+        LoginResponse? result = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
+
+        Assert.NotNull(result);
+        Assert.Equal(user.Username, result!.Username);
+        Assert.NotNull(result.Token);
+        Assert.NotEmpty(result.Token);
+    }
+
+    [Fact]
+    public async Task Login_WhenCalledWithExpiredTempPassword_ShouldReturnUnauthorized()
+    {
+        // Arrange
+        UserEntity user = await CreateTestUserWithExpiredTempPassword();
+        LoginRequest request = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "TempPass123!"
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/login", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Failure", problemDetails["title"].GetString());
+        Assert.Equal("TempPasswordExpired", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/login", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
+    }
+
+    [Fact]
+    public async Task Login_WhenCalledWithInvalidCredentials_ShouldReturnUnauthorized()
+    {
+        // Arrange
+        UserEntity user = await CreateTestUser();
+        LoginRequest request = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "WrongPass123!"
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/login", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.Equal("General.Failure", problemDetails["title"].GetString());
+        Assert.Equal("InvalidUsernameOrPassword", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/login", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
+    }
+
+    [Fact]
+    public async Task Login_WhenCalledWithInvalidTotpCode_ShouldReturnUnauthorized()
+    {
+        // Arrange
+        UserEntity user = await CreateTestUserWithTotp();
+        LoginRequest request = _loginRequestFixture.Create(
+            username: user.Username,
+            password: "TestPass123!",
+            totpCode: "000000"
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/login", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
+        Assert.Equal("General.Validation", problemDetails["title"].GetString());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/login", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
+
+        Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("InvalidTotpCode", errors["General.Validation"]);
+    }
+   
+    /// <summary>
+    /// Creates a test user without a TOTP secret in the database and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
+    private async Task<UserEntity> CreateTestUser()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = null;
+
+        dbContext.Users.Add(user);
+        await dbContext.SaveChangesAsync();
+        return user;
+    }
+
+    /// <summary>
+    /// Creates a test user with a TOTP secret in the database and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
+    private async Task<UserEntity> CreateTestUserWithTotp()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        byte[] totpSecret = _totpTokenGenerator.GenerateSecret();
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(totpSecret));
+
+        dbContext.Users.Add(user);
+        await dbContext.SaveChangesAsync();
+        return user;
+    }
+
+    /// <summary>
+    /// Creates a test user with a temporary password in the database and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
+    private async Task<UserEntity> CreateTestUserWithTempPassword()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = null;
+        user.TempPassword = Uri.EscapeDataString(_hashService.HashString("TempPass123!"));
+        user.TempPasswordCreated = DateTime.UtcNow;
+
+        dbContext.Users.Add(user);
+        await dbContext.SaveChangesAsync();
+        return user;
+    }
+
+    /// <summary>
+    /// Creates a test user with an expired temporary password in the database and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
+    private async Task<UserEntity> CreateTestUserWithExpiredTempPassword()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = null;
+        user.TempPassword = Uri.EscapeDataString(_hashService.HashString("TempPass123!"));
+        user.TempPasswordCreated = DateTime.UtcNow.AddMinutes(-16); // Expired (> 15 minutes old).
+
+        dbContext.Users.Add(user);
+        await dbContext.SaveChangesAsync();
+        return user;
+    }
+
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public async Task DisposeAsync()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == _testUsername);
+        if (user is not null)
+        {
+            dbContext.Users.Remove(user);
+            await dbContext.SaveChangesAsync();
+        }
+    }
+}

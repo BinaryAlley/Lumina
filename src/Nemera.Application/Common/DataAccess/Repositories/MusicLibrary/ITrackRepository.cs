@@ -1,0 +1,189 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.Common.Actions;
+using Nemera.Application.Common.DataAccess.Repositories.Common.Base;
+using Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Domain.Common.Primitives;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Application.Common.DataAccess.Repositories.MusicLibrary;
+
+/// <summary>
+/// Interface for the repository for tracks.
+/// </summary>
+public interface ITrackRepository : IRepository<TrackEntity>,
+                                    IInsertRepositoryAction<TrackEntity>,
+                                    IUpdateRepositoryAction<TrackEntity>,
+                                    IApplyUpdateRepositoryAction<TrackEntity>,
+                                    IGetByIdRepositoryAction<TrackEntity, Guid>,
+                                    IDeleteByIdRepositoryAction<Guid>
+{
+    /// <summary>
+    /// Gets the subset of <paramref name="paths"/> that is already used by a track of the library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library whose tracks are searched.</param>
+    /// <param name="paths">The track paths to check.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the paths that are already used, or an error.</returns>
+    Task<Result<IReadOnlyCollection<string>>> GetExistingPathsAsync(Guid libraryId, IReadOnlyCollection<string> paths, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the tracks of the album identified by <paramref name="albumId"/> that are not soft deleted.
+    /// </summary>
+    /// <param name="albumId">The Id of the album whose tracks are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="TrackEntity"/>, or an error.</returns>
+    Task<Result<IReadOnlyList<TrackEntity>>> GetByAlbumIdAsync(Guid albumId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets all the tracks of the album identified by <paramref name="albumId"/>, whether they are soft deleted or not.
+    /// </summary>
+    /// <param name="albumId">The Id of the album whose tracks are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="TrackEntity"/>, or an error.</returns>
+    Task<Result<IReadOnlyList<TrackEntity>>> GetByAlbumIdIncludingDeletedAsync(Guid albumId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the lightweight read models of the tracks of the album identified by <paramref name="albumId"/>, projecting only the fields needed to display the tracks of an album.
+    /// </summary>
+    /// <param name="albumId">The Id of the album whose tracks are retrieved.</param>
+    /// <param name="paginationData">The pagination data that includes the current page and the number of items per page to retrieve. If <see langword="null"/>, all matching tracks are returned.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a paginated result of <see cref="TrackLiteRow"/>, or an error.</returns>
+    Task<Result<PaginatedResultDto<TrackLiteRow>>> GetTracksLiteByAlbumIdAsync(Guid albumId, PaginationDataDto? paginationData, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets a uniformly random selection of tracks of the library identified by <paramref name="libraryId"/>, optionally scoped to
+    /// an artist or an album, excluding the tracks in <paramref name="excludedTrackIds"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library whose tracks are sampled.</param>
+    /// <param name="artistId">The Id of the artist whose tracks are sampled, or <see langword="null"/> for every artist of the library.</param>
+    /// <param name="albumId">The Id of the album whose tracks are sampled, or <see langword="null"/> for every album of the scope.</param>
+    /// <param name="excludedTrackIds">The tracks that must not be returned.</param>
+    /// <param name="count">The maximum number of tracks to return.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="ShuffleTrackRowDto"/>, or an error.</returns>
+    Task<Result<IReadOnlyList<ShuffleTrackRowDto>>> GetShuffleTracksLiteAsync(Guid libraryId, Guid? artistId, Guid? albumId, IReadOnlyCollection<Guid> excludedTrackIds, int count, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the track of the library identified by <paramref name="libraryId"/> that is stored at the provided <paramref name="path"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library whose track is retrieved.</param>
+    /// <param name="path">The file system path of the track to retrieve.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="TrackEntity"/> stored at the provided path, or an error.</returns>
+    Task<Result<TrackEntity?>> GetByPathAsync(Guid libraryId, string path, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the data needed to stream the audio file of the track identified by <paramref name="trackId"/>, when it belongs to the album identified by
+    /// <paramref name="albumId"/> and to the media library identified by <paramref name="libraryId"/>, and that album belongs to the artist identified by
+    /// <paramref name="artistId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library the track must belong to.</param>
+    /// <param name="albumId">The Id of the album the track must belong to.</param>
+    /// <param name="artistId">The Id of the artist that must own the album the track belongs to.</param>
+    /// <param name="trackId">The Id of the track whose streaming data is retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either the <see cref="TrackStreamDto"/> of the track, <see langword="null"/> when no track matches the
+    /// provided identifiers, or an error.
+    /// </returns>
+    Task<Result<TrackStreamDto?>> GetTrackStreamInfoAsync(Guid libraryId, Guid albumId, Guid artistId, Guid trackId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the stored probe result needed to build the playback manifest of the track identified by <paramref name="trackId"/>, when it belongs to
+    /// the album identified by <paramref name="albumId"/> and to the media library identified by <paramref name="libraryId"/>, and that album belongs
+    /// to the artist identified by <paramref name="artistId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library the track must belong to.</param>
+    /// <param name="albumId">The Id of the album the track must belong to.</param>
+    /// <param name="artistId">The Id of the artist that must own the album the track belongs to.</param>
+    /// <param name="trackId">The Id of the track whose playback manifest data is retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either the <see cref="TrackPlaybackManifestDto"/> of the track, <see langword="null"/> when no track
+    /// matches the provided identifiers, or an error.
+    /// </returns>
+    Task<Result<TrackPlaybackManifestDto?>> GetPlaybackManifestInfoAsync(Guid libraryId, Guid albumId, Guid artistId, Guid trackId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Resets the enrichment state of the tracks stored at the provided <paramref name="paths"/> in the media library identified by
+    /// <paramref name="libraryId"/>, together with their albums and artists, so that they are re-enriched, because their content changed since the last scan.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose tracks are reset.</param>
+    /// <param name="paths">The file system paths of the tracks whose enrichment state is reset.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> ResetEnrichmentStateForPathsAsync(Guid libraryId, IReadOnlyCollection<string> paths, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the number of tracks of the media library identified by <paramref name="libraryId"/> whose metadata has not been enriched yet.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose tracks are counted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the number of tracks needing their metadata enriched, or an error.</returns>
+    Task<Result<int>> GetTracksNeedingMetadataCountAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Resets the metadata enrichment status of all the tracks of the media library identified by <paramref name="libraryId"/>,
+    /// so that they are re-enriched, because the metadata provider configuration of the library changed.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose tracks are reset.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> ResetMetadataStatusForLibraryAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the number of tracks in <paramref name="trackIds"/> that exist, together with the distinct Ids of the libraries that contain them.
+    /// </summary>
+    /// <param name="trackIds">The Ids of the tracks whose access information is retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the access summary of the existing tracks, or an error.</returns>
+    Task<Result<TrackAccessSummaryDto>> GetAccessInfoByIdsAsync(IReadOnlyCollection<Guid> trackIds, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the tracks identified by <paramref name="trackIds"/>, optionally together with their navigation properties.
+    /// </summary>
+    /// <param name="trackIds">The Ids of the tracks to get.</param>
+    /// <param name="shouldIncludeNavigationProperties">Whether the navigation properties of the tracks should be loaded together with the tracks themselves.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the existing tracks, or an error.</returns>
+    Task<Result<IReadOnlyList<TrackEntity>>> GetByIdsAsync(IReadOnlyCollection<Guid> trackIds, bool shouldIncludeNavigationProperties, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the soft deleted track identified by <paramref name="id"/>, when its album and artist are not soft deleted.
+    /// </summary>
+    /// <param name="id">The Id of the soft deleted track to get.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted <see cref="TrackEntity"/>, <see langword="null"/> when the track does not exist, is not soft deleted, or its album or artist is soft deleted, or an error.</returns>
+    Task<Result<TrackEntity?>> GetSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the soft deleted tracks of the media library identified by <paramref name="libraryId"/>, whose album and artist are not soft deleted.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library whose soft deleted tracks are retrieved.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted tracks, or an error.</returns>
+    Task<Result<IReadOnlyList<TrackEntity>>> GetSoftDeletedByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Soft deletes the track identified by <paramref name="id"/>, without removing its stored metadata or artwork.
+    /// </summary>
+    /// <param name="id">The Id of the track to soft delete.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> SoftDeleteByIdAsync(Guid id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Restores the soft deleted track identified by <paramref name="id"/>.
+    /// </summary>
+    /// <param name="id">The Id of the track to restore.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Updated>> RestoreSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken);
+}

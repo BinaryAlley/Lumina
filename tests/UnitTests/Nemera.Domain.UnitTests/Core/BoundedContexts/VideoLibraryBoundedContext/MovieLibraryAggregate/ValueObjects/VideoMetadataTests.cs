@@ -1,0 +1,141 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.ValueObjects.Metadata;
+using Nemera.Domain.Core.BoundedContexts.VideoLibraryBoundedContext.MovieLibraryAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Common.ValueObjects.Metadata;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.VideoLibraryBoundedContext.MovieLibraryAggregate.ValueObjects;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+#endregion
+
+namespace Nemera.Domain.UnitTests.Core.BoundedContexts.VideoLibraryBoundedContext.MovieLibraryAggregate.ValueObjects;
+
+/// <summary>
+/// Contains unit tests for the <see cref="VideoMetadata"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class VideoMetadataTests
+{
+    private readonly GenreFixture _genreFixture = new();
+    private readonly TagFixture _tagFixture = new();
+    private readonly ReleaseInfoFixture _releaseInfoFixture = new();
+    private readonly LanguageInfoFixture _languageInfoFixture = new();
+    private readonly VideoMetadataFixture _videoMetadataFixture = new();
+
+    [Fact]
+    public void Create_WhenCalledWithValidValues_ShouldCreateMetadataWithAllPropertiesSet()
+    {
+        // Act
+        Result<VideoMetadata> result = VideoMetadata.Create(
+            "Inception",
+            Optional<string>.Some("Inception (Original)"),
+            durationInSeconds: 8880,
+            "1920x1080",
+            Optional<string>.Some("A thief who steals corporate secrets."),
+            _releaseInfoFixture.Create(),
+            Optional<LanguageInfo>.Some(_languageInfoFixture.Create()),
+            Optional<LanguageInfo>.None(),
+            Optional<float>.Some(24),
+            Optional<string>.Some("H.264"),
+            Optional<string>.Some("AAC"),
+            [_genreFixture.Create(name: "Action")],
+            [_tagFixture.Create(name: "heist")]);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Inception", result.Value.Title);
+        Assert.Equal("Inception (Original)", result.Value.OriginalTitle.Value);
+        Assert.Equal(8880, result.Value.DurationInSeconds);
+        Assert.Equal("1920x1080", result.Value.Resolution);
+        Assert.Equal("A thief who steals corporate secrets.", result.Value.Description.Value);
+        Assert.Equal(24, result.Value.FrameRate.Value);
+        Assert.Equal("H.264", result.Value.VideoCodec.Value);
+        Assert.Equal("AAC", result.Value.AudioCodec.Value);
+        Assert.Single(result.Value.Genres);
+        Assert.Single(result.Value.Tags);
+        Assert.True(result.Value.Language.HasValue);
+        Assert.False(result.Value.OriginalLanguage.HasValue);
+    }
+
+    [Fact]
+    public void Equals_WithSameValues_ShouldReturnTrue()
+    {
+        // Arrange
+        ReleaseInfo releaseInfo = _releaseInfoFixture.Create();
+        VideoMetadata first = _videoMetadataFixture.Create(
+            title: "Inception",
+            originalTitle: Optional<string>.None(),
+            durationInSeconds: 8880,
+            resolution: "1920x1080",
+            description: Optional<string>.None(),
+            releaseInfo: releaseInfo,
+            language: Optional<LanguageInfo>.None(),
+            originalLanguage: Optional<LanguageInfo>.None(),
+            frameRate: Optional<float>.None(),
+            videoCodec: Optional<string>.None(),
+            audioCodec: Optional<string>.None(),
+            genres: [],
+            tags: []);
+        VideoMetadata second = _videoMetadataFixture.Create(
+            title: "Inception",
+            originalTitle: Optional<string>.None(),
+            durationInSeconds: 8880,
+            resolution: "1920x1080",
+            description: Optional<string>.None(),
+            releaseInfo: releaseInfo,
+            language: Optional<LanguageInfo>.None(),
+            originalLanguage: Optional<LanguageInfo>.None(),
+            frameRate: Optional<float>.None(),
+            videoCodec: Optional<string>.None(),
+            audioCodec: Optional<string>.None(),
+            genres: [],
+            tags: []);
+
+        // Act
+        bool result = first.Equals(second);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void Equals_WithDifferentDuration_ShouldReturnFalse()
+    {
+        // Arrange
+        ReleaseInfo releaseInfo = _releaseInfoFixture.Create();
+        VideoMetadata first = _videoMetadataFixture.Create(
+            title: "Inception",
+            originalTitle: Optional<string>.None(),
+            durationInSeconds: 8880,
+            resolution: "1920x1080",
+            description: Optional<string>.None(),
+            releaseInfo: releaseInfo,
+            language: Optional<LanguageInfo>.None(),
+            originalLanguage: Optional<LanguageInfo>.None(),
+            frameRate: Optional<float>.None(),
+            videoCodec: Optional<string>.None(),
+            audioCodec: Optional<string>.None(),
+            genres: [],
+            tags: []);
+        VideoMetadata second = _videoMetadataFixture.Create(
+            title: "Inception",
+            originalTitle: Optional<string>.None(),
+            durationInSeconds: 8881,
+            resolution: "1920x1080",
+            description: Optional<string>.None(),
+            releaseInfo: releaseInfo,
+            language: Optional<LanguageInfo>.None(),
+            originalLanguage: Optional<LanguageInfo>.None(),
+            frameRate: Optional<float>.None(),
+            videoCodec: Optional<string>.None(),
+            audioCodec: Optional<string>.None(),
+            genres: [],
+            tags: []);
+
+        // Act
+        bool result = first.Equals(second);
+
+        // Assert
+        Assert.False(result);
+    }
+}

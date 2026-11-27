@@ -1,0 +1,22 @@
+#region ========================================================================= USING =====================================================================================
+using System.Diagnostics;
+#endregion
+
+namespace Nemera.Application.Common.Infrastructure.Models.DTO.Configuration;
+
+/// <summary>
+/// Data transfer object for deserializing plugins settings.
+/// </summary>
+[DebuggerDisplay("{SECTION_NAME}")]
+public class PluginsSettingsDto
+{
+    /// <summary>
+    /// The name of the configuration section that holds the plugins settings.
+    /// </summary>
+    public const string SECTION_NAME = "PluginsSettings";
+
+    /// <summary>
+    /// Gets or sets the directory where the plugin assemblies are located.
+    /// </summary>
+    public required string Directory { get; init; }
+}

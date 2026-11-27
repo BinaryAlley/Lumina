@@ -1,0 +1,418 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Repositories.Authorization;
+using Nemera.Application.Common.DataAccess.Repositories.Users;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Application.Fixtures.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+using Nemera.Contracts.Responses.Authorization;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using NSubstitute;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
+#endregion
+
+namespace Nemera.Application.UnitTests.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+
+/// <summary>
+/// Contains unit tests for the <see cref="UpdateUserRoleAndPermissionsCommandHandler"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class UpdateUserRoleAndPermissionsCommandHandlerTests
+{
+    private readonly IUnitOfWork _mockUnitOfWork;
+    private readonly IAuthorizationService _mockAuthorizationService;
+    private readonly ICurrentUserService _mockCurrentUserService;
+    private readonly IUserRepository _mockUserRepository;
+    private readonly IRoleRepository _mockRoleRepository;
+    private readonly IPermissionRepository _mockPermissionRepository;
+    private readonly IValidator<UpdateUserRoleAndPermissionsCommand> _mockValidator;
+    private readonly UpdateUserRoleAndPermissionsCommandHandler _sut;
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly UserRoleEntityFixture _userRoleEntityFixture = new();
+    private readonly UserPermissionEntityFixture _userPermissionEntityFixture = new();
+    private readonly UpdateUserRoleAndPermissionsCommandFixture _updateUserRoleAndPermissionsCommandFixture = new();
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
+    private readonly PaginatedResultDtoFixture<UserEntity> _paginatedResultDtoFixture = new();
+    private readonly Guid _userId;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateUserRoleAndPermissionsCommandHandlerTests"/> class.
+    /// </summary>
+    public UpdateUserRoleAndPermissionsCommandHandlerTests()
+    {
+        _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
+        _mockAuthorizationService = Substitute.For<IAuthorizationService>();
+        _mockCurrentUserService = Substitute.For<ICurrentUserService>();
+        _mockUserRepository = Substitute.For<IUserRepository>();
+        _mockRoleRepository = Substitute.For<IRoleRepository>();
+        _mockPermissionRepository = Substitute.For<IPermissionRepository>();
+        _userId = Guid.NewGuid();
+
+        _mockCurrentUserService.UserId.Returns(_userId);
+        _mockUnitOfWork.UserRepository.Returns(_mockUserRepository);
+        _mockUnitOfWork.RoleRepository.Returns(_mockRoleRepository);
+        _mockUnitOfWork.PermissionRepository.Returns(_mockPermissionRepository);
+
+        _mockValidator = Substitute.For<IValidator<UpdateUserRoleAndPermissionsCommand>>();
+        _mockValidator.Validate(Arg.Any<UpdateUserRoleAndPermissionsCommand>())
+            .Returns([]);
+        _sut = new UpdateUserRoleAndPermissionsCommandHandler(
+            _mockAuthorizationService,
+            _mockCurrentUserService,
+            _mockUnitOfWork,
+            _mockValidator);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenUserIsNotAdmin_ShouldReturnNotAuthorizedError()
+    {
+        // Arrange
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create();
+        _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        // Act
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockUserRepository.DidNotReceive().UpdateAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenUserIsNotAuthenticated_ShouldReturnNotAuthorizedError()
+    {
+        // Arrange
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create();
+        _mockCurrentUserService.UserId.Returns((Guid?)null);
+
+        // Act
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockAuthorizationService.DidNotReceive().IsInRoleAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockUserRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenUserDoesNotExist_ShouldReturnUserDoesNotExistError()
+    {
+        // Arrange
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create();
+        _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
+            .Returns(true);
+        _mockUserRepository.GetByIdAsync(command.UserId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns((UserEntity?)null);
+
+        // Act
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.Users.UserDoesNotExist, result.FirstError);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenRoleDoesNotExist_ShouldReturnRoleNotFoundError()
+    {
+        // Arrange
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
+        UserEntity user = _userEntityFixture.Create();
+
+        _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
+            .Returns(true);
+        _mockUserRepository.GetByIdAsync(command.UserId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(user);
+        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns((RoleEntity?)null);
+
+        // Act
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.RoleNotFound, result.FirstError);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenRemovingLastAdmin_ShouldReturnCannotRemoveLastAdminError()
+    {
+        // Arrange
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
+        RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
+        Guid userId = Guid.NewGuid();
+        UserRoleEntity userRole = _userRoleEntityFixture.Create(userId: userId, role: adminRole);
+
+        UserEntity user = _userEntityFixture.Create(
+            id: userId,
+            username: "testAdmin",
+            password: "hashedPassword",
+            userRole: userRole,
+            includeUserRole: true);
+
+        RoleEntity newRole = _roleEntityFixture.Create(roleName: "User");
+        List<UserEntity> users = [user];
+
+        _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
+            .Returns(true);
+        _mockUserRepository.GetByIdAsync(command.UserId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(user);
+        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(newRole);
+        _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From(_paginatedResultDtoFixture.Create(data: users, currentPage: 1, perPage: users.Count, count: users.Count, numberOfPages: 1)));
+
+        // Act
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.CannotRemoveLastAdmin, result.FirstError);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenUpdateFails_ShouldReturnError()
+    {
+        // Arrange
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
+        UserEntity user = _userEntityFixture.Create();
+        RoleEntity role = _roleEntityFixture.Create(roleName: "TestRole");
+        IEnumerable<PermissionEntity> permissions = command.Permissions.Select(permissionId =>
+            _permissionEntityFixture.Create(id: permissionId, permissionName: AuthorizationPermission.CanViewUsers));
+        Error error = Error.Failure("Database.Error", "Failed to update user");
+
+        _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
+            .Returns(true);
+        _mockUserRepository.GetByIdAsync(command.UserId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(user);
+        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(role);
+        _mockPermissionRepository.GetByIdsAsync(command.Permissions, Arg.Any<CancellationToken>())
+            .Returns(Result.From(permissions));
+        _mockUserRepository.UpdateAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
+            .Returns(error);
+
+        // Act
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(error, result.FirstError);
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenAllOperationsSucceed_ShouldReturnSuccessResponse()
+    {
+        // Arrange
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
+        UserEntity user = _userEntityFixture.Create(id: command.UserId, username: "testUser", password: "hashedPassword");
+
+        List<UserPermissionEntity> userPermissions = [.. command.Permissions.Select((permissionId, index) =>
+            _userPermissionEntityFixture.Create(
+                user: user,
+                permission: _permissionEntityFixture.Create(id: permissionId, permissionName: (AuthorizationPermission)(index + 1))))];
+        foreach (UserPermissionEntity userPermission in userPermissions)
+            user.UserPermissions.Add(userPermission);
+
+        RoleEntity role = _roleEntityFixture.Create(roleName: "TestRole");
+        IEnumerable<PermissionEntity> permissions = command.Permissions.Select((permissionId, index) =>
+            _permissionEntityFixture.Create(id: permissionId, permissionName: (AuthorizationPermission)(index + 1)));
+
+        _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
+            .Returns(true);
+        _mockUserRepository.GetByIdAsync(command.UserId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(user);
+        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(role);
+        _mockPermissionRepository.GetByIdsAsync(command.Permissions, Arg.Any<CancellationToken>())
+            .Returns(Result.From(permissions));
+        _mockUserRepository.UpdateAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Updated);
+
+        // Act
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(command.UserId, result.Value.UserId);
+        Assert.Equal(role.RoleName, result.Value.Role);
+        Assert.Equal(command.Permissions.Count, result.Value.Permissions.Count);
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenGetAllUsersFails_ShouldReturnError()
+    {
+        // Arrange
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
+        RoleEntity adminRole = _roleEntityFixture.Create(roleName: "Admin");
+        UserRoleEntity userRole = _userRoleEntityFixture.Create(userId: command.UserId, role: adminRole);
+
+        UserEntity user = _userEntityFixture.Create(
+            id: command.UserId,
+            username: "testUser",
+            password: "hashedPassword",
+            userRole: userRole,
+            includeUserRole: true);
+
+        Error error = Error.Failure("Database.Error", "Failed to get users");
+
+        _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
+            .Returns(true);
+        _mockUserRepository.GetByIdAsync(command.UserId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(user);
+        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(_roleEntityFixture.Create(roleName: "User"));
+        _mockUserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(error);
+
+        // Act
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(error, result.FirstError);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenGetPermissionsFails_ShouldReturnError()
+    {
+        // Arrange
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
+        UserEntity user = _userEntityFixture.Create(id: command.UserId, username: "testUser", password: "hashedPassword");
+        Error error = Error.Failure("Database.Error", "Failed to get permissions");
+
+        _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
+            .Returns(true);
+        _mockUserRepository.GetByIdAsync(command.UserId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(user);
+        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(_roleEntityFixture.Create(roleName: "User"));
+        _mockPermissionRepository.GetByIdsAsync(command.Permissions, Arg.Any<CancellationToken>())
+            .Returns(error);
+
+        // Act
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(error, result.FirstError);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenRoleIdIsOmitted_ShouldPreserveTheCurrentRole()
+    {
+        // Arrange
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: null);
+        RoleEntity currentRole = _roleEntityFixture.Create(roleName: "Editor");
+        UserRoleEntity userRole = _userRoleEntityFixture.Create(userId: command.UserId, role: currentRole);
+        UserEntity user = _userEntityFixture.Create(
+            id: command.UserId,
+            username: "testUser",
+            password: "hashedPassword",
+            userRole: userRole,
+            includeUserRole: true);
+        IEnumerable<PermissionEntity> permissions = command.Permissions.Select(permissionId =>
+            _permissionEntityFixture.Create(id: permissionId, permissionName: AuthorizationPermission.CanViewUsers));
+
+        _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
+            .Returns(true);
+        _mockUserRepository.GetByIdAsync(command.UserId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(user);
+        _mockPermissionRepository.GetByIdsAsync(command.Permissions, Arg.Any<CancellationToken>())
+            .Returns(Result.From(permissions));
+        _mockUserRepository.UpdateAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Updated);
+
+        // Act
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(currentRole.RoleName, result.Value.Role);
+
+        // The current role is left untouched, so the repository is asked to keep it and no role lookup is made.
+        await _mockUserRepository.Received(1).UpdateAsync(
+            Arg.Is<UserEntity>(updatedUser => updatedUser.UserRole != null && updatedUser.UserRole.RoleId == currentRole.Id),
+            Arg.Any<CancellationToken>());
+        await _mockRoleRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenPermissionDoesNotExist_ShouldReturnPermissionNotFoundError()
+    {
+        // Arrange
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create(roleId: Guid.NewGuid());
+        UserEntity user = _userEntityFixture.Create(id: command.UserId, username: "testUser", password: "hashedPassword");
+        RoleEntity role = _roleEntityFixture.Create(roleName: "TestRole");
+
+        // Only one of the requested permissions exists, so resolving the rest would throw if it were done with a strict lookup.
+        IEnumerable<PermissionEntity> existingPermissions =
+        [
+            _permissionEntityFixture.Create(id: command.Permissions[0], permissionName: AuthorizationPermission.CanViewUsers)
+        ];
+
+        _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>())
+            .Returns(true);
+        _mockUserRepository.GetByIdAsync(command.UserId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(user);
+        _mockRoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(role);
+        _mockPermissionRepository.GetByIdsAsync(command.Permissions, Arg.Any<CancellationToken>())
+            .Returns(Result.From(existingPermissions));
+
+        // Act
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.PermissionNotFound, result.FirstError);
+        await _mockUserRepository.DidNotReceive().UpdateAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenValidationFails_ShouldReturnTheValidationErrorsWithoutPersisting()
+    {
+        // Arrange
+        UpdateUserRoleAndPermissionsCommand command = _updateUserRoleAndPermissionsCommandFixture.Create();
+        Error validationError = Error.Validation("General.Validation", "RoleIdCannotBeEmpty");
+        _mockValidator.Validate(command).Returns([validationError]);
+
+        // Act
+        Result<AuthorizationResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(validationError, result.FirstError);
+        // The handler short-circuits on validation failure, so no authentication, lookup or persistence work is done.
+        await _mockAuthorizationService.DidNotReceive().IsInRoleAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockUserRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
+        await _mockUserRepository.DidNotReceive().UpdateAsync(Arg.Any<UserEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+}

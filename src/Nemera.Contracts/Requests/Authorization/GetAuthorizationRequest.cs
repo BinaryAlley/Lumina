@@ -1,0 +1,13 @@
+#region ========================================================================= USING =====================================================================================
+using System;
+#endregion
+
+namespace Nemera.Contracts.Requests.Authorization;
+
+/// <summary>
+/// Represents the request model for retrieving account authorization information.
+/// </summary>
+/// <param name="UserId">The unique identifier of the user for whom to get the authorization. Required.</param>
+public record GetAuthorizationRequest(
+    Guid? UserId
+);

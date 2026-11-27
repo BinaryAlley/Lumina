@@ -1,0 +1,273 @@
+#region ========================================================================= USING =====================================================================================
+using FastEndpoints;
+using FastEndpoints.Swagger;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Presentation.Api.Common.Authentication;
+using Nemera.Presentation.Api.Common.HealthChecks;
+using MessagePack;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Json;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Api.Common.DependencyInjection;
+
+/// <summary>
+/// Utility class for registering the services of the Presentation Api layer into the Dependency Injection container.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public static class PresentationApiLayerServices
+{
+    /// <summary>
+    /// The name of the rate limiting policy applied to the authentication endpoints.
+    /// </summary>
+    public const string AUTHENTICATION_RATE_LIMIT_POLICY = "authenticationPolicy";
+
+    /// <summary>
+    /// The name of the rate limiting policy applied to the endpoints that stream tracks.
+    /// </summary>
+    public const string TRACK_STREAM_RATE_LIMIT_POLICY = "trackStreamPolicy";
+
+    /// <summary>
+    /// Registers the services of the Presentation Api layer into the Dependency Injection container.
+    /// </summary>
+    /// <param name="services">The service collection to add the services to.</param>
+    /// <param name="configuration">The configuration used to read the application configuration.</param>
+    /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
+    public static IServiceCollection AddPresentationApiLayerServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddMemoryCache(); // Used for the tracking involved in authentication rate limiting.
+        services.AddProblemDetails();
+
+        // The readiness health check verifies that the database can be reached, and is probed by container orchestrators and load balancers.
+        services.AddHealthChecks()
+            .AddCheck<DatabaseHealthCheck>("database", HealthStatus.Unhealthy, ["ready"]);
+
+        services.Configure<JsonOptions>(jsonOptions =>
+        {
+            jsonOptions.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            jsonOptions.SerializerOptions.MaxDepth = 256;
+            jsonOptions.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // Needed because file system API responses can have very nested structures.
+        });
+
+        // TODO: also implement account locking after a number of failed login attempts.
+        services.AddRateLimiter(rateLimiterOptions =>
+        {
+            rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            rateLimiterOptions.OnRejected = async (onRejectedContext, cancellationToken) =>
+            {
+                ILogger<Program> logger = onRejectedContext.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+
+                string clientIp = onRejectedContext.HttpContext.Request.Headers["X-Forwarded-For"]
+                    .FirstOrDefault()?.Split(',')[0].Trim()
+                    ?? onRejectedContext.HttpContext.Connection.RemoteIpAddress?.ToString()
+                    ?? "unknown";
+                if (logger.IsEnabled(LogLevel.Warning))
+                    logger.LogWarning(
+                        "Rate limit exceeded. IP: {IpAddress}, Route: {Route}, Lease Acquired: {IsAcquired}",
+                        clientIp,
+                        onRejectedContext.HttpContext.Request.Path,
+                        onRejectedContext.Lease.IsAcquired); // When False, the request was rejected because it exceeded rate limits.
+
+                onRejectedContext.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                onRejectedContext.HttpContext.Response.ContentType = "application/problem+json";
+
+                // Set standard rate limit headers.
+                if (onRejectedContext.Lease.TryGetMetadata(MetadataName.RetryAfter, out TimeSpan retryAfter))
+                    onRejectedContext.HttpContext.Response.Headers.RetryAfter = ((int)retryAfter.TotalSeconds).ToString();
+
+                // Set custom rate limit headers.
+                onRejectedContext.HttpContext.Response.Headers["X-RateLimit-Limit"] = "10";
+                onRejectedContext.HttpContext.Response.Headers["X-RateLimit-Remaining"] = "0";
+                onRejectedContext.HttpContext.Response.Headers["X-RateLimit-Reset"] = DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds().ToString();
+
+                var problem = new
+                {
+                    type = "https://tools.ietf.org/html/rfc6585#section-4",
+                    title = "TooManyRequests", 
+                    status = StatusCodes.Status429TooManyRequests,
+                    detail = "TooManyRequests",
+                    retryAfter = "900"
+                };
+
+                await onRejectedContext.HttpContext.Response.WriteAsJsonAsync(problem, cancellationToken);
+            };
+            rateLimiterOptions.AddPolicy(AUTHENTICATION_RATE_LIMIT_POLICY, httpContext =>
+            {
+                string clientIp = httpContext.Request.Headers["X-Forwarded-For"] // First check forwarded headers, in case this is behind a reverse proxy.
+                    .FirstOrDefault()?.Split(',')[0].Trim() // Take first IP, if multiple available, to avoid IP spoofing attempts,
+                    ?? httpContext.Connection.RemoteIpAddress?.ToString() // Then try RemoteIpAddress.
+                    ?? "unknown"; // Fallback if both are null.
+                return RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: $"auth_{clientIp}",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 10, // Allow 10 attempts.
+                        Window = TimeSpan.FromMinutes(15), // Within 15 minute window.
+                        QueueLimit = 0,  // Don't queue requests.
+                        AutoReplenishment = true  // Automatically reset rate limiter tokens.
+                    });
+            });
+            rateLimiterOptions.AddPolicy(TRACK_STREAM_RATE_LIMIT_POLICY, httpContext =>
+            {
+                // The track stream is limited per user, so that a single user cannot hold an unbounded number of long lived audio streams open at once.
+                // This is deliberately not the login policy: it is a concurrency limit, partitioned per authenticated user, not a per IP attempt window.
+                string userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "anonymous";
+                return RateLimitPartition.GetConcurrencyLimiter(
+                    partitionKey: $"trackStream_{userId}",
+                    factory: _ => new ConcurrencyLimiterOptions
+                    {
+                        PermitLimit = 4, // Allow 4 concurrent audio streams per user.
+                        QueueLimit = 0, // Don't queue requests, a request beyond the limit is rejected instead of waiting.
+                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+                    });
+            });
+        });
+
+        // Add authentication and specify the JWT scheme to check tokens against.
+        services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(jwtBearerOptions =>
+            {
+                jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = configuration.GetValue<string>("JwtSettings:Issuer"),
+                    ValidAudience = configuration.GetValue<string>("JwtSettings:Audience"),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("JwtSettings:SecretKey")!)),
+                };
+
+                jwtBearerOptions.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = jwtBearerMessageReceivedContext => // The SignalR clients send the token as a query string parameter, because the browser cannot set the Authorization header of a WebSocket connection.
+                    {
+                        string? accessToken = jwtBearerMessageReceivedContext.Request.Query["access_token"];
+                        PathString requestPath = jwtBearerMessageReceivedContext.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            (requestPath.StartsWithSegments("/scanProgressHub") || requestPath.StartsWithSegments("/scheduledJobsHub")))
+                            jwtBearerMessageReceivedContext.Token = accessToken;
+                        return Task.CompletedTask;
+                    },
+                    OnChallenge = jwtBearerChallengeContext => // Event triggered when authentication is not successful for whatever reason.
+                    {
+                        jwtBearerChallengeContext.HandleResponse(); // Prevent the default 401 response.
+                        // Set the response status code to 401 Unauthorized.
+                        jwtBearerChallengeContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        jwtBearerChallengeContext.Response.ContentType = "application/problem+json";
+
+                        string errorDetails = "Authentication failed";
+                        if (!string.IsNullOrEmpty(jwtBearerChallengeContext.Error))
+                        {
+                            errorDetails = jwtBearerChallengeContext.Error switch
+                            { // TODO: implement translation.
+                                "invalid_token" => !string.IsNullOrEmpty(jwtBearerChallengeContext.ErrorDescription)
+                                    ? $"Invalid token: {jwtBearerChallengeContext.ErrorDescription}"
+                                    : "The token is invalid",
+                                "expired_token" => "The token has expired",
+                                _ => $"Authentication failed{(jwtBearerChallengeContext.Error is not null ? ": " + jwtBearerChallengeContext.Error : string.Empty)}"
+                            };
+                        }
+
+                        string detail = jwtBearerChallengeContext.Error switch
+                        {
+                            "invalid_token" => !string.IsNullOrEmpty(jwtBearerChallengeContext.ErrorDescription)
+                                ? $"Invalid token: {jwtBearerChallengeContext.ErrorDescription}"
+                                : "The token is invalid",
+                            "expired_token" => "The token has expired",
+                            _ => $"Authentication failed{(jwtBearerChallengeContext.Error is not null ? ": " + jwtBearerChallengeContext.Error : string.Empty)}"
+                        };
+
+                        return jwtBearerChallengeContext.Response.WriteAsJsonAsync(new
+                        {
+                            type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                            status = StatusCodes.Status401Unauthorized,
+                            title = "Unauthorized",
+                            detail,
+                            instance = jwtBearerChallengeContext.HttpContext.Request.Path
+                        });
+                    }
+                };
+            });
+
+        services.AddAuthorization();
+
+        services.AddFastEndpoints(endpointDiscoveryOptions =>
+        {
+            endpointDiscoveryOptions.Assemblies = [ typeof(Program).Assembly ];
+            // Only scan the application assembly, so that duplicate copies of it loaded into other assembly load contexts during the process lifetime are never scanned again;
+            // otherwise a single host can register every endpoint multiple times and fail with duplicate routes.
+            endpointDiscoveryOptions.DisableAutoDiscovery = true;
+        });
+
+        services.AddOpenApi();
+
+        services.SwaggerDocument(documentOptions =>
+        {
+            documentOptions.EnableJWTBearerAuth = true; 
+            documentOptions.SerializerSettings = jsonSerializerOptions =>
+            {
+                jsonSerializerOptions.PropertyNamingPolicy = null;
+                jsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            };
+            documentOptions.MaxEndpointVersion = 1;
+            documentOptions.MinEndpointVersion = 1;
+            documentOptions.DocumentSettings = aspNetCoreOpenApiDocumentGeneratorSettings =>
+            {
+                aspNetCoreOpenApiDocumentGeneratorSettings.DocumentName = "v1";
+                aspNetCoreOpenApiDocumentGeneratorSettings.Title = "Nemera API v1";
+                aspNetCoreOpenApiDocumentGeneratorSettings.Version = "v1";
+            };
+            documentOptions.RemoveEmptyRequestSchema = true;
+            documentOptions.ShortSchemaNames = true;
+        }); // For an eventual next version:
+        //.SwaggerDocument(documentOptions => 
+        //{
+        //    documentOptions.MaxEndpointVersion = 2;
+        //    documentOptions.MinEndpointVersion = 2;
+        //    documentOptions.DocumentSettings = aspNetCoreOpenApiDocumentGeneratorSettings =>
+        //    {
+        //        aspNetCoreOpenApiDocumentGeneratorSettings.DocumentName = "v2";
+        //        aspNetCoreOpenApiDocumentGeneratorSettings.Title = "Nemera API v2";
+        //        aspNetCoreOpenApiDocumentGeneratorSettings.Version = "v2";
+        //    };
+        //});
+
+        services.AddCors(corsOptions =>
+        {
+            corsOptions.AddPolicy("SecurePolicy", 
+                corsPolicyBuilder => corsPolicyBuilder
+                    .WithOrigins(configuration.GetValue<string[]>("CorsSettings:AllowedOrigins") ?? [])
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+        });
+
+        services.AddSignalR()
+            .AddJsonProtocol(jsonHubProtocolOptions =>
+                // The scheduler page consumes enum values as strings (job status and task type names), so the hub must
+                // serialize enums the same way the REST API does, which is also configured with JsonStringEnumConverter.
+                jsonHubProtocolOptions.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
+            .AddMessagePackProtocol(messagePackHubProtocolOptions => 
+            messagePackHubProtocolOptions.SerializerOptions = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData));
+        
+        services.AddScoped<ICurrentUserService, HttpContextCurrentUserService>();
+
+        return services;
+    }
+}

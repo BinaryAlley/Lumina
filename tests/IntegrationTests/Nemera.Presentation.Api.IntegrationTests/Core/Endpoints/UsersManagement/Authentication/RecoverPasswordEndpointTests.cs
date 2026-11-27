@@ -1,0 +1,354 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.Infrastructure.Security;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.Authentication;
+using Nemera.Contracts.Requests.Authentication;
+using Nemera.Contracts.Responses.Authentication;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Infrastructure.Core.Authentication;
+using Nemera.Infrastructure.Core.Security;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using OtpNet;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagement.Authentication;
+
+/// <summary>
+/// Contains integration tests for the <see cref="RecoverPasswordEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
+{
+    private HttpClient _client;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
+    private readonly PasswordHashService _hashService = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly RecoverPasswordRequestFixture _recoverPasswordRequestFixture = new();
+    private readonly ICryptographyService _cryptographyService;
+    private readonly TotpTokenGenerator _totpTokenGenerator = new();
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+    };
+    private readonly string _testUsername;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RecoverPasswordEndpointTests"/> class.
+    /// </summary>
+    /// <param name="apiFactory">Injected in-memory API factory.</param>
+    public RecoverPasswordEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
+    {
+        _client = apiFactory.CreateClient();
+        _apiFactory = apiFactory;
+        _testUsername = $"testuser_{Guid.NewGuid()}";
+
+        // Get the encryption service with the test key from factory.
+        using IServiceScope scope = apiFactory.Services.CreateScope();
+        _cryptographyService = scope.ServiceProvider.GetRequiredService<ICryptographyService>();
+    }
+
+    /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = _apiFactory.CreateClient();
+        await Task.CompletedTask;
+    }
+
+    [Fact]
+    public async Task RecoverPassword_WhenCalledWithValidRequest_ShouldResetPassword()
+    {
+        // Arrange       
+        UserEntity user = await CreateUserWithTotp();
+
+        // Decrypt the TOTP secret and generate a valid code.
+        byte[] totpSecret = Convert.FromBase64String(_cryptographyService.Decrypt(user.TotpSecret!));
+        Totp totp = new(totpSecret);
+        string validTotpCode = totp.ComputeTotp(DateTime.UtcNow);
+
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(
+            username: user.Username,
+            totpCode: validTotpCode
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/recover-password", request);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        string content = await response.Content.ReadAsStringAsync();
+        RecoverPasswordResponse? result = JsonSerializer.Deserialize<RecoverPasswordResponse>(content, _jsonOptions);
+
+        Assert.NotNull(result);
+        Assert.True(result!.IsPasswordReset);
+
+        // Create a new context to get fresh data.
+        using IServiceScope verificationScope = _apiFactory.Services.CreateScope();
+        NemeraDbContext verificationContext = verificationScope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        // Ensure we get fresh data from the database.
+        verificationContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        UserEntity? updatedUser = await verificationContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Username == user.Username);
+
+        Assert.NotNull(updatedUser);
+        Assert.NotNull(updatedUser!.TempPassword);
+        Assert.True(Math.Abs((updatedUser.TempPasswordCreated - DateTime.UtcNow)!.Value.TotalSeconds) < 5);
+    }
+
+    [Fact]
+    public async Task RecoverPassword_WhenUserDoesNotExist_ShouldReturnNotFound()
+    {
+        // Arrange
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(
+            username: "nonexistentuser",
+            totpCode: "123456"
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/recover-password", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status404NotFound, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.5", problemDetails["type"].GetString());
+        Assert.Equal("General.NotFound", problemDetails["title"].GetString());
+        Assert.Equal("UsernameDoesNotExist", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/recover-password", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
+    }
+
+    [Fact]
+    public async Task RecoverPassword_WhenInvalidTotpCode_ShouldReturnForbiddenResult()
+    {
+        // Arrange
+        UserEntity user = await CreateUserWithTotp();
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(
+            username: user.Username,
+            totpCode: "000000"
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/recover-password", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
+        Assert.Equal("General.Validation", problemDetails["title"].GetString());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/recover-password", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
+
+        Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("InvalidTotpCode", errors["General.Validation"]);
+    }
+
+    [Fact]
+    public async Task RecoverPassword_WhenRequestIsNull_ShouldReturnValidationError()
+    {
+        // Arrange
+        RecoverPasswordRequest? request = null;
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/recover-password", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
+        Assert.Equal("General.Validation", problemDetails["title"].GetString());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/recover-password", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
+
+        Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("UsernameCannotBeEmpty", errors["General.Validation"]);
+        Assert.Contains("TotpCannotBeEmpty", errors["General.Validation"]);
+    }
+
+    [Fact]
+    public async Task RecoverPassword_WhenUserDoesNotUseTotpAndTriesToRecover_ShouldReturnForbiddenResult()
+    {
+        // Arrange
+        UserEntity user = await CreateUserWithoutTotp();
+
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(
+            username: user.Username,
+            totpCode: "123456"
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/recover-password", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
+        Assert.Equal("General.Validation", problemDetails["title"].GetString());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/recover-password", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
+
+        Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("InvalidTotpCode", errors["General.Validation"]);
+    }
+
+    [Fact]
+    public async Task RecoverPassword_WhenUserDoesNotUseTotpAndTriesToRecoverWithoutCode_ShouldReturnForbiddenResult()
+    {
+        // Arrange
+        // Setup user without TOTP.
+        using (IServiceScope scope = _apiFactory.Services.CreateScope())
+        {
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+            UserEntity userWithoutTotp = _userEntityFixture.Create(username: "userwithoutotp2", password: _hashService.HashString("OldPass123!"));
+            userWithoutTotp.TotpSecret = null; // No TOTP configured.
+            dbContext.Users.Add(userWithoutTotp);
+            await dbContext.SaveChangesAsync();
+        }
+
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(
+            username: "userwithoutotp2",
+            includeTotpCode: false
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/auth/recover-password", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
+        Assert.Equal("General.Validation", problemDetails["title"].GetString());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/auth/recover-password", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
+
+        Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("TotpCannotBeEmpty", errors["General.Validation"]);
+    }
+
+    [Fact]
+    public async Task RecoverPassword_WhenCancellationRequested_ShouldThrowTaskCanceledException()
+    {
+        // Arrange
+        RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(
+            username: "testuser",
+            totpCode: "123456"
+        );
+        using CancellationTokenSource cts = new();
+
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
+        {
+            cts.Cancel();
+            await _client.PostAsJsonAsync("/api/v1/auth/recover-password", request, cts.Token);
+        });
+        Assert.IsType<TaskCanceledException>(exception);
+    }
+
+    /// <summary>
+    /// Creates a test user with a TOTP secret in the database and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
+    private async Task<UserEntity> CreateUserWithTotp()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        byte[] totpSecret = _totpTokenGenerator.GenerateSecret();
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("OldPass123!"));
+        user.TotpSecret = _cryptographyService.Encrypt(Convert.ToBase64String(totpSecret));
+
+        dbContext.Users.Add(user);
+        await dbContext.SaveChangesAsync();
+        return user;
+    }
+
+    /// <summary>
+    /// Creates a test user without a TOTP secret in the database and returns it.
+    /// </summary>
+    /// <returns>The created user entity.</returns>
+    private async Task<UserEntity> CreateUserWithoutTotp()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("OldPass123!"));
+        user.TotpSecret = null;
+
+        dbContext.Users.Add(user);
+        await dbContext.SaveChangesAsync();
+        return user;
+    }
+
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public async Task DisposeAsync()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == _testUsername);
+        if (user is not null)
+        {
+            dbContext.Users.Remove(user);
+            await dbContext.SaveChangesAsync();
+        }
+    }
+}

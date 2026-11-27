@@ -1,0 +1,63 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Presentation.Web.Common.Requests.Themes;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Themes.SetCurrentTheme;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
+using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Themes.SetCurrentTheme;
+
+/// <summary>
+/// Contains integration tests for the <see cref="SetCurrentThemeEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class SetCurrentThemeEndpointTests : IClassFixture<NemeraWebFactory>
+{
+    private readonly NemeraWebFactory _apiFactory;
+    private readonly SetCurrentThemeRequestFixture _setCurrentThemeRequestFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SetCurrentThemeEndpointTests"/> class.
+    /// </summary>
+    /// <param name="apiFactory">Injected Web application factory.</param>
+    public SetCurrentThemeEndpointTests(NemeraWebFactory apiFactory)
+    {
+        _apiFactory = apiFactory;
+    }
+
+    [Fact]
+    public async Task SetCurrentTheme_WhenCalledByAuthenticatedAdminWithAntiforgeryToken_ShouldSetCurrentThemeAndReturnSuccess()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        const string THEME_ID = "test-theme";
+        _apiFactory.ApiClientStub.RegisterPutPayload<SetCurrentThemeRequest>("themes/current");
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        HttpRequestMessage setCurrentThemeRequest = new(HttpMethod.Put, "/en-us/admin/themes/api-set-current-theme")
+        {
+            Content = JsonContent.Create(_setCurrentThemeRequestFixture.Create(themeId: THEME_ID))
+        };
+        setCurrentThemeRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        setCurrentThemeRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        setCurrentThemeRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(setCurrentThemeRequest);
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using JsonDocument json = JsonDocument.Parse(content);
+        Assert.True(json.RootElement.GetProperty("success").GetBoolean());
+        Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == "themes/current");
+    }
+}

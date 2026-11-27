@@ -1,0 +1,140 @@
+@*
+    FALLBACK DELETED ITEMS VIEW - READ BEFORE EDITING
+
+    This view is the application fallback of the deleted items page of a book library, rendered only when the
+    active theme does not provide its own template for the page. It keeps the DOM contract and the client script
+    the theme template mirrors, so that restoring a deleted book keeps working even without the theme.
+
+    /library/written-content-library/books-library/books/deleted-items?libraryId=...
+*@
+
+@using Nemera.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary
+@using Nemera.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@{
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+    var libraryId = Model.Library.Id?.ToString() ?? string.Empty;
+}
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+
+@model DeletedBooksPageDto
+
+@Html.AntiForgeryToken()
+
+<div style="display: grid; grid-template-rows: auto 1fr;">
+    <div style="min-height: 1rem;"></div>
+    <div class="enlightenment-panel shadow-effect mx-auto panel w-60 mb-10 deleted-books-panel" style="min-width: 320px;">
+        <div class="shine-effect"></div>
+        <div class="form-row deleted-books-top-bar">
+            <button id="btn-back-to-library" type="button" class="abort-button">@_localizer["BackToLibrary"]</button>
+        </div>
+        <div class="form-row deleted-books-title-row">
+            <h1 class="text-light-two w-100 text-center pt-0 pb-0 engraved-title">@_localizer["Title"]</h1>
+        </div>
+        <p id="no-deleted-books" class="text-light-two text-center @(Model.DeletedBooks.Count == 0 ? string.Empty : "hidden")">@_localizer["NoDeletedItems"]</p>
+        <table id="deleted-books-table" class="w-100 form-table deleted-books-table @(Model.DeletedBooks.Count == 0 ? "hidden" : string.Empty)">
+            <thead>
+                <tr>
+                    <th>@_localizer["BookTitle"]</th>
+                    <th>@_localizer["DeletedOn"]</th>
+                    <th class="w-100px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (DeletedBookDto book in Model.DeletedBooks)
+                {
+                    <tr class="deleted-book-row" data-book-id="@book.Id">
+                        <td>@book.Title</td>
+                        <td>@book.DeletedOnUtc.ToString("g")</td>
+                        <td>
+                            <button type="button" class="confirm-button w-100px btn-restore-book" data-book-id="@book.Id">@_localizer["Restore"]</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls. site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
+    <script type="text/plain" data-form="@scriptId">
+        // Create cleanup registry for this view.
+        const cleanupFunctions = [];
+        let isInitialized = false;
+
+        const libraryId = '@libraryId';
+        const libraryIndexUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.INDEX)';
+        const restoreUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.RESTORE_BOOK, new { bookId = default(Guid) })';
+
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
+        const btnBackToLibrary = document.getElementById('btn-back-to-library');
+        const deletedBooksTable = document.getElementById('deleted-books-table');
+        const noDeletedBooks = document.getElementById('no-deleted-books');
+
+        const jsLocalizedStrings = {
+            restored: @Json.Serialize(_localizer["Restored"].Value),
+            restoreFailed: @Json.Serialize(_localizer["RestoreFailed"].Value)
+        };
+
+        // Restores the clicked deleted book, then removes its row from the page.
+        async function handleRestoreAsync(event) {
+            const button = event.target.closest('.btn-restore-book');
+            if (!button || button.disabled)
+                return;
+            button.disabled = true;
+            try {
+                const url = restoreUrlTemplate.replace('/@(default(Guid))', `/${button.dataset.bookId}`) + `?libraryId=${encodeURIComponent(libraryId)}`;
+                const result = await callApiPostAsync(url, {});
+                if (result?.isRestored !== true) {
+                    notificationService.show(jsLocalizedStrings.restoreFailed, NotificationType.ERROR);
+                    return;
+                }
+                notificationService.show(jsLocalizedStrings.restored, NotificationType.SUCCESS);
+                button.closest('.deleted-book-row')?.remove();
+                if (deletedBooksTable && deletedBooksTable.querySelectorAll('.deleted-book-row').length === 0) {
+                    deletedBooksTable.classList.add('hidden');
+                    noDeletedBooks?.classList.remove('hidden');
+                }
+            } finally {
+                if (button.isConnected)
+                    button.disabled = false;
+            }
+        }
+
+        // Navigates back to the library page of the deleted books.
+        async function handleBackToLibraryAsync() {
+            await updateContentAsync(`${libraryIndexUrl}?libraryId=${encodeURIComponent(libraryId)}`, true);
+        }
+
+        // Add listeners.
+        btnBackToLibrary.addEventListener('click', handleBackToLibraryAsync);
+        deletedBooksTable.addEventListener('click', handleRestoreAsync);
+        document.addEventListener('DOMContentLoaded', InitializeAsync);
+
+        // Register cleanup for these listeners.
+        cleanupFunctions.push(() => {
+            btnBackToLibrary.removeEventListener('click', handleBackToLibraryAsync);
+            deletedBooksTable.removeEventListener('click', handleRestoreAsync);
+            document.removeEventListener('DOMContentLoaded', InitializeAsync);
+        });
+
+        function InitializeAsync() {
+            if (isInitialized)
+                return;
+            isInitialized = true;
+        }
+
+        // Store all cleanups for this view on window object using the scriptId.
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

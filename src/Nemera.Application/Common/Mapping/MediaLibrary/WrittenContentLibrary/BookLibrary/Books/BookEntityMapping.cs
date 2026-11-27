@@ -1,0 +1,306 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Common.DTO.MediaConsumption;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Mapping.Common.Metadata;
+using Nemera.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
+using Nemera.Contracts.Responses.Common;
+using Nemera.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.ValueObjects.Metadata;
+using Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
+using Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
+using Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
+using Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.MediaContributorBoundedContext.MediaContributorAggregate;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+#endregion
+
+namespace Nemera.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+
+/// <summary>
+/// Extension methods for converting <see cref="BookEntity"/>.
+/// </summary>
+public static class BookEntityMapping
+{
+    /// <summary>
+    /// Converts <paramref name="repositoryEntity"/> to the consumption history row of a book.
+    /// </summary>
+    /// <param name="repositoryEntity">The repository entity to be converted.</param>
+    /// <param name="lastConsumedOnUtc">The date and time when the book was last consumed.</param>
+    /// <param name="countedSessionCount">The number of sessions of the book that count towards statistics.</param>
+    /// <param name="completedSessionCount">The number of sessions of the book that completed.</param>
+    /// <param name="consumedDurationMilliseconds">The active duration consumed in the book, over all of its sessions, in milliseconds.</param>
+    /// <param name="creatorName">The name of the author of the book, or an empty string when there is none.</param>
+    /// <returns>The converted consumption history row.</returns>
+    public static ConsumedItemDto ToDto(this BookEntity repositoryEntity, DateTime lastConsumedOnUtc, int countedSessionCount, int completedSessionCount, long consumedDurationMilliseconds, string creatorName)
+    {
+        return new ConsumedItemDto(
+            MediaKind.Book,
+            repositoryEntity.Id,
+            repositoryEntity.LibraryId,
+            true,
+            repositoryEntity.Title,
+            string.Empty,
+            creatorName,
+            repositoryEntity.Artwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover)?.FileName,
+            lastConsumedOnUtc,
+            countedSessionCount,
+            completedSessionCount,
+            consumedDurationMilliseconds);
+    }
+
+    /// <summary>
+    /// Converts <paramref name="repositoryEntity"/> to <see cref="Book"/>.
+    /// </summary>
+    /// <param name="repositoryEntity">The repository entity to be converted.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either a successfully converted <see cref="Book"/>, or an error message.
+    /// </returns>
+    public static Result<Book> ToDomainEntity(this BookEntity repositoryEntity)
+    {
+        IEnumerable<Result<Tag>> tagsResult = repositoryEntity.Tags.ToDomainValueObjects();
+        foreach (Result<Tag> tagResult in tagsResult)
+            if (tagResult.IsFailure)
+                return tagResult.Errors;
+
+        IEnumerable<Result<Genre>> genresResult = repositoryEntity.Genres.ToDomainValueObjects();
+        foreach (Result<Genre> genreResult in genresResult)
+            if (genreResult.IsFailure)
+                return genreResult.Errors;
+
+        IEnumerable<Result<Isbn>> isbnsResult = repositoryEntity.ISBNs.ToDomainValueObjects();
+        foreach (Result<Isbn> isbnResult in isbnsResult)
+            if (isbnResult.IsFailure)
+                return isbnResult.Errors;
+
+        IEnumerable<Result<BookRating>> bookRatingsResult = repositoryEntity.Ratings.ToDomainValueObjects();
+        foreach (Result<BookRating> bookRatingResult in bookRatingsResult)
+            if (bookRatingResult.IsFailure)
+                return bookRatingResult.Errors;
+
+        List<BookMediaContributor> domainContributors = [];
+        foreach (BookContributorEntity bookContributor in repositoryEntity.Contributors)
+        {
+            Result<BookMediaContributor> contributorResult = BookMediaContributor.Create(
+                MediaContributorId.Create(bookContributor.MediaContributorId), bookContributor.Role);
+            if (contributorResult.IsFailure)
+                return contributorResult.Errors;
+            domainContributors.Add(contributorResult.Value);
+        }
+
+        Result<ReleaseInfo> releaseInfoResult = ReleaseInfo.Create(
+                    Optional<DateOnly>.FromNullable(repositoryEntity.OriginalReleaseDate),
+                    Optional<int>.FromNullable(repositoryEntity.OriginalReleaseYear),
+                    Optional<DateOnly>.FromNullable(repositoryEntity.ReReleaseDate),
+                    Optional<int>.FromNullable(repositoryEntity.ReReleaseYear),
+                    Optional<ReleaseCountry>.FromNullable(repositoryEntity.ReleaseCountry),
+                    Optional<string>.FromNullable(repositoryEntity.ReleaseVersion)
+                );
+        if (releaseInfoResult.IsFailure)
+            return releaseInfoResult.Errors;
+
+        Optional<LanguageInfo> languageInfo = Optional<LanguageInfo>.None();
+        if (repositoryEntity.LanguageCode is not null && repositoryEntity.LanguageName is not null)
+            languageInfo = LanguageInfo.Create(
+                    repositoryEntity.LanguageCode,
+                    repositoryEntity.LanguageName,
+                    Optional<string>.FromNullable(repositoryEntity.LanguageNativeName)
+                );
+
+        Optional<LanguageInfo> originalLanguageCode = Optional<LanguageInfo>.None();
+        if (repositoryEntity.OriginalLanguageCode is not null && repositoryEntity.OriginalLanguageName is not null)
+            originalLanguageCode = LanguageInfo.Create(
+                    repositoryEntity.OriginalLanguageCode,
+                    repositoryEntity.OriginalLanguageName,
+                    Optional<string>.FromNullable(repositoryEntity.OriginalLanguageNativeName)
+                );
+
+        Result<WrittenContentMetadata> writtenContentMetadataResult = WrittenContentMetadata.Create(
+                repositoryEntity.Title,
+                Optional<string>.FromNullable(repositoryEntity.OriginalTitle),
+                Optional<string>.FromNullable(repositoryEntity.Description),
+                releaseInfoResult.Value,
+                [.. genresResult.Select(genre => genre.Value)],
+                [.. tagsResult.Select(tag => tag.Value)],
+                languageInfo,
+                originalLanguageCode,
+                Optional<string>.FromNullable(repositoryEntity.Publisher),
+                Optional<int>.FromNullable(repositoryEntity.PageCount)
+            );
+        if (writtenContentMetadataResult.IsFailure)
+            return writtenContentMetadataResult.Errors;
+
+        Optional<BookFormat> bookFormat = Optional<BookFormat>.FromNullable(repositoryEntity.Format);
+
+        Result<Book> bookResult = Book.Create(
+            BookId.Create(repositoryEntity.Id),
+            LibraryId.Create(repositoryEntity.LibraryId),
+            repositoryEntity.Path,
+            writtenContentMetadataResult.Value,
+            bookFormat,
+            Optional<string>.FromNullable(repositoryEntity.Edition),
+            Optional<float>.FromNullable(repositoryEntity.VolumeNumber),
+            Optional<BookSeries>.None(),
+            Optional<string>.FromNullable(repositoryEntity.ASIN),
+            Optional<string>.FromNullable(repositoryEntity.GoodreadsId),
+            Optional<string>.FromNullable(repositoryEntity.LCCN),
+            Optional<string>.FromNullable(repositoryEntity.OCLCNumber),
+            Optional<string>.FromNullable(repositoryEntity.OpenLibraryId),
+            Optional<string>.FromNullable(repositoryEntity.LibraryThingId),
+            Optional<string>.FromNullable(repositoryEntity.GoogleBooksId),
+            Optional<string>.FromNullable(repositoryEntity.BarnesAndNobleId),
+            Optional<string>.FromNullable(repositoryEntity.AppleBooksId),
+            repositoryEntity.CreatedOnUtc,
+            Optional<DateTime>.FromNullable(repositoryEntity.UpdatedOnUtc),
+            [.. isbnsResult.Select(isbn => isbn.Value)],
+            domainContributors,
+            [.. bookRatingsResult.Select(bookRating => bookRating.Value)]);
+        if (bookResult.IsFailure)
+            return bookResult.Errors;
+
+        return bookResult;
+    }
+
+    /// <summary>
+    /// Converts <paramref name="repositoryEntities"/> to a collection of <see cref="Book"/>.
+    /// </summary>
+    /// <param name="repositoryEntities">The repository entities to be converted.</param>
+    /// <returns>The converted domain entities.</returns>
+    /// <returns>
+    /// An colection of <see cref="Result{TValue}"/> containing either a collection of converted <see cref="Book"/>, or error messages.
+    /// </returns>
+    public static IEnumerable<Result<Book>> ToDomainEntities(this IEnumerable<BookEntity> repositoryEntities)
+    {
+        return repositoryEntities.Select(repositoryEntity => repositoryEntity.ToDomainEntity());
+    }
+
+    /// <summary>
+    /// Converts <paramref name="repositoryEntity"/> to <see cref="BookResponse"/>.
+    /// </summary>
+    /// <param name="repositoryEntity">The repository entity to be converted.</param>
+    /// <returns>The converted response entity.</returns>
+    public static BookResponse ToResponse(this BookEntity repositoryEntity)
+    {
+        ReleaseInfoDto releaseInfoEntity = new(
+            repositoryEntity.OriginalReleaseDate,
+            repositoryEntity.OriginalReleaseYear,
+            repositoryEntity.ReReleaseDate,
+            repositoryEntity.ReReleaseYear,
+            repositoryEntity.ReleaseCountry,
+            repositoryEntity.ReleaseVersion
+        );
+        // Language and original language make sense only if their subproperties have values.
+        LanguageInfoDto? languageInfoEntity = !string.IsNullOrWhiteSpace(repositoryEntity.LanguageCode) ||
+                                          !string.IsNullOrWhiteSpace(repositoryEntity.LanguageName) ||
+                                          !string.IsNullOrWhiteSpace(repositoryEntity.LanguageNativeName)
+            ? new LanguageInfoDto(
+                repositoryEntity.LanguageCode,
+                repositoryEntity.LanguageName,
+                repositoryEntity.LanguageNativeName
+            ) : null;
+        LanguageInfoDto? originalLanguageInfoEntity = !string.IsNullOrWhiteSpace(repositoryEntity.OriginalLanguageCode) ||
+                                          !string.IsNullOrWhiteSpace(repositoryEntity.OriginalLanguageName) ||
+                                          !string.IsNullOrWhiteSpace(repositoryEntity.OriginalLanguageNativeName)
+            ? new LanguageInfoDto(
+                repositoryEntity.OriginalLanguageCode,
+                repositoryEntity.OriginalLanguageName,
+                repositoryEntity.OriginalLanguageNativeName
+            ) : null;
+        WrittenContentMetadataDto metadata = new(
+            repositoryEntity.Title,
+            repositoryEntity.OriginalTitle,
+            repositoryEntity.Description,
+            releaseInfoEntity,
+            [.. repositoryEntity.Genres.ToResponses()],
+            [.. repositoryEntity.Tags.ToResponses()],
+            languageInfoEntity,
+            originalLanguageInfoEntity,
+            repositoryEntity.Publisher,
+            repositoryEntity.PageCount
+        );
+        return new BookResponse(
+            repositoryEntity.Id,
+            repositoryEntity.LibraryId,
+            repositoryEntity.Path,
+            metadata,
+            repositoryEntity.Format,
+            repositoryEntity.Edition,
+            repositoryEntity.VolumeNumber,
+            null,
+            repositoryEntity.ASIN,
+            repositoryEntity.GoodreadsId,
+            repositoryEntity.LCCN,
+            repositoryEntity.OCLCNumber,
+            repositoryEntity.OpenLibraryId,
+            repositoryEntity.LibraryThingId,
+            repositoryEntity.GoogleBooksId,
+            repositoryEntity.BarnesAndNobleId,
+            repositoryEntity.AppleBooksId,
+            [.. repositoryEntity.ISBNs.ToResponses()],
+            [.. repositoryEntity.Contributors.Select(contributor => new MediaContributorReferenceDto(contributor.MediaContributorId, contributor.Role))],
+            [.. repositoryEntity.Ratings.ToResponses()],
+            repositoryEntity.MetadataStatus,
+            repositoryEntity.LastMetadataUpdateUtc,
+            repositoryEntity.MetadataProvider,
+            repositoryEntity.CreatedOnUtc,
+            repositoryEntity.UpdatedOnUtc,
+            repositoryEntity.Artwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover)?.FileName
+        );
+    }
+
+    /// <summary>
+    /// Converts a deleted <paramref name="repositoryEntity"/> to <see cref="DeletedBookResponse"/>.
+    /// </summary>
+    /// <param name="repositoryEntity">The deleted repository entity to be converted.</param>
+    /// <param name="deletedOnUtc">The date and time when the book was deleted.</param>
+    /// <returns>The converted deleted book response.</returns>
+    public static DeletedBookResponse ToResponse(this BookEntity repositoryEntity, DateTime deletedOnUtc)
+    {
+        return new DeletedBookResponse(
+            repositoryEntity.Id,
+            repositoryEntity.LibraryId,
+            repositoryEntity.Title,
+            repositoryEntity.OriginalTitle,
+            repositoryEntity.Path,
+            deletedOnUtc,
+            repositoryEntity.Artwork.FirstOrDefault(artwork => artwork.ArtworkType == ArtworkType.Cover)?.FileName
+        );
+    }
+
+    /// <summary>
+    /// Converts <paramref name="repositoryEntities"/> to a collection of <see cref="Book"/>.
+    /// </summary>
+    /// <param name="repositoryEntities">The repository entities to be converted.</param>
+    /// <returns>The converted reponses.</returns>
+    public static IReadOnlyList<BookResponse> ToResponses(this IEnumerable<BookEntity> repositoryEntities)
+    {
+        return [.. repositoryEntities.Select(repositoryEntity => repositoryEntity.ToResponse())];
+    }
+
+    /// <summary>
+    /// Converts <paramref name="repositoryEntities"/> to a paginated collection of <see cref="BookResponse"/>.
+    /// </summary>
+    /// <param name="repositoryEntities">The paginated repository entities to be converted.</param>
+    /// <returns>The converted paginated responses.</returns>
+    public static PaginatedResponse<BookResponse> ToResponses(this PaginatedResultDto<BookEntity> repositoryEntities)
+    {
+        return new PaginatedResponse<BookResponse>
+        {
+            Data = repositoryEntities.Data.ToResponses(),
+            CurrentPage = repositoryEntities.CurrentPage,
+            PerPage = repositoryEntities.PerPage,
+            Count = repositoryEntities.Count,
+            NumberOfPages = repositoryEntities.NumberOfPages
+        };
+    }
+}

@@ -1,0 +1,65 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+#endregion
+
+namespace Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
+
+/// <summary>
+/// Interface for the tracker used for media library scans progress.
+/// </summary>
+public interface IMediaLibrariesScanProgressTracker
+{
+    /// <summary>
+    /// Initializes the progress tracking of a media library scan that is waiting in the scan queue, before its jobs are prepared.
+    /// </summary>
+    /// <param name="libraryId">The object representing the unique identifier of the media library being scanned.</param>
+    /// <param name="mediaLibraryScanCompositeId">Model for tracking media library scans.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Result<Created> InitializeQueuedScanProgress(LibraryId libraryId, MediaLibraryScanCompositeId mediaLibraryScanCompositeId);
+
+    /// <summary>
+    /// Initializes the the progress tracking of a media library scan.
+    /// </summary>
+    /// <param name="libraryId">The object representing the unique identifier of the media library being scanned.</param>
+    /// <param name="mediaLibraryScanCompositeId">Model for tracking media library scans.</param>
+    /// <param name="totalJobs">The total number of jobs that this media library scan contains.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Result<Created> InitializeScanProgress(LibraryId libraryId, MediaLibraryScanCompositeId mediaLibraryScanCompositeId, int totalJobs);
+
+    /// <summary>
+    /// Updates the progress tracking of the media library scan by incrementing the number of completed scan jobs.
+    /// </summary>
+    /// <param name="libraryId">The object representing the unique identifier of the media library being scanned.</param>
+    /// <param name="mediaLibraryScanCompositeId">Model for tracking media library scans.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Result<Updated> UpdateScanProgress(LibraryId libraryId, MediaLibraryScanCompositeId mediaLibraryScanCompositeId);
+
+    /// <summary>
+    /// Updates the progress tracking of the media library scan by incrementing the number of completed items of a scan job.
+    /// </summary>
+    /// <param name="libraryId">The object representing the unique identifier of the media library being scanned.</param>
+    /// <param name="mediaLibraryScanCompositeId">Model for tracking media library scans.</param>
+    /// <param name="progress">The object representing the progress of the media library scan job.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Result<Updated> UpdateScanJobProgress(LibraryId libraryId, MediaLibraryScanCompositeId mediaLibraryScanCompositeId, MediaLibraryScanJobProgress progress);
+
+    /// <summary>
+    /// Gets the progress of a media library scan.
+    /// </summary>
+    /// <param name="mediaLibraryScanCompositeId">Model for tracking media library scans.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either a <see cref="MediaLibraryScanProgress"/>, or an error message.
+    /// </returns>
+    Result<MediaLibraryScanProgress> GetScanProgress(MediaLibraryScanCompositeId mediaLibraryScanCompositeId);
+
+    /// <summary>
+    /// Removes the progress of a media library scan.
+    /// </summary>
+    /// <param name="mediaLibraryScanCompositeId">Model for tracking media library scans.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either a <see cref="MediaLibraryScanProgress"/>, or an error message.
+    /// </returns>
+    Result<MediaLibraryScanProgress> RemoveScanProgress(MediaLibraryScanCompositeId mediaLibraryScanCompositeId);
+}

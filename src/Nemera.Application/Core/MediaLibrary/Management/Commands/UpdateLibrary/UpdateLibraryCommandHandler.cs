@@ -1,0 +1,234 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DomainEvents;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Nemera.Application.Common.Infrastructure.Plugins;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Mapping.MediaLibrary.Management;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.PathTemplate;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
+#endregion
+
+namespace Nemera.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary;
+
+/// <summary>
+/// Handler for the command to update a media library.
+/// </summary>
+public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand, Result<LibraryResponse>>
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly IAuthorizationService _authorizationService;
+    private readonly IDomainEventsQueue _domainEventsQueue;
+    private readonly IEnvironmentContext _environmentContext;
+    private readonly IMediaLibraryProviderConfigurationStore _providerConfigurationStore;
+    private readonly ILibraryPathTemplateService _pathTemplateService;
+    private readonly IValidator<UpdateLibraryCommand> _validator;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateLibraryCommandHandler"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Injected service for authorization related functionality.</param>
+    /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
+    /// <param name="domainEventsQueue">Injected service for the queue of domain events.</param>
+    /// <param name="environmentContext">Injected facade service for environment contextual services.</param>
+    /// <param name="providerConfigurationStore">Injected store of the provider configurations of the media libraries.</param>
+    /// <param name="pathTemplateService">Injected service for validating and resolving the path templates of the media libraries.</param>
+    /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
+    /// <param name="validator">Injected validator for application validation rules.</param>
+    public UpdateLibraryCommandHandler(
+        IAuthorizationService authorizationService,
+        ICurrentUserService currentUserService,
+        IDomainEventsQueue domainEventsQueue,
+        IEnvironmentContext environmentContext,
+        IMediaLibraryProviderConfigurationStore providerConfigurationStore,
+        ILibraryPathTemplateService pathTemplateService,
+        IUnitOfWork unitOfWork,
+        IValidator<UpdateLibraryCommand> validator)
+    {
+        _authorizationService = authorizationService;
+        _currentUserService = currentUserService;
+        _unitOfWork = unitOfWork;
+        _domainEventsQueue = domainEventsQueue;
+        _environmentContext = environmentContext;
+        _providerConfigurationStore = providerConfigurationStore;
+        _pathTemplateService = pathTemplateService;
+        _validator = validator;
+    }
+
+    /// <summary>
+    /// Handles the command to update a media library.
+    /// </summary>
+    /// <param name="command">The command to be handled.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either a successfully updated <see cref="LibraryResponse"/>, or an error message.
+    /// </returns>
+    public async Task<Result<LibraryResponse>> HandleAsync(UpdateLibraryCommand command, CancellationToken cancellationToken)
+    {
+        List<Error> validationResult = _validator.Validate(command);
+        if (validationResult.Count > 0)
+            return validationResult;
+
+        // An authenticated request must always carry a user identity.
+        Guid? currentUserId = _currentUserService.UserId;
+        if (currentUserId is null)
+            return ApplicationErrors.Authorization.NotAuthorized;
+        Guid userId = currentUserId.Value;
+
+        // Get a library repository and retrieve the library to update.
+        Result<LibraryEntity?> getLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(command.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getLibraryResult.IsFailure)
+            return getLibraryResult.Errors;
+        else if (getLibraryResult.Value is null)
+            return DomainErrors.Library.LibraryNotFound;
+
+        // Admins can update any library. Everyone else can only update the libraries they own, and only while they hold the permission to manage media
+        // libraries, which can be withheld to keep a user from changing even the libraries they own. Authorization comes before the cover image is
+        // read, so a user who may not update the library can never make the server open a path on their behalf.
+        if (!await _authorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(userId, new LibraryOwnershipPolicyContext(command.Id), cancellationToken).ConfigureAwait(false))
+            return ApplicationErrors.Authorization.NotAuthorized;
+        if (!await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false) &&
+            !await _authorizationService.HasPermissionAsync(userId, AuthorizationPermission.CanCreateLibraries, cancellationToken).ConfigureAwait(false))
+            return ApplicationErrors.Authorization.NotAuthorized;
+        bool hasProviderChoices = command.MetadataProviders is not null || command.ArtworkProviders is not null || command.BookReaders is not null;
+        // A missing hidden files setting keeps the stored one, so that a partial update never silently turns it off.
+        bool shouldSkipHiddenFilesAndDirectoriesDuringScan = command.ShouldSkipHiddenFilesAndDirectoriesDuringScan ?? getLibraryResult.Value.ShouldSkipHiddenFilesAndDirectoriesDuringScan;
+        // The directory scan fingerprints are only valid for the scan scope that produced them, so changing either scan scope setting
+        // discards them, forcing the next scan to read the whole library instead of skipping directories that are no longer in scope.
+        bool areScanScopeSettingsChanged =
+            getLibraryResult.Value.ShouldSkipUnchangedDirectoriesDuringScan != command.ShouldSkipUnchangedDirectoriesDuringScan ||
+            getLibraryResult.Value.ShouldSkipHiddenFilesAndDirectoriesDuringScan != shouldSkipHiddenFilesAndDirectoriesDuringScan;
+
+        // Make sure the file is an actual supported image, but only when a new cover image was chosen; the stored cover image is
+        // relative to the application base directory and is already validated, so it must not block saving unrelated changes.
+        if (command.CoverImage is not null && command.CoverImage != getLibraryResult.Value.CoverImage)
+        {
+            Result<FileSystemPathId> fileSystemPathIdResult = FileSystemPathId.Create(command.CoverImage);
+            if (fileSystemPathIdResult.IsFailure)
+                return fileSystemPathIdResult.Errors;
+
+            Result<ImageType> imageCheckResult = await _environmentContext.FileTypeService.GetImageTypeAsync(fileSystemPathIdResult.Value, cancellationToken).ConfigureAwait(false);
+            if (imageCheckResult.IsFailure)
+                return imageCheckResult.Errors;
+            if (imageCheckResult.Value == ImageType.None)
+                return DomainErrors.Library.CoverFileMustBeAnImage;
+        }
+
+        // Create a domain library object.
+        LibraryType newLibraryType = Enum.Parse<LibraryType>(command.LibraryType!, ignoreCase: true);
+
+        // Keep the stored consumption settings unless the request explicitly changes them. When progress tracking is enabled and
+        // no threshold is supplied, the stored threshold is kept; the value object never retains a threshold while tracking is disabled.
+        LibraryConsumptionSettings existingConsumptionSettings = LibraryConsumptionSettings.Create(
+            getLibraryResult.Value.ShouldTrackConsumptionProgress,
+            Optional<int>.FromNullable(getLibraryResult.Value.CompletionThresholdPercentage));
+        bool shouldTrackConsumptionProgress = command.ShouldTrackConsumptionProgress ?? existingConsumptionSettings.ShouldTrackConsumptionProgress;
+        bool isEnablingConsumptionProgressTracking = shouldTrackConsumptionProgress && !existingConsumptionSettings.ShouldTrackConsumptionProgress;
+        Optional<int> completionThresholdPercentage = Optional<int>.FromNullable(command.CompletionThresholdPercentage);
+        if (completionThresholdPercentage.HasValue && !shouldTrackConsumptionProgress)
+            return DomainErrors.Library.CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff;
+        if (!completionThresholdPercentage.HasValue && shouldTrackConsumptionProgress)
+        {
+            completionThresholdPercentage = existingConsumptionSettings.CompletionThresholdPercentage;
+            // Enabling progress tracking on a library that did not track it yet must use the same type default that creating the library would have used.
+            if (!completionThresholdPercentage.HasValue && isEnablingConsumptionProgressTracking)
+                completionThresholdPercentage = LibraryConsumptionSettings.CreateDefault(newLibraryType).CompletionThresholdPercentage;
+        }
+        LibraryConsumptionSettings consumptionSettings = LibraryConsumptionSettings.Create(shouldTrackConsumptionProgress, completionThresholdPercentage);
+
+        // A library always carries a path template: the one provided by the user, or the ideal structure of the library type as its default.
+        Result<IReadOnlyList<LibraryPathPart>> pathTemplatePartsResult = command.PathTemplateParts.ToDomainParts();
+        if (pathTemplatePartsResult.IsFailure)
+            return pathTemplatePartsResult.Errors;
+        Result<LibraryPathTemplate> pathTemplateResult = _pathTemplateService.ResolveTemplate(newLibraryType, pathTemplatePartsResult.Value);
+        if (pathTemplateResult.IsFailure)
+            return pathTemplateResult.Errors;
+
+        // The owner of a library is the user who created it, and an update never changes it.
+        Result<Library> createLibraryResult = Library.Create(
+            LibraryId.Create(command.Id),
+            UserId.Create(getLibraryResult.Value.UserId),
+            command.Title!,
+            newLibraryType,
+            command.ContentLocations!,
+            Optional<string>.FromNullable(command.CoverImage),
+            command.IsEnabled,
+            command.IsLocked,
+            command.CanDownloadMetadataFromWeb,
+            command.ShouldSaveMetadataInMediaDirectories,
+            command.ShouldSkipUnchangedDirectoriesDuringScan,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan,
+            command.IsContentOnSsd,
+            consumptionSettings,
+            pathTemplateResult.Value,
+            [.. getLibraryResult.Value.LibraryScans.Select(libraryScan => ScanId.Create(libraryScan.Id))]
+        );
+        if (createLibraryResult.IsFailure)
+            return createLibraryResult.Errors;
+        // Convert the domain library entity to a repository library entity.
+        LibraryEntity persistenceLibrary = createLibraryResult.Value.ToRepositoryEntity();
+
+        // Update the repository entity, apply the choices made for the providers, and when the library type changed, also reconcile the kinds of
+        // configuration that were not chosen, so they match the plugins supporting the new type; then save the changes. When the type is unchanged,
+        // a kind of configuration that was not chosen is left untouched.
+        Result<Updated> updateLibraryResult = await _unitOfWork.LibraryRepository.UpdateAsync(persistenceLibrary, cancellationToken).ConfigureAwait(false);
+        if (updateLibraryResult.IsFailure)
+            return updateLibraryResult.Errors;
+        if (areScanScopeSettingsChanged)
+        {
+            Result<Deleted> deleteDirectoryScanFingerprintsResult = await _unitOfWork.DirectoryScanFingerprintRepository.DeleteByLibraryIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
+            if (deleteDirectoryScanFingerprintsResult.IsFailure)
+                return deleteDirectoryScanFingerprintsResult.Errors;
+        }
+        bool isLibraryTypeChanged = getLibraryResult.Value.LibraryType != newLibraryType;
+        if (isLibraryTypeChanged || hasProviderChoices)
+        {
+            Result<Success> configureProvidersResult = await _providerConfigurationStore.ConfigureProvidersAsync(
+                command.Id, newLibraryType, command.MetadataProviders, command.ArtworkProviders, command.BookReaders, isLibraryTypeChanged, cancellationToken).ConfigureAwait(false);
+            if (configureProvidersResult.IsFailure)
+                return configureProvidersResult.Errors;
+        }
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
+
+        // Retrieve the updated media library from the persistence medium and return it.
+        Result<LibraryEntity?> getCreatedLibraryResult = await _unitOfWork.LibraryRepository.GetByIdAsync(createLibraryResult.Value.Id.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getCreatedLibraryResult.IsFailure)
+            return getCreatedLibraryResult.Errors;
+        if (getCreatedLibraryResult.Value is null)
+            return ApplicationErrors.Persistence.ErrorPersistingMediaLibrary;
+
+        // Mark the media library as saved.
+        createLibraryResult.Value.Save();
+
+        // Queue any domain events.
+        foreach (IDomainEvent domainEvent in createLibraryResult.Value.GetDomainEvents())
+            _domainEventsQueue.Enqueue(domainEvent);
+
+        return getCreatedLibraryResult.Value.ToResponse();
+    }
+}

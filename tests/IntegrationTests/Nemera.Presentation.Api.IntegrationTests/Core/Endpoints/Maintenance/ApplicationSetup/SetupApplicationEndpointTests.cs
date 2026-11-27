@@ -1,0 +1,257 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.Authentication;
+using Nemera.Contracts.Requests.Authentication;
+using Nemera.Contracts.Responses.Authentication;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Infrastructure.Core.Security;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Maintenance.ApplicationSetup;
+
+/// <summary>
+/// Contains integration tests for the <see cref="SetupApplicationEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class SetupApplicationEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
+{
+    private HttpClient _client;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly RegistrationRequestFixture _registrationRequestFixture = new();
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+    };
+    private readonly string _testUsername;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SetupApplicationEndpointTests"/> class.
+    /// </summary>
+    /// <param name="apiFactory">Injected in-memory API factory.</param>
+    public SetupApplicationEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
+    {
+        _client = apiFactory.CreateClient();
+        _apiFactory = apiFactory;
+        _testUsername = $"testuser_{Guid.NewGuid()}";
+    }
+
+    /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = _apiFactory.CreateClient();
+        await Task.CompletedTask;
+    }
+
+    [Fact]
+    public async Task SetupApplication_WhenCalledWithValidRequestAnd2FA_ShouldSetupApplicationSuccessfully()
+    {
+        // Arrange
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username: _testUsername,
+            password: "TestPass123!",
+            passwordConfirm: "TestPass123!",
+            use2fa: true
+        );
+        await _apiFactory.ResetDatabaseAsync();
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/initialization", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        RegistrationResponse? result = JsonSerializer.Deserialize<RegistrationResponse>(content, _jsonOptions);
+
+        Assert.NotNull(result);
+        Assert.Equal(_testUsername, result!.Username);
+        Assert.NotEqual(Guid.Empty, result.Id);
+        Assert.NotNull(result.TotpSecret);
+        Assert.NotEmpty(result.TotpSecret);
+        Assert.StartsWith("data:image/png;base64,", result.TotpSecret);
+
+        Assert.NotNull(response.Headers.Location);
+        Assert.Equal($"http://localhost/api/v1/users/{result.Id}", response.Headers.Location.ToString());
+
+        // Verify default permissions, roles, and role permissions are set.
+        await VerifyDefaultSetup(result.Id);
+    }
+
+    [Fact]
+    public async Task SetupApplication_WhenCalledWithValidRequestWithout2FA_ShouldSetupApplicationSuccessfully()
+    {
+        // Arrange
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username: _testUsername,
+            password: "TestPass123!",
+            passwordConfirm: "TestPass123!",
+            use2fa: false
+        );
+        await _apiFactory.ResetDatabaseAsync();
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/initialization", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        RegistrationResponse? result = JsonSerializer.Deserialize<RegistrationResponse>(content, _jsonOptions);
+
+        Assert.NotNull(result);
+        Assert.Equal(_testUsername, result!.Username);
+        Assert.NotEqual(Guid.Empty, result.Id);
+        Assert.Null(result.TotpSecret);
+
+        Assert.NotNull(response.Headers.Location);
+        Assert.Equal($"http://localhost/api/v1/users/{result.Id}", response.Headers.Location.ToString());
+
+        // Verify default permissions, roles, and role permissions are set.
+        await VerifyDefaultSetup(result.Id);
+    }
+
+    [Fact]
+    public async Task SetupApplication_WhenAdminAccountAlreadyExists_ShouldReturnConflict()
+    {
+        // Arrange
+        await CreateTestUser();
+        RegistrationRequest request = _registrationRequestFixture.Create(
+            username: "another_admin",
+            password: "TestPass123!",
+            passwordConfirm: "TestPass123!",
+            use2fa: false
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/initialization", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status409Conflict, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.10", problemDetails["type"].GetString());
+        Assert.Equal("General.Conflict", problemDetails["title"].GetString());
+        Assert.Equal("AdminAccountAlreadyCreated", problemDetails["detail"].GetString());
+        Assert.Equal("/api/v1/initialization", problemDetails["instance"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
+    }
+
+    [Fact]
+    public async Task SetupApplication_WhenRequestIsNull_ShouldReturnValidationError()
+    {
+        // Arrange
+        RegistrationRequest? request = null;
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/api/v1/initialization", request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Dictionary<string, string[]>? errors = problemDetails!["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("UsernameCannotBeEmpty", errors["General.Validation"]);
+        Assert.Contains("PasswordCannotBeEmpty", errors["General.Validation"]);
+        Assert.Contains("PasswordConfirmCannotBeEmpty", errors["General.Validation"]);
+    }
+
+    private async Task VerifyDefaultSetup(Guid userId)
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        
+        // TODO: update list when defaults change.
+        // Verify default permissions.
+        List<PermissionEntity> permissions = await dbContext.Permissions.ToListAsync();
+        Assert.Contains(permissions, p => p.PermissionName == AuthorizationPermission.CanViewUsers);
+        Assert.Contains(permissions, p => p.PermissionName == AuthorizationPermission.CanDeleteUsers);
+        Assert.Contains(permissions, p => p.PermissionName == AuthorizationPermission.CanRegisterUsers);
+        Assert.All(permissions, permission => Assert.Equal(AuditIdentities.s_systemUserId, permission.CreatedBy));
+
+        // Verify default roles.
+        List<RoleEntity> roles = await dbContext.Roles.ToListAsync();
+        RoleEntity? adminRole = roles.FirstOrDefault(r => r.RoleName == "Admin");
+        Assert.NotNull(adminRole);
+        Assert.Equal(AuditIdentities.s_systemUserId, adminRole!.CreatedBy);
+
+        // Verify admin role permissions.
+        List<RolePermissionEntity> rolePermissions = await dbContext.RolePermissions
+            .Where(rp => rp.RoleId == adminRole.Id)
+            .ToListAsync();
+        Assert.NotEmpty(rolePermissions);
+        Assert.Contains(rolePermissions, rp => permissions.Any(p => p.Id == rp.PermissionId));
+        Assert.All(rolePermissions, rolePermission => Assert.Equal(AuditIdentities.s_systemUserId, rolePermission.CreatedBy));
+
+        // Verify user has admin role.
+        UserRoleEntity? userRole = await dbContext.UserRoles.FirstOrDefaultAsync(ur => ur.UserId == userId && ur.RoleId == adminRole.Id);
+        Assert.NotNull(userRole);
+        Assert.Equal(AuditIdentities.s_systemUserId, userRole!.CreatedBy);
+
+        // Verify the admin account and the default scheduled jobs were created by the initialization flow, which is anonymous.
+        UserEntity? adminUser = await dbContext.Users.FirstOrDefaultAsync(user => user.Id == userId);
+        Assert.NotNull(adminUser);
+        Assert.Equal(AuditIdentities.s_systemUserId, adminUser!.CreatedBy);
+        List<ScheduledJobEntity> scheduledJobs = await dbContext.ScheduledJobs.ToListAsync();
+        Assert.NotEmpty(scheduledJobs);
+        Assert.All(scheduledJobs, scheduledJob => Assert.Equal(AuditIdentities.s_systemUserId, scheduledJob.CreatedBy));
+    }
+
+    private async Task<UserEntity> CreateTestUser()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        // TODO: test default role and permissions?
+        UserEntity user = _userEntityFixture.Create(username: _testUsername, password: new PasswordHashService().HashString("TestPass123!"));
+        user.TotpSecret = null;
+
+        dbContext.Users.Add(user);
+        await dbContext.SaveChangesAsync();
+        return user;
+    }
+
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public async Task DisposeAsync()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == _testUsername);
+        if (user is not null)
+        {
+            dbContext.Users.Remove(user);
+            await dbContext.SaveChangesAsync();
+        }
+    }
+}

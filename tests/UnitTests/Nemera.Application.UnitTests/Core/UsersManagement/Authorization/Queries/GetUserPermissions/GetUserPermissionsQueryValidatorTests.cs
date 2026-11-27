@@ -1,0 +1,61 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
+using Nemera.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Primitives;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+#endregion
+
+namespace Nemera.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
+
+/// <summary>
+/// Contains unit tests for the <see cref="GetUserPermissionsQueryValidator"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class GetUserPermissionsQueryValidatorTests
+{
+    private readonly GetUserPermissionsQueryValidator _validator = new();
+    private readonly GetUserPermissionsQueryFixture _getUserPermissionsQueryFixture = new();
+
+    [Fact]
+    public void Validate_WhenUserIdIsNull_ShouldHaveValidationError()
+    {
+        // Arrange
+        GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.Create(includeUserId: false);
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Users.UserIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WhenUserIdIsEmpty_ShouldHaveValidationError()
+    {
+        // Arrange
+        GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.Create(Guid.Empty);
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Users.UserIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WhenUserIdIsValid_ShouldNotHaveValidationError()
+    {
+        // Arrange
+        GetUserPermissionsQuery query = _getUserPermissionsQueryFixture.Create(Guid.NewGuid());
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldNotHaveValidationError(Errors.Users.UserIdCannotBeEmpty);
+    }
+}

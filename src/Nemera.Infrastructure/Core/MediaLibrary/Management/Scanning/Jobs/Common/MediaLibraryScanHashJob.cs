@@ -1,0 +1,175 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
+using Nemera.Application.Common.Infrastructure.Security;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
+
+/// <summary>
+/// Media library scan job for computing the content hashes of the files that changed since the previous scan.
+/// </summary>
+internal sealed class MediaLibraryScanHashJob : MediaLibraryScanJob, IMediaLibraryScanHashJob
+{
+    private const int HASHING_PAGE_SIZE = 1000; // The number of files that are hashed and written back in a single batch, keeping the peak memory bounded regardless of the library size.
+    private readonly IServiceScopeFactory _serviceScopeFactory;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaLibraryScanHashJob"/> class.
+    /// </summary>
+    /// <param name="serviceScopeFactory">
+    /// Injected factory for creating scopes in which services are requested.
+    /// See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
+    /// </param>
+    public MediaLibraryScanHashJob(IServiceScopeFactory serviceScopeFactory)
+    {
+        _serviceScopeFactory = serviceScopeFactory;
+    }
+
+    /// <summary>
+    /// Executes the payload of the media library scan job.
+    /// </summary>
+    /// <typeparam name="TInput">The type of the input parameter representing the data to be processed by this payload.</typeparam>
+    /// <param name="id">The unique identifier of the media library scan job.</param>
+    /// <param name="input">The input data to be processed by this payload.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    public override async Task ExecuteAsync<TInput>(Guid id, TInput input, CancellationToken cancellationToken)
+    {
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            // Increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel).
+            int parentsCompleted = Interlocked.Increment(ref parentsPayloadsExecuted);
+            // Only execute this job's payload when it has no parents, or when all the parents finished their execution.
+            if (Parents.Count == 0 || parentsCompleted == Parents.Count)
+            {
+                Status = LibraryScanJobStatus.Running;
+                // See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details:
+                await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
+                IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
+                IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
+
+                IFileHashService fileHashService = asyncServiceScope.ServiceProvider.GetService<IFileHashService>()!;
+
+                MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
+
+                // Count the files that need hashing, for progress reporting purposes.
+                Result<int> getFilesToHashCountResult = await unitOfWork.LibraryScanStagingResultsRepository.GetFilesToHashCountAsync(ScanId.Value, cancellationToken).ConfigureAwait(false);
+                if (getFilesToHashCountResult.IsFailure)
+                    throw new InvalidOperationException(getFilesToHashCountResult.FirstError.Description);
+                int totalFilesToHash = getFilesToHashCountResult.Value;
+
+                // Get the library only when there are files to hash, and only the scalar values needed to know whether its content is stored on a solid state drive.
+                // in which case the file reads run in parallel.
+                bool shouldParallelizeReads = false;
+                if (totalFilesToHash > 0)
+                {
+                    Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(
+                        LibraryId.Value,
+                        shouldIncludeNavigationProperties: false,
+                        shouldTrackEntities: false,
+                        cancellationToken: cancellationToken).ConfigureAwait(false);
+                    if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
+                        throw new InvalidOperationException(getLibraryResult.IsFailure ? getLibraryResult.FirstError.Description : "The media library was not found.");
+                    shouldParallelizeReads = getLibraryResult.Value.IsContentOnSsd;
+                }
+
+                // Set the initial progress of the scan job.
+                Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, totalFilesToHash, cancellationToken).ConfigureAwait(false);
+                if (publishJobProgressResult.IsFailure)
+                    throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
+
+                DateTime lastUpdateTime = DateTime.UtcNow;
+                int minUpdateIntervalMs = 100;
+                int processedFilesCount = 0;
+                string? lastPath = null;
+
+                // Process the files that need hashing in pages, keeping the peak memory bounded regardless of the library size.
+                while (true)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    Result<IReadOnlyList<HashedFileSystemFileDto>> getFilesToHashPageResult = await unitOfWork.LibraryScanStagingResultsRepository.GetFilesToHashPageAsync(ScanId.Value, lastPath, HASHING_PAGE_SIZE, cancellationToken).ConfigureAwait(false);
+                    if (getFilesToHashPageResult.IsFailure)
+                        throw new InvalidOperationException(getFilesToHashPageResult.FirstError.Description);
+                    IReadOnlyList<HashedFileSystemFileDto> filesToHashPage = getFilesToHashPageResult.Value;
+                    if (filesToHashPage.Count == 0)
+                        break;
+
+                    // Hash the files of the current page in parallel, invoking the progress callback before each file.
+                    List<HashedFileSystemFileDto> hashedFiles = await fileHashService.HashFilesAsync(filesToHashPage, shouldParallelizeReads, async () =>
+                    {
+                        // Check if enough time has passed since last update.
+                        DateTime now = DateTime.UtcNow;
+                        if ((now - lastUpdateTime).TotalMilliseconds >= minUpdateIntervalMs)
+                        {
+                            // Increment the number of processed elements progress.
+                            publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, Interlocked.Increment(ref processedFilesCount), totalFilesToHash, cancellationToken).ConfigureAwait(false);
+                            if (publishJobProgressResult.IsFailure)
+                                throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
+                            lastUpdateTime = now;
+                        }
+                    }, cancellationToken).ConfigureAwait(false);
+
+                    // Write the computed hashes back to the staging results.
+                    Result<Updated> updateHashesResult = await unitOfWork.LibraryScanStagingResultsRepository.UpdateFileHashesAsync(ScanId.Value, hashedFiles, cancellationToken).ConfigureAwait(false);
+                    if (updateHashesResult.IsFailure)
+                        throw new InvalidOperationException(updateHashesResult.FirstError.Description);
+
+                    lastPath = filesToHashPage[^1].Path;
+                }
+
+                // This job finished, increment the number of processed jobs progress.
+                await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.CreateVersion7(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                Status = LibraryScanJobStatus.Completed;
+
+                // Call each linked child with the obtained payload.
+                foreach (IMediaLibraryScanJob child in Children)
+                    await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            Status = LibraryScanJobStatus.Canceled;
+            throw;
+        }
+        catch (Exception exception)
+        {
+            Status = LibraryScanJobStatus.Failed;
+            await ScanFailurePublisher.PublishAsync(_serviceScopeFactory, LibraryId, MediaLibraryScanCompositeId.Create(ScanId, UserId), exception, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Publishes a job progress update.
+    /// </summary>
+    /// <param name="domainEventPublisher">The service used to publish the progress update.</param>
+    /// <param name="compositeKey">The composite unique identifier of a media library scan.</param>
+    /// <param name="currentProgress">The current job progress.</param>
+    /// <param name="totalProgress">The total job progress.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    private async Task<Result<Success>> PublishJobProgressAsync(IDomainEventPublisher domainEventPublisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
+    {
+        Result<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "HashingFileContents");
+        if (scanJobProgressResult.IsFailure)
+            return scanJobProgressResult.Errors;
+
+        await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(
+            Guid.CreateVersion7(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+
+        return Result.Success;
+    }
+}

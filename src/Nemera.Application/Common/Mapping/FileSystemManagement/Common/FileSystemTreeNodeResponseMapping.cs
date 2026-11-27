@@ -1,0 +1,40 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+#endregion
+
+namespace Nemera.Application.Common.Mapping.FileSystemManagement.Common;
+
+/// <summary>
+/// Extension methods for converting <see cref="FileSystemTreeNodeResponse"/>.
+/// </summary>
+public static class FileSystemTreeNodeResponseMapping
+{
+    /// <summary>
+    /// Converts <paramref name="response"/> to <see cref="WindowsRootItem"/>.
+    /// </summary>
+    /// <param name="response">The response to be converted.</param>
+    /// <returns>The converted domain entity.</returns>
+    public static Result<WindowsRootItem> ToWindowsRootItem(this FileSystemTreeNodeResponse response)
+    {
+        return WindowsRootItem.Create(
+            response.Path,
+            response.Name,
+            FileSystemItemStatus.Accessible
+        );
+    }
+
+    /// <summary>
+    /// Converts <paramref name="_"/> to <see cref="UnixRootItem"/>.
+    /// </summary>
+    /// <param name="_">The response to be converted.</param>
+    /// <returns>The converted domain entity.</returns>
+    public static Result<UnixRootItem> ToUnixRootItem(this FileSystemTreeNodeResponse _)
+    {
+        return UnixRootItem.Create(
+            FileSystemItemStatus.Accessible
+        );
+    }
+}

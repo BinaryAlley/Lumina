@@ -1,0 +1,34 @@
+#region ========================================================================= USING =====================================================================================
+using FastEndpoints;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Plugins;
+using Nemera.Presentation.Web.Common.Requests.Library.Management;
+using System;
+using System.Diagnostics.CodeAnalysis;
+#endregion
+
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.Management.GetMetadataProviders;
+
+/// <summary>
+/// Class used for providing a textual description for the <see cref="GetMetadataProvidersEndpoint"/> endpoint, for OpenAPI.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class GetMetadataProvidersEndpointSummary : Summary<GetMetadataProvidersEndpoint, GetMetadataProvidersRequest>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetMetadataProvidersEndpointSummary"/> class.
+    /// </summary>
+    public GetMetadataProvidersEndpointSummary()
+    {
+        Summary = "Retrieves the metadata providers of a media library.";
+        Description = "Retrieves the metadata providers of the media library identified by the route.";
+
+        RequestParam(r => r.LibraryId, "The unique identifier of the media library whose metadata providers are retrieved. Required.");
+
+        ExampleRequest = new GetMetadataProvidersRequest(
+            LibraryId: Guid.NewGuid()
+        );
+
+        Response(200, "The metadata providers of the media library are returned.", example: new SuccessResponse<LibraryMetadataProviderDto[]>(true, default));
+    }
+}

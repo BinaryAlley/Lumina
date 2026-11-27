@@ -1,0 +1,210 @@
+#region ========================================================================= USING =====================================================================================
+using FastEndpoints;
+using Nemera.Contracts.Requests.MediaLibrary.Management;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+#endregion
+
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.Management.UpdateLibrary;
+
+/// <summary>
+/// Class used for providing a textual description for the <see cref="UpdateLibraryEndpoint"/> API endpoint, for OpenAPI.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class UpdateLibraryEndpointSummary : Summary<UpdateLibraryEndpoint, UpdateLibraryRequest>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateLibraryEndpointSummary"/> class.
+    /// </summary>
+    public UpdateLibraryEndpointSummary()
+    {
+        Summary = "Updates an existing media library.";
+        Description = "Updates a media library and returns its details, if the user making the request is an Admin, or the owner of the library holding the permission to create libraries. The owner of the library is never changed by an update.";
+
+        ExampleRequest = new UpdateLibraryRequest(
+            Id: Guid.NewGuid(),
+            Title: "TV Shows",
+            LibraryType: "TvShow",
+            ContentLocations: [
+                "/media/tv shows/drama/",
+                "/media/tv shows/SCI-FI/",
+            ],
+            CoverImage: "/media/posters/myPoster.jpg",
+            IsEnabled: true,
+            IsLocked: false,
+            CanDownloadMetadataFromWeb: true,
+            ShouldSaveMetadataInMediaDirectories: false,
+            ShouldSkipUnchangedDirectoriesDuringScan: false,
+            ShouldSkipHiddenFilesAndDirectoriesDuringScan: false,
+            IsContentOnSsd: false,
+            ShouldTrackConsumptionProgress: true,
+            CompletionThresholdPercentage: 90,
+            PathTemplateParts: null,
+            MetadataProviders: [new LibraryProviderSelectionRequest(PluginId: Guid.NewGuid(), IsEnabled: true)],
+            ArtworkProviders: [new LibraryProviderSelectionRequest(PluginId: Guid.NewGuid(), IsEnabled: true)],
+            BookReaders: null
+        );
+
+        RequestParam(r => r.Id, "The unique identifier of the media library. Required.");
+        RequestParam(r => r.Title, "The title of the media library. Required.");
+        RequestParam(r => r.LibraryType, "The type of the media library. Required.");
+        RequestParam(r => r.ContentLocations, ">The file system paths of the directories where the media library elements are located. Required.");
+        RequestParam(r => r.CoverImage, "The path of the image file used as the cover for the library. Optional.");
+        RequestParam(r => r.IsEnabled, "Whether this media library is enabled or not. A disabled media library is never shown or changed. Optional.");
+        RequestParam(r => r.IsLocked, "Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated. Optional.");
+        RequestParam(r => r.CanDownloadMetadataFromWeb, "Whether this media library should update the metadata of its elements from the web, or not. Optional.");
+        RequestParam(r => r.ShouldSaveMetadataInMediaDirectories, "Whether this media library should copy the downloaded metadata into the media library content locations, or not. Optional.");
+        RequestParam(r => r.ShouldSkipUnchangedDirectoriesDuringScan, "Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not. Optional.");
+        RequestParam(r => r.ShouldSkipHiddenFilesAndDirectoriesDuringScan, "Whether this media library should skip hidden files and directories during the scan, or not. Optional, the stored value is kept when absent.");
+        RequestParam(r => r.IsContentOnSsd, "Whether the content of this media library is stored on a solid state drive, in which case the file discovery and content hashing stages read the files in parallel. Optional.");
+        RequestParam(r => r.ShouldTrackConsumptionProgress, "Whether the consumption progress of the media library items should be tracked, or not. Optional, the stored value is kept when absent.");
+        RequestParam(r => r.CompletionThresholdPercentage, "The percentage of a media library item that must be consumed for its session to be considered completed. Optional, the stored value is kept when absent.");
+        RequestParam(r => r.PathTemplateParts, "The ordered parts of the template describing the structure of the media library on disk. Optional, the ideal structure of the library type is used when absent.");
+        RequestParam(r => r.MetadataProviders, "The metadata providers of the media library, in the order in which they are tried, and whether each one is enabled. Optional, the stored configurations are kept, or reconciled with the library type when it changes when absent.");
+        RequestParam(r => r.ArtworkProviders, "The artwork providers of the media library, in the order in which they are tried, and whether each one is enabled. Optional, the stored configurations are kept, or reconciled with the library type when it changes when absent.");
+        RequestParam(r => r.BookReaders, "The book readers of the media library, and whether each one is enabled. Optional, the stored configurations are kept, or reconciled with the library type when it changes when absent.");
+
+        ResponseParam<LibraryResponse>(r => r.Id, "The unique identifier of the entity.");
+        ResponseParam<LibraryResponse>(r => r.UserId, "The unique identifier of the user owning the media library.");
+        ResponseParam<LibraryResponse>(r => r.Title, "The title of the media library.");
+        ResponseParam<LibraryResponse>(r => r.LibraryType, "The type of the media library.");
+        ResponseParam<LibraryResponse>(r => r.ContentLocations, "The file system paths of the directories where the media library elements are located.");
+        ResponseParam<LibraryResponse>(r => r.CoverImage, "The path of the image file used as the cover for the library.");
+        ResponseParam<LibraryResponse>(r => r.IsEnabled, "Whether this media library is enabled or not. A disabled media library is never shown or changed.");
+        ResponseParam<LibraryResponse>(r => r.IsLocked, "Whether this media library is locked or not. A locked media library is displayed, but is never changed or updated.");
+        ResponseParam<LibraryResponse>(r => r.CanDownloadMetadataFromWeb, "Whether this media library should update the metadata of its elements from the web, or not.");
+        ResponseParam<LibraryResponse>(r => r.ShouldSaveMetadataInMediaDirectories, "Whether this media library should copy the downloaded metadata into the media library content locations, or not.");
+        ResponseParam<LibraryResponse>(r => r.ShouldSkipUnchangedDirectoriesDuringScan, "Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.");
+        ResponseParam<LibraryResponse>(r => r.ShouldSkipHiddenFilesAndDirectoriesDuringScan, "Whether this media library should skip hidden files and directories during the scan, or not.");
+        ResponseParam<LibraryResponse>(r => r.IsContentOnSsd, "Whether the content of this media library is stored on a solid state drive, in which case the file discovery and content hashing stages read the files in parallel.");
+        ResponseParam<LibraryResponse>(r => r.ShouldTrackConsumptionProgress, "Whether the consumption progress of the media library items is tracked.");
+        ResponseParam<LibraryResponse>(r => r.CompletionThresholdPercentage, "The percentage of a media library item that must be consumed for its session to be considered completed, when progress tracking is enabled.");
+        ResponseParam<LibraryResponse>(r => r.PathTemplateParts, "The ordered parts of the template describing the structure of the media library on disk.");
+        ResponseParam<LibraryResponse>(r => r.CreatedOnUtc, "The date and time when the entity was created.");
+        ResponseParam<LibraryResponse>(r => r.UpdatedOnUtc, "The date and time when the entity was last updated.");
+
+        Response(200, "The media library was successfully updated.", example:
+            new LibraryResponse(
+                Id: Guid.NewGuid(),
+                UserId: Guid.NewGuid(),
+                Title: "TV Shows",
+                LibraryType: LibraryType.TvShow,
+                ContentLocations: ["/media/tv shows/drama/", "/media/tv shows/SCI-FI/"],
+                CoverImage: "/media/myPoster.jpg",
+                IsEnabled: true,
+                IsLocked: false,
+                CanDownloadMetadataFromWeb: true,
+                ShouldSaveMetadataInMediaDirectories: false,
+                ShouldSkipUnchangedDirectoriesDuringScan: false,
+                ShouldSkipHiddenFilesAndDirectoriesDuringScan: false,
+                IsContentOnSsd: false,
+                ShouldTrackConsumptionProgress: true,
+                CompletionThresholdPercentage: 90,
+                PathTemplateParts: [],
+                CreatedOnUtc: DateTime.UtcNow,
+                UpdatedOnUtc: default
+            ));
+
+        Response(401, "Authentication required.", "application/problem+json",
+            example: new[]
+            {
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "Authentication failed",
+                    instance = "/api/v1/libraries"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token has expired",
+                    instance = "/api/v1/libraries"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc7235#section-3.1",
+                    status = 401,
+                    title = "Unauthorized",
+                    detail = "The token is invalid",
+                    instance = "/api/v1/libraries"
+                }
+            }
+        );
+
+        Response(403, "The request failed because the authenticated user is neither an Admin, nor the owner of the media library holding the permission to create libraries, or because the request carried an unsupported library type.", "application/problem+json",
+            example: new[]
+            {
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+                    title = "General.Failure",
+                    status = 403,
+                    detail = "NotAuthorized",
+                    instance = "/api/v1/libraries/{id}",
+                    traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                },
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+                    title = "General.Forbidden",
+                    status = 403,
+                    detail = "UnknownLibraryType",
+                    instance = "/api/v1/libraries/{id}",
+                    traceId = "00-a712bbf99ca8ab485f86a762ae5ae74d-b3a2eb78813b0a5d-00"
+                }
+            }
+        );
+
+        Response(404, "The request failed because the requested media library does not exist.", "application/problem+json",
+            example: new
+            {
+                type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
+                title = "General.NotFound",
+                status = 404,
+                detail = "LibraryNotFound",
+                instance = "/api/v1/libraries/{id}",
+                traceId = "00-57d15dadd702dbd4aeb5dc9b7cee68ee-9330237dbb2ce0e5-00"
+            }
+        );
+
+        Response(422, "The request did not pass validation checks.", "application/problem+json",
+            example: new
+            {
+                type = "https://tools.ietf.org/html/rfc4918#section-11.2",
+                title = "General.Validation",
+                status = 422,
+                detail = "OneOrMoreValidationErrorsOccurred",
+                instance = "/api/v1/libraries",
+                errors = new Dictionary<string, string[]>
+                {
+                    {
+                        "General.Validation", new[]
+                        {
+                            "LibraryIdCannotBeEmpty",
+                            "LibraryTypeCannotBeNull",
+                            "PathsListCannotBeNull",
+                            "PathsListCannotBeEmpty",
+                            "PathCannotBeEmpty",
+                            "PathMustBeMaximum260CharactersLong",
+                            "TitleCannotBeEmpty",
+                            "TitleMustBeMaximum255CharactersLong",
+                            "CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff",
+                            "CompletionThresholdPercentageMustBeBetweenZeroAndOneHundred",
+                            "PluginIdCannotBeEmpty",
+                            "PluginIdsMustBeUnique",
+                            "PluginNotSupportedForLibraryType"
+                        }
+                    }
+                },
+                traceId = "00-2470be4248a2a5a0c6f70579975a6954-b9c3ba9544a03500-00"
+            }
+        );
+    }
+}

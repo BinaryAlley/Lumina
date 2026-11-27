@@ -1,0 +1,659 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DomainEvents;
+using Nemera.Application.Common.DTO.MediaLibrary.Management;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Plugins;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DTO.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Core.MediaLibrary.Management.Commands.AddLibrary;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.PathTemplate;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using NSubstitute;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
+#endregion
+
+namespace Nemera.Application.UnitTests.Core.MediaLibrary.Management.Commands.AddLibrary;
+
+/// <summary>
+/// Contains unit tests for the <see cref="AddLibraryCommandHandler"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class AddLibraryCommandHandlerTests
+{
+    private readonly IUnitOfWork _mockUnitOfWork;
+    private readonly ILibraryRepository _mockLibraryRepository;
+    private readonly IAuthorizationService _mockAuthorizationService;
+    private readonly ICurrentUserService _mockCurrentUserService;
+    private readonly IDomainEventsQueue _mockDomainEventsQueue;
+    private readonly IEnvironmentContext _mockEnvironmentContext;
+    private readonly IMediaLibraryProviderConfigurationStore _mockProviderConfigurationStore;
+    private readonly ILibraryPathTemplateService _mockLibraryPathTemplateService;
+    private readonly IValidator<AddLibraryCommand> _mockValidator;
+    private readonly AddLibraryCommandHandler _sut;
+    private readonly AddLibraryCommandFixture _addLibraryCommandFixture = new();
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly LibraryPathPartFixture _libraryPathPartFixture = new();
+    private readonly LibraryPathTemplateFixture _libraryPathTemplateFixture = new();
+    private readonly LibraryPathTemplatePartDtoFixture _libraryPathTemplatePartDtoFixture = new();
+    private readonly LibraryProviderSelectionDtoFixture _libraryProviderSelectionDtoFixture = new();
+    private readonly Guid _userId;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AddLibraryCommandHandlerTests"/> class.
+    /// </summary>
+    public AddLibraryCommandHandlerTests()
+    {
+        _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
+        _mockLibraryRepository = Substitute.For<ILibraryRepository>();
+        _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
+        _mockAuthorizationService = Substitute.For<IAuthorizationService>();
+        _mockCurrentUserService = Substitute.For<ICurrentUserService>();
+        _mockDomainEventsQueue = Substitute.For<IDomainEventsQueue>();
+        _mockEnvironmentContext = Substitute.For<IEnvironmentContext>();
+        _mockProviderConfigurationStore = Substitute.For<IMediaLibraryProviderConfigurationStore>();
+        _mockLibraryPathTemplateService = Substitute.For<ILibraryPathTemplateService>();
+        _mockValidator = Substitute.For<IValidator<AddLibraryCommand>>();
+        _userId = Guid.NewGuid();
+
+        // Default stubs: the current user is authenticated, is an admin, the cover image is a valid image, and the provider configurations are seeded successfully.
+        _mockCurrentUserService.UserId.Returns(_userId);
+        _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(true);
+        _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(ImageType.PNG));
+        _mockLibraryRepository.InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Created);
+        _mockProviderConfigurationStore.ConfigureProvidersAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Success);
+        _mockValidator.Validate(Arg.Any<AddLibraryCommand>()).Returns([]);
+        _mockLibraryPathTemplateService.ResolveTemplate(Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryPathPart>>()).Returns(Result.From(LibraryPathTemplate.Empty()));
+
+        _sut = new AddLibraryCommandHandler(_mockAuthorizationService, _mockCurrentUserService, _mockDomainEventsQueue, _mockEnvironmentContext, _mockProviderConfigurationStore, _mockLibraryPathTemplateService, _mockUnitOfWork, _mockValidator);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenCommandIsValid_ShouldInsertLibraryAndReturnResponse()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create();
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(persistedLibrary.Id, result.Value.Id);
+        await _mockLibraryRepository.Received(1).InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockProviderConfigurationStore.Received(1).ConfigureProvidersAsync(
+            Arg.Any<Guid>(), Arg.Is<LibraryType>(libraryType => libraryType == Enum.Parse<LibraryType>(command.LibraryType!)), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Is(true), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        _mockDomainEventsQueue.Received(1).Enqueue(Arg.Any<LibrarySavedDomainEvent>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenHiddenFilesSettingIsAbsent_ShouldDefaultToNotSkippingHiddenFiles()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(shouldSkipHiddenFilesAndDirectoriesDuringScan: null);
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).InsertAsync(
+            Arg.Is<LibraryEntity>(library => !library.ShouldSkipHiddenFilesAndDirectoriesDuringScan),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenThresholdIsSuppliedWhileEffectiveTrackingIsOff_ShouldReturnThresholdMustBeNullError()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Music),
+            shouldTrackConsumptionProgress: null,
+            completionThresholdPercentage: 50);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.Library.CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff, result.FirstError);
+        await _mockLibraryRepository.DidNotReceive().InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenProgressTrackingIsEnabledWithoutThreshold_ShouldUseLibraryTypeDefaultThreshold()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Book),
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: null);
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).InsertAsync(
+            Arg.Is<LibraryEntity>(library =>
+                library.ShouldTrackConsumptionProgress &&
+                library.CompletionThresholdPercentage == 100),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenProviderChoicesAreMade_ShouldConfigureProvidersWithTheChoices()
+    {
+        // Arrange
+        LibraryProviderSelectionDto[] metadataProviders = [.. _libraryProviderSelectionDtoFixture.CreateMany(2)];
+        LibraryProviderSelectionDto[] artworkProviders = [_libraryProviderSelectionDtoFixture.Create(isEnabled: false)];
+        LibraryProviderSelectionDto[] bookReaders = [_libraryProviderSelectionDtoFixture.Create()];
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(metadataProviders: metadataProviders, artworkProviders: artworkProviders, bookReaders: bookReaders);
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockProviderConfigurationStore.Received(1).ConfigureProvidersAsync(
+            Arg.Any<Guid>(),
+            Enum.Parse<LibraryType>(command.LibraryType!),
+            Arg.Is<IReadOnlyList<LibraryProviderSelectionDto>?>(selections => selections == metadataProviders),
+            Arg.Is<IReadOnlyList<LibraryProviderSelectionDto>?>(selections => selections == artworkProviders),
+            Arg.Is<IReadOnlyList<LibraryProviderSelectionDto>?>(selections => selections == bookReaders),
+            Arg.Is(true),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenConfiguringProvidersFails_ShouldReturnErrorWithoutSaving()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create();
+        _mockProviderConfigurationStore.ConfigureProvidersAsync(Arg.Any<Guid>(), Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to configure provider configurations"));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenCoverImageIsNull_ShouldSkipImageTypeCheck()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create();
+        command = command with { CoverImage = null };
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockEnvironmentContext.FileTypeService.DidNotReceive()
+            .GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenCoverImageIsNotAnImage_ShouldReturnCoverFileMustBeAnImageError()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create();
+        _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(ImageType.None));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.Library.CoverFileMustBeAnImage, result.FirstError);
+        await _mockLibraryRepository.DidNotReceive().InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenImageTypeCheckFails_ShouldReturnError()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create();
+        _mockEnvironmentContext.FileTypeService.GetImageTypeAsync(Arg.Any<FileSystemPathId>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to determine image type"));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        await _mockLibraryRepository.DidNotReceive().InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenCoverImagePathIsInvalid_ShouldReturnInvalidPathError()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create();
+        command = command with { CoverImage = " " };
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.FileSystemManagement.InvalidPath, result.FirstError);
+        await _mockLibraryRepository.DidNotReceive().InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenCurrentUserIsNull_ShouldReturnNotAuthorizedError()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create();
+        _mockCurrentUserService.UserId.Returns((Guid?)null);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockLibraryRepository.DidNotReceive().InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenUserIsNotAdminAndLacksPermission_ShouldReturnNotAuthorizedError()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create();
+        _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(false);
+        _mockAuthorizationService.HasPermissionAsync(_userId, Arg.Any<Nemera.Domain.SharedKernel.Common.Enums.Authorization.AuthorizationPermission>(), Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockLibraryRepository.DidNotReceive().InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenLibraryCreationFails_ShouldReturnError()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create();
+        command = command with { ContentLocations = [""] };
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.FileSystemManagement.InvalidPath, result.FirstError);
+        await _mockLibraryRepository.DidNotReceive().InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenInsertFails_ShouldReturnErrorWithoutSaving()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create();
+        _mockLibraryRepository.InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>())
+            .Returns(Error.Failure(description: "Failed to insert library"));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenCreatedLibraryCannotBeRetrieved_ShouldReturnPersistenceError()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create();
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result<LibraryEntity?>.Success(null));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Persistence.ErrorPersistingMediaLibrary, result.FirstError);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenValidationFails_ShouldReturnValidationErrorsWithoutPersisting()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create();
+        _mockValidator.Validate(Arg.Any<AddLibraryCommand>()).Returns([DomainErrors.Library.LibraryIdCannotBeEmpty]);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.Library.LibraryIdCannotBeEmpty, result.FirstError);
+        await _mockAuthorizationService.DidNotReceive().IsInRoleAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+        await _mockLibraryRepository.DidNotReceive().InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenPathTemplatePartsIsNull_ShouldResolveTemplateWithoutParts()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(pathTemplateParts: null);
+        LibraryPathPart defaultPart = _libraryPathPartFixture.Create(
+            kind: LibraryPathPartKind.Artist,
+            representation: "{0}",
+            isOptional: true);
+        LibraryPathTemplate defaultTemplate = _libraryPathTemplateFixture.Create(parts: [defaultPart]);
+        _mockLibraryPathTemplateService.ResolveTemplate(Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryPathPart>>()).Returns(Result.From(defaultTemplate));
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+        LibraryType expectedLibraryType = Enum.Parse<LibraryType>(command.LibraryType!);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        _mockLibraryPathTemplateService.Received(1).ResolveTemplate(
+            expectedLibraryType,
+            Arg.Is<IReadOnlyList<LibraryPathPart>>(parts => parts.Count == 0));
+        await _mockLibraryRepository.Received(1).InsertAsync(
+            Arg.Is<LibraryEntity>(library =>
+                library.PathTemplateParts.Count == 1 &&
+                library.PathTemplateParts.First().Kind == LibraryPathPartKind.Artist &&
+                library.PathTemplateParts.First().Representation == "{0}" &&
+                library.PathTemplateParts.First().IsOptional),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenPathTemplatePartsAreProvided_ShouldBuildTemplateFromProvidedParts()
+    {
+        // Arrange
+        LibraryPathTemplatePartDto providedDto = _libraryPathTemplatePartDtoFixture.Create(
+            kind: nameof(LibraryPathPartKind.Artist),
+            representation: "{0}",
+            isOptional: false);
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(pathTemplateParts: [providedDto]);
+        LibraryPathPart providedPart = _libraryPathPartFixture.Create(
+            kind: LibraryPathPartKind.Artist,
+            representation: "{0}",
+            isOptional: false);
+        LibraryPathTemplate resolvedTemplate = _libraryPathTemplateFixture.Create(parts: [providedPart]);
+        _mockLibraryPathTemplateService.ResolveTemplate(Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryPathPart>>()).Returns(Result.From(resolvedTemplate));
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+        LibraryType expectedLibraryType = Enum.Parse<LibraryType>(command.LibraryType!);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        _mockLibraryPathTemplateService.Received(1).ResolveTemplate(
+            expectedLibraryType,
+            Arg.Is<IReadOnlyList<LibraryPathPart>>(parts =>
+                parts.Count == 1 &&
+                parts[0].Kind == LibraryPathPartKind.Artist &&
+                parts[0].Representation == "{0}" &&
+                !parts[0].IsOptional));
+        await _mockLibraryRepository.Received(1).InsertAsync(
+            Arg.Is<LibraryEntity>(library =>
+                library.PathTemplateParts.Count == 1 &&
+                library.PathTemplateParts.First().Kind == LibraryPathPartKind.Artist &&
+                library.PathTemplateParts.First().Representation == "{0}" &&
+                !library.PathTemplateParts.First().IsOptional),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenPathTemplateMappingFails_ShouldReturnErrorWithoutPersisting()
+    {
+        // Arrange
+        LibraryPathTemplatePartDto invalidPart = _libraryPathTemplatePartDtoFixture.Create() with { Kind = "NotARealLibraryPathPartKind" };
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(pathTemplateParts: [invalidPart]);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.Library.PathTemplatePartKindNotSupportedForLibraryType, result.FirstError);
+        _mockLibraryPathTemplateService.DidNotReceive().ResolveTemplate(Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryPathPart>>());
+        await _mockLibraryRepository.DidNotReceive().InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenPathTemplateValidationFails_ShouldReturnErrorWithoutPersisting()
+    {
+        // Arrange
+        LibraryPathTemplatePartDto validPart = _libraryPathTemplatePartDtoFixture.Create(
+            kind: nameof(LibraryPathPartKind.Artist),
+            representation: "{0}");
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(pathTemplateParts: [validPart]);
+        Error validationError = DomainErrors.Library.PathTemplateIsNotSupportedForLibraryType;
+        _mockLibraryPathTemplateService.ResolveTemplate(Arg.Any<LibraryType>(), Arg.Any<IReadOnlyList<LibraryPathPart>>()).Returns(validationError);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(validationError, result.FirstError);
+        await _mockLibraryRepository.DidNotReceive().InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenProgressTrackingIsNotSpecifiedAndLibraryTypeTracksByDefault_ShouldUseTheTypeDefaults()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.EBook),
+            shouldTrackConsumptionProgress: null,
+            completionThresholdPercentage: null);
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).InsertAsync(
+            Arg.Is<LibraryEntity>(library =>
+                library.LibraryType == LibraryType.EBook &&
+                library.ShouldTrackConsumptionProgress &&
+                library.CompletionThresholdPercentage == 100),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenProgressTrackingIsNotSpecifiedAndLibraryTypeDoesNotTrackByDefault_ShouldStoreTrackingOffWithoutThreshold()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Music),
+            shouldTrackConsumptionProgress: null,
+            completionThresholdPercentage: null);
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).InsertAsync(
+            Arg.Is<LibraryEntity>(library =>
+                library.LibraryType == LibraryType.Music &&
+                !library.ShouldTrackConsumptionProgress &&
+                library.CompletionThresholdPercentage == null),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenProgressTrackingIsExplicitlyEnabledOnATypeWithoutDefaultThreshold_ShouldStoreTrackingOnWithoutThreshold()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Music),
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: null);
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).InsertAsync(
+            Arg.Is<LibraryEntity>(library =>
+                library.LibraryType == LibraryType.Music &&
+                library.ShouldTrackConsumptionProgress &&
+                library.CompletionThresholdPercentage == null),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenExplicitThresholdIsSuppliedWhileProgressTrackingIsEnabled_ShouldStoreTheSuppliedThreshold()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Book),
+            shouldTrackConsumptionProgress: true,
+            completionThresholdPercentage: 42);
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).InsertAsync(
+            Arg.Is<LibraryEntity>(library =>
+                library.LibraryType == LibraryType.Book &&
+                library.ShouldTrackConsumptionProgress &&
+                library.CompletionThresholdPercentage == 42),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenProgressTrackingIsExplicitlyDisabledWithoutThreshold_ShouldStoreTrackingOffWithoutThreshold()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Book),
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: null);
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).InsertAsync(
+            Arg.Is<LibraryEntity>(library =>
+                library.LibraryType == LibraryType.Book &&
+                !library.ShouldTrackConsumptionProgress &&
+                library.CompletionThresholdPercentage == null),
+            Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenProgressTrackingIsExplicitlyDisabledButThresholdIsSupplied_ShouldReturnThresholdMustBeNullError()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(
+            libraryType: nameof(LibraryType.Book),
+            shouldTrackConsumptionProgress: false,
+            completionThresholdPercentage: 50);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(DomainErrors.Library.CompletionThresholdPercentageMustBeNullWhenProgressTrackingIsOff, result.FirstError);
+        await _mockLibraryRepository.DidNotReceive().InsertAsync(Arg.Any<LibraryEntity>(), Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+}

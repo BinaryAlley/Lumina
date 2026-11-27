@@ -1,0 +1,136 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Models.Core;
+using System.Collections.Generic;
+using System.Diagnostics;
+#endregion
+
+namespace Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+
+/// <summary>
+/// Value Object for the information about a media stream.
+/// </summary>
+[DebuggerDisplay("{StreamId}")]
+public class StreamInfo : ValueObject
+{
+    /// <summary>
+    /// Gets the id of the stream.
+    /// </summary>
+    public string StreamId { get; }
+
+    /// <summary>
+    /// Gets the MimeType of the stream.
+    /// </summary>
+    public string MimeType { get; }
+
+    /// <summary>
+    /// Gets the bitrate of the stream.
+    /// </summary>
+    public int Bitrate { get; }
+
+    /// <summary>
+    /// Gets the codec of the stream.
+    /// </summary>
+    public string Codec { get; }
+
+    /// <summary>
+    /// Gets the optional resolution of the stream.
+    /// </summary>
+    public Optional<string> Resolution { get; }
+
+    /// <summary>
+    /// Gets the optional frame rate of the stream.
+    /// </summary>
+    public Optional<float> FrameRate { get; }
+
+    /// <summary>
+    /// Gets the optional sample rate of the stream.
+    /// </summary>
+    public Optional<int> SampleRate { get; }
+
+    /// <summary>
+    /// Gets the optional channels of the stream.
+    /// </summary>
+    public Optional<int> Channels { get; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StreamInfo"/> class.
+    /// </summary>
+    /// <param name="streamId">The unique identifier for the stream.</param>
+    /// <param name="mimeType">The MIME type of the stream content.</param>
+    /// <param name="bitrate">The bitrate of the stream in bits per second.</param>
+    /// <param name="codec">The codec used for the stream.</param>
+    /// <param name="resolution">The resolution of the stream (for video).</param>
+    /// <param name="frameRate">The frame rate of the stream (for video).</param>
+    /// <param name="sampleRate">The sample rate of the stream (for audio).</param>
+    /// <param name="channels">The number of channels (for audio).</param>
+    private StreamInfo(
+        string streamId,
+        string mimeType,
+        int bitrate,
+        string codec,
+        Optional<string> resolution,
+        Optional<float> frameRate,
+        Optional<int> sampleRate,
+        Optional<int> channels)
+    {
+        StreamId = streamId;
+        MimeType = mimeType;
+        Bitrate = bitrate;
+        Codec = codec;
+        Resolution = resolution;
+        FrameRate = frameRate;
+        SampleRate = sampleRate;
+        Channels = channels;
+    }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="StreamInfo"/> class.
+    /// </summary>
+    /// <param name="streamId">The unique identifier for the stream.</param>
+    /// <param name="mimeType">The MIME type of the stream content.</param>
+    /// <param name="bitrate">The bitrate of the stream in bits per second.</param>
+    /// <param name="codec">The codec used for the stream.</param>
+    /// <param name="resolution">The resolution of the stream (for video).</param>
+    /// <param name="frameRate">The frame rate of the stream (for video).</param>
+    /// <param name="sampleRate">The sample rate of the stream (for audio).</param>
+    /// <param name="channels">The number of channels (for audio).</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either a successfully created <see cref="StreamInfo"/>, or an error message.
+    /// </returns>
+    public static Result<StreamInfo> Create(
+        string streamId,
+        string mimeType,
+        int bitrate,
+        string codec,
+        Optional<string> resolution,
+        Optional<float> frameRate,
+        Optional<int> sampleRate,
+        Optional<int> channels)
+    {
+        if (string.IsNullOrWhiteSpace(streamId))
+            return Errors.FileSystemManagement.StreamIdCannotBeEmpty;
+        if (string.IsNullOrWhiteSpace(codec))
+            return Errors.FileSystemManagement.CodecCannotBeEmpty;
+        if (bitrate <= 0)
+            return Errors.FileSystemManagement.BitrateMustBeAPositiveNumber;
+        return new StreamInfo(streamId, mimeType, bitrate, codec, resolution, frameRate, sampleRate, channels);
+    }
+
+    /// <summary>
+    /// Gets the list of items that define equality of the object.
+    /// </summary>
+    /// <returns>A list of items defining the equality.</returns>
+    public override IEnumerable<object> GetEqualityComponents()
+    {
+        yield return StreamId;
+        yield return MimeType;
+        yield return Bitrate;
+        yield return Codec;
+        yield return Resolution;
+        yield return FrameRate;
+        yield return SampleRate;
+        yield return Channels;
+    }
+}

@@ -19,12 +19,12 @@ Key constraints that shaped this decision:
 
 ## Decision
 
-Replace MediatR with minimal, hand-written CQRS abstractions placed in `Lumina.Application.Common.CQRS`. Handlers are resolved directly via the .NET dependency injection container - no mediator object, no runtime reflection dispatch.
+Replace MediatR with minimal, hand-written CQRS abstractions placed in `Nemera.Application.Common.CQRS`. Handlers are resolved directly via the .NET dependency injection container - no mediator object, no runtime reflection dispatch.
 
 ### Core Abstractions
 
 ```csharp
-// src/Lumina.Application/Common/CQRS/ICommand.cs
+// src/Nemera.Application/Common/CQRS/ICommand.cs
 
 /// <summary>
 /// Marker interface for command types handled by <see cref="ICommandHandler{TCommand, TResult}"/>.
@@ -46,7 +46,7 @@ public interface ICommandHandler<in TCommand, TResult> where TCommand : ICommand
 ```
 
 ```csharp
-// src/Lumina.Application/Common/CQRS/IQuery.cs
+// src/Nemera.Application/Common/CQRS/IQuery.cs
 
 /// <summary>
 /// Marker interface for query types handled by <see cref="IQueryHandler{TQuery, TResult}"/>.

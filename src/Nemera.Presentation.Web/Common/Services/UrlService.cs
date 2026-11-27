@@ -1,0 +1,102 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Presentation.Web.Common.Routes;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text.RegularExpressions;
+#endregion
+
+namespace Nemera.Presentation.Web.Common.Services;
+
+/// <summary>
+/// Service for generating absolute URLs for the application routes, with URL localization.
+/// </summary>
+public class UrlService : IUrlService
+{
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    /// <summary>
+    /// The collection of route templates defined in the <see cref="WebRoutes"/> constants, used to validate the requested routes.
+    /// </summary>
+    private static readonly HashSet<string> s_knownRouteTemplates = GetKnownRouteTemplates();
+
+    /// <summary>
+    /// Matches an optional route parameter segment, such as <c>/{returnUrl?}</c>, that was left without a value.
+    /// </summary>
+    private static readonly Regex s_unfilledOptionalSegmentPattern = new(@"/?\{[^{}?]+\?\}", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UrlService"/> class.
+    /// </summary>
+    /// <param name="httpContextAccessor">Provides access to the current HTTP context.</param>
+    public UrlService(IHttpContextAccessor httpContextAccessor)
+    {
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    /// <summary>
+    /// Generates an absolute URL for the specified route template.
+    /// </summary>
+    /// <param name="routeTemplate">The route template of the target page or endpoint, taken from the <see cref="WebRoutes"/> constants.</param>
+    /// <param name="additionalRouteValues">Optional additional route values, like route parameters.</param>
+    /// <returns>An absolute URL to the specified route.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="routeTemplate"/> is not one of the route templates defined in the <see cref="WebRoutes"/> constants.</exception>
+    public string? GetAbsoluteUrl(string routeTemplate, object? additionalRouteValues = null)
+    {
+        string? path = GetRelativeUrl(routeTemplate, additionalRouteValues);
+        if (path is null)
+            return null;
+        HttpContext? httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext is null)
+            return null;
+        // Build the absolute URL from the request's scheme, host and the already localized path base.
+        return $"{httpContext.Request.Scheme}://{httpContext.Request.Host}{path}";
+    }
+
+    /// <inheritdoc />
+    public string? GetRelativeUrl(string routeTemplate, object? additionalRouteValues = null)
+    {
+        // Fail fast when the route template is not one of the ones defined in the WebRoutes constants, instead of silently generating a broken URL.
+        if (!s_knownRouteTemplates.Contains(routeTemplate))
+            throw new ArgumentException($"The route template '{routeTemplate}' is not defined in the WebRoutes constants.", nameof(routeTemplate));
+
+        HttpContext? httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext is null)
+            return null;
+        string culture = httpContext.Request.RouteValues["culture"]?.ToString() ?? "en-US";
+        string path = routeTemplate.Replace("{culture}", culture, StringComparison.OrdinalIgnoreCase);
+        if (additionalRouteValues is not null)
+            foreach (PropertyInfo property in additionalRouteValues.GetType().GetProperties())
+            {
+                string? routeValue = property.GetValue(additionalRouteValues)?.ToString();
+                path = path.Replace($"{{{property.Name}}}", routeValue, StringComparison.OrdinalIgnoreCase);
+                // An optional parameter is only filled in when a value is supplied, otherwise its segment is removed below.
+                if (!string.IsNullOrEmpty(routeValue))
+                    path = path.Replace($"{{{property.Name}?}}", routeValue, StringComparison.OrdinalIgnoreCase);
+            }
+        // Optional parameters that received no value would otherwise end up literally in the URL (and be percent encoded by the
+        // browser, like "/auth/login/%7BreturnUrl?%7D"), producing a link that does not match the intended route.
+        path = s_unfilledOptionalSegmentPattern.Replace(path, string.Empty);
+        // Ensure the path starts with a slash, so that it is relative to the server root when concatenated with the path base.
+        if (!path.StartsWith('/'))
+            path = "/" + path;
+        // The scheme and host are deliberately omitted. A browser resolves this against its own origin, so the value stays
+        // correct behind a reverse proxy even when the request headers do not describe the origin the browser used.
+        return $"{httpContext.Request.PathBase}{path}";
+    }
+
+    /// <summary>
+    /// Collects the values of all route template constants defined in the <see cref="WebRoutes"/> class.
+    /// </summary>
+    /// <returns>The set of the route templates defined in the <see cref="WebRoutes"/> constants.</returns>
+    private static HashSet<string> GetKnownRouteTemplates()
+    {
+        HashSet<string> routeTemplates = [];
+        foreach (Type nestedType in typeof(WebRoutes).GetNestedTypes())
+            foreach (FieldInfo field in nestedType.GetFields(BindingFlags.Public | BindingFlags.Static))
+                if (field.IsLiteral && field.FieldType == typeof(string))
+                    routeTemplates.Add((string)field.GetValue(null)!);
+        return routeTemplates;
+    }
+}

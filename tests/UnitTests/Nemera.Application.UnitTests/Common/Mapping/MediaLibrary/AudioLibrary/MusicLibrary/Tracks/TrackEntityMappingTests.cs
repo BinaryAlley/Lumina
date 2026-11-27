@@ -1,0 +1,389 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DTO.MediaConsumption;
+using Nemera.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Common;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaContributors;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary;
+using Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+#endregion
+
+namespace Nemera.Application.UnitTests.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+
+/// <summary>
+/// Contains unit tests for the <see cref="TrackEntityMapping"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class TrackEntityMappingTests
+{
+    private readonly TrackEntityFixture _trackEntityFixture = new();
+    private readonly AudioRatingEntityFixture _audioRatingEntityFixture = new();
+    private readonly GenreEntityFixture _genreEntityFixture = new();
+    private readonly TagEntityFixture _tagEntityFixture = new();
+    private readonly TrackMoodEntityFixture _trackMoodEntityFixture = new();
+    private readonly TrackIsrcEntityFixture _trackIsrcEntityFixture = new();
+    private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
+    private readonly AudioRatingDtoFixture _audioRatingDtoFixture = new();
+    private readonly AlbumEntityFixture _albumEntityFixture = new();
+    private readonly ArtistEntityFixture _artistEntityFixture = new();
+
+    [Fact]
+    public void ToDomainEntity_WhenMappingValidTrackEntity_ShouldMapAllPropertiesCorrectly()
+    {
+        // Arrange
+        TrackEntity entity = _trackEntityFixture.Create();
+
+        // Act
+        Result<Track> result = entity.ToDomainEntity();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Track track = result.Value;
+        Assert.Equal(entity.Id, track.Id.Value);
+        Assert.Equal(entity.Path, track.Path);
+        Assert.Equal(entity.Title, track.Metadata.Title);
+        Assert.True(track.Metadata.OriginalTitle.HasValue);
+        Assert.Equal(entity.OriginalTitle, track.Metadata.OriginalTitle.Value);
+        Assert.True(track.Metadata.Description.HasValue);
+        Assert.Equal(entity.Description, track.Metadata.Description.Value);
+        Assert.Equal(entity.OriginalReleaseDate, track.Metadata.ReleaseInfo.OriginalReleaseDate.Value);
+        Assert.Equal(entity.OriginalReleaseYear, track.Metadata.ReleaseInfo.OriginalReleaseYear.Value);
+        Assert.Equal(entity.ReReleaseDate, track.Metadata.ReleaseInfo.ReReleaseDate.Value);
+        Assert.Equal(entity.ReReleaseYear, track.Metadata.ReleaseInfo.ReReleaseYear.Value);
+        Assert.Equal(entity.ReleaseCountry, track.Metadata.ReleaseInfo.ReleaseCountry.Value);
+        Assert.Equal(entity.ReleaseVersion, track.Metadata.ReleaseInfo.ReleaseVersion.Value);
+        Assert.True(track.Metadata.Language.HasValue);
+        Assert.Equal(entity.LanguageCode!.ToLowerInvariant(), track.Metadata.Language.Value.LanguageCode);
+        Assert.Equal(entity.LanguageName, track.Metadata.Language.Value.LanguageName);
+        Assert.Equal(entity.LanguageNativeName, track.Metadata.Language.Value.NativeName.Value);
+        Assert.True(track.Metadata.OriginalLanguage.HasValue);
+        Assert.Equal(entity.OriginalLanguageCode!.ToLowerInvariant(), track.Metadata.OriginalLanguage.Value.LanguageCode);
+        Assert.Equal(entity.OriginalLanguageName, track.Metadata.OriginalLanguage.Value.LanguageName);
+        Assert.Equal(entity.OriginalLanguageNativeName, track.Metadata.OriginalLanguage.Value.NativeName.Value);
+        Assert.Equal(entity.DurationInSeconds, track.Metadata.DurationInSeconds);
+        Assert.Equal(entity.SampleRate, track.Metadata.SampleRate);
+        Assert.Equal(entity.Channels, track.Metadata.Channels);
+        Assert.Equal(entity.BitDepth, track.Metadata.BitDepth.Value);
+        Assert.Equal(entity.AudioCodec, track.Metadata.AudioCodec.Value);
+        Assert.Equal(entity.Container, track.Metadata.Container.Value);
+        Assert.Equal(entity.Bitrate, track.Metadata.Bitrate.Value);
+        Assert.Equal(entity.Genres.Select(genre => genre.Name).OrderBy(name => name), track.Metadata.Genres.Select(genre => genre.Name).OrderBy(name => name));
+        Assert.Equal(entity.Tags.Select(tag => tag.Name).OrderBy(name => name), track.Metadata.Tags.Select(tag => tag.Name).OrderBy(name => name));
+        Assert.Equal(entity.TrackNumber, track.TrackNumber);
+        Assert.Equal(entity.DiscNumber, track.DiscNumber.Value);
+        Assert.Equal(entity.Script, track.Script.Value);
+        Assert.Equal(entity.Key, track.Key.Value);
+        Assert.Equal(entity.Bpm, track.Bpm.Value);
+        Assert.Equal(entity.WorkTitle, track.Work.Value.Title);
+        Assert.Equal(entity.MusicBrainzRecordingId, track.MusicBrainzRecordingId.Value.Value);
+        Assert.Equal(entity.MusicBrainzTrackId, track.MusicBrainzTrackId.Value.Value);
+        Assert.Equal(entity.MusicBrainzWorkId, track.Work.Value.MusicBrainzWorkId.Value);
+        Assert.Equal(entity.Moods.Select(mood => mood.Name), track.Moods.Select(mood => mood.Name));
+        Assert.Equal(entity.Isrcs.Select(isrc => isrc.Value), track.Isrcs.Select(isrc => isrc.Value));
+        Assert.Equal(entity.Ratings.Select(rating => rating.Value), track.Ratings.Select(rating => (decimal?)rating.Value));
+        Assert.Equal(entity.Contributors.Select(contributor => contributor.MediaContributorId), track.Contributors.Select(contributor => contributor.ContributorId.Value));
+        Assert.Equal(entity.Contributors.Select(contributor => contributor.Role), track.Contributors.Select(contributor => contributor.Role));
+        Assert.Equal(entity.CreatedOnUtc, track.CreatedOnUtc);
+        Assert.Equal(entity.UpdatedOnUtc, track.UpdatedOnUtc.Value);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenTheEntityHasNoContainer_ShouldMapMetadataWithoutAContainer()
+    {
+        // Arrange
+        TrackEntity entity = _trackEntityFixture.Create(includeContainer: false);
+
+        // Act
+        Result<Track> result = entity.ToDomainEntity();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.False(result.Value.Metadata.Container.HasValue);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenReleaseDateAndYearDoNotMatch_ShouldReturnError()
+    {
+        // Arrange
+        TrackEntity entity = _trackEntityFixture.Create(
+            originalReleaseDate: new DateOnly(2000, 1, 1),
+            originalReleaseYear: 1999);
+
+        // Act
+        Result<Track> result = entity.ToDomainEntity();
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Metadata.OriginalReleaseDateAndYearMustMatch, result.FirstError);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenGenreIsInvalid_ShouldReturnError()
+    {
+        // Arrange
+        TrackEntity entity = _trackEntityFixture.Create();
+        entity.Genres = [_genreEntityFixture.Create(name: string.Empty)];
+
+        // Act
+        Result<Track> result = entity.ToDomainEntity();
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Metadata.GenreNameCannotBeEmpty, result.FirstError);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenTagIsInvalid_ShouldReturnError()
+    {
+        // Arrange
+        TrackEntity entity = _trackEntityFixture.Create();
+        entity.Tags = [_tagEntityFixture.Create(name: "   ")];
+
+        // Act
+        Result<Track> result = entity.ToDomainEntity();
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Metadata.TagNameCannotBeEmpty, result.FirstError);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenMoodIsInvalid_ShouldReturnError()
+    {
+        // Arrange
+        TrackEntity entity = _trackEntityFixture.Create();
+        entity.Moods = [_trackMoodEntityFixture.Create(name: string.Empty)];
+
+        // Act
+        Result<Track> result = entity.ToDomainEntity();
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Metadata.MoodNameCannotBeEmpty, result.FirstError);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenIsrcIsInvalid_ShouldReturnError()
+    {
+        // Arrange
+        TrackEntity entity = _trackEntityFixture.Create();
+        entity.Isrcs = [_trackIsrcEntityFixture.Create(value: "not-an-isrc")];
+
+        // Act
+        Result<Track> result = entity.ToDomainEntity();
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.IsrcInvalidFormat, result.FirstError);
+    }
+
+    [Fact]
+    public void ToDomainEntity_WhenRatingIsInvalid_ShouldReturnError()
+    {
+        // Arrange
+        TrackEntity entity = _trackEntityFixture.Create();
+        entity.Ratings = [_audioRatingEntityFixture.Create(value: 6, maxValue: 5, includeSource: false, includeVoteCount: false)];
+
+        // Act
+        Result<Track> result = entity.ToDomainEntity();
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Metadata.RatingValueCannotBeGreaterThanMaxValue, result.FirstError);
+    }
+
+    [Fact]
+    public void ToDto_WhenMappingATrack_ShouldMapTheConsumptionHistoryRow()
+    {
+        // Arrange
+        Guid trackId = Guid.NewGuid();
+        Guid trackLibraryId = Guid.NewGuid();
+        ArtistEntity artist = _artistEntityFixture.Create(includeAlbums: false);
+        AlbumEntity album = _albumEntityFixture.Create(includeTracks: false, libraryId: Guid.NewGuid());
+        album.Artist = artist;
+        TrackEntity entity = _trackEntityFixture.Create(id: trackId, libraryId: trackLibraryId);
+        entity.Album = album;
+        DateTime lastConsumedOnUtc = new(2026, 2, 3, 4, 5, 6, DateTimeKind.Utc);
+
+        // Act
+        ConsumedItemDto result = entity.ToDto(lastConsumedOnUtc, 7, 3, 240_000, "covers/track.jpg");
+
+        // Assert
+        Assert.Equal(MediaKind.MusicTrack, result.MediaKind);
+        Assert.Equal(trackId, result.MediaItemId);
+        Assert.Equal(trackLibraryId, result.LibraryId);
+        Assert.True(result.IsAvailable);
+        Assert.Equal(entity.Title, result.Title);
+        Assert.Equal(album.Title, result.CollectionTitle);
+        Assert.Equal(artist.Name, result.CreatorName);
+        Assert.Equal("covers/track.jpg", result.CoverPath);
+        Assert.Equal(lastConsumedOnUtc, result.LastConsumedOnUtc);
+        Assert.Equal(7, result.CountedSessionCount);
+        Assert.Equal(3, result.CompletedSessionCount);
+        Assert.Equal(240_000L, result.ConsumedDurationMilliseconds);
+    }
+
+    [Fact]
+    public void ToDto_WhenTheTrackHasNoAlbum_ShouldMapEmptyCollectionAndCreatorNames()
+    {
+        // Arrange
+        TrackEntity entity = _trackEntityFixture.Create();
+        entity.Album = null;
+        DateTime lastConsumedOnUtc = new(2026, 2, 3, 4, 5, 6, DateTimeKind.Utc);
+
+        // Act
+        ConsumedItemDto result = entity.ToDto(lastConsumedOnUtc, 1, 0, 15_000, null);
+
+        // Assert
+        Assert.Equal(entity.Id, result.MediaItemId);
+        Assert.Equal(entity.LibraryId, result.LibraryId);
+        Assert.Equal(string.Empty, result.CollectionTitle);
+        Assert.Equal(string.Empty, result.CreatorName);
+        Assert.Null(result.CoverPath);
+    }
+
+    [Fact]
+    public void ToDto_WhenTheAlbumHasNoArtist_ShouldMapAnEmptyCreatorName()
+    {
+        // Arrange
+        AlbumEntity album = _albumEntityFixture.Create(includeTracks: false);
+        album.Artist = null;
+        TrackEntity entity = _trackEntityFixture.Create();
+        entity.Album = album;
+        DateTime lastConsumedOnUtc = new(2026, 2, 3, 4, 5, 6, DateTimeKind.Utc);
+
+        // Act
+        ConsumedItemDto result = entity.ToDto(lastConsumedOnUtc, 1, 0, 15_000, "covers/track.jpg");
+
+        // Assert
+        Assert.Equal(album.Title, result.CollectionTitle);
+        Assert.Equal(string.Empty, result.CreatorName);
+    }
+
+    [Fact]
+    public void ToDto_WhenTheCoverPathIsNotSupplied_ShouldPreserveTheNullCoverPath()
+    {
+        // Arrange
+        TrackEntity entity = _trackEntityFixture.Create();
+        DateTime lastConsumedOnUtc = new(2026, 2, 3, 4, 5, 6, DateTimeKind.Utc);
+
+        // Act
+        ConsumedItemDto result = entity.ToDto(lastConsumedOnUtc, 2, 1, 30_000, null);
+
+        // Assert
+        Assert.Null(result.CoverPath);
+        Assert.Equal(2, result.CountedSessionCount);
+        Assert.Equal(1, result.CompletedSessionCount);
+        Assert.Equal(30_000L, result.ConsumedDurationMilliseconds);
+    }
+
+    [Fact]
+    public void ToResponse_WhenMappingTrackEntity_ShouldMapAllPropertiesCorrectly()
+    {
+        // Arrange
+        TrackEntity entity = _trackEntityFixture.Create();
+
+        // Act
+        TrackResponse result = entity.ToResponse();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(entity.Id, result.Id);
+        Assert.Equal(entity.AlbumId, result.AlbumId);
+        Assert.Equal(entity.LibraryId, result.LibraryId);
+        Assert.Equal(entity.Path, result.Path);
+        Assert.Equal(entity.Title, result.Metadata.Title);
+        Assert.Equal(entity.OriginalTitle, result.Metadata.OriginalTitle);
+        Assert.Equal(entity.Description, result.Metadata.Description);
+        Assert.Equal(entity.OriginalReleaseDate, result.Metadata.ReleaseInfo!.OriginalReleaseDate);
+        Assert.Equal(entity.OriginalReleaseYear, result.Metadata.ReleaseInfo.OriginalReleaseYear);
+        Assert.Equal(entity.ReReleaseDate, result.Metadata.ReleaseInfo.ReReleaseDate);
+        Assert.Equal(entity.ReReleaseYear, result.Metadata.ReleaseInfo.ReReleaseYear);
+        Assert.Equal(entity.ReleaseCountry, result.Metadata.ReleaseInfo.ReleaseCountry);
+        Assert.Equal(entity.ReleaseVersion, result.Metadata.ReleaseInfo.ReleaseVersion);
+        Assert.NotNull(result.Metadata.Language);
+        Assert.Equal(entity.LanguageCode, result.Metadata.Language!.LanguageCode);
+        Assert.Equal(entity.LanguageName, result.Metadata.Language.LanguageName);
+        Assert.Equal(entity.LanguageNativeName, result.Metadata.Language.NativeName);
+        Assert.NotNull(result.Metadata.OriginalLanguage);
+        Assert.Equal(entity.OriginalLanguageCode, result.Metadata.OriginalLanguage!.LanguageCode);
+        Assert.Equal(entity.OriginalLanguageName, result.Metadata.OriginalLanguage.LanguageName);
+        Assert.Equal(entity.OriginalLanguageNativeName, result.Metadata.OriginalLanguage.NativeName);
+        Assert.Equal(entity.DurationInSeconds, result.Metadata.DurationInSeconds);
+        Assert.Equal(entity.SampleRate, result.Metadata.SampleRate);
+        Assert.Equal(entity.Channels, result.Metadata.Channels);
+        Assert.Equal(entity.BitDepth, result.Metadata.BitDepth);
+        Assert.Equal(entity.AudioCodec, result.Metadata.AudioCodec);
+        Assert.Equal(entity.Bitrate, result.Metadata.Bitrate);
+        Assert.Equal(entity.Tags.Select(tag => tag.Name).OrderBy(name => name), result.Metadata.Tags!.Select(tag => tag.Name).OrderBy(name => name));
+        Assert.Equal(entity.Genres.Select(genre => genre.Name).OrderBy(name => name), result.Metadata.Genres!.Select(genre => genre.Name).OrderBy(name => name));
+        Assert.Equal(entity.Container, result.Container);
+        Assert.Equal(entity.TrackNumber, result.TrackNumber);
+        Assert.Equal(entity.DiscNumber, result.DiscNumber);
+        Assert.Equal(entity.Script, result.Script);
+        Assert.Equal(entity.Key, result.Key);
+        Assert.Equal(entity.Bpm, result.Bpm);
+        Assert.Equal(entity.WorkTitle, result.Work!.Title);
+        Assert.Equal(entity.MusicBrainzRecordingId, result.MusicBrainzRecordingId);
+        Assert.Equal(entity.MusicBrainzTrackId, result.MusicBrainzTrackId);
+        Assert.Equal(entity.MusicBrainzWorkId, result.Work!.MusicBrainzWorkId);
+        Assert.Equal(entity.CreatedOnUtc, result.CreatedOnUtc);
+        Assert.Equal(entity.UpdatedOnUtc, result.UpdatedOnUtc);
+        Assert.Equal(entity.Moods.Select(mood => mood.Name), result.Moods!.Select(mood => mood.Name));
+        Assert.Equal(entity.Isrcs.Select(isrc => isrc.Value), result.Isrcs!.Select(isrc => isrc.Value));
+        Assert.Equal(entity.Contributors.Select(contributor => _mediaContributorReferenceDtoFixture.Create(contributorId: contributor.MediaContributorId, role: contributor.Role)), result.Contributors);
+        Assert.Equal(entity.Ratings.Select(rating => _audioRatingDtoFixture.Create(value: rating.Value, maxValue: rating.MaxValue, source: rating.Source, voteCount: rating.VoteCount)), result.Ratings);
+    }
+
+    [Fact]
+    public void ToResponse_WhenLanguageSubpropertiesAreBlank_ShouldMapLanguagesToNull()
+    {
+        // Arrange
+        TrackEntity entity = _trackEntityFixture.Create();
+        entity.LanguageCode = null;
+        entity.LanguageName = null;
+        entity.LanguageNativeName = null;
+        entity.OriginalLanguageCode = null;
+        entity.OriginalLanguageName = null;
+        entity.OriginalLanguageNativeName = null;
+
+        // Act
+        TrackResponse result = entity.ToResponse();
+
+        // Assert
+        Assert.Null(result.Metadata.Language);
+        Assert.Null(result.Metadata.OriginalLanguage);
+    }
+
+    [Fact]
+    public void ToResponses_WhenMappingMultipleTrackEntities_ShouldMapAllCorrectly()
+    {
+        // Arrange
+        List<TrackEntity> entities = _trackEntityFixture.CreateMany(2);
+
+        // Act
+        IReadOnlyList<TrackResponse> results = entities.ToResponses();
+
+        // Assert
+        Assert.NotNull(results);
+        Assert.Equal(entities.Count, results.Count);
+        for (int i = 0; i < entities.Count; i++)
+        {
+            Assert.Equal(entities[i].Id, results[i].Id);
+            Assert.Equal(entities[i].Title, results[i].Metadata.Title);
+        }
+    }
+}

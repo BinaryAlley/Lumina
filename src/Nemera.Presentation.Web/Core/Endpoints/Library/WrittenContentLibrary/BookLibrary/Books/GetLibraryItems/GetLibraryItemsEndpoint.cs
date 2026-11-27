@@ -1,0 +1,84 @@
+#region ========================================================================= USING =====================================================================================
+using FastEndpoints;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Common.Requests.Libraries;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Common;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetLibraryItems;
+
+/// <summary>
+/// API endpoint for the <c>/{culture}/library/written-content-library/books-library/books/api-get-library-items</c> route.
+/// </summary>
+public class GetLibraryItemsEndpoint : BaseEndpoint<GetBooksLiteRequest, IResult>
+{
+    private readonly IApiHttpClient _apiHttpClient;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetLibraryItemsEndpoint"/> class.
+    /// </summary>
+    /// <param name="apiHttpClient">Injected service for interactions with the API.</param>
+    public GetLibraryItemsEndpoint(IApiHttpClient apiHttpClient)
+    {
+        _apiHttpClient = apiHttpClient;
+    }
+
+    /// <summary>
+    /// Configures the endpoint.
+    /// </summary>
+    public override void Configure()
+    {
+        base.Configure();
+        Verbs(Http.GET);
+        Routes(WebRoutes.Books.GET_LIBRARY_ITEMS);
+        DontAutoTag();
+        Options(options => options.WithTags("Books"));
+    }
+
+    /// <summary>
+    /// Retrieves the lightweight details of the books of a media library.
+    /// </summary>
+    /// <param name="request">The request containing the parameters used to retrieve the books.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    public override async Task<IResult> ExecuteAsync(GetBooksLiteRequest request, CancellationToken cancellationToken)
+    {
+        PaginatedDto<BookLiteDto> response = await _apiHttpClient.GetAsync<PaginatedDto<BookLiteDto>>(BuildItemsEndpoint(request), cancellationToken).ConfigureAwait(false);
+        return JsonSuccess(response);
+    }
+
+    /// <summary>
+    /// Builds the API endpoint used to retrieve the lightweight details of the books of a media library, from the provided <paramref name="query"/>.
+    /// </summary>
+    /// <param name="query">The request containing the parameters used to retrieve the books.</param>
+    /// <returns>The API endpoint to which the retrieval request is sent.</returns>
+    private static string BuildItemsEndpoint(GetBooksLiteRequest query)
+    {
+        StringBuilder endpoint = new(ApiRoutes.Books.GET_BOOKS_LITE.Replace("{libraryId}", query.LibraryId.ToString()));
+        List<string> parameters = [];
+        if (query.CurrentPage is not null)
+            parameters.Add($"currentPage={query.CurrentPage}");
+        if (query.PerPage is not null)
+            parameters.Add($"perPage={query.PerPage}");
+        if (!string.IsNullOrWhiteSpace(query.SearchTerm))
+            parameters.Add($"searchTerm={Uri.EscapeDataString(query.SearchTerm)}");
+        if (!string.IsNullOrWhiteSpace(query.FilterAlphaKey))
+            parameters.Add($"filterAlphaKey={Uri.EscapeDataString(query.FilterAlphaKey)}");
+        parameters.Add($"shouldIgnoreThePrefixForAlphaPicker={query.ShouldIgnoreThePrefixForAlphaPicker}");
+        if (!string.IsNullOrWhiteSpace(query.SortBy))
+            parameters.Add($"sortBy={Uri.EscapeDataString(query.SortBy)}");
+        if (query.SortOrder is not null)
+            parameters.Add($"sortOrder={query.SortOrder}");
+        if (parameters.Count > 0)
+            endpoint.Append('?').Append(string.Join('&', parameters));
+        return endpoint.ToString();
+    }
+}

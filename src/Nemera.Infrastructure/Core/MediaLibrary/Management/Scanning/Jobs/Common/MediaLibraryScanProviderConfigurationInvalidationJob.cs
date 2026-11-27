@@ -1,0 +1,203 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
+
+/// <summary>
+/// Media library scan job for invalidating the enrichment state of the books whose metadata or artwork provider configuration
+/// changed since the last scan, so that they are re-enriched by the enrichment jobs that follow.
+/// </summary>
+internal sealed class MediaLibraryScanProviderConfigurationInvalidationJob : MediaLibraryScanJob, IMediaLibraryScanProviderConfigurationInvalidationJob
+{
+    private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly ILogger<MediaLibraryScanProviderConfigurationInvalidationJob> _logger;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaLibraryScanProviderConfigurationInvalidationJob"/> class.
+    /// </summary>
+    /// <param name="serviceScopeFactory">
+    /// Injected factory for creating scopes in which services are requested.
+    /// See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
+    /// </param>
+    /// <param name="logger">Injected logger used to report the issues encountered while invalidating the enrichment state.</param>
+    public MediaLibraryScanProviderConfigurationInvalidationJob(IServiceScopeFactory serviceScopeFactory, ILogger<MediaLibraryScanProviderConfigurationInvalidationJob> logger)
+    {
+        _serviceScopeFactory = serviceScopeFactory;
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// Executes the payload of the media library scan job.
+    /// </summary>
+    /// <typeparam name="TInput">The type of the input parameter representing the data to be processed by this payload.</typeparam>
+    /// <param name="id">The unique identifier of the media library scan job.</param>
+    /// <param name="input">The input data to be processed by this payload.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    public override async Task ExecuteAsync<TInput>(Guid id, TInput input, CancellationToken cancellationToken)
+    {
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            // Increment the number of parents that finished their execution and called this job (beware race conditions, jobs run in parallel).
+            int parentsCompleted = Interlocked.Increment(ref parentsPayloadsExecuted);
+            // Only execute this job's payload when it has no parents, or when all the parents finished their execution.
+            if (Parents.Count == 0 || parentsCompleted == Parents.Count)
+            {
+                Status = LibraryScanJobStatus.Running;
+                // See docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md for details.
+                await using AsyncServiceScope asyncServiceScope = _serviceScopeFactory.CreateAsyncScope();
+                IUnitOfWork unitOfWork = asyncServiceScope.ServiceProvider.GetService<IUnitOfWork>()!;
+                IDomainEventPublisher domainEventPublisher = asyncServiceScope.ServiceProvider.GetService<IDomainEventPublisher>()!;
+
+                MediaLibraryScanCompositeId compositeKey = MediaLibraryScanCompositeId.Create(ScanId, UserId);
+
+                // Set the initial progress of the scan job; it is a single step job, invalidating the stale enrichment state.
+                Result<Success> publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 0, 1, cancellationToken).ConfigureAwait(false);
+                if (publishJobProgressResult.IsFailure)
+                    throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
+
+                // Load the media library, whose web access setting determines the effective provider set, and whose stored fingerprints
+                // are compared against the current provider configuration to detect whether it changed since the last scan.
+                Result<LibraryEntity?> getLibraryResult = await unitOfWork.LibraryRepository.GetByIdAsync(LibraryId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
+                if (getLibraryResult.IsFailure || getLibraryResult.Value is null)
+                    throw new InvalidOperationException(getLibraryResult.IsFailure ? getLibraryResult.FirstError.Description : "The media library was not found.");
+                LibraryEntity library = getLibraryResult.Value;
+
+                // The type of the media library determines the materializer whose enrichment state is invalidated.
+                IMediaLibraryScanItemMaterializer? materializer = asyncServiceScope.ServiceProvider
+                    .GetServices<IMediaLibraryScanItemMaterializer>()
+                    .FirstOrDefault(candidate => candidate.SupportedLibraryType == library.LibraryType);
+                if (materializer is null)
+                    throw new InvalidOperationException($"No media library item materializer exists for media library type '{library.LibraryType}'.");
+
+                // Load the provider configurations of the media library, whose fingerprint is compared against the stored one.
+                Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> getMetadataConfigurationsResult = await unitOfWork.LibraryMetadataProviderConfigurationRepository.GetByLibraryIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                if (getMetadataConfigurationsResult.IsFailure)
+                    throw new InvalidOperationException(getMetadataConfigurationsResult.FirstError.Description);
+
+                Result<IReadOnlyList<LibraryArtworkProviderConfigurationEntity>> getArtworkConfigurationsResult = await unitOfWork.ArtworkProviderConfigurationRepository.GetByLibraryIdAsync(LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                if (getArtworkConfigurationsResult.IsFailure)
+                    throw new InvalidOperationException(getArtworkConfigurationsResult.FirstError.Description);
+
+                // Read whether the metadata and the artwork of the items of the user are aggregated from multiple providers, when missing.
+                bool shouldAggregateMetadataWhenMissing = false;
+                bool shouldAggregateArtworkWhenMissing = false;
+                if (unitOfWork.UserSettingsRepository is not null)
+                {
+                    Result<UserSettingsEntity?> getUserSettingsResult = await unitOfWork.UserSettingsRepository.GetByUserIdAsync(UserId.Value, cancellationToken).ConfigureAwait(false);
+                    if (getUserSettingsResult.IsFailure)
+                        _logger.LogWarning("Failed to read the user settings, the provider configuration fingerprints will not include the aggregation settings.");
+                    else
+                    {
+                        shouldAggregateMetadataWhenMissing = getUserSettingsResult.Value?.ShouldAggregateMetadataWhenMissing ?? false;
+                        shouldAggregateArtworkWhenMissing = getUserSettingsResult.Value?.ShouldAggregateArtworkWhenMissing ?? false;
+                    }
+                }
+
+                // Compare the current fingerprints against the stored ones, resetting the enrichment state of the channel whose configuration
+                // changed, so that the enrichment jobs that follow re-enrich the books. A missing stored fingerprint means the configuration
+                // was never recorded yet, so the current state of the books is trusted, and only the new fingerprint is stored.
+                string metadataFingerprint = ProviderConfigurationFingerprint.ComputeMetadataFingerprint(getMetadataConfigurationsResult.Value, shouldAggregateMetadataWhenMissing, library.CanDownloadMetadataFromWeb);
+                string artworkFingerprint = ProviderConfigurationFingerprint.ComputeArtworkFingerprint(getArtworkConfigurationsResult.Value, shouldAggregateArtworkWhenMissing, library.CanDownloadMetadataFromWeb);
+                string pathTemplateFingerprint = ProviderConfigurationFingerprint.ComputePathTemplateFingerprint([.. library.PathTemplateParts]);
+
+                if (library.MetadataProvidersConfigurationFingerprint is not null && library.MetadataProvidersConfigurationFingerprint != metadataFingerprint)
+                {
+                    Result<Updated> resetMetadataResult = await materializer.ResetMetadataStatusForLibraryAsync(unitOfWork, LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    if (resetMetadataResult.IsFailure)
+                        throw new InvalidOperationException(resetMetadataResult.FirstError.Description);
+                }
+
+                // A path template change invalidates the metadata derived from the paths, so the metadata state is reset as well.
+                if (library.PathTemplateFingerprint is not null && library.PathTemplateFingerprint != pathTemplateFingerprint)
+                {
+                    Result<Updated> resetPathTemplateMetadataResult = await materializer.ResetMetadataStatusForLibraryAsync(unitOfWork, LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    if (resetPathTemplateMetadataResult.IsFailure)
+                        throw new InvalidOperationException(resetPathTemplateMetadataResult.FirstError.Description);
+                }
+
+                if (library.ArtworkProvidersConfigurationFingerprint is not null && library.ArtworkProvidersConfigurationFingerprint != artworkFingerprint)
+                {
+                    Result<Updated> resetArtworkResult = await materializer.ResetArtworkStatusForLibraryAsync(unitOfWork, LibraryId.Value, cancellationToken).ConfigureAwait(false);
+                    if (resetArtworkResult.IsFailure)
+                        throw new InvalidOperationException(resetArtworkResult.FirstError.Description);
+                }
+
+                // Store the current fingerprints, so that the next scan can detect whether the provider configuration changed again.
+                // The library is already tracked by the change tracker, so the modifications are persisted directly, without going through the repository
+                // update action, whose clearing and re-adding of the owned content locations would drop them when the same tracked instance is passed.
+                library.MetadataProvidersConfigurationFingerprint = metadataFingerprint;
+                library.ArtworkProvidersConfigurationFingerprint = artworkFingerprint;
+                library.PathTemplateFingerprint = pathTemplateFingerprint;
+
+                Result<Success> saveChangesResult = await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                if (saveChangesResult.IsFailure)
+                    throw new InvalidOperationException(saveChangesResult.FirstError.Description);
+
+                // Increment the number of processed elements progress.
+                publishJobProgressResult = await PublishJobProgressAsync(domainEventPublisher, compositeKey, 1, 1, cancellationToken).ConfigureAwait(false);
+                if (publishJobProgressResult.IsFailure)
+                    throw new InvalidOperationException(publishJobProgressResult.FirstError.Description);
+
+                // Increment the number of completed jobs progress.
+                await domainEventPublisher.PublishAsync(new LibraryScanProgressChangedDomainEvent(Guid.CreateVersion7(), LibraryId, compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+                Status = LibraryScanJobStatus.Completed;
+                // When this job has no linked children, it is the last job in the directed acyclic job graph, and the scan is completed.
+                if (Children.Count == 0)
+                    await domainEventPublisher.PublishAsync(new LibraryScanFinishedDomainEvent(Guid.CreateVersion7(), compositeKey, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+
+                // Call each linked child with the obtained payload.
+                foreach (IMediaLibraryScanJob child in Children)
+                    await child.ExecuteAsync(id, input, cancellationToken).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            Status = LibraryScanJobStatus.Canceled;
+            throw;
+        }
+        catch (Exception exception)
+        {
+            Status = LibraryScanJobStatus.Failed;
+            await ScanFailurePublisher.PublishAsync(_serviceScopeFactory, LibraryId, MediaLibraryScanCompositeId.Create(ScanId, UserId), exception, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Publishes a job progress update.
+    /// </summary>
+    /// <param name="domainEventPublisher">The service used to publish the progress update.</param>
+    /// <param name="compositeKey">The composite unique identifier of a media library scan.</param>
+    /// <param name="currentProgress">The current job progress.</param>
+    /// <param name="totalProgress">The total job progress.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    private async Task<Result<Success>> PublishJobProgressAsync(IDomainEventPublisher domainEventPublisher, MediaLibraryScanCompositeId compositeKey, int currentProgress, int totalProgress, CancellationToken cancellationToken)
+    {
+        Result<MediaLibraryScanJobProgress> scanJobProgressResult = MediaLibraryScanJobProgress.Create(currentProgress, totalProgress, "InvalidatingStaleEnrichment");
+        if (scanJobProgressResult.IsFailure)
+            return scanJobProgressResult.Errors;
+
+        await domainEventPublisher.PublishAsync(new LibraryScanJobProgressChangedDomainEvent(
+            Guid.CreateVersion7(), LibraryId, compositeKey, scanJobProgressResult.Value, DateTime.UtcNow), cancellationToken).ConfigureAwait(false);
+
+        return Result.Success;
+    }
+}

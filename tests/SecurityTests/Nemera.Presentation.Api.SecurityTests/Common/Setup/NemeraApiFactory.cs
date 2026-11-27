@@ -1,0 +1,335 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.Authentication;
+using Nemera.Contracts.Responses.Authentication;
+using Nemera.DataAccess.Common.Interceptors;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Infrastructure.Core.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
+#endregion
+
+namespace Nemera.Presentation.Api.SecurityTests.Common.Setup;
+
+/// <summary>
+/// Factory for creating a web application for security tests.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class NemeraApiFactory : WebApplicationFactory<Program>, IDisposable
+{
+    private readonly SqliteConnection _connection;
+    private readonly string _sharedInMemoryConnectionString;
+    private readonly PasswordHashService _hashService = new();
+    private readonly LoginRequestFixture _loginRequestFixture = new();
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly UserRoleEntityFixture _userRoleEntityFixture = new();
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
+    private readonly UserPermissionEntityFixture _userPermissionEntityFixture = new();
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly BookEntityFixture _bookEntityFixture = new();
+    private const string TEST_ENCRYPTION_KEY = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=";
+    private const string SHARED_IN_MEMORY_CONNECTION_STRING_PREFIX = "Data Source=nemera-tests-{0};Mode=Memory;Cache=Shared";
+    
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NemeraApiFactory"/> class.
+    /// </summary>
+    public NemeraApiFactory()
+    {
+        // Each factory gets its own uniquely named shared in-memory database, so that parallel test classes remain isolated from one another;
+        // the shared cache allows each DbContext to open its own pooled connection to the same database, instead of sharing a single connection,
+        // which would otherwise serialize every request on one connection and cause nested transaction errors between requests.
+        _sharedInMemoryConnectionString = string.Format(SHARED_IN_MEMORY_CONNECTION_STRING_PREFIX, Guid.NewGuid());
+        // Keep a single anchor connection open, so that the shared in-memory database it refers to is not dropped.
+        _connection = new SqliteConnection(_sharedInMemoryConnectionString);
+        _connection.Open();
+    }
+
+    /// <summary>
+    /// Configures the web host for the security tests.
+    /// </summary>
+    /// <param name="builder">The web host builder to configure.</param>
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.ConfigureAppConfiguration((context, config) =>
+        {
+            // Clear all existing configuration sources.
+            config.Sources.Clear();
+
+            config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            config.AddJsonFile($"appsettings.test.json", optional: true, reloadOnChange: true);
+            config.AddJsonFile("appsettings.shared.json", optional: true, reloadOnChange: true);
+            config.AddJsonFile($"appsettings.shared.test.json", optional: true, reloadOnChange: true);
+            // First add the test values directly.
+            config.AddInMemoryCollection(initialData: new Dictionary<string, string?>
+            {
+                ["JwtSettings:SecretKey"] = "test-key-thats-at-least-32-chars-long-for-jwt",
+                ["JwtSettings:ExpiryMinutes"] = "15", // Control the expiry time during tests.
+                ["JwtSettings:Issuer"] = "Nemera",
+                ["JwtSettings:Audience"] = "Nemera",
+                ["CorsSettings:AllowedOrigins:0"] = "http://localhost:5012",
+                ["EncryptionSettings:SecretKey"] = TEST_ENCRYPTION_KEY // Base64 encoded test key.
+            });
+        });
+        builder.ConfigureServices(services =>
+        {
+            // Remove existing DbContext configuration.
+            ServiceDescriptor? descriptor = services.SingleOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(DbContextOptions<NemeraDbContext>));
+            if (descriptor is not null)
+                services.Remove(descriptor);
+            // Add SQLite DbContext configuration.
+            services.AddDbContext<NemeraDbContext>((serviceProvider, options) =>
+            {
+                options.UseSqlite(_sharedInMemoryConnectionString);
+                options.AddInterceptors(serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>());
+            });
+            // Configure JWT authentication for testing.
+            services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = "Nemera",
+                    ValidAudience = "Nemera",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("test-key-thats-at-least-32-chars-long-for-jwt"))
+                };
+            });
+            // Build service provider and ensure database is created.
+            ServiceProvider servicePreovider = services.BuildServiceProvider();
+            using (IServiceScope scope = servicePreovider.CreateScope())
+            {
+                IServiceProvider scopedServices = scope.ServiceProvider;
+                NemeraDbContext dbContext = scopedServices.GetRequiredService<NemeraDbContext>();
+                dbContext.Database.Migrate();
+            }
+        });
+    }
+
+    /// <summary>
+    /// Gets a unique IP address derived from a fresh GUID, to isolate the rate-limiting partition of each test.
+    /// </summary>
+    /// <returns>A unique IP address in the 192.168.0.0/16 private range.</returns>
+    public static string GetUniqueTestIp()
+    {
+        byte[] bytes = Guid.NewGuid().ToByteArray();
+        return $"192.168.{bytes[0]}.{bytes[1]}";
+    }
+
+    /// <summary>
+    /// Creates a test user with the Admin role, authenticates it on <paramref name="client"/>, and returns its Id.
+    /// </summary>
+    /// <param name="client">The HTTP client to configure with authentication headers.</param>
+    /// <returns>The Id of the created admin test user.</returns>
+    public async Task<Guid> CreateAndAuthenticateAdminUserAsync(HttpClient client)
+    {
+        // A unique X-Forwarded-For isolates rate limiting state per test.
+        client.DefaultRequestHeaders.Clear();
+        client.DefaultRequestHeaders.Add("X-Forwarded-For", GetUniqueTestIp());
+
+        using IServiceScope scope = Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        Guid userId = Guid.NewGuid();
+        string username = $"testuser_{Guid.NewGuid()}";
+        UserEntity user = _userEntityFixture.Create(id: userId, username: username, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = null;
+        dbContext.Users.Add(user);
+        await dbContext.SaveChangesAsync();
+
+        // Seed a dedicated Admin role for this test user, keeping each test isolated in the shared in-memory database.
+        Guid roleId = Guid.NewGuid();
+        RoleEntity role = _roleEntityFixture.Create(id: roleId, roleName: "Admin", createdBy: userId, createdOnUtc: DateTime.UtcNow);
+        dbContext.Roles.Add(role);
+        dbContext.UserRoles.Add(_userRoleEntityFixture.Create(userId: userId, user: user, roleId: roleId, role: role));
+        await dbContext.SaveChangesAsync();
+
+        HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", _loginRequestFixture.Create(username: username, password: "TestPass123!"));
+        string content = await loginResponse.Content.ReadAsStringAsync();
+        LoginResponse? loginResult = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResult!.Token);
+
+        return userId;
+    }
+
+    /// <summary>
+    /// Creates a test user, authenticates it on <paramref name="client"/>, and returns its Id and username.
+    /// </summary>
+    /// <param name="client">The HTTP client to configure with authentication headers.</param>
+    /// <returns>The Id and username of the created test user.</returns>
+    public async Task<(Guid UserId, string Username)> CreateAndAuthenticateUserAsync(HttpClient client)
+    {
+        // A unique X-Forwarded-For isolates rate limiting state per test.
+        client.DefaultRequestHeaders.Clear();
+        client.DefaultRequestHeaders.Add("X-Forwarded-For", GetUniqueTestIp());
+
+        using IServiceScope scope = Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        Guid userId = Guid.NewGuid();
+        string username = $"testuser_{Guid.NewGuid()}";
+        UserEntity user = _userEntityFixture.Create(id: userId, username: username, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = null;
+        dbContext.Users.Add(user);
+        await dbContext.SaveChangesAsync();
+
+        HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", _loginRequestFixture.Create(username: username, password: "TestPass123!"));
+        string content = await loginResponse.Content.ReadAsStringAsync();
+        LoginResponse? loginResult = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResult!.Token);
+
+        return (userId, username);
+    }
+
+    /// <summary>
+    /// Creates a test user that holds a single permission directly, authenticates it on <paramref name="client"/>, and returns its Id and username.
+    /// </summary>
+    /// <param name="client">The HTTP client to configure with authentication headers.</param>
+    /// <param name="permission">The permission granted to the created user.</param>
+    /// <returns>The Id and username of the created test user.</returns>
+    public async Task<(Guid UserId, string Username)> CreateAndAuthenticateUserWithPermissionAsync(HttpClient client, AuthorizationPermission permission)
+    {
+        // A unique X-Forwarded-For isolates rate limiting state per test.
+        client.DefaultRequestHeaders.Clear();
+        client.DefaultRequestHeaders.Add("X-Forwarded-For", GetUniqueTestIp());
+
+        using IServiceScope scope = Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        Guid userId = Guid.NewGuid();
+        string username = $"testuser_{Guid.NewGuid()}";
+        UserEntity user = _userEntityFixture.Create(id: userId, username: username, password: _hashService.HashString("TestPass123!"));
+        user.TotpSecret = null;
+        dbContext.Users.Add(user);
+
+        PermissionEntity permissionEntity = _permissionEntityFixture.Create(permissionName: permission);
+        dbContext.Permissions.Add(permissionEntity);
+        dbContext.UserPermissions.Add(_userPermissionEntityFixture.Create(user, permissionEntity));
+        await dbContext.SaveChangesAsync();
+
+        HttpResponseMessage loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", _loginRequestFixture.Create(username: username, password: "TestPass123!"));
+        string content = await loginResponse.Content.ReadAsStringAsync();
+        LoginResponse? loginResult = JsonSerializer.Deserialize<LoginResponse>(content, _jsonOptions);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResult!.Token);
+
+        return (userId, username);
+    }
+
+    /// <summary>
+    /// Removes a test user and its owned libraries from the database.
+    /// </summary>
+    /// <param name="username">The username of the test user to remove.</param>
+    public async Task RemoveTestUserAsync(string username)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        UserEntity? user = await dbContext.Users.Include(candidate => candidate.Libraries).FirstOrDefaultAsync(candidate => candidate.Username == username).ConfigureAwait(false);
+        if (user is not null)
+        {
+            dbContext.Libraries.RemoveRange(user.Libraries);
+            dbContext.Users.Remove(user);
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
+    /// <summary>
+    /// Removes a test user and its owned libraries from the database.
+    /// </summary>
+    /// <param name="username">The username of the test user to remove.</param>
+    public void RemoveTestUser(string username)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        UserEntity? user = dbContext.Users.Include(candidate => candidate.Libraries).FirstOrDefault(candidate => candidate.Username == username);
+        if (user is not null)
+        {
+            dbContext.Libraries.RemoveRange(user.Libraries);
+            dbContext.Users.Remove(user);
+            dbContext.SaveChanges();
+        }
+    }
+
+    /// <summary>
+    /// Removes a test admin user, its role, and its user-role link from the database.
+    /// </summary>
+    /// <param name="userId">The Id of the admin test user to remove.</param>
+    public async Task RemoveAdminUserAsync(Guid userId)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        UserRoleEntity? userRole = await dbContext.UserRoles.FirstOrDefaultAsync(candidate => candidate.UserId == userId).ConfigureAwait(false);
+        if (userRole is not null)
+        {
+            RoleEntity? role = await dbContext.Roles.FirstOrDefaultAsync(candidate => candidate.Id == userRole.RoleId).ConfigureAwait(false);
+            if (role is not null)
+                dbContext.Roles.Remove(role);
+            dbContext.UserRoles.Remove(userRole);
+        }
+        UserEntity? user = await dbContext.Users.FirstOrDefaultAsync(candidate => candidate.Id == userId).ConfigureAwait(false);
+        if (user is not null)
+            dbContext.Users.Remove(user);
+        await dbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Seeds a <see cref="LibraryEntity"/> owned by <paramref name="userId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the library to seed.</param>
+    /// <param name="userId">The Id of the user that owns the library.</param>
+    public async Task SeedLibraryAsync(Guid libraryId, Guid userId)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []));
+        await dbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Seeds a <see cref="BookEntity"/> belonging to the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The Id of the media library the book belongs to.</param>
+    /// <param name="title">The title of the book.</param>
+    public async Task SeedBookAsync(Guid libraryId, string title)
+    {
+        using IServiceScope scope = Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        dbContext.Books.Add(_bookEntityFixture.Create(libraryId: libraryId, title: title, path: $"/books/{Guid.NewGuid()}.epub", includeMetadata: false));
+        await dbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Disposes the connection to the database.
+    /// </summary>
+    public new void Dispose()
+    {
+        _connection.Close();
+        base.Dispose();
+    }
+}

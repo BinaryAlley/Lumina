@@ -1,0 +1,33 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
+using System;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+#endregion
+
+namespace Nemera.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+
+/// <summary>
+/// Validates the needed validation rules for <see cref="UpdateUserRoleAndPermissionsCommand"/>.
+/// </summary>
+public class UpdateUserRoleAndPermissionsCommandValidator : AbstractValidator<UpdateUserRoleAndPermissionsCommand>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateUserRoleAndPermissionsCommandValidator"/> class.
+    /// </summary>
+    public UpdateUserRoleAndPermissionsCommandValidator()
+    {
+        RuleFor(command => command.UserId)
+            .NotEmpty()
+            .WithError(ApplicationErrors.Users.UserIdCannotBeEmpty)
+            .Must(id => id != Guid.Empty)
+            .WithError(ApplicationErrors.Users.UserIdCannotBeEmpty);
+
+        // Validate each permission Id when the list is provided.
+        RuleForEach(command => command.Permissions)
+            .NotEmpty()
+            .WithError(ApplicationErrors.Authorization.PermissionIdCannotBeEmpty)
+            .Must(id => id != Guid.Empty)
+            .WithError(ApplicationErrors.Authorization.PermissionIdCannotBeEmpty);
+    }
+}

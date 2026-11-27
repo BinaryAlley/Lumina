@@ -1,8 +1,8 @@
-- [Lumina Domain](#lumina-domain)
+- [Nemera Domain](#nemera-domain)
   - [Video Library Aggregate](#video-library-aggregate)
     - [Movie](#movie)
 
-# [Lumina Domain](#lumina-domain)
+# [Nemera Domain](#nemera-domain)
 
 ## [Video Library Aggregate](#video-library-aggregate)
 

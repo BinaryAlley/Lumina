@@ -1,6 +1,6 @@
-# Lumina API
+# Nemera API
 
-- [Lumina API](#lumina-api)
+- [Nemera API](#nemera-api)
   - [Library](#library)
     - [Add Library](#add-library)
       - [Add Library Request](#add-library-request)

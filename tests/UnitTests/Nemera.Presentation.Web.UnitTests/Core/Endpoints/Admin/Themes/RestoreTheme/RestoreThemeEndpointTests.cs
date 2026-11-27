@@ -1,0 +1,84 @@
+#region ========================================================================= USING =====================================================================================
+using FastEndpoints;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Themes.RestoreTheme;
+using Nemera.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using NSubstitute;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Admin.Themes.RestoreTheme;
+
+/// <summary>
+/// Contains unit tests for the <see cref="RestoreThemeEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class RestoreThemeEndpointTests
+{
+    private readonly IApiHttpClient _mockApiHttpClient;
+    private readonly RestoreThemeEndpoint _sut;
+    private readonly RestoreThemeRequestFixture _restoreThemeRequestFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RestoreThemeEndpointTests"/> class.
+    /// </summary>
+    public RestoreThemeEndpointTests()
+    {
+        _mockApiHttpClient = Substitute.For<IApiHttpClient>();
+        ThemeService themeService = new(_mockApiHttpClient);
+        _sut = Factory.Create<RestoreThemeEndpoint>(themeService);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenThemeIdProvided_ShouldRestoreThemeAndReturnSuccessJson()
+    {
+        // Arrange
+        string themeId = "editorial-paper";
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(_restoreThemeRequestFixture.Create(themeId: themeId), CancellationToken.None);
+        string body = await JsonResultTestHelper.GetResponseBodyAsync(result);
+
+        // Assert
+        using (System.Text.Json.JsonDocument jsonDocument = System.Text.Json.JsonDocument.Parse(body))
+        {
+            Assert.True(jsonDocument.RootElement.GetProperty("success").GetBoolean());
+        }
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenThemeIdProvided_ShouldRestoreThemeWithResolvedEndpoint()
+    {
+        // Arrange
+        string themeId = "editorial-paper";
+        string expectedEndpoint = ApiRoutes.Themes.RESTORE_THEME.Replace("{themeId}", themeId);
+
+        // Act
+        await _sut.ExecuteAsync(_restoreThemeRequestFixture.Create(themeId: themeId), CancellationToken.None);
+
+        // Assert
+        await _mockApiHttpClient.Received(1).PostIgnoringResponseAsync(expectedEndpoint, Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData(null)] // Missing theme id.
+    [InlineData("")] // Empty theme id.
+    [InlineData("   ")] // Whitespace theme id.
+    public async Task ExecuteAsync_WhenThemeIdIsBlank_ShouldReturnProblemWithBadRequest(string? themeId)
+    {
+        // Act
+        IResult result = await _sut.ExecuteAsync(_restoreThemeRequestFixture.Create(themeId: themeId), CancellationToken.None);
+
+        // Assert
+        ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status400BadRequest, problemResult.StatusCode);
+        await _mockApiHttpClient.DidNotReceive().PostIgnoringResponseAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+    }
+}

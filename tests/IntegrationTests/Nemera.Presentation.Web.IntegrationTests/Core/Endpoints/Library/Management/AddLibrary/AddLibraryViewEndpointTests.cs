@@ -1,0 +1,45 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Presentation.Web.Core.Endpoints.Library.Management.AddLibrary;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
+using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.AddLibrary;
+
+/// <summary>
+/// Contains integration tests for the <see cref="AddLibraryViewEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class AddLibraryViewEndpointTests : IClassFixture<NemeraWebFactory>
+{
+    private readonly NemeraWebFactory _apiFactory;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AddLibraryViewEndpointTests"/> class.
+    /// </summary>
+    /// <param name="apiFactory">Injected Web application factory.</param>
+    public AddLibraryViewEndpointTests(NemeraWebFactory apiFactory)
+    {
+        _apiFactory = apiFactory;
+    }
+
+    [Fact]
+    public async Task AddLibraryView_WhenCalledByAuthenticatedUser_ShouldRenderLibraryAddingView()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.GetAsync("/en-us/libraries/manage/item");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("text/html", response.Content.Headers.ContentType!.MediaType);
+    }
+}

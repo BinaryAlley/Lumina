@@ -1,0 +1,53 @@
+@* 
+    FALLBACK NAVIGATION MENU - READ BEFORE EDITING
+
+    This view is rendered ONLY when the active theme's navigation template
+    (shared/nav-menu.html) cannot be rendered, for example when the theme is
+    broken, missing or unavailable. On a healthy site, the navigation menu is
+    built by ThemeNavBuilder and rendered by the theme's shared/nav-menu.html
+    template, so changes made in this file do NOT show up on a working site.
+
+    To change the menu, edit ThemeNavBuilder. To restyle the menu, edit the
+    theme. This fallback is intentionally plain, unstyled HTML, so that a 
+    broken theme is obvious to the user while navigation still works.
+*@
+@using Nemera.Presentation.Web.Common.DTO.Themes
+@using Nemera.Presentation.Web.Core.Themes
+@using System.Threading
+@inject ThemeNavBuilder _navBuilder
+
+@{
+    ThemeNavMenuDto menu = await _navBuilder.BuildAsync(CancellationToken.None);
+}
+
+<nav>
+    <ul>
+        @foreach (ThemeNavSectionDto menuSection in menu.MenubarSections)
+        {
+            <li>
+                <span>@menuSection.Label</span>
+                <ul>
+                    @foreach (ThemeNavEntryDto item in menuSection.Items)
+                    {
+                        <li>
+                            @if (item.Children.Count > 0)
+                            {
+                                <span>@item.Label</span>
+                                <ul>
+                                    @foreach (ThemeNavEntryDto child in item.Children)
+                                    {
+                                        <li><a href="@child.Url">@child.Label</a></li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <a href="@item.Url">@item.Label</a>
+                            }
+                        </li>
+                    }
+                </ul>
+            </li>
+        }
+    </ul>
+</nav>

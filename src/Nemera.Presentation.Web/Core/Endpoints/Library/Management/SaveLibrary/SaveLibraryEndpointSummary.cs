@@ -1,0 +1,46 @@
+#region ========================================================================= USING =====================================================================================
+using FastEndpoints;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Libraries;
+using System.Diagnostics.CodeAnalysis;
+#endregion
+
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.Management.SaveLibrary;
+
+/// <summary>
+/// Class used for providing a textual description for the <see cref="SaveLibraryEndpoint"/> endpoint, for OpenAPI.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class SaveLibraryEndpointSummary : Summary<SaveLibraryEndpoint, LibraryDto>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SaveLibraryEndpointSummary"/> class.
+    /// </summary>
+    public SaveLibraryEndpointSummary()
+    {
+        Summary = "Creates or updates a media library.";
+        Description = "Creates or updates the media library provided in the request.";
+        RequestParam(r => r.Id, "The unique identifier of the media library. Optional, when creating a new media library.");
+        RequestParam(r => r.Title, "The title of the media library. Required.");
+        RequestParam(r => r.LibraryType, "The type of the media library. Required.");
+        RequestParam(r => r.CoverImage, "The path of the image file used as the cover of the media library. Optional.");
+        RequestParam(r => r.ContentLocations, "The collection of directories that contain the media library files. Required.");
+        RequestParam(r => r.IsEnabled, "Whether the media library is enabled or not. Optional.");
+        RequestParam(r => r.IsLocked, "Whether the media library is locked or not. Optional.");
+        RequestParam(r => r.CanDownloadMetadataFromWeb, "Whether the metadata of the media library items should be downloaded from the web, or not. Optional.");
+        RequestParam(r => r.ShouldSaveMetadataInMediaDirectories, "Whether the downloaded metadata should be copied into the media library content locations, or not. Optional.");
+        RequestParam(r => r.ShouldSkipUnchangedDirectoriesDuringScan, "Whether the directories whose contents have not changed since the last scan should be skipped during the scan, or not. Optional.");
+        RequestParam(r => r.ShouldSkipHiddenFilesAndDirectoriesDuringScan, "Whether hidden files and directories should be skipped during the scan, or not. Optional, the stored value is kept when absent.");
+        RequestParam(r => r.IsContentOnSsd, "Whether the content of the media library is stored on a solid state drive, in which case the file discovery and content hashing stages read the files in parallel. Optional.");
+        RequestParam(r => r.ShouldTrackConsumptionProgress, "Whether the consumption progress of the media library items should be tracked, or not. Optional, the default of the library type is used on create, and the stored value is kept on update.");
+        RequestParam(r => r.CompletionThresholdPercentage, "The percentage of a media library item that must be consumed for its session to be considered completed. Optional, the default of the library type is used on create, and the stored value is kept on update.");
+        RequestParam(r => r.PathTemplateParts, "The ordered parts of the template describing the structure of the media library on disk. Optional, the ideal structure of the library type is used when absent.");
+        RequestParam(r => r.MetadataProviders, "The metadata providers of the media library, in the order in which they are tried, and whether each one is enabled. Optional, the providers are configured with their defaults on create, and the stored configurations are kept on update, when absent.");
+        RequestParam(r => r.ArtworkProviders, "The artwork providers of the media library, in the order in which they are tried, and whether each one is enabled. Optional, the providers are configured with their defaults on create, and the stored configurations are kept on update, when absent.");
+        RequestParam(r => r.BookReaders, "The book readers of the media library, and whether each one is enabled. Optional, the readers are configured with their defaults on create, and the stored configurations are kept on update, when absent.");
+
+        ExampleRequest = new LibraryDto();
+
+        Response(200, "The media library is created or updated.", example: new SuccessResponse<LibraryDto>(true, default));
+    }
+}

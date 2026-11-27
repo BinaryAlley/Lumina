@@ -1,0 +1,114 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Core.Repositories.Libraries;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.Libraries;
+
+/// <summary>
+/// Contains integration tests for the <see cref="LibraryScanRepository"/> class, exercising it against a real SQLite database.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class LibraryScanRepositoryTests
+{
+    private readonly UserEntityFixture _userEntityFixture = new();
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly LibraryScanEntityFixture _libraryScanEntityFixture = new();
+
+    [Fact]
+    public async Task UpdateAsync_WhenAnEditableValueChanges_ShouldPreserveTheStoredAuditColumns()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-libraryscanrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        LibraryScanRepository sut = new(context);
+
+        UserEntity storedUser = _userEntityFixture.Create(username: "scan-user", password: "Password123");
+        context.Users.Add(storedUser);
+        LibraryEntity storedLibrary = _libraryEntityFixture.Create(userId: storedUser.Id);
+        context.Libraries.Add(storedLibrary);
+        await context.SaveChangesAsync();
+
+        DateTime storedCreatedOnUtc = new(2020, 3, 4, 5, 6, 7, DateTimeKind.Utc);
+        Guid storedCreatedBy = Guid.NewGuid();
+        LibraryScanEntity storedScan = _libraryScanEntityFixture.Create(libraryId: storedLibrary.Id, userId: storedUser.Id, status: LibraryScanJobStatus.Running, libraryEntity: storedLibrary);
+        storedScan.CreatedOnUtc = storedCreatedOnUtc;
+        storedScan.CreatedBy = storedCreatedBy;
+        context.LibraryScans.Add(storedScan);
+        await context.SaveChangesAsync();
+
+        LibraryScanEntity updatedScan = _libraryScanEntityFixture.Create(id: storedScan.Id, libraryId: storedLibrary.Id, userId: storedUser.Id, status: LibraryScanJobStatus.Completed, libraryEntity: storedLibrary);
+        updatedScan.CreatedOnUtc = DateTime.UtcNow.AddYears(-10);
+        updatedScan.CreatedBy = Guid.NewGuid();
+        updatedScan.UpdatedOnUtc = DateTime.UtcNow.AddYears(-5);
+        updatedScan.UpdatedBy = Guid.NewGuid();
+
+        // Act
+        Result<Updated> result = await sut.UpdateAsync(updatedScan, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Updated, result.Value);
+
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+        LibraryScanEntity reloadedScan = await context.LibraryScans.AsNoTracking().FirstAsync(scan => scan.Id == storedScan.Id);
+        Assert.Equal(LibraryScanJobStatus.Completed, reloadedScan.Status);
+        Assert.Equal(storedCreatedOnUtc, reloadedScan.CreatedOnUtc);
+        Assert.Equal(storedCreatedBy, reloadedScan.CreatedBy);
+        Assert.Null(reloadedScan.UpdatedOnUtc);
+        Assert.Null(reloadedScan.UpdatedBy);
+    }
+
+    [Fact]
+    public async Task FailInterruptedScansAsync_WhenScansArePendingOrRunning_ShouldMarkThemAsFailedAndLeaveTheOthersUnchanged()
+    {
+        // Arrange
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-libraryscanrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        anchorConnection.Open();
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        context.Database.EnsureCreated();
+        LibraryScanRepository sut = new(context);
+
+        UserEntity storedUser = _userEntityFixture.Create(username: "scan-user", password: "Password123");
+        context.Users.Add(storedUser);
+        LibraryEntity storedLibrary = _libraryEntityFixture.Create(userId: storedUser.Id);
+        context.Libraries.Add(storedLibrary);
+        await context.SaveChangesAsync();
+
+        LibraryScanEntity pendingScan = _libraryScanEntityFixture.Create(libraryId: storedLibrary.Id, userId: storedUser.Id, status: LibraryScanJobStatus.Pending, libraryEntity: storedLibrary);
+        LibraryScanEntity runningScan = _libraryScanEntityFixture.Create(libraryId: storedLibrary.Id, userId: storedUser.Id, status: LibraryScanJobStatus.Running, libraryEntity: storedLibrary);
+        LibraryScanEntity completedScan = _libraryScanEntityFixture.Create(libraryId: storedLibrary.Id, userId: storedUser.Id, status: LibraryScanJobStatus.Completed, libraryEntity: storedLibrary);
+        LibraryScanEntity canceledScan = _libraryScanEntityFixture.Create(libraryId: storedLibrary.Id, userId: storedUser.Id, status: LibraryScanJobStatus.Canceled, libraryEntity: storedLibrary);
+        LibraryScanEntity failedScan = _libraryScanEntityFixture.Create(libraryId: storedLibrary.Id, userId: storedUser.Id, status: LibraryScanJobStatus.Failed, libraryEntity: storedLibrary);
+        context.LibraryScans.AddRange(pendingScan, runningScan, completedScan, canceledScan, failedScan);
+        await context.SaveChangesAsync();
+
+        // Act
+        Result<Updated> result = await sut.FailInterruptedScansAsync(CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Updated, result.Value);
+        context.ChangeTracker.Clear();
+        Assert.Equal(LibraryScanJobStatus.Failed, (await context.LibraryScans.AsNoTracking().FirstAsync(scan => scan.Id == pendingScan.Id)).Status);
+        Assert.Equal(LibraryScanJobStatus.Failed, (await context.LibraryScans.AsNoTracking().FirstAsync(scan => scan.Id == runningScan.Id)).Status);
+        Assert.Equal(LibraryScanJobStatus.Completed, (await context.LibraryScans.AsNoTracking().FirstAsync(scan => scan.Id == completedScan.Id)).Status);
+        Assert.Equal(LibraryScanJobStatus.Canceled, (await context.LibraryScans.AsNoTracking().FirstAsync(scan => scan.Id == canceledScan.Id)).Status);
+        Assert.Equal(LibraryScanJobStatus.Failed, (await context.LibraryScans.AsNoTracking().FirstAsync(scan => scan.Id == failedScan.Id)).Status);
+    }
+}

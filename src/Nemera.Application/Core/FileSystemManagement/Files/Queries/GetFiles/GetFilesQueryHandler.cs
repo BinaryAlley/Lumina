@@ -1,0 +1,52 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Files;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Contracts.Responses.FileSystemManagement.Files;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
+
+/// <summary>
+/// Handler for the query to get all files.
+/// </summary>
+public class GetFilesQueryHandler : IQueryHandler<GetFilesQuery, Result<IEnumerable<FileResponse>>>
+{
+    private readonly IFileService _fileService;
+    private readonly IValidator<GetFilesQuery> _validator;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetFilesQueryHandler"/> class.
+    /// </summary>
+    /// <param name="fileService">Injected service for handling files.</param>
+    /// <param name="validator">Injected validator for application validation rules.</param>
+    public GetFilesQueryHandler(IFileService fileService, IValidator<GetFilesQuery> validator)
+    {
+        _fileService = fileService;
+        _validator = validator;
+    }
+
+    /// <summary>
+    /// Gets the list of files at the specified path.
+    /// </summary>
+    /// <param name="query">The query containing the requested path.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either a collection of <see cref="FileResponse"/>, or an error message.
+    /// </returns>
+    public Task<Result<IEnumerable<FileResponse>>> HandleAsync(GetFilesQuery query, CancellationToken cancellationToken)
+    {
+        List<Error> validationResult = _validator.Validate(query);
+        if (validationResult.Count > 0)
+            return Task.FromResult<Result<IEnumerable<FileResponse>>>(validationResult);
+
+        Result<IEnumerable<File>> getFilesResult = _fileService.GetFiles(query.Path!, query.ShouldIncludeHiddenElements);
+        return Task.FromResult(getFilesResult.Match(values => Result.From(values.ToResponses()), errors => errors));
+    }
+}

@@ -1,0 +1,194 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.Contracts.Fixtures.Core.Requests.Authorization;
+using Nemera.Contracts.Requests.Authorization;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Text;
+using System.Text.Json;
+#endregion
+
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Admin.Authorization.Roles;
+
+/// <summary>
+/// Contains security tests for the <see cref="UpdateRoleEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class UpdateRoleEndpointTests : IClassFixture<NemeraApiFactory>, IAsyncDisposable
+{
+    private readonly HttpClient _client;
+    private readonly NemeraApiFactory _apiFactory;
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+    private Guid _adminUserId;
+    private Guid _seededPermissionId;
+    private Guid _seededRoleId;
+    private readonly RoleEntityFixture _roleEntityFixture = new();
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
+    private readonly UpdateRoleRequestFixture _updateRoleRequestFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateRoleEndpointTests"/> class.
+    /// </summary>
+    /// <param name="apiFactory">Injected in-memory API factory.</param>
+    public UpdateRoleEndpointTests(NemeraApiFactory apiFactory)
+    {
+        _apiFactory = apiFactory;
+        _client = apiFactory.CreateClient();
+    }
+
+    [Fact]
+    public async Task UpdateRole_WhenUnauthorized_ShouldReturnUnauthorizedResult()
+    {
+        // Arrange
+        UpdateRoleRequest requestBody = _updateRoleRequestFixture.Create(
+            roleId: Guid.NewGuid(),
+            roleName: "Editor",
+            permissions: []
+        );
+
+        StringContent content = new(
+            JsonSerializer.Serialize(requestBody),
+            Encoding.UTF8,
+            "application/json"
+        );
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsync("/api/v1/auth/roles", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+
+        string responseContent = await response.Content.ReadAsStringAsync();
+
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseContent, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status401Unauthorized, problemDetails!["status"].GetInt32());
+        Assert.Equal("https://tools.ietf.org/html/rfc7235#section-3.1", problemDetails["type"].GetString());
+        Assert.Equal("Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("/api/v1/auth/roles", problemDetails["instance"].GetProperty("value").GetString());
+        Assert.Equal("Authentication failed", problemDetails["detail"].GetString());
+    }
+
+    [Theory]
+    [InlineData("'; DROP TABLE Roles--")] // Destructive injection.
+    [InlineData("' OR '1'='1")] // Boolean-based injection.
+    public async Task UpdateRole_WithSQLInjectionInRoleName_ShouldNotCorruptOrDeleteData(string maliciousRoleName)
+    {
+        // Arrange
+        HttpClient client = _apiFactory.CreateClient();
+        _adminUserId = await _apiFactory.CreateAndAuthenticateAdminUserAsync(client);
+        _seededPermissionId = Guid.NewGuid();
+        _seededRoleId = Guid.NewGuid();
+        RoleEntity seededRole = _roleEntityFixture.Create(id: _seededRoleId, roleName: "ExistingRole");
+        using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
+        {
+            NemeraDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+            seedDbContext.Permissions.Add(_permissionEntityFixture.Create(id: _seededPermissionId, permissionName: AuthorizationPermission.CanDeleteUsers));
+            seedDbContext.Roles.Add(seededRole);
+            await seedDbContext.SaveChangesAsync();
+        }
+        UpdateRoleRequest requestBody = _updateRoleRequestFixture.Create(
+            roleId: seededRole.Id,
+            roleName: maliciousRoleName,
+            permissions: [_seededPermissionId]
+        );
+        StringContent content = new(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
+
+        // Act
+        HttpResponseMessage response = await client.PutAsync("/api/v1/auth/roles", content);
+
+        // Assert
+        // The malicious role name passes the authenticated handler and the permissions validation, reaches the
+        // parameterized update, and is persisted verbatim: if it were concatenated into raw SQL, the update would fail.
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.DoesNotContain("SqliteException", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        RoleEntity? updatedRole = await dbContext.Roles.FirstOrDefaultAsync(role => role.Id == seededRole.Id);
+        Assert.NotNull(updatedRole);
+        Assert.Equal(maliciousRoleName, updatedRole!.RoleName);
+    }
+
+    [Fact]
+    public async Task UpdateRole_WhenAuthenticatedNonAdmin_ShouldReturnForbiddenResult()
+    {
+        // Arrange
+        HttpClient client = _apiFactory.CreateClient();
+        (Guid _, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(client);
+        _seededPermissionId = Guid.NewGuid();
+        _seededRoleId = Guid.NewGuid();
+        RoleEntity seededRole = _roleEntityFixture.Create(id: _seededRoleId, roleName: "ExistingRole");
+        using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
+        {
+            NemeraDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+            seedDbContext.Permissions.Add(_permissionEntityFixture.Create(id: _seededPermissionId, permissionName: AuthorizationPermission.CanDeleteUsers));
+            seedDbContext.Roles.Add(seededRole);
+            await seedDbContext.SaveChangesAsync();
+        }
+        UpdateRoleRequest requestBody = _updateRoleRequestFixture.Create(
+            roleId: seededRole.Id,
+            roleName: "Hijacked",
+            permissions: [_seededPermissionId]
+        );
+        StringContent content = new(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
+
+        // Act
+        HttpResponseMessage response = await client.PutAsync("/api/v1/auth/roles", content);
+        string responseContent = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(responseContent, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("General.Unauthorized", problemDetails["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+        Assert.DoesNotContain("password", responseContent, StringComparison.OrdinalIgnoreCase);
+
+        // The role is untouched.
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        RoleEntity? storedRole = await dbContext.Roles.FirstOrDefaultAsync(role => role.Id == seededRole.Id);
+        Assert.NotNull(storedRole);
+        Assert.Equal("ExistingRole", storedRole!.RoleName);
+
+        await _apiFactory.RemoveTestUserAsync(username);
+    }
+
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+
+        if (_seededPermissionId != Guid.Empty)
+        {
+            PermissionEntity? permission = dbContext.Permissions.FirstOrDefault(candidate => candidate.Id == _seededPermissionId);
+            if (permission is not null)
+                dbContext.Permissions.Remove(permission);
+        }
+        if (_seededRoleId != Guid.Empty)
+        {
+            RoleEntity? role = dbContext.Roles.FirstOrDefault(candidate => candidate.Id == _seededRoleId);
+            if (role is not null)
+                dbContext.Roles.Remove(role);
+        }
+        dbContext.SaveChanges();
+        if (_adminUserId != Guid.Empty)
+            await _apiFactory.RemoveAdminUserAsync(_adminUserId).ConfigureAwait(false);
+    }
+}

@@ -1,8 +1,8 @@
-# Lumina: because your files deserve better than collecting digital dust.
+# Nemera: because your files deserve better than collecting digital dust.
 
-### Welcome to Lumina, the radiant new star in the galaxy of media servers! 🌟
+### Welcome to Nemera, the radiant new star in the galaxy of media servers! 🌟
 
-Lumina aims to be your go-to hub for all things media - movies, TV shows, music, and more. We're just getting started, but our vision is bright:
+Nemera aims to be your go-to hub for all things media - movies, TV shows, music, and more. We're just getting started, but our vision is bright:
 
 - Stream your content anywhere, anytime.
 - Organize your media with style.
@@ -12,21 +12,21 @@ Lumina aims to be your go-to hub for all things media - movies, TV shows, music,
 - Your media, your control.
 - Free and Open Source.
 
-Stay tuned as we build something amazing together. Lumina is about to light up your media experience! 
+Stay tuned as we build something amazing together. Nemera is about to light up your media experience! 
 
 P.S. This README is just a spark. Watch it grow into a supernova! ✨
 
-> **Warning: pre-alpha, not production ready.** Lumina is under heavy development, and breaking changes happen all the time. Configuration, APIs, data formats and behavior can change between versions without a migration path or a guaranteed way back. Do not use Lumina in production. Back up before you update.
+> **Warning: pre-alpha, not production ready.** Nemera is under heavy development, and breaking changes happen all the time. Configuration, APIs, data formats and behavior can change between versions without a migration path or a guaranteed way back. Do not use Nemera in production. Back up before you update.
 
 ## Documentation
 
-The user facing manual, covering installing, using and administering Lumina, can be found at [docs/manual](./docs/manual/index.md). Start there if you want to run Lumina rather than read how it is built.
+The user facing manual, covering installing, using and administering Nemera, can be found at [docs/manual](./docs/manual/index.md). Start there if you want to run Nemera rather than read how it is built.
 
 For those with technical curiosities, here are some goodies to browse through:
 - This application was written following Clean Architecture and Domain Driven Design. Although you've probably seen it countless times before, here is the diagram of how the structure looks like.
-- A tree-like schematic of the Lumina's Server Domain layer can be seen [here](./docs/technical/domain/Domain.md).
-- The Ubiquitous Language used by Lumina's Server Domain layer can be read [here](./docs/technical/domain/UbiquitousLanguage.md).
-- For Software Architects, the architecture documents of Lumina were designed using the [C4 model](https://c4model.com/), therefor, you can visualize:
+- A tree-like schematic of the Nemera's Server Domain layer can be seen [here](./docs/technical/domain/Domain.md).
+- The Ubiquitous Language used by Nemera's Server Domain layer can be read [here](./docs/technical/domain/UbiquitousLanguage.md).
+- For Software Architects, the architecture documents of Nemera were designed using the [C4 model](https://c4model.com/), therefor, you can visualize:
 1. [1 System Context diagram](./docs/technical/architecture/1%20system-context-diagram.svg)
 2. [2 Container diagram](./docs/technical/architecture/2%20container-diagram.svg)
 3. [3.1 Component Web Client diagram](./docs/technical/architecture/3.1%20component-web-client-diagram.svg)
@@ -35,11 +35,11 @@ For those with technical curiosities, here are some goodies to browse through:
 6. [4.2 Code book reading diagram](./docs/technical/architecture/4.2%20code-book-reading-diagram.svg)
 7. [4.3 Code scheduled jobs diagram](./docs/technical/architecture/4.3%20code-scheduler-diagram.svg)
 - To regenerate the diagrams after editing a `.puml` file, follow the [diagram rendering instructions](./docs/technical/architecture/README.md).
-- Also for Software Architects, you might want to take a look at the Architecture Decision Log, where you may find important stories from the past of Lumina's development, like [this one](./docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md), and others like it.
+- Also for Software Architects, you might want to take a look at the Architecture Decision Log, where you may find important stories from the past of Nemera's development, like [this one](./docs/technical/architecture/architecture-knowledge-management/architecture-decision-log/architecture-decision-record-0001.md), and others like it.
 
 ## Telemetry and Observability
 
-Lumina instruments its applications with OpenTelemetry (traces and metrics) and structured logging (Serilog), correlated through trace and span identifiers.
+Nemera instruments its applications with OpenTelemetry (traces and metrics) and structured logging (Serilog), correlated through trace and span identifiers.
 
 - Every query, command, and domain event handler in the application layer emits a trace span, latency and invocation metrics, and a structured log entry, through a telemetry decorator registered in the dependency injection container.
 - Serilog enriches every log line with `TraceId` and `SpanId`, so logs can be joined to the traces that produced them.
@@ -53,7 +53,7 @@ The `docker-compose.yml` file ships an observability stack for local development
 - OpenTelemetry Collector, receiving OTLP at `localhost:4317` (gRPC) and `localhost:4318` (HTTP), and fanning traces and metrics out to the backends below.
 - Jaeger for trace search: http://localhost:16686
 - Prometheus for metrics: http://localhost:9090
-- Grafana for dashboards: http://localhost:3000, pre-provisioned with a "Lumina" dashboard (handler latency and invocation rates) and Prometheus and Jaeger data sources. The local development stack signs in with `admin` / `lumina-admin`, overridable through the `GRAFANA_ADMIN_PASSWORD` environment variable.
+- Grafana for dashboards: http://localhost:3000, pre-provisioned with a "Nemera" dashboard (handler latency and invocation rates) and Prometheus and Jaeger data sources. The local development stack signs in with `admin` / `nemera-admin`, overridable through the `GRAFANA_ADMIN_PASSWORD` environment variable.
 
 Start everything with `docker compose up` (or `docker compose up --build` after code changes), then open the dashboards. The Web application runs at http://localhost:5012 and the API at http://localhost:5214.
 
@@ -75,12 +75,12 @@ For a production deployment, point the OTLP endpoint at a real collector instead
 The development setup ships convenience defaults that must never be used in a real deployment:
 
 - **API secrets.** The API requires a JWT signing key and an encryption key, both validated with `ValidateOnStart()`. Production deployments must supply their own values through the `JwtSettings__SecretKey` and `EncryptionSettings__SecretKey` environment variables, otherwise the API fails to start.
-- **Grafana.** The local observability stack signs in with the well-known `admin` / `lumina-admin` credentials and binds Grafana to `127.0.0.1`. Do not leave the default password: set `GRAFANA_ADMIN_PASSWORD` (or `GF_SECURITY_ADMIN_PASSWORD`) before exposing Grafana beyond your own machine.
+- **Grafana.** The local observability stack signs in with the well-known `admin` / `nemera-admin` credentials and binds Grafana to `127.0.0.1`. Do not leave the default password: set `GRAFANA_ADMIN_PASSWORD` (or `GF_SECURITY_ADMIN_PASSWORD`) before exposing Grafana beyond your own machine.
 - **Scope.** The observability stack (collector, Jaeger, Prometheus, Grafana) in `docker-compose.yml` is intended for local development only.
 
 ## Contributing
 
-Lumina welcomes community contributions. All forms of input, be it code, bug reports, or feature suggestions, are appreciated. Be sure to read the [guidelines](./docs/CONTRIBUTING.md) for contributing first, and if you use AI when contributing, read the [AI policy](./docs/other/AI_POLICY.md) as well. It is short, and it is enforced.
+Nemera welcomes community contributions. All forms of input, be it code, bug reports, or feature suggestions, are appreciated. Be sure to read the [guidelines](./docs/CONTRIBUTING.md) for contributing first, and if you use AI when contributing, read the [AI policy](./docs/other/AI_POLICY.md) as well. It is short, and it is enforced.
 
 ## Acknowledgments and Credits
 

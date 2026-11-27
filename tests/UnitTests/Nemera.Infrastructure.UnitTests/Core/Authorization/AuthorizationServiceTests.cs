@@ -1,0 +1,555 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Repositories.Users;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Infrastructure.Core.Authorization;
+using Nemera.Infrastructure.Core.Authorization.Policies.Common.Factory;
+using Nemera.Infrastructure.Fixtures.Core.Authorization;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Infrastructure.UnitTests.Core.Authorization;
+
+/// <summary>
+/// Contains unit tests for the <see cref="AuthorizationService"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class AuthorizationServiceTests
+{
+    private readonly IUnitOfWork _mockUnitOfWork;
+    private readonly IUserRepository _mockUserRepository;
+    private readonly IAuthorizationPolicyFactory _mockAuthorizationPolicyFactory;
+    private readonly AuthorizationService _sut;
+    private readonly AuthorizationServiceFixture _authorizationServiceFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AuthorizationServiceTests"/> class.
+    /// </summary>
+    public AuthorizationServiceTests()
+    {
+        _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
+        _mockUserRepository = Substitute.For<IUserRepository>();
+        _mockAuthorizationPolicyFactory = Substitute.For<IAuthorizationPolicyFactory>();
+
+        _mockUnitOfWork.UserRepository.Returns(_mockUserRepository);
+
+        _sut = new AuthorizationService(_mockUnitOfWork, _mockAuthorizationPolicyFactory);
+    }
+
+    [Fact]
+    public async Task HasPermissionAsync_WhenUserDoesNotExist_ShouldReturnFalse()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserEntity?>(null));
+
+        // Act
+        bool result = await _sut.HasPermissionAsync(userId, AuthorizationPermission.CanViewUsers, CancellationToken.None);
+
+        // Assert
+        Assert.False(result);
+        await _mockUserRepository.Received(1).GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HasPermissionAsync_WhenGetUserFails_ShouldReturnFalse()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        Error error = Error.Failure("Database.Error", "Failed to retrieve user");
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(error);
+
+        // Act
+        bool result = await _sut.HasPermissionAsync(userId, AuthorizationPermission.CanViewUsers, CancellationToken.None);
+
+        // Assert
+        Assert.False(result);
+        await _mockUserRepository.Received(1).GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HasPermissionAsync_WhenUserHasDirectPermission_ShouldReturnTrue()
+    {
+        // Arrange
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
+            directPermissions: [AuthorizationPermission.CanViewUsers]);
+
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserEntity?>(user));
+
+        // Act
+        bool result = await _sut.HasPermissionAsync(user.Id, AuthorizationPermission.CanViewUsers, CancellationToken.None);
+
+        // Assert
+        Assert.True(result);
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HasPermissionAsync_WhenUserHasPermissionThroughRole_ShouldReturnTrue()
+    {
+        // Arrange
+        Dictionary<string, IEnumerable<AuthorizationPermission>> rolePermissions = new()
+        {
+            { "Admin", new[] { AuthorizationPermission.CanViewUsers } }
+        };
+
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
+            rolePermissions: rolePermissions);
+
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserEntity?>(user));
+
+        // Act
+        bool result = await _sut.HasPermissionAsync(user.Id, AuthorizationPermission.CanViewUsers, CancellationToken.None);
+
+        // Assert
+        Assert.True(result);
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HasPermissionAsync_WhenUserHasNoPermissions_ShouldReturnFalse()
+    {
+        // Arrange
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions();
+
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserEntity?>(user));
+
+        // Act
+        bool result = await _sut.HasPermissionAsync(user.Id, AuthorizationPermission.CanViewUsers, CancellationToken.None);
+
+        // Assert
+        Assert.False(result);
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HasPermissionAsync_WhenUserHasDifferentPermission_ShouldReturnFalse()
+    {
+        // Arrange
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
+            directPermissions: [AuthorizationPermission.CanDeleteUsers]);
+
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserEntity?>(user));
+
+        // Act
+        bool result = await _sut.HasPermissionAsync(user.Id, AuthorizationPermission.CanViewUsers, CancellationToken.None);
+
+        // Assert
+        Assert.False(result);
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HasPermissionAsync_WhenUserHasPermissionBothDirectlyAndThroughRole_ShouldReturnTrue()
+    {
+        // Arrange
+        Dictionary<string, IEnumerable<AuthorizationPermission>> rolePermissions = new()
+        {
+            { "Admin", new[] { AuthorizationPermission.CanViewUsers } }
+        };
+
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
+            directPermissions: [AuthorizationPermission.CanViewUsers],
+            rolePermissions: rolePermissions);
+
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserEntity?>(user));
+
+        // Act
+        bool result = await _sut.HasPermissionAsync(user.Id, AuthorizationPermission.CanViewUsers, CancellationToken.None);
+
+        // Assert
+        Assert.True(result);
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task IsInRoleAsync_WhenUserDoesNotExist_ShouldReturnFalse()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserEntity?>(null));
+
+        // Act
+        bool result = await _sut.IsInRoleAsync(userId, "Admin", CancellationToken.None);
+
+        // Assert
+        Assert.False(result);
+        await _mockUserRepository.Received(1).GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task IsInRoleAsync_WhenGetUserFails_ShouldReturnFalse()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        Error error = Error.Failure("Database.Error", "Failed to retrieve user");
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(error);
+
+        // Act
+        bool result = await _sut.IsInRoleAsync(userId, "Admin", CancellationToken.None);
+
+        // Assert
+        Assert.False(result);
+        await _mockUserRepository.Received(1).GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task IsInRoleAsync_WhenUserHasRole_ShouldReturnTrue()
+    {
+        // Arrange
+        Dictionary<string, IEnumerable<AuthorizationPermission>> rolePermissions = new()
+        {
+            { "Admin", Array.Empty<AuthorizationPermission>() }
+        };
+
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
+            rolePermissions: rolePermissions);
+
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserEntity?>(user));
+
+        // Act
+        bool result = await _sut.IsInRoleAsync(user.Id, "Admin", CancellationToken.None);
+
+        // Assert
+        Assert.True(result);
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task IsInRoleAsync_WhenUserHasDifferentRole_ShouldReturnFalse()
+    {
+        // Arrange
+        Dictionary<string, IEnumerable<AuthorizationPermission>> rolePermissions = new()
+        {
+            { "", Array.Empty<AuthorizationPermission>() }
+        };
+
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
+            rolePermissions: rolePermissions);
+
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserEntity?>(user));
+
+        // Act
+        bool result = await _sut.IsInRoleAsync(user.Id, "Admin", CancellationToken.None);
+
+        // Assert
+        Assert.False(result);
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task IsInRoleAsync_WhenUserHasNoRoles_ShouldReturnFalse()
+    {
+        // Arrange
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions();
+
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserEntity?>(user));
+
+        // Act
+        bool result = await _sut.IsInRoleAsync(user.Id, "Admin", CancellationToken.None);
+
+        // Assert
+        Assert.False(result);
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task EvaluatePolicyAsync_WhenPolicyEvaluationSucceeds_ShouldReturnTrue()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        PolicyContext context = new LibraryOwnershipPolicyContext(Guid.NewGuid());
+        IAuthorizationPolicy mockPolicy = Substitute.For<IAuthorizationPolicy>();
+        mockPolicy.EvaluateAsync(userId, context, Arg.Any<CancellationToken>())
+            .Returns(true);
+
+        _mockAuthorizationPolicyFactory.CreatePolicy<IAuthorizationPolicy>()
+            .Returns(mockPolicy);
+
+        // Act
+        bool result = await _sut.EvaluatePolicyAsync<IAuthorizationPolicy>(userId, context, CancellationToken.None);
+
+        // Assert
+        Assert.True(result);
+        await mockPolicy.Received(1).EvaluateAsync(userId, context, Arg.Any<CancellationToken>());
+        _mockAuthorizationPolicyFactory.Received(1).CreatePolicy<IAuthorizationPolicy>();
+    }
+
+    [Fact]
+    public async Task EvaluatePolicyAsync_WhenPolicyEvaluationFails_ShouldReturnFalse()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        PolicyContext context = new LibraryOwnershipPolicyContext(Guid.NewGuid());
+        IAuthorizationPolicy mockPolicy = Substitute.For<IAuthorizationPolicy>();
+        mockPolicy.EvaluateAsync(userId, context, Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        _mockAuthorizationPolicyFactory.CreatePolicy<IAuthorizationPolicy>()
+            .Returns(mockPolicy);
+
+        // Act
+        bool result = await _sut.EvaluatePolicyAsync<IAuthorizationPolicy>(userId, context, CancellationToken.None);
+
+        // Assert
+        Assert.False(result);
+        await mockPolicy.Received(1).EvaluateAsync(userId, context, Arg.Any<CancellationToken>());
+        _mockAuthorizationPolicyFactory.Received(1).CreatePolicy<IAuthorizationPolicy>();
+    }
+
+    [Fact]
+    public async Task EvaluatePolicyAsync_WhenPolicyThrowsException_ShouldPropagateException()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        PolicyContext context = new LibraryOwnershipPolicyContext(Guid.NewGuid());
+        IAuthorizationPolicy mockPolicy = Substitute.For<IAuthorizationPolicy>();
+        mockPolicy.EvaluateAsync(userId, context, Arg.Any<CancellationToken>())
+            .Throws(new InvalidOperationException("Policy evaluation failed"));
+
+        _mockAuthorizationPolicyFactory.CreatePolicy<IAuthorizationPolicy>()
+            .Returns(mockPolicy);
+
+        // Act
+        Func<Task> act = async () => await _sut.EvaluatePolicyAsync<IAuthorizationPolicy>(userId, context, CancellationToken.None);
+
+        // Assert
+        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(act);
+        Assert.Equal("Policy evaluation failed", exception.Message);
+        await mockPolicy.Received(1).EvaluateAsync(userId, context, Arg.Any<CancellationToken>());
+        _mockAuthorizationPolicyFactory.Received(1).CreatePolicy<IAuthorizationPolicy>();
+    }
+
+    [Fact]
+    public async Task EvaluatePolicyAsync_WhenFactoryThrowsException_ShouldPropagateException()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        PolicyContext context = new LibraryOwnershipPolicyContext(Guid.NewGuid());
+        _mockAuthorizationPolicyFactory.CreatePolicy<IAuthorizationPolicy>()
+            .Throws(new InvalidOperationException("Policy creation failed"));
+
+        // Act
+        Func<Task> act = async () => await _sut.EvaluatePolicyAsync<IAuthorizationPolicy>(userId, context, CancellationToken.None);
+
+        // Assert
+        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(act);
+        Assert.Equal("Policy creation failed", exception.Message);
+        _mockAuthorizationPolicyFactory.Received(1).CreatePolicy<IAuthorizationPolicy>();
+    }
+
+    [Fact]
+    public async Task EvaluatePolicyAsync_WhenCancellationRequested_ShouldPropagateToken()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        PolicyContext context = new LibraryOwnershipPolicyContext(Guid.NewGuid());
+        IAuthorizationPolicy mockPolicy = Substitute.For<IAuthorizationPolicy>();
+        CancellationToken cancellationToken = new(true);
+
+        _mockAuthorizationPolicyFactory.CreatePolicy<IAuthorizationPolicy>()
+            .Returns(mockPolicy);
+
+        // Act
+        await _sut.EvaluatePolicyAsync<IAuthorizationPolicy>(userId, context, cancellationToken);
+
+        // Assert
+        await mockPolicy.Received(1).EvaluateAsync(userId, context, cancellationToken);
+        _mockAuthorizationPolicyFactory.Received(1).CreatePolicy<IAuthorizationPolicy>();
+    }
+
+    [Fact]
+    public async Task EvaluatePolicyAsync_WithConcretePolicy_ShouldCreateCorrectPolicyType()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        PolicyContext context = new LibraryOwnershipPolicyContext(Guid.NewGuid());
+        IAuthorizationPolicy mockPolicy = Substitute.For<ITestAuthorizationPolicy>();
+        mockPolicy.EvaluateAsync(userId, context, Arg.Any<CancellationToken>())
+            .Returns(true);
+
+        _mockAuthorizationPolicyFactory.CreatePolicy<ITestAuthorizationPolicy>()
+            .Returns(mockPolicy);
+
+        // Act
+        bool result = await _sut.EvaluatePolicyAsync<ITestAuthorizationPolicy>(userId, context, CancellationToken.None);
+
+        // Assert
+        Assert.True(result);
+        await mockPolicy.Received(1).EvaluateAsync(userId, context, Arg.Any<CancellationToken>());
+        _mockAuthorizationPolicyFactory.Received(1).CreatePolicy<ITestAuthorizationPolicy>();
+    }
+
+    [Fact]
+    public async Task GetUserAuthorizationAsync_WhenUserDoesNotExist_ShouldReturnError()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserEntity?>(null));
+
+        // Act
+        Result<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(userId, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Users.UserDoesNotExist, result.FirstError);
+        await _mockUserRepository.Received(1).GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task GetUserAuthorizationAsync_WhenGetUserFails_ShouldReturnError()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        Error error = Error.Failure("Database.Error", "Failed to retrieve user");
+        _mockUserRepository.GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(error);
+
+        // Act
+        Result<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(userId, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(error, result.FirstError);
+        await _mockUserRepository.Received(1).GetByIdAsync(userId, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task GetUserAuthorizationAsync_WhenUserHasNoRolesOrPermissions_ShouldReturnEmptySets()
+    {
+        // Arrange
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions();
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserEntity?>(user));
+
+        // Act
+        Result<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(user.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(user.Id, result.Value.UserId);
+        Assert.Null(result.Value.Role);
+        Assert.Empty(result.Value.Permissions);
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task GetUserAuthorizationAsync_WhenUserHasOnlyDirectPermissions_ShouldReturnCorrectPermissions()
+    {
+        // Arrange
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
+            directPermissions:
+            [
+                AuthorizationPermission.CanViewUsers,
+                AuthorizationPermission.CanDeleteUsers
+            ]);
+
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserEntity?>(user));
+
+        // Act
+        Result<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(user.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(user.Id, result.Value.UserId);
+        Assert.Null(result.Value.Role);
+        Assert.Equal([AuthorizationPermission.CanViewUsers, AuthorizationPermission.CanDeleteUsers],
+            result.Value.Permissions);
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task GetUserAuthorizationAsync_WhenUserHasOnlyRolePermissions_ShouldReturnCorrectRolesAndPermissions()
+    {
+        // Arrange
+        Dictionary<string, IEnumerable<AuthorizationPermission>> rolePermissions = new()
+        {
+            {
+                "Admin",
+                new[] { AuthorizationPermission.CanViewUsers, AuthorizationPermission.CanDeleteUsers }
+            }
+        };
+
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
+            rolePermissions: rolePermissions);
+
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserEntity?>(user));
+
+        // Act
+        Result<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(user.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(user.Id, result.Value.UserId);
+        Assert.Equal("Admin", result.Value.Role);
+        Assert.Equal([AuthorizationPermission.CanViewUsers, AuthorizationPermission.CanDeleteUsers],
+            result.Value.Permissions);
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task GetUserAuthorizationAsync_WhenUserHasBothDirectAndRolePermissions_ShouldReturnCombinedPermissions()
+    {
+        // Arrange
+        Dictionary<string, IEnumerable<AuthorizationPermission>> rolePermissions = new()
+        {
+            {
+                "Admin",
+                new[] { AuthorizationPermission.CanViewUsers, AuthorizationPermission.CanDeleteUsers }
+            }
+        };
+
+        UserEntity user = _authorizationServiceFixture.CreateUserWithPermissions(
+            directPermissions: [AuthorizationPermission.CanRegisterUsers],
+            rolePermissions: rolePermissions);
+
+        _mockUserRepository.GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<UserEntity?>(user));
+
+        // Act
+        Result<UserAuthorizationEntity> result = await _sut.GetUserAuthorizationAsync(user.Id, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(user.Id, result.Value.UserId);
+        Assert.Equal("Admin", result.Value.Role);
+        Assert.Equivalent(
+            new HashSet<AuthorizationPermission>
+            {
+        AuthorizationPermission.CanViewUsers,
+        AuthorizationPermission.CanDeleteUsers,
+        AuthorizationPermission.CanRegisterUsers
+            },
+            result.Value.Permissions
+        );
+        await _mockUserRepository.Received(1).GetByIdAsync(user.Id, cancellationToken: Arg.Any<CancellationToken>());
+    }
+}

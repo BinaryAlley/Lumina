@@ -563,7 +563,7 @@ ScheduledJobRepository --> ScheduledJobEntity : persists
 ScheduledJobExecutionRepository --> ScheduledJobExecutionEntity : persists
 SchedulerDisplayPreferencesRepository --> SchedulerDisplayPreferencesEntity : persists
 
-caption [Code] Lumina - Scheduled Jobs 3.2.3
+caption [Code] Nemera - Scheduled Jobs 3.2.3
 
 footer The code diagram for the Scheduled Jobs 3.2.3 - created with PlantUML
 @enduml

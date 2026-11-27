@@ -1,0 +1,14 @@
+#region ========================================================================= USING =====================================================================================
+using System.Diagnostics;
+#endregion
+
+namespace Nemera.Presentation.Web.Common.Requests.UsersManagement.Authentication;
+
+/// <summary>
+/// Represents a request for displaying the account login view.
+/// </summary>
+/// <param name="ReturnUrl">The URL to return to, after login. Optional.</param>
+[DebuggerDisplay("ReturnUrl: {ReturnUrl}")]
+public record LoginViewRequest(
+    string? ReturnUrl = null
+);

@@ -1,0 +1,19 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.CQRS;
+#endregion
+
+namespace Nemera.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
+
+/// <summary>
+/// Command for the initial application setup.
+/// </summary>
+/// <param name="Username">The username for the Admin account.</param>
+/// <param name="Password">The password for the Admin account.</param>
+/// <param name="PasswordConfirm">Confirmation of the password.</param>
+/// <param name="Use2fa">Indicates whether to enable two-factor authentication for the Admin account.</param>
+public record SetupApplicationCommand(
+    string? Username,
+    string? Password,
+    string? PasswordConfirm,
+    bool Use2fa
+) : ICommand;

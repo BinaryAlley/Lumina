@@ -1,0 +1,377 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBookCover;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBookCover;
+
+/// <summary>
+/// Contains integration tests for the <see cref="UpdateBookCoverEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class UpdateBookCoverEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
+{
+    private HttpClient _client;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+    };
+    private readonly BookEntityFixture _bookEntityFixture = new();
+    private readonly BookArtworkEntityFixture _bookArtworkEntityFixture = new();
+    private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly UserEntityFixture _userEntityFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateBookCoverEndpointTests"/> class.
+    /// </summary>
+    /// <param name="apiFactory">Injected in-memory API factory.</param>
+    public UpdateBookCoverEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
+    {
+        _client = apiFactory.CreateClient();
+        _apiFactory = apiFactory;
+    }
+
+    /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = await _apiFactory.CreateAuthenticatedClientAsync();
+    }
+
+    [Fact]
+    public async Task UpdateBookCover_WhenCalledByOwnerWithValidImage_ShouldReplaceTheStoredCover()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (Guid libraryId, Guid bookId) = await SeedLibraryAndBookWithCoverAsync(userId, "/media/books/old-cover.jpg");
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/cover", CreateCoverForm("cover.png"));
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        string storedPath = JsonSerializer.Deserialize<UpdateBookCoverResponse>(content, _jsonOptions)!.CoverPath;
+        Assert.False(string.IsNullOrWhiteSpace(storedPath));
+        Assert.Contains("cover.png", storedPath, StringComparison.OrdinalIgnoreCase);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        BookArtworkEntity coverArtwork = dbContext.Books
+            .SelectMany(book => book.Artwork)
+            .Single(artwork => artwork.BookId == bookId && artwork.ArtworkType == ArtworkType.Cover);
+        Assert.Equal(storedPath, coverArtwork.FileName);
+        Assert.Equal(ArtworkStatus.Enriched, coverArtwork.Status);
+    }
+
+    [Fact]
+    public async Task UpdateBookCover_WhenBookHasNoExistingCover_ShouldCreateACoverArtwork()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (Guid libraryId, Guid bookId) = await SeedLibraryAndBookAsync(userId);
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/cover", CreateCoverForm("cover.png"));
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        string storedPath = JsonSerializer.Deserialize<UpdateBookCoverResponse>(content, _jsonOptions)!.CoverPath;
+        Assert.False(string.IsNullOrWhiteSpace(storedPath));
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        BookArtworkEntity coverArtwork = dbContext.Books
+            .SelectMany(book => book.Artwork)
+            .Single(artwork => artwork.BookId == bookId && artwork.ArtworkType == ArtworkType.Cover);
+        Assert.Equal(storedPath, coverArtwork.FileName);
+    }
+
+    [Fact]
+    public async Task UpdateBookCover_WhenBookDoesNotExist_ShouldReturnBookNotFoundProblem()
+    {
+        // Act
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{Guid.NewGuid()}/cover", CreateCoverForm("cover.png"));
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.NotFound", problemDetails!["title"].GetString());
+        Assert.Equal("BookNotFound", problemDetails["detail"].GetString());
+    }
+
+    [Fact]
+    public async Task UpdateBookCover_WhenRouteIdIsNotParseable_ShouldReturnUnprocessableEntity()
+    {
+        // Act
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/not-a-guid/cover", CreateCoverForm("cover.png"));
+
+        // Assert
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
+        Assert.Contains("BookIdCannotBeEmpty", content, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task UpdateBookCover_WhenBookBelongsToAnotherUserLibrary_ShouldReturnForbiddenProblem()
+    {
+        // Arrange
+        (Guid otherUserId, _) = await SeedOtherUserAsync();
+        (Guid libraryId, Guid bookId) = await SeedLibraryAndBookAsync(otherUserId);
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/cover", CreateCoverForm("cover.png"));
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Unauthorized", problemDetails!["title"].GetString());
+        Assert.Equal("NotAuthorized", problemDetails["detail"].GetString());
+    }
+
+    [Fact]
+    public async Task UpdateBookCover_WhenBookBelongsToAnotherLibrary_ShouldReturnBookNotFoundProblem()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (_, Guid bookId) = await SeedLibraryAndBookAsync(userId);
+        Guid otherLibraryId = Guid.NewGuid();
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/{otherLibraryId}/books/{bookId}/cover", CreateCoverForm("cover.png"));
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.NotFound", problemDetails!["title"].GetString());
+        Assert.Equal("BookNotFound", problemDetails["detail"].GetString());
+    }
+
+    [Fact]
+    public async Task UpdateBookCover_WhenUnauthorized_ShouldReturnUnauthorizedResult()
+    {
+        // Arrange
+        HttpClient unauthenticatedClient = _apiFactory.CreateClient();
+
+        // Act
+        HttpResponseMessage response = await unauthenticatedClient.PutAsync($"/api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{Guid.NewGuid()}/cover", CreateCoverForm("cover.png"));
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateBookCover_WhenNoFileIsUploaded_ShouldReturnUnprocessableEntityWithBookCoverCannotBeNull()
+    {
+        // Arrange
+        MultipartFormDataContent form = [];
+        form.Add(new StringContent("unrelated-field"), "unrelated-field");
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/{Guid.NewGuid()}/books/{Guid.NewGuid()}/cover", form);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
+        Assert.Contains("BookCoverCannotBeNull", content, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task UpdateBookCover_WhenUploadedFileIsNotAnImage_ShouldReturnUnprocessableEntityWithCoverFileMustBeAnImage()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (Guid libraryId, Guid bookId) = await SeedLibraryAndBookAsync(userId);
+        MultipartFormDataContent form = CreateCoverForm([1, 2, 3, 4, 5, 6, 7, 8], "cover.png");
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/cover", form);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
+        Assert.Contains("CoverFileMustBeAnImage", content, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task UpdateBookCover_WhenUploadedFileIsTooLarge_ShouldReturnUnprocessableEntityWithFileTooLarge()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        (Guid libraryId, Guid bookId) = await SeedLibraryAndBookAsync(userId);
+        // The artwork size limit is 10 MiB, so the payload exceeds it by one byte.
+        byte[] payload = new byte[(10 * 1024 * 1024) + 1];
+        payload[0] = 137;
+        payload[1] = 80;
+        payload[2] = 78;
+        payload[3] = 71;
+        payload[4] = 13;
+        payload[5] = 10;
+        payload[6] = 26;
+        payload[7] = 10;
+        MultipartFormDataContent form = CreateCoverForm(payload, "cover.png");
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsync($"/api/v1/libraries/{libraryId}/books/{bookId}/cover", form);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal("General.Validation", problemDetails!["title"].GetString());
+        Assert.Contains("FileTooLarge", content, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Creates a multipart form carrying a minimal PNG-like payload.
+    /// </summary>
+    /// <param name="fileName">The name of the uploaded file.</param>
+    /// <returns>A configured <see cref="MultipartFormDataContent"/> instance.</returns>
+    private static MultipartFormDataContent CreateCoverForm(string fileName)
+    {
+        // The payload only needs to carry the PNG signature in its first bytes and exceed the header detection buffer.
+        byte[] payload = new byte[100];
+        payload[0] = 137;
+        payload[1] = 80;
+        payload[2] = 78;
+        payload[3] = 71;
+        payload[4] = 13;
+        payload[5] = 10;
+        payload[6] = 26;
+        payload[7] = 10;
+        return CreateCoverForm(payload, fileName);
+    }
+
+    /// <summary>
+    /// Creates a multipart form carrying the provided payload as an uploaded file.
+    /// </summary>
+    /// <param name="payload">The bytes of the uploaded file.</param>
+    /// <param name="fileName">The name of the uploaded file.</param>
+    /// <returns>A configured <see cref="MultipartFormDataContent"/> instance.</returns>
+    private static MultipartFormDataContent CreateCoverForm(byte[] payload, string fileName)
+    {
+        MultipartFormDataContent form = [];
+        ByteArrayContent fileContent = new(payload);
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+        form.Add(fileContent, "cover", fileName);
+        return form;
+    }
+
+    /// <summary>
+    /// Seeds a library owned by <paramref name="userId"/> and a book with an existing cover belonging to it.
+    /// </summary>
+    /// <param name="userId">The Id of the user that owns the library.</param>
+    /// <param name="existingCoverFileName">The relative path of the existing cover of the book.</param>
+    /// <returns>The Ids of the seeded library and book.</returns>
+    private async Task<(Guid libraryId, Guid bookId)> SeedLibraryAndBookWithCoverAsync(Guid userId, string existingCoverFileName)
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
+        LibraryEntity library = _libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []);
+        BookEntity book = _bookEntityFixture.Create(id: bookId, libraryId: libraryId, path: $"/books/{bookId:N}.epub", title: "Test Book", includeMetadata: false);
+        BookArtworkEntity existingCover = _bookArtworkEntityFixture.Create(bookId: bookId, artworkType: ArtworkType.Cover, fileName: existingCoverFileName, status: ArtworkStatus.Enriched);
+        book.Artwork.Add(existingCover);
+        dbContext.Libraries.Add(library);
+        dbContext.Books.Add(book);
+        await dbContext.SaveChangesAsync();
+        return (libraryId, bookId);
+    }
+
+    /// <summary>
+    /// Seeds a library owned by <paramref name="userId"/> and a book belonging to it.
+    /// </summary>
+    /// <param name="userId">The Id of the user that owns the library.</param>
+    /// <returns>The Ids of the seeded library and book.</returns>
+    private async Task<(Guid libraryId, Guid bookId)> SeedLibraryAndBookAsync(Guid userId)
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        Guid libraryId = Guid.NewGuid();
+        Guid bookId = Guid.NewGuid();
+        LibraryEntity library = _libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []);
+        BookEntity book = _bookEntityFixture.Create(id: bookId, libraryId: libraryId, path: $"/books/{bookId:N}.epub", title: "Test Book", includeMetadata: false);
+        dbContext.Libraries.Add(library);
+        dbContext.Books.Add(book);
+        await dbContext.SaveChangesAsync();
+        return (libraryId, bookId);
+    }
+
+    /// <summary>
+    /// Seeds a user distinct from the authenticated test user and returns its Id.
+    /// </summary>
+    /// <returns>The Id of the seeded user and its username.</returns>
+    private async Task<(Guid userId, string username)> SeedOtherUserAsync()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        Guid userId = Guid.NewGuid();
+        string username = $"otheruser_{Guid.NewGuid()}";
+        dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: username, password: "TestPass123!"));
+        await dbContext.SaveChangesAsync();
+        return (userId, username);
+    }
+
+    /// <summary>
+    /// Gets the Id of the currently authenticated test user.
+    /// </summary>
+    /// <returns>The Id of the authenticated test user.</returns>
+    private Guid GetCurrentUserId()
+    {
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
+        UserEntity user = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername);
+        return user.Id;
+    }
+
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public async Task DisposeAsync()
+    {
+        await _apiFactory.RemoveTestUserAsync();
+    }
+}

@@ -1,6 +1,6 @@
-# Lumina API
+# Nemera API
 
-- [Lumina API](#lumina-api)
+- [Nemera API](#nemera-api)
   - [Plugins](#plugins)
     - [Install Plugin](#install-plugin)
       - [Install Plugin Request](#install-plugin-request)
@@ -71,7 +71,7 @@ GET api/v1/plugins
   {
     "id": "f4c1a7de-3b52-4e6a-9d21-8c7e5b04a1f3",
     "name": "MusicBrainz Metadata",
-    "author": "Lumina",
+    "author": "Nemera",
     "version": "1.0.0",
     "description": "Retrieves artist, album and track metadata from MusicBrainz.",
     "loadStatus": "Loaded",

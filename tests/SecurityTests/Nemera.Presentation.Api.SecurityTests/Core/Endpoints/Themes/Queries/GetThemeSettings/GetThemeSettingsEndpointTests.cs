@@ -1,0 +1,65 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
+using System.Diagnostics.CodeAnalysis;
+using System.Net;
+#endregion
+
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Themes.Queries.GetThemeSettings;
+
+/// <summary>
+/// Contains security tests for the <see cref="GetThemeSettingsEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class GetThemeSettingsEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
+{
+    private readonly HttpClient _client;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetThemeSettingsEndpointTests"/> class.
+    /// </summary>
+    /// <param name="apiFactory">Injected in-memory API factory.</param>
+    public GetThemeSettingsEndpointTests(NemeraApiFactory apiFactory)
+    {
+        _client = apiFactory.CreateClient();
+        // A unique X-Forwarded-For isolates rate limiting state per test.
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
+    }
+
+    [Fact]
+    public async Task GetThemeSettings_WhenAnonymous_ShouldNotRequireAuthentication()
+    {
+        // Arrange
+        // Act
+        HttpResponseMessage response = await _client.GetAsync("/api/v1/themes/settings");
+
+        // Assert
+        // The route is AllowAnonymous, so anonymous callers must never be challenged for credentials.
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetThemeSettings_WhenAnonymous_ShouldNotLeakSensitiveData()
+    {
+        // Arrange
+        // Act
+        HttpResponseMessage response = await _client.GetAsync("/api/v1/themes/settings");
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Disposes the API factory resources.
+    /// </summary>
+    public void Dispose()
+    {
+        _client.Dispose();
+    }
+}

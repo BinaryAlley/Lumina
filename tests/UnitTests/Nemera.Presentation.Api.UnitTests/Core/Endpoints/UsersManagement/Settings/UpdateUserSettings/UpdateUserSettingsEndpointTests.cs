@@ -1,0 +1,125 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
+using Nemera.Contracts.Fixtures.Core.Requests.UsersManagement.Settings;
+using Nemera.Contracts.Requests.UsersManagement.Settings;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Settings.UpdateUserSettings;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using NSubstitute;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Settings.UpdateUserSettings;
+
+/// <summary>
+/// Contains unit tests for the <see cref="UpdateUserSettingsEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class UpdateUserSettingsEndpointTests
+{
+    private readonly ICommandHandler<UpdateUserSettingsCommand, Result<Updated>> _mockHandler;
+    private readonly UpdateUserSettingsEndpoint _sut;
+    private readonly UpdateUserSettingsRequestFixture _updateUserSettingsRequestFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateUserSettingsEndpointTests"/> class.
+    /// </summary>
+    public UpdateUserSettingsEndpointTests()
+    {
+        _mockHandler = Substitute.For<ICommandHandler<UpdateUserSettingsCommand, Result<Updated>>>();
+        _sut = FastEndpoints.Factory.Create<UpdateUserSettingsEndpoint>(_mockHandler);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenSuccessful_ShouldReturnOkResultWithUpdatedMarker()
+    {
+        // Arrange
+        UpdateUserSettingsRequest request = _updateUserSettingsRequestFixture.Create(isPaginationEnabled: true, itemsPerPage: 48, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false);
+        CancellationToken cancellationToken = CancellationToken.None;
+        _mockHandler.HandleAsync(Arg.Any<UpdateUserSettingsCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Updated);
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(request, cancellationToken);
+
+        // Assert
+        Ok<Updated> okResult = Assert.IsType<Ok<Updated>>(result);
+        Assert.Equal(Result.Updated, okResult.Value);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenHandlerReturnsValidationErrors_ShouldReturnValidationProblemResult()
+    {
+        // Arrange
+        UpdateUserSettingsRequest request = _updateUserSettingsRequestFixture.Create(isPaginationEnabled: true, itemsPerPage: 0, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false);
+        CancellationToken cancellationToken = CancellationToken.None;
+        Error expectedError = Error.Validation("UserSettings.ItemsPerPageMustBeGreaterThanZero", "ItemsPerPage must be greater than zero.");
+        _mockHandler.HandleAsync(Arg.Any<UpdateUserSettingsCommand>(), Arg.Any<CancellationToken>())
+            .Returns(expectedError);
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(request, cancellationToken);
+
+        // Assert
+        ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemResult.StatusCode);
+        Assert.Equal("application/problem+json", problemResult.ContentType);
+        Assert.IsType<HttpValidationProblemDetails>(problemResult.ProblemDetails);
+        Assert.Equal("General.Validation", problemResult.ProblemDetails.Title);
+        Assert.NotNull(problemResult.ProblemDetails.Extensions["traceId"]);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCalled_ShouldSendUpdateUserSettingsCommandToSender()
+    {
+        // Arrange
+        UpdateUserSettingsRequest request = _updateUserSettingsRequestFixture.Create(isPaginationEnabled: true, itemsPerPage: 24, shouldIgnoreThePrefixForAlphaPicker: true, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false);
+        CancellationToken cancellationToken = CancellationToken.None;
+        _mockHandler.HandleAsync(Arg.Any<UpdateUserSettingsCommand>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Updated);
+
+        // Act
+        await _sut.ExecuteAsync(request, cancellationToken);
+
+        // Assert
+        await _mockHandler.Received(1).HandleAsync(
+            Arg.Is<UpdateUserSettingsCommand>(command =>
+                command.IsPaginationEnabled == request.IsPaginationEnabled &&
+                command.ItemsPerPage == request.ItemsPerPage &&
+                command.ShouldIgnoreThePrefixForAlphaPicker == request.ShouldIgnoreThePrefixForAlphaPicker &&
+                command.IsThemeCachingEnabled == request.IsThemeCachingEnabled),
+            Arg.Is(cancellationToken));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCancellationRequested_ShouldCancelOperation()
+    {
+        // Arrange
+        CancellationTokenSource cts = new();
+        TaskCompletionSource<bool> operationStarted = new();
+        TaskCompletionSource<bool> cancellationRequested = new();
+
+        _mockHandler.HandleAsync(Arg.Any<UpdateUserSettingsCommand>(), Arg.Any<CancellationToken>())
+            .Returns(info => Task.Run(async () =>
+            {
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                info.Arg<CancellationToken>().ThrowIfCancellationRequested();
+                return Result.From(Result.Updated);
+            }, info.Arg<CancellationToken>()));
+
+        // Act
+        Task<IResult> operationTask = _sut.ExecuteAsync(_updateUserSettingsRequestFixture.Create(isPaginationEnabled: true, itemsPerPage: 48, shouldIgnoreThePrefixForAlphaPicker: false, isThemeCachingEnabled: true, shouldAggregateMetadataWhenMissing: false), cts.Token);
+        await operationStarted.Task;
+        cts.Cancel();
+        cancellationRequested.SetResult(true);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
+    }
+}

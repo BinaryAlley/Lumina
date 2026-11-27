@@ -1,0 +1,59 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+#endregion
+
+namespace Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+
+/// <summary>
+/// Represents a track response.
+/// </summary>
+/// <param name="Id">The Id of the track.</param>
+/// <param name="AlbumId">The Id of the album the track belongs to.</param>
+/// <param name="LibraryId">The Id of the media library this track belongs to.</param>
+/// <param name="Path">The file system path of the track.</param>
+/// <param name="Metadata">The audio metadata of the track.</param>
+/// <param name="TrackNumber">The number of the track on its disc.</param>
+/// <param name="DiscNumber">The number of the disc the track belongs to, if applicable.</param>
+/// <param name="Script">The script used by the language of the track, if applicable.</param>
+/// <param name="Key">The musical key of the track, if applicable.</param>
+/// <param name="Bpm">The tempo of the track in beats per minute, if applicable.</param>
+/// <param name="Work">The work the track is a recording of, if applicable.</param>
+/// <param name="MusicBrainzRecordingId">The MusicBrainz identifier of the recording, if applicable.</param>
+/// <param name="MusicBrainzTrackId">The MusicBrainz identifier of the track, if applicable.</param>
+/// <param name="CreatedOnUtc">The date and time when the track was created.</param>
+/// <param name="UpdatedOnUtc">The optional date and time when the track was updated.</param>
+/// <param name="Moods">The list of moods of the track.</param>
+/// <param name="Isrcs">The list of ISRC (International Standard Recording Code) of the track.</param>
+/// <param name="Contributors">The list of references to the media contributors that performed on the track, each with the role they played.</param>
+/// <param name="Ratings">The list of ratings for this track.</param>
+/// <param name="Container">The container of the audio file of the track, for example MP3, FLAC, OGG, AAC, MP4 or WAV, captured from the file itself. Read only, and not settable through a request. Optional.</param>
+[DebuggerDisplay("Title: {Metadata.Title}")]
+public record TrackResponse(
+    Guid Id,
+    Guid AlbumId,
+    Guid LibraryId,
+    string Path,
+    MusicTrackMetadataDto Metadata,
+    int TrackNumber,
+    int? DiscNumber,
+    string? Script,
+    MusicKey? Key,
+    int? Bpm,
+    MusicWorkDto? Work,
+    Guid? MusicBrainzRecordingId,
+    Guid? MusicBrainzTrackId,
+    DateTime CreatedOnUtc,
+    DateTime? UpdatedOnUtc,
+    List<MoodDto>? Moods,
+    List<IsrcDto>? Isrcs,
+    List<MediaContributorReferenceDto>? Contributors,
+    List<AudioRatingDto>? Ratings,
+    string? Container = null
+);

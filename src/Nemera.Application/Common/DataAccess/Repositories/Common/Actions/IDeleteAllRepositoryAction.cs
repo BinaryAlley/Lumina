@@ -1,0 +1,18 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Domain.Common.Primitives;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Application.Common.DataAccess.Repositories.Common.Actions;
+
+/// <summary>
+/// Interface defining the "delete all" action for interacting with a generic persistence medium.
+/// </summary>
+public interface IDeleteAllRepositoryAction
+{
+    /// <summary>
+    /// Deletes all entities from the storage medium.
+    /// </summary>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Deleted>> DeleteAllAsync();
+}

@@ -1,0 +1,939 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using NSubstitute;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+#endregion
+
+namespace Nemera.Domain.UnitTests.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+
+/// <summary>
+/// Contains unit tests for the <see cref="PathService"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class PathServiceTests
+{
+    private readonly IPlatformContextManager _mockPlatformContextManager;
+    private readonly IPlatformContext _mockPlatformContext;
+    private readonly IPathStrategy _mockPathStrategy;
+    private readonly PathService _sut;
+    private readonly FileSystemPathIdFixture _fileSystemPathIdFixture = new();
+    private readonly PathSegmentFixture _pathSegmentFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PathServiceTests"/> class.
+    /// </summary>
+    public PathServiceTests()
+    {
+        _mockPlatformContextManager = Substitute.For<IPlatformContextManager>();
+        _mockPlatformContext = Substitute.For<IPlatformContext>();
+        _mockPathStrategy = Substitute.For<IPathStrategy>();
+        _mockPlatformContext.PathStrategy.Returns(_mockPathStrategy);
+        _mockPlatformContextManager.GetCurrentContext().Returns(_mockPlatformContext);
+        _sut = new PathService(_mockPlatformContextManager);
+    }
+
+    [Fact]
+    public void PathSeparator_WhenAccessed_ShouldReturnPathStrategySeparator()
+    {
+        // Arrange
+        char expectedSeparator = '\\';
+        _mockPathStrategy.PathSeparator.Returns(expectedSeparator);
+
+        // Act
+        char result = _sut.PathSeparator;
+
+        // Assert
+        Assert.Equal(expectedSeparator, result);
+    }
+
+    [Fact]
+    public void IsValidPath_WithValidPath_ShouldReturnTrue()
+    {
+        // Arrange
+        string validPath = @"C:\ValidPath";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(validPath);
+        _mockPathStrategy.IsValidPath(pathId).Returns(true);
+
+        // Act
+        bool result = _sut.IsValidPath(validPath);
+
+        // Assert
+        Assert.True(result);
+        _mockPathStrategy.Received(1).IsValidPath(Arg.Is<FileSystemPathId>(id => id.Path == validPath));
+    }
+
+    [Fact]
+    public void IsValidPath_WithInvalidPath_ShouldReturnFalse()
+    {
+        // Arrange
+        string invalidPath = @"C:\Invalid\*Path";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(invalidPath);
+        _mockPathStrategy.IsValidPath(pathId).Returns(false);
+
+        // Act
+        bool result = _sut.IsValidPath(invalidPath);
+
+        // Assert
+        Assert.False(result);
+        _mockPathStrategy.Received(1).IsValidPath(Arg.Is<FileSystemPathId>(id => id.Path == invalidPath));
+    }
+
+    [Fact]
+    public void IsValidPath_WithEmptyPath_ShouldReturnFalse()
+    {
+        // Arrange
+        string emptyPath = string.Empty;
+
+        // Act
+        bool result = _sut.IsValidPath(emptyPath);
+
+        // Assert
+        Assert.False(result);
+        _mockPathStrategy.DidNotReceive().IsValidPath(Arg.Any<FileSystemPathId>());
+    }
+
+    [Fact]
+    public void IsValidPath_WithNullPath_ShouldReturnFalse()
+    {
+        // Arrange
+        string? nullPath = null;
+
+        // Act
+        bool result = _sut.IsValidPath(nullPath!);
+
+        // Assert
+        Assert.False(result);
+        _mockPathStrategy.DidNotReceive().IsValidPath(Arg.Any<FileSystemPathId>());
+    }
+
+    [Fact]
+    public void Exists_WithValidExistingPath_ShouldReturnTrue()
+    {
+        // Arrange
+        string existingPath = @"C:\ExistingPath";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(existingPath);
+        _mockPathStrategy.Exists(pathId).Returns(true);
+
+        // Act
+        bool result = _sut.Exists(existingPath);
+
+        // Assert
+        Assert.True(result);
+        _mockPathStrategy.Received(1).Exists(Arg.Is<FileSystemPathId>(id => id.Path == existingPath));
+    }
+
+    [Fact]
+    public void Exists_WhenPathIsHiddenAndShouldIncludeHiddenElementsIsTrue_ShouldReturnTrue()
+    {
+        // Arrange
+        string existingPath = @"C:\ExistingPath";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(existingPath);
+        _mockPathStrategy.Exists(pathId, true).Returns(true);
+
+        // Act
+        bool result = _sut.Exists(existingPath, true);
+
+        // Assert
+        Assert.True(result);
+        _mockPathStrategy.Received(1).Exists(Arg.Is<FileSystemPathId>(id => id.Path == existingPath));
+    }
+
+    [Fact]
+    public void Exists_WhenPathIsHiddenAndShouldIncludeHiddenElementsIsFalse_ShouldReturnFalse()
+    {
+        // Arrange
+        string existingPath = @"C:\ExistingPath";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(existingPath);
+        _mockPathStrategy.Exists(pathId, false).Returns(false);
+
+        // Act
+        bool result = _sut.Exists(existingPath, false);
+
+        // Assert
+        Assert.False(result);
+        _mockPathStrategy.Received(1).Exists(Arg.Is<FileSystemPathId>(id => id.Path == existingPath), false);
+    }
+
+    [Fact]
+    public void Exists_WithValidNonExistingPath_ShouldReturnFalse()
+    {
+        // Arrange
+        string nonExistingPath = @"C:\NonExistingPath";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(nonExistingPath);
+        _mockPathStrategy.Exists(pathId).Returns(false);
+
+        // Act
+        bool result = _sut.Exists(nonExistingPath);
+
+        // Assert
+        Assert.False(result);
+        _mockPathStrategy.Received(1).Exists(Arg.Is<FileSystemPathId>(id => id.Path == nonExistingPath));
+    }
+
+    [Fact]
+    public void Exists_WithEmptyPath_ShouldReturnFalse()
+    {
+        // Arrange
+        string emptyPath = string.Empty;
+
+        // Act
+        bool result = _sut.Exists(emptyPath);
+
+        // Assert
+        Assert.False(result);
+        _mockPathStrategy.DidNotReceive().Exists(Arg.Any<FileSystemPathId>());
+    }
+
+    [Fact]
+    public void Exists_WithNullPath_ShouldReturnFalse()
+    {
+        // Arrange
+        string? nullPath = null;
+
+        // Act
+        bool result = _sut.Exists(nullPath!);
+
+        // Assert
+        Assert.False(result);
+        _mockPathStrategy.DidNotReceive().Exists(Arg.Any<FileSystemPathId>());
+    }
+
+    [Fact]
+    public void CombinePath_WithValidPathAndName_ShouldReturnCombinedPath()
+    {
+        // Arrange
+        string path = @"C:\BaseDir";
+        string name = "SubDir";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
+        FileSystemPathId combinedPathId = _fileSystemPathIdFixture.Create(@"C:\BaseDir\SubDir");
+        _mockPathStrategy.CombinePath(pathId, name).Returns(Result.From(combinedPathId));
+
+        // Act
+        Result<string> result = _sut.CombinePath(path, name);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(@"C:\BaseDir\SubDir", result.Value);
+        _mockPathStrategy.Received(1).CombinePath(Arg.Is<FileSystemPathId>(id => id.Path == path), name);
+    }
+
+    [Fact]
+    public void CombinePath_WithInvalidPath_ShouldReturnError()
+    {
+        // Arrange
+        string invalidPath = string.Empty;
+        string name = "SubDir";
+
+        // Act
+        Result<string> result = _sut.CombinePath(invalidPath, name);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+        _mockPathStrategy.DidNotReceive().CombinePath(Arg.Any<FileSystemPathId>(), Arg.Any<string>());
+    }
+
+    [Fact]
+    public void CombinePath_WhenPathStrategyReturnsError_ShouldPropagateError()
+    {
+        // Arrange
+        string path = @"C:\BaseDir";
+        string name = "Invalid*Name";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
+        _mockPathStrategy.CombinePath(pathId, name).Returns(Errors.FileSystemManagement.InvalidPath);
+
+        // Act
+        Result<string> result = _sut.CombinePath(path, name);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+        _mockPathStrategy.Received(1).CombinePath(Arg.Is<FileSystemPathId>(id => id.Path == path), name);
+    }
+
+    [Fact]
+    public void CombinePath_WithNullName_ShouldReturnError()
+    {
+        // Arrange
+        string path = @"C:\BaseDir";
+        string? name = null;
+
+        // Act
+        Result<string> result = _sut.CombinePath(path, name!);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+        _mockPathStrategy.DidNotReceive().CombinePath(Arg.Any<FileSystemPathId>(), Arg.Any<string>());
+    }
+
+    [Fact]
+    public void ParsePath_WithValidPath_ShouldReturnPathSegments()
+    {
+        // Arrange
+        string validPath = @"C:\ValidPath\SubDir";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(validPath);
+        List<PathSegment> expectedSegments = _pathSegmentFixture.CreateMany();
+        _mockPathStrategy.ParsePath(pathId).Returns(Result.From(expectedSegments.AsEnumerable()));
+
+        // Act
+        Result<IEnumerable<PathSegment>> result = _sut.ParsePath(validPath);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(expectedSegments, result.Value);
+        _mockPathStrategy.Received(1).ParsePath(Arg.Is<FileSystemPathId>(id => id.Path == validPath));
+    }
+
+    [Fact]
+    public void ParsePath_WithInvalidPath_ShouldReturnError()
+    {
+        // Arrange
+        string invalidPath = string.Empty;
+
+        // Act
+        Result<IEnumerable<PathSegment>> result = _sut.ParsePath(invalidPath);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+        _mockPathStrategy.DidNotReceive().ParsePath(Arg.Any<FileSystemPathId>());
+    }
+
+    [Fact]
+    public void ParsePath_WhenPathStrategyReturnsError_ShouldPropagateError()
+    {
+        // Arrange
+        string path = @"C:\InvalidPath\*SubDir";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
+        _mockPathStrategy.ParsePath(pathId).Returns(Errors.FileSystemManagement.InvalidPath);
+
+        // Act
+        Result<IEnumerable<PathSegment>> result = _sut.ParsePath(path);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+        _mockPathStrategy.Received(1).ParsePath(Arg.Is<FileSystemPathId>(id => id.Path == path));
+    }
+
+    [Fact]
+    public void ParsePath_WithNullPath_ShouldReturnError()
+    {
+        // Arrange
+        string? nullPath = null;
+
+        // Act
+        Result<IEnumerable<PathSegment>> result = _sut.ParsePath(nullPath!);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+        _mockPathStrategy.DidNotReceive().ParsePath(Arg.Any<FileSystemPathId>());
+    }
+
+    [Fact]
+    public void GoUpOneLevel_WithValidPath_ShouldReturnParentPathSegments()
+    {
+        // Arrange
+        string validPath = @"C:\ValidPath\SubDir";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(validPath);
+        List<PathSegment> expectedSegments = _pathSegmentFixture.CreateMany(2); // Assuming parent path has 2 segments.
+        _mockPathStrategy.GoUpOneLevel(pathId).Returns(Result.From(expectedSegments.AsEnumerable()));
+
+        // Act
+        Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(validPath);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(expectedSegments, result.Value);
+        _mockPathStrategy.Received(1).GoUpOneLevel(Arg.Is<FileSystemPathId>(id => id.Path == validPath));
+    }
+
+    [Fact]
+    public void GoUpOneLevel_WithRootPath_ShouldReturnEmptySegmentList()
+    {
+        // Arrange
+        string rootPath = @"C:\";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(rootPath);
+        List<PathSegment> emptySegmentList = [];
+        _mockPathStrategy.GoUpOneLevel(pathId).Returns(Result.From(emptySegmentList.AsEnumerable()));
+
+        // Act
+        Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(rootPath);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Empty(result.Value);
+        _mockPathStrategy.Received(1).GoUpOneLevel(Arg.Is<FileSystemPathId>(id => id.Path == rootPath));
+    }
+
+    [Fact]
+    public void GoUpOneLevel_WithInvalidPath_ShouldReturnError()
+    {
+        // Arrange
+        string invalidPath = string.Empty;
+
+        // Act
+        Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(invalidPath);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+        _mockPathStrategy.DidNotReceive().GoUpOneLevel(Arg.Any<FileSystemPathId>());
+    }
+
+    [Fact]
+    public void GoUpOneLevel_WhenPathStrategyReturnsError_ShouldPropagateError()
+    {
+        // Arrange
+        string path = @"C:\InvalidPath\*SubDir";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
+        _mockPathStrategy.GoUpOneLevel(pathId).Returns(Errors.FileSystemManagement.InvalidPath);
+
+        // Act
+        Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(path);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+        _mockPathStrategy.Received(1).GoUpOneLevel(Arg.Is<FileSystemPathId>(id => id.Path == path));
+    }
+
+    [Fact]
+    public void GoUpOneLevel_WithNullPath_ShouldReturnError()
+    {
+        // Arrange
+        string? nullPath = null;
+
+        // Act
+        Result<IEnumerable<PathSegment>> result = _sut.GoUpOneLevel(nullPath!);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+        _mockPathStrategy.DidNotReceive().GoUpOneLevel(Arg.Any<FileSystemPathId>());
+    }
+
+    [Fact]
+    public void GetInvalidPathCharsForPlatform_WhenCalled_ShouldReturnInvalidCharsFromPathStrategy()
+    {
+        // Arrange
+        char[] expectedInvalidChars = ['<', '>', ':', '"', '|', '?', '*'];
+        _mockPathStrategy.GetInvalidPathCharsForPlatform().Returns(expectedInvalidChars);
+
+        // Act
+        char[] result = _sut.GetInvalidPathCharsForPlatform();
+
+        // Assert
+        Assert.Equal(expectedInvalidChars, result);
+        _mockPathStrategy.Received(1).GetInvalidPathCharsForPlatform();
+    }
+
+    [Fact]
+    public void GetInvalidPathCharsForPlatform_WhenPathStrategyReturnsEmptyArray_ShouldReturnEmptyArray()
+    {
+        // Arrange
+        char[] emptyArray = [];
+        _mockPathStrategy.GetInvalidPathCharsForPlatform().Returns(emptyArray);
+
+        // Act
+        char[] result = _sut.GetInvalidPathCharsForPlatform();
+
+        // Assert
+        Assert.Empty(result);
+        _mockPathStrategy.Received(1).GetInvalidPathCharsForPlatform();
+    }
+
+    [Fact]
+    public void GetInvalidPathCharsForPlatform_WhenReturnedArrayIsModified_ShouldNotAffectSubsequentCalls()
+    {
+        // Arrange
+        char[] originalInvalidChars = ['<', '>', ':', '"', '|', '?', '*'];
+        _mockPathStrategy.GetInvalidPathCharsForPlatform().Returns(_ => (char[])originalInvalidChars.Clone());
+
+        // Act
+        char[] result = _sut.GetInvalidPathCharsForPlatform();
+        result[0] = 'X'; // Attempt to modify the returned array.
+
+        // Assert
+        char[] secondResult = _sut.GetInvalidPathCharsForPlatform();
+        Assert.Equal(originalInvalidChars, secondResult);
+        _mockPathStrategy.Received(2).GetInvalidPathCharsForPlatform();
+    }
+
+    [Fact]
+    public void GetPathRoot_WhenCalledWithValidPath_ShouldReturnRootPathSegment()
+    {
+        // Arrange
+        string validPath = @"C:\ValidPath\SubDir";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(validPath);
+        PathSegment expectedRootSegment = _pathSegmentFixture.Create(name: "C:", isDirectory: false, isDrive: true);
+        _mockPathStrategy.GetPathRoot(pathId).Returns(Result.From(expectedRootSegment));
+
+        // Act
+        Result<PathSegment> result = _sut.GetPathRoot(validPath);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(expectedRootSegment, result.Value);
+        _mockPathStrategy.Received(1).GetPathRoot(Arg.Is<FileSystemPathId>(id => id.Path == validPath));
+    }
+
+    [Fact]
+    public void GetPathRoot_WhenCalledWithInvalidPath_ShouldReturnError()
+    {
+        // Arrange
+        string invalidPath = string.Empty;
+
+        // Act
+        Result<PathSegment> result = _sut.GetPathRoot(invalidPath);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+        _mockPathStrategy.DidNotReceive().GetPathRoot(Arg.Any<FileSystemPathId>());
+    }
+
+    [Fact]
+    public void GetPathRoot_WhenPathStrategyReturnsError_ShouldPropagateError()
+    {
+        // Arrange
+        string path = @"C:\InvalidPath\*SubDir";
+        FileSystemPathId pathId = _fileSystemPathIdFixture.Create(path);
+        _mockPathStrategy.GetPathRoot(pathId).Returns(Errors.FileSystemManagement.InvalidPath);
+
+        // Act
+        Result<PathSegment> result = _sut.GetPathRoot(path);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+        _mockPathStrategy.Received(1).GetPathRoot(Arg.Is<FileSystemPathId>(id => id.Path == path));
+    }
+
+    [Fact]
+    public void GetPathRoot_WhenCalledWithNullPath_ShouldReturnError()
+    {
+        // Arrange
+        string? nullPath = null;
+
+        // Act
+        Result<PathSegment> result = _sut.GetPathRoot(nullPath!);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+        _mockPathStrategy.DidNotReceive().GetPathRoot(Arg.Any<FileSystemPathId>());
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithValidName_ShouldReturnTheNameAsASegment()
+    {
+        // Arrange
+        char[] invalidChars = ['<', '>', ':', '"', '|', '?', '*'];
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(invalidChars);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("Valid Name");
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Valid Name", result.Value.Name);
+        _mockPathStrategy.Received(1).GetInvalidPathSegmentCharsForPlatform();
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithLeadingAndTrailingWhitespace_ShouldTrimTheName()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("  Valid Name  ");
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Valid Name", result.Value.Name);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithInvalidCharacters_ShouldReplaceThemWithSpaces()
+    {
+        // Arrange
+        char[] invalidChars = ['<', '>', ':', '"', '|', '?', '*'];
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(invalidChars);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("Bad<Name>");
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Bad Name", result.Value.Name);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithConsecutiveWhitespace_ShouldCollapseItIntoASingleSpace()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("Name   with   spaces");
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Name with spaces", result.Value.Name);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithDotSegment_ShouldReturnInvalidPath()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment(".");
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithDotDotSegment_ShouldReturnInvalidPath()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("..");
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithForwardSlash_ShouldReturnInvalidPath()
+    {
+        // Arrange
+        // The forward slash is not an invalid character for a segment on Unix-like platforms, so only the path service can reject it.
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['\0']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("a/b");
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithBackslash_ShouldReturnInvalidPath()
+    {
+        // Arrange
+        // The backslash is not an invalid character for a segment on Windows platforms, so only the path service can reject it.
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', '"', '|', '?', '*', ':']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("a\\b");
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Theory]
+    [InlineData("../..")] // Parent directory escape.
+    [InlineData("a/../b")] // Embedded parent directory escape.
+    [InlineData("..\\..")] // Windows parent directory escape.
+    [InlineData("a\\..\\b")] // Embedded Windows parent directory escape.
+    public void SanitizeSegment_WithPathTraversal_ShouldReturnInvalidPath(string name)
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['\0']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment(name);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithAColon_WhenTheColonIsValidForThePlatform_ShouldKeepTheColon()
+    {
+        // Arrange
+        // The colon is not an invalid character for a segment on Unix-like platforms, so it must be preserved.
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['\0']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("Name:WithColon");
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Name:WithColon", result.Value.Name);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithAColon_WhenTheColonIsInvalidForThePlatform_ShouldReplaceItWithASpace()
+    {
+        // Arrange
+        // The colon is an invalid character for a segment on Windows platforms, so it must be replaced.
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', '"', '|', '?', '*', ':']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("Name:WithColon");
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("Name WithColon", result.Value.Name);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithEmptyName_ShouldReturnNameCannotBeEmpty()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment(string.Empty);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.NameCannotBeEmpty, result.FirstError);
+        _mockPathStrategy.DidNotReceive().GetInvalidPathSegmentCharsForPlatform();
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithWhitespaceOnlyName_ShouldReturnNameCannotBeEmpty()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("   ");
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.NameCannotBeEmpty, result.FirstError);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithNameMadeOnlyOfInvalidCharacters_ShouldReturnInvalidPath()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment("***");
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithNameLongerThanTheMaximumLength_ShouldCapTheSegment()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment(new string('a', 150));
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(100, result.Value.Name.Length);
+        Assert.Equal(new string('a', 100), result.Value.Name);
+    }
+
+    [Fact]
+    public void SanitizeSegment_WithNameLongerThanTheMaximumLengthAndTrailingWhitespace_ShouldTrimAfterCapping()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeSegment(new string('a', 110) + new string(' ', 50));
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(100, result.Value.Name.Length);
+    }
+
+    [Fact]
+    public void SanitizeCompositeSegment_WhenTheNameFitsTheBudget_ShouldAppendTheIdentifier()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+        string identifier = Guid.NewGuid().ToString();
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeCompositeSegment("Queen", identifier);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal($"Queen-{identifier}", result.Value.Name);
+    }
+
+    [Fact]
+    public void SanitizeCompositeSegment_WhenTheNameExceedsTheBudget_ShouldTruncateOnlyTheName()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+        string identifier = Guid.NewGuid().ToString();
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeCompositeSegment(new string('a', 99), identifier);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(100, result.Value.Name.Length);
+        Assert.EndsWith($"-{identifier}", result.Value.Name);
+        Assert.Equal(new string('a', 63), result.Value.Name[..^($"-{identifier}".Length)]);
+    }
+
+    [Fact]
+    public void SanitizeCompositeSegment_WhenTheIdentifierLeavesNoRoomForTheName_ShouldReturnInvalidPath()
+    {
+        // Arrange
+        _mockPathStrategy.GetInvalidPathSegmentCharsForPlatform().Returns(['<', '>', ':', '"', '|', '?', '*']);
+
+        // Act
+        Result<PathSegment> result = _sut.SanitizeCompositeSegment("Queen", new string('a', 99));
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.FileSystemManagement.InvalidPath, result.FirstError);
+    }
+
+    [Fact]
+    public void IsPathWithin_WhenBothPathsAreValid_ShouldCreatePathIdsAndDelegateToTheStrategy()
+    {
+        // Arrange
+        string path = @"C:\Media\Books\book.epub";
+        string parentPath = @"C:\Media\Books";
+        _mockPathStrategy.IsPathWithin(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>()).Returns(true);
+
+        // Act
+        bool result = _sut.IsPathWithin(path, parentPath);
+
+        // Assert
+        Assert.True(result);
+        _mockPathStrategy.Received(1).IsPathWithin(
+            Arg.Is<FileSystemPathId>(pathId => pathId.Path == path),
+            Arg.Is<FileSystemPathId>(pathId => pathId.Path == parentPath));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void IsPathWithin_WhenPathIsNotValid_ShouldReturnFalseWithoutCallingTheStrategy(string? invalidPath)
+    {
+        // Act
+        bool result = _sut.IsPathWithin(invalidPath!, @"C:\Media");
+
+        // Assert
+        Assert.False(result);
+        _mockPathStrategy.DidNotReceive().IsPathWithin(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>());
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void IsPathWithin_WhenParentPathIsNotValid_ShouldReturnFalseWithoutCallingTheStrategy(string? invalidParentPath)
+    {
+        // Act
+        bool result = _sut.IsPathWithin(@"C:\Media\Books\book.epub", invalidParentPath!);
+
+        // Assert
+        Assert.False(result);
+        _mockPathStrategy.DidNotReceive().IsPathWithin(Arg.Any<FileSystemPathId>(), Arg.Any<FileSystemPathId>());
+    }
+
+    [Theory]
+    [InlineData('\\', @"C:\Music\Queen\Bohemian Rhapsody.mp3", "Bohemian Rhapsody.mp3")] // Windows separated path.
+    [InlineData('/', "/music/queen/bohemian-rhapsody.mp3", "bohemian-rhapsody.mp3")] // Unix separated path.
+    public void GetFileName_WhenPathHasDirectories_ShouldReturnTheLastSegment(char separator, string path, string expectedFileName)
+    {
+        // Arrange
+        _mockPathStrategy.PathSeparator.Returns(separator);
+
+        // Act
+        string result = _sut.GetFileName(path);
+
+        // Assert
+        Assert.Equal(expectedFileName, result);
+    }
+
+    [Theory]
+    [InlineData('\\')] // Windows separated path.
+    [InlineData('/')] // Unix separated path.
+    public void GetFileName_WhenPathHasNoDirectory_ShouldReturnThePath(char separator)
+    {
+        // Arrange
+        _mockPathStrategy.PathSeparator.Returns(separator);
+
+        // Act
+        string result = _sut.GetFileName("Bohemian Rhapsody.mp3");
+
+        // Assert
+        Assert.Equal("Bohemian Rhapsody.mp3", result);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public void GetFileName_WhenPathIsNullOrEmpty_ShouldReturnThePath(string? path)
+    {
+        // Act
+        string result = _sut.GetFileName(path!);
+
+        // Assert
+        Assert.Equal(path, result);
+    }
+
+    [Theory]
+    [InlineData('\\', @"C:\Music\Queen\Bohemian Rhapsody.mp3", "Bohemian Rhapsody")] // Windows separated path.
+    [InlineData('/', "/music/queen/bohemian-rhapsody.mp3", "bohemian-rhapsody")] // Unix separated path.
+    public void GetFileNameWithoutExtension_WhenPathHasDirectories_ShouldReturnTheFileNameWithoutItsExtension(char separator, string path, string expectedFileName)
+    {
+        // Arrange
+        _mockPathStrategy.PathSeparator.Returns(separator);
+
+        // Act
+        string result = _sut.GetFileNameWithoutExtension(path);
+
+        // Assert
+        Assert.Equal(expectedFileName, result);
+    }
+
+    [Theory]
+    [InlineData('\\')] // Windows separated path.
+    [InlineData('/')] // Unix separated path.
+    public void GetFileNameWithoutExtension_WhenFileNameHasNoExtension_ShouldReturnTheFileName(char separator)
+    {
+        // Arrange
+        _mockPathStrategy.PathSeparator.Returns(separator);
+
+        // Act
+        string result = _sut.GetFileNameWithoutExtension("Bohemian Rhapsody");
+
+        // Assert
+        Assert.Equal("Bohemian Rhapsody", result);
+    }
+}

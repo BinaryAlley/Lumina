@@ -1,0 +1,111 @@
+#region ========================================================================= USING =====================================================================================
+using Bogus;
+using Nemera.Application.Common.DTO.MediaLibrary.Management;
+using Nemera.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+#endregion
+
+namespace Nemera.Application.Fixtures.Core.MediaLibrary.Management.Commands.UpdateLibrary;
+
+/// <summary>
+/// Fixture class for the <see cref="UpdateLibraryCommand"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class UpdateLibraryCommandFixture
+{
+    /// <summary>
+    /// Creates a random valid command to update a media library.
+    /// </summary>
+    /// <param name="id">Optional. The Id of the media library.</param>
+    /// <param name="title">Optional. The title of the media library.</param>
+    /// <param name="libraryType">Optional. The type of the media library.</param>
+    /// <param name="contentLocations">Optional. The content locations of the media library.</param>
+    /// <param name="coverImage">Optional. The cover image path of the media library.</param>
+    /// <param name="isEnabled">Whether the media library is enabled or not.</param>
+    /// <param name="isLocked">Whether the media library is locked or not.</param>
+    /// <param name="canDownloadMetadataFromWeb">Whether the media library should download metadata from the web or not.</param>
+    /// <param name="shouldSaveMetadataInMediaDirectories">Whether the metadata should be saved in the media directories or not.</param>
+    /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether unchanged directories should be skipped during a scan or not.</param>
+    /// <param name="shouldSkipHiddenFilesAndDirectoriesDuringScan">Optional. Whether hidden files and directories should be skipped during a scan or not. When absent, the stored value is kept.</param>
+    /// <param name="isContentOnSsd">Whether the content of the media library is stored on a solid state drive.</param>
+    /// <param name="shouldTrackConsumptionProgress">Optional. Whether the consumption progress of the media library items should be tracked, or not.</param>
+    /// <param name="completionThresholdPercentage">Optional. The percentage of a media library item that must be consumed for its session to be considered completed.</param>
+    /// <param name="pathTemplateParts">Optional. The ordered parts of the path template of the media library.</param>
+    /// <param name="metadataProviders">Optional. The choices made for the metadata providers of the media library.</param>
+    /// <param name="artworkProviders">Optional. The choices made for the artwork providers of the media library.</param>
+    /// <param name="bookReaders">Optional. The choices made for the book readers of the media library.</param>
+    /// <returns>The created command.</returns>
+    public UpdateLibraryCommand Create(
+        Guid? id = null,
+        string? title = null,
+        string? libraryType = null,
+        string[]? contentLocations = null,
+        string? coverImage = null,
+        bool isEnabled = true,
+        bool isLocked = false,
+        bool canDownloadMetadataFromWeb = true,
+        bool shouldSaveMetadataInMediaDirectories = true,
+        bool shouldSkipUnchangedDirectoriesDuringScan = false,
+        bool? shouldSkipHiddenFilesAndDirectoriesDuringScan = null,
+        bool isContentOnSsd = false,
+        bool? shouldTrackConsumptionProgress = null,
+        int? completionThresholdPercentage = null,
+        LibraryPathTemplatePartDto[]? pathTemplateParts = null,
+        LibraryProviderSelectionDto[]? metadataProviders = null,
+        LibraryProviderSelectionDto[]? artworkProviders = null,
+        LibraryProviderSelectionDto[]? bookReaders = null)
+    {
+        return new Faker<UpdateLibraryCommand>()
+            .CustomInstantiator(f => new UpdateLibraryCommand(
+                default,
+                default!,
+                default!,
+                default!,
+                default!,
+                true,
+                false,
+                true,
+                true,
+                false,
+                null,
+                false,
+                shouldTrackConsumptionProgress,
+                completionThresholdPercentage,
+                null,
+                null,
+                null,
+                null
+            ))
+            .RuleFor(x => x.Id, id ?? Guid.NewGuid())
+            .RuleFor(x => x.Title, f => title ?? f.Lorem.Word())
+            .RuleFor(x => x.LibraryType, f => libraryType ?? f.Random.Enum<LibraryType>().ToString())
+            .RuleFor(x => x.ContentLocations, f => contentLocations ?? [f.System.DirectoryPath(), f.System.DirectoryPath(), f.System.DirectoryPath()])
+            .RuleFor(x => x.CoverImage, f => coverImage ?? f.System.FilePath())
+            .RuleFor(x => x.IsEnabled, isEnabled)
+            .RuleFor(x => x.IsLocked, isLocked)
+            .RuleFor(x => x.CanDownloadMetadataFromWeb, canDownloadMetadataFromWeb)
+            .RuleFor(x => x.ShouldSaveMetadataInMediaDirectories, shouldSaveMetadataInMediaDirectories)
+            .RuleFor(x => x.ShouldSkipUnchangedDirectoriesDuringScan, shouldSkipUnchangedDirectoriesDuringScan)
+            .RuleFor(x => x.ShouldSkipHiddenFilesAndDirectoriesDuringScan, shouldSkipHiddenFilesAndDirectoriesDuringScan)
+            .RuleFor(x => x.IsContentOnSsd, isContentOnSsd)
+            .RuleFor(x => x.PathTemplateParts, pathTemplateParts)
+            .RuleFor(x => x.MetadataProviders, metadataProviders)
+            .RuleFor(x => x.ArtworkProviders, artworkProviders)
+            .RuleFor(x => x.BookReaders, bookReaders)
+            .Generate();
+    }
+
+    /// <summary>
+    /// Creates a list of <see cref="UpdateLibraryCommand"/>.
+    /// </summary>
+    /// <param name="count">The number of elements to create.</param>
+    /// <returns>The created list.</returns>
+    public List<UpdateLibraryCommand> CreateMany(int count = 3)
+    {
+        return [.. Enumerable.Range(0, count).Select(_ => Create())];
+    }
+}

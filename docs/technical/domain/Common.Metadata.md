@@ -1,4 +1,4 @@
-- [Lumina Domain](#lumina-domain)
+- [Nemera Domain](#nemera-domain)
   - [Common](#common)
     - [Metadata](#metadata)
       - [Genre](#genre)
@@ -8,7 +8,7 @@
       - [Release Info](#release-info)
       - [Language Info](#language-info)
 
-# [Lumina Domain](#lumina-domain)
+# [Nemera Domain](#nemera-domain)
 
 ## [Common](#common)
 

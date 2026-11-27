@@ -1,6 +1,6 @@
-# Lumina API
+# Nemera API
 
-- [Lumina API](#lumina-api)
+- [Nemera API](#nemera-api)
   - [Health](#health)
     - [Check Health](#check-health)
       - [Check Health Request](#check-health-request)

@@ -1,0 +1,119 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Core.Endpoints.Themes.ThemeAssets;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
+using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Net.Http.Headers;
+#endregion
+
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Themes.ThemeAssets;
+
+/// <summary>
+/// Contains security tests for the <see cref="ThemeAssetsEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class ThemeAssetsEndpointTests : IClassFixture<NemeraWebFactory>
+{
+    private readonly NemeraWebFactory _apiFactory;
+    private readonly BlobDataDtoFixture _blobDataDtoFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ThemeAssetsEndpointTests"/> class.
+    /// </summary>
+    /// <param name="apiFactory">Injected Web application factory.</param>
+    public ThemeAssetsEndpointTests(NemeraWebFactory apiFactory)
+    {
+        _apiFactory = apiFactory;
+    }
+
+    [Fact]
+    public async Task ThemeAssets_WhenCalledWithoutAuthentication_ShouldServeAsset()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        byte[] expectedBytes = [0x89, 0x50, 0x4E, 0x47];
+        _apiFactory.ApiClientStub.RegisterBlobResponse(_blobDataDtoFixture.Create(data: expectedBytes, contentType: "image/png"));
+        HttpClient client = WebTestHelpers.CreateAnonymousClient(_apiFactory);
+
+        // Act
+        HttpResponseMessage response = await client.GetAsync("/theme-assets/test-theme/assets/logo.png");
+        byte[] content = await response.Content.ReadAsByteArrayAsync();
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("image/png", response.Content.Headers.ContentType!.MediaType);
+        Assert.Equal(expectedBytes, content);
+    }
+
+    [Fact]
+    public async Task ThemeAssets_WhenCraftedPathLooksLikeAuthorizationCheck_ShouldNotSignOutAuthenticatedUser()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.RegisterBlobException(new ApiException(
+            new ProblemDetailsDto { Title = "General.NotFound", Status = 404, Detail = "ThemeNotFound" },
+            HttpStatusCode.NotFound,
+            "/api/v1/themes/test-theme/assets/auth/get-authorization"));
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        HttpRequestMessage request = new(HttpMethod.Get, "/theme-assets/test-theme/auth/get-authorization");
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/html"));
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Equal("/en-us/not-found", response.Headers.Location!.ToString());
+    }
+
+    [Theory]
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("'; DROP TABLE Themes--")] // Destructive injection.
+    public async Task ThemeAssets_WithInjectionInThemeId_ShouldNotLeakOrError(string maliciousThemeId)
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.RegisterBlobResponse(_blobDataDtoFixture.Create(data: [0x01], contentType: "application/octet-stream"));
+        HttpClient client = WebTestHelpers.CreateAnonymousClient(_apiFactory);
+
+        // Act
+        HttpResponseMessage response = await client.GetAsync($"/theme-assets/{Uri.EscapeDataString(maliciousThemeId)}/assets/logo.png");
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Theory]
+    [InlineData("' OR '1'='1")] // Basic SQL injection.
+    [InlineData("..\\..\\appsettings.json")] // Path traversal.
+    public async Task ThemeAssets_WithInjectionInPath_ShouldNotLeakOrError(string maliciousPath)
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        _apiFactory.ApiClientStub.RegisterBlobResponse(_blobDataDtoFixture.Create(data: [0x01], contentType: "application/octet-stream"));
+        HttpClient client = WebTestHelpers.CreateAnonymousClient(_apiFactory);
+
+        // Act
+        HttpResponseMessage response = await client.GetAsync($"/theme-assets/test-theme/assets/{Uri.EscapeDataString(maliciousPath)}");
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
+    }
+}

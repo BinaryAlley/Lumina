@@ -1,0 +1,98 @@
+#region ========================================================================= USING =====================================================================================
+using FastEndpoints;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
+using Nemera.Contracts.Fixtures.Core.Responses.UsersManagement;
+using Nemera.Contracts.Responses.UsersManagement;
+using Nemera.Presentation.Api.Core.Endpoints.Maintenance.ApplicationSetup;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using NSubstitute;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Maintenance.ApplicationSetup;
+
+/// <summary>
+/// Contains unit tests for the <see cref="CheckInitializationEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class CheckInitializationEndpointTests
+{
+    private readonly IQueryHandler<CheckInitializationQuery, InitializationResponse> _mockHandler;
+    private readonly CheckInitializationEndpoint _sut;
+    private readonly InitializationResponseFixture _initializationResponseFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CheckInitializationEndpointTests"/> class.
+    /// </summary>
+    public CheckInitializationEndpointTests()
+    {
+        _mockHandler = Substitute.For<IQueryHandler<CheckInitializationQuery, InitializationResponse>>();
+        _sut = Factory.Create<CheckInitializationEndpoint>(_mockHandler);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCalled_ShouldReturnOkResultWithInitializationResponse()
+    {
+        // Arrange
+        CancellationToken cancellationToken = CancellationToken.None;
+        InitializationResponse expectedResponse = _initializationResponseFixture.Create(isInitialized: true);
+        _mockHandler.HandleAsync(Arg.Any<CheckInitializationQuery>(), Arg.Any<CancellationToken>())
+            .Returns(expectedResponse);
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
+
+        // Assert
+        Ok<InitializationResponse> okResult = Assert.IsType<Ok<InitializationResponse>>(result);
+        Assert.Equal(expectedResponse, okResult.Value);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCalled_ShouldSendCheckInitializationQueryToSender()
+    {
+        // Arrange
+        CancellationToken cancellationToken = CancellationToken.None;
+        _mockHandler.HandleAsync(Arg.Any<CheckInitializationQuery>(), Arg.Any<CancellationToken>())
+            .Returns(_initializationResponseFixture.Create(isInitialized: true));
+
+        // Act
+        await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
+
+        // Assert
+        await _mockHandler.Received(1).HandleAsync(
+            Arg.Any<CheckInitializationQuery>(),
+            Arg.Is(cancellationToken));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCancellationRequested_ShouldCancelOperation()
+    {
+        // Arrange
+        CancellationTokenSource cts = new();
+        TaskCompletionSource<bool> operationStarted = new();
+        TaskCompletionSource<bool> cancellationRequested = new();
+
+        _mockHandler.HandleAsync(Arg.Any<CheckInitializationQuery>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.Run(async () =>
+            {
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
+                return _initializationResponseFixture.Create(isInitialized: true);
+            }, callInfo.Arg<CancellationToken>()));
+
+        // Act
+        Task<IResult> operationTask = _sut.ExecuteAsync(EmptyRequest.Instance, cts.Token);
+        await operationStarted.Task;
+        cts.Cancel();
+        cancellationRequested.SetResult(true);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
+    }
+}

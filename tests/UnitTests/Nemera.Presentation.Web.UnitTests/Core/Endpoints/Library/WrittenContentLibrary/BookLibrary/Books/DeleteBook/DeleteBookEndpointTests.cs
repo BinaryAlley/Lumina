@@ -1,0 +1,138 @@
+#region ========================================================================= USING =====================================================================================
+using FastEndpoints;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.DeleteBook;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Microsoft.AspNetCore.Http;
+using NSubstitute;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.DeleteBook;
+
+/// <summary>
+/// Contains unit tests for the <see cref="DeleteBookEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class DeleteBookEndpointTests
+{
+    private readonly IApiHttpClient _mockApiHttpClient;
+    private readonly DeleteBookEndpoint _sut;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteBookEndpointTests"/> class.
+    /// </summary>
+    public DeleteBookEndpointTests()
+    {
+        _mockApiHttpClient = Substitute.For<IApiHttpClient>();
+        _sut = Factory.Create<DeleteBookEndpoint>(_mockApiHttpClient);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCalled_ShouldDeleteBookViaApiAndReturnSuccessWithoutData()
+    {
+        // Arrange
+        Guid bookId = Guid.NewGuid();
+        Guid libraryId = Guid.NewGuid();
+        ConfigureRequest(bookId.ToString(), libraryId);
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
+        string body = await JsonResultTestHelper.GetResponseBodyAsync(result);
+
+        // Assert
+        await _mockApiHttpClient.Received(1).DeleteAsync(
+            BuildExpectedEndpoint(libraryId, bookId),
+            Arg.Any<CancellationToken>());
+        using JsonDocument jsonDocument = JsonDocument.Parse(body);
+        Assert.True(jsonDocument.RootElement.GetProperty("success").GetBoolean());
+        Assert.False(jsonDocument.RootElement.TryGetProperty("data", out JsonElement _));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenBookIdIsNotParseable_ShouldForwardGuidEmptyBookIdToApi()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        ConfigureRequest("not-a-guid", libraryId);
+
+        // Act
+        await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
+
+        // Assert
+        await _mockApiHttpClient.Received(1).DeleteAsync(
+            BuildExpectedEndpoint(libraryId, Guid.Empty),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenBookIdIsMissing_ShouldForwardGuidEmptyBookIdToApi()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        _sut.HttpContext.Request.QueryString = new QueryString($"?libraryId={libraryId}");
+
+        // Act
+        await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
+
+        // Assert
+        await _mockApiHttpClient.Received(1).DeleteAsync(
+            BuildExpectedEndpoint(libraryId, Guid.Empty),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenLibraryQueryIdIsNotParseable_ShouldForwardGuidEmptyLibraryIdToApi()
+    {
+        // Arrange
+        Guid bookId = Guid.NewGuid();
+        ConfigureRequest(bookId.ToString(), "not-a-guid");
+
+        // Act
+        await _sut.ExecuteAsync(EmptyRequest.Instance, CancellationToken.None);
+
+        // Assert
+        await _mockApiHttpClient.Received(1).DeleteAsync(
+            BuildExpectedEndpoint(Guid.Empty, bookId),
+            Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>
+    /// Sets the route and query values the endpoint reads the book identity from.
+    /// </summary>
+    /// <param name="bookId">The raw route value of the book Id.</param>
+    /// <param name="libraryId">The raw query value of the library Id.</param>
+    private void ConfigureRequest(string bookId, Guid libraryId)
+    {
+        ConfigureRequest(bookId, libraryId.ToString());
+    }
+
+    /// <summary>
+    /// Sets the route and query values the endpoint reads the book identity from.
+    /// </summary>
+    /// <param name="bookId">The raw route value of the book Id.</param>
+    /// <param name="libraryId">The raw query value of the library Id.</param>
+    private void ConfigureRequest(string bookId, string libraryId)
+    {
+        _sut.HttpContext.Request.RouteValues["bookId"] = bookId;
+        _sut.HttpContext.Request.QueryString = new QueryString($"?libraryId={libraryId}");
+    }
+
+    /// <summary>
+    /// Builds the upstream endpoint the book deletion is expected to be sent to.
+    /// </summary>
+    /// <param name="libraryId">The normalized Id of the media library.</param>
+    /// <param name="bookId">The normalized Id of the book.</param>
+    /// <returns>The expected upstream endpoint.</returns>
+    private static string BuildExpectedEndpoint(Guid libraryId, Guid bookId)
+    {
+        return ApiRoutes.Books.DELETE_BOOK
+            .Replace("{libraryId}", libraryId.ToString())
+            .Replace("{bookId}", bookId.ToString());
+    }
+}

@@ -1,0 +1,264 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Contracts.Responses.FileSystemManagement.Files;
+using Nemera.Presentation.Api.Fixtures.Core.Endpoints.FileSystemManagement;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Runtime.InteropServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemManagement.Files;
+
+/// <summary>
+/// Contains integration tests for the <see cref="GetFilesEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class GetFilesEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
+{
+    private HttpClient _client;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
+    private readonly FileSystemStructureFixture _fileSystemStructureFixture = new();
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+    };
+    private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetFilesEndpointTests"/> class.
+    /// </summary>
+    /// <param name="apiFactory">Injected in-memory API factory.</param>
+    public GetFilesEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
+    {
+        _client = apiFactory.CreateClient();
+        _apiFactory = apiFactory;
+    }
+
+    /// <summary>
+    /// Initializes authenticated API client.
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        _client = await _apiFactory.CreateAuthenticatedClientAsync();
+    }
+
+    [SkipWhenHiddenAttributeNotSupportedFact]
+    public async Task GetFiles_WhenCalledWithValidPathAndNotShouldIncludeHiddenElements_ShouldReturnFilesWithoutHiddenElements()
+    {
+        // Arrange
+        string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
+        testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
+        bool shouldIncludeHiddenElements = false;
+        try
+        {
+            // Act
+            HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-files?path={Uri.EscapeDataString(testPath)}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}");
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            string content = await response.Content.ReadAsStringAsync();
+            List<FileResponse>? files = JsonSerializer.Deserialize<List<FileResponse>>(content, _jsonOptions);
+
+            Assert.NotNull(files);
+            Assert.NotEmpty(files);
+
+            string[] pathSegments = testPath.Split(System.IO.Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+
+
+            FileResponse firstDirectory = files!.First();
+            Assert.Equal("TestFile_2.txt", firstDirectory.Name);
+            Assert.Equal(System.IO.Path.Combine(testPath, "TestFile_2.txt"), firstDirectory.Path);
+            Assert.False(firstDirectory.IsHidden);
+            Assert.Single(files); // Only files.
+        }
+        finally
+        {
+            _fileSystemStructureFixture.CleanupFileSystemStructure();
+        }
+    }
+
+    [SkipWhenHiddenAttributeNotSupportedFact]
+    public async Task GetFiles_WhenCalledWithValidPathAndHiddenChildrenAndNotShouldIncludeHiddenElements_ShouldReturnNoFiles()
+    {
+        // Arrange
+        string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
+        testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
+        testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // Two levels to get to the element that has a hidden element as child.
+        bool shouldIncludeHiddenElements = false;
+        try
+        {
+            // Act
+            HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-files?path={Uri.EscapeDataString(testPath)}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}");
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            string content = await response.Content.ReadAsStringAsync();
+            List<FileResponse>? files = JsonSerializer.Deserialize<List<FileResponse>>(content, _jsonOptions);
+
+            Assert.NotNull(files);
+            FileResponse firstDirectory = files!.First();
+            Assert.Equal("TestFile_2.txt", firstDirectory.Name);
+            Assert.Equal(System.IO.Path.Combine(testPath, "TestFile_2.txt"), firstDirectory.Path);
+            Assert.False(firstDirectory.IsHidden);
+        }
+        finally
+        {
+            _fileSystemStructureFixture.CleanupFileSystemStructure();
+        }
+    }
+
+    [SkipWhenHiddenAttributeNotSupportedFact]
+    public async Task GetFiles_WhenCalledWithValidPathAndWithShouldIncludeHiddenElements_ShouldReturnFilesWithHiddenElements()
+    {
+        // Arrange
+        string testPath = _fileSystemStructureFixture.CreateFileSystemStructure();
+        testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath;
+        testPath = System.IO.Path.GetDirectoryName(testPath) ?? testPath; // Two levels to get to the element that has a hidden element as child.
+        bool shouldIncludeHiddenElements = true;
+        try
+        {
+            // Act
+            HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-files?path={Uri.EscapeDataString(testPath)}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}");
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            string content = await response.Content.ReadAsStringAsync();
+            List<FileResponse>? files = JsonSerializer.Deserialize<List<FileResponse>>(content, _jsonOptions);
+
+            Assert.NotNull(files);
+            Assert.NotEmpty(files);
+
+            string[] pathSegments = testPath.Split(System.IO.Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+
+            FileResponse firstDirectory = files!.First();
+            Assert.Equal((s_isUnix ? "." : string.Empty) + "TestFile_1.txt", firstDirectory.Name);
+            Assert.Equal(System.IO.Path.Combine(testPath, (s_isUnix ? "." : string.Empty) + "TestFile_1.txt"), firstDirectory.Path);
+            Assert.True(firstDirectory.IsHidden);
+
+            FileResponse secondDirectory = files!.Last();
+            Assert.Equal("TestFile_2.txt", secondDirectory.Name);
+            Assert.Equal(System.IO.Path.Combine(testPath, "TestFile_2.txt"), secondDirectory.Path);
+            Assert.False(secondDirectory.IsHidden);
+            Assert.Equal(2, files.Count);
+        }
+        finally
+        {
+            _fileSystemStructureFixture.CleanupFileSystemStructure();
+        }
+    }
+
+    [Fact]
+    public async Task GetFiles_WhenCalledWithInvalidPath_ShouldReturnForbiddenResult()
+    {
+        // Arrange
+        string invalidPath = "invalid:path";
+        string encodedPath = Uri.EscapeDataString(invalidPath);
+        bool shouldIncludeHiddenElements = true;
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-files?path={encodedPath}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync();
+
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemDetails!["status"].GetInt32());
+        Assert.Equal("General.Failure", problemDetails["title"].GetString());
+        Assert.Equal("/api/v1/files/get-files", problemDetails["instance"].GetString());
+        Assert.Equal("UnauthorizedAccess", problemDetails["detail"].GetString());
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
+    }
+
+    [Fact]
+    public async Task GetFiles_WhenCalledWithEmptyPath_ShouldReturnValidationProblemResult()
+    {
+        // Arrange
+        string emptyPath = "";
+        string encodedPath = Uri.EscapeDataString(emptyPath);
+        bool shouldIncludeHiddenElements = true;
+
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/api/v1/files/get-files?path={encodedPath}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+        string content = await response.Content.ReadAsStringAsync();
+        Dictionary<string, JsonElement>? problemDetails = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(content, _jsonOptions);
+        Assert.NotNull(problemDetails);
+        Assert.Equal(StatusCodes.Status422UnprocessableEntity, problemDetails!["status"].GetInt32());
+        Assert.Equal("General.Validation", problemDetails["title"].GetString());
+        Assert.Equal("/api/v1/files/get-files", problemDetails["instance"].GetString());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails["detail"].GetString());
+        Assert.Equal("https://tools.ietf.org/html/rfc4918#section-11.2", problemDetails["type"].GetString());
+        Assert.NotNull(problemDetails["traceId"].GetString());
+        Assert.NotEmpty(problemDetails["traceId"].GetString()!);
+
+        Dictionary<string, string[]>? errors = problemDetails["errors"].Deserialize<Dictionary<string, string[]>>(_jsonOptions);
+        Assert.NotNull(errors);
+        Assert.Contains("General.Validation", errors.Keys);
+        Assert.Contains("PathCannotBeEmpty", errors["General.Validation"]);
+    }
+
+    [Fact]
+    public async Task GetFiles_WhenCalledWithCancellationToken_ShouldCompleteSuccessfully()
+    {
+        // Arrange
+        string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");
+        string encodedPath = Uri.EscapeDataString(testPath);
+        bool shouldIncludeHiddenElements = true;
+        using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
+
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
+            await _client.GetAsync($"/api/v1/files/get-files?path={encodedPath}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}", cts.Token)
+        );
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public async Task GetFiles_WhenCancellationTokenIsCanceled_ShouldThrowTaskCanceledException()
+    {
+        // Arrange
+        string testPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "testDirectory");
+        string encodedPath = Uri.EscapeDataString(testPath);
+        bool shouldIncludeHiddenElements = true;
+        using CancellationTokenSource cts = new();
+
+        // Act & Assert
+        Exception? exception = await Record.ExceptionAsync(async () =>
+        {
+            cts.Cancel();
+            await _client.GetAsync($"/api/v1/files/get-files?path={encodedPath}&shouldIncludeHiddenElements={shouldIncludeHiddenElements}", cts.Token);
+        });
+        Assert.IsType<TaskCanceledException>(exception);
+    }
+
+    /// <summary>
+    /// Disposes API factory resources.
+    /// </summary>
+    public async Task DisposeAsync()
+    {
+        await _apiFactory.RemoveTestUserAsync();
+    }
+}

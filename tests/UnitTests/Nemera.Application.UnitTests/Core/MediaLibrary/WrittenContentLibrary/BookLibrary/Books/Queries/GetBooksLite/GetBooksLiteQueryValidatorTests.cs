@@ -1,0 +1,139 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooksLite;
+using Nemera.Application.Fixtures.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooksLite;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+#endregion
+
+namespace Nemera.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooksLite;
+
+/// <summary>
+/// Contains unit tests for the <see cref="GetBooksLiteQueryValidator"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class GetBooksLiteQueryValidatorTests
+{
+    private readonly GetBooksLiteQueryValidator _validator = new();
+    private readonly GetBooksLiteQueryFixture _getBooksLiteQueryFixture = new();
+
+    [Fact]
+    public void Validate_WhenLibraryIdIsEmpty_ShouldHaveValidationError()
+    {
+        // Arrange
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create(libraryId: string.Empty);
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Library.LibraryIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WhenLibraryIdIsNull_ShouldHaveValidationError()
+    {
+        // Arrange
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create(includeLibraryId: false);
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Library.LibraryIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WhenLibraryIdIsWhitespace_ShouldHaveValidationError()
+    {
+        // Arrange
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create(libraryId: "   ");
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Library.LibraryIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WhenLibraryIdIsGuidEmpty_ShouldHaveValidationError()
+    {
+        // Arrange
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create(libraryId: Guid.Empty.ToString());
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Library.LibraryIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WhenLibraryIdIsNotAValidGuid_ShouldHaveValidationError()
+    {
+        // Arrange
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create(libraryId: "not-a-library-guid");
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Library.LibraryIdCannotBeEmpty);
+    }
+
+    [Fact]
+    public void Validate_WhenQueryIsValid_ShouldNotHaveValidationError()
+    {
+        // Arrange
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create();
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Fact]
+    public void Validate_WhenFilterAlphaKeyIsNotASingleLetterOrSpecialKey_ShouldHaveValidationError()
+    {
+        // Arrange
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create(filterAlphaKey: "AB");
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldHaveValidationError(Errors.Library.InvalidFilterAlphaKey);
+    }
+
+    [Fact]
+    public void Validate_WhenFilterAlphaKeyIsASingleLetter_ShouldNotHaveValidationError()
+    {
+        // Arrange
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create(filterAlphaKey: "Q");
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Fact]
+    public void Validate_WhenFilterAlphaKeyIsNumberOrSymbol_ShouldNotHaveValidationError()
+    {
+        // Arrange
+        GetBooksLiteQuery query = _getBooksLiteQueryFixture.Create(filterAlphaKey: "#");
+
+        // Act
+        List<Error> result = _validator.TestValidate(query);
+
+        // Assert
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+}

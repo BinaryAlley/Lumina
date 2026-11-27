@@ -1,0 +1,131 @@
+#region ========================================================================= USING =====================================================================================
+using FastEndpoints;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Admin.Authorization.Roles.Queries.GetRoles;
+using Nemera.Contracts.Fixtures.Core.Responses.Authorization;
+using Nemera.Contracts.Responses.Authorization;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.GetRoles;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using NSubstitute;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Admin.Authorization.Roles.GetRoles;
+
+/// <summary>
+/// Contains unit tests for the <see cref="GetRolesEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class GetRolesEndpointTests
+{
+    private readonly IQueryHandler<GetRolesQuery, Result<IEnumerable<RoleResponse>>> _mockHandler;
+    private readonly GetRolesEndpoint _sut;
+    private readonly RoleResponseFixture _roleResponseFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetRolesEndpointTests"/> class.
+    /// </summary>
+    public GetRolesEndpointTests()
+    {
+        _mockHandler = Substitute.For<IQueryHandler<GetRolesQuery, Result<IEnumerable<RoleResponse>>>>();
+        _sut = Factory.Create<GetRolesEndpoint>(_mockHandler);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenSuccessful_ShouldReturnOkResultWithRoles()
+    {
+        // Arrange
+        CancellationToken cancellationToken = CancellationToken.None;
+        IEnumerable<RoleResponse> expectedResponse =
+        [
+            _roleResponseFixture.Create(roleName: "Admin")
+        ];
+        _mockHandler.HandleAsync(Arg.Any<GetRolesQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(expectedResponse));
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
+
+        // Assert
+        Ok<IEnumerable<RoleResponse>> okResult = Assert.IsType<Ok<IEnumerable<RoleResponse>>>(result);
+        Assert.Equal(expectedResponse, okResult.Value);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenHandlerReturnsFailureError_ShouldReturnProblemResult()
+    {
+        // Arrange
+        CancellationToken cancellationToken = CancellationToken.None;
+        Error expectedError = Error.Failure("Roles.NotFound", "No roles found.");
+        _mockHandler.HandleAsync(Arg.Any<GetRolesQuery>(), Arg.Any<CancellationToken>())
+            .Returns(expectedError);
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
+
+        // Assert
+        ProblemHttpResult problemResult = Assert.IsType<ProblemHttpResult>(result);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemResult.StatusCode);
+        Assert.Equal("application/problem+json", problemResult.ContentType);
+        Assert.IsType<Microsoft.AspNetCore.Mvc.ProblemDetails>(problemResult.ProblemDetails);
+
+        Assert.Equal("Roles.NotFound", problemResult.ProblemDetails.Title);
+        Assert.Equal("No roles found.", problemResult.ProblemDetails.Detail);
+        Assert.Equal(StatusCodes.Status403Forbidden, problemResult.ProblemDetails.Status);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemResult.ProblemDetails.Type);
+        Assert.NotNull(problemResult.ProblemDetails.Extensions["traceId"]);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCalled_ShouldSendGetRolesQueryToSender()
+    {
+        // Arrange
+        CancellationToken cancellationToken = CancellationToken.None;
+        _mockHandler.HandleAsync(Arg.Any<GetRolesQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(new List<RoleResponse>
+                {
+                    _roleResponseFixture.Create(roleName: "Admin")
+                } as IEnumerable<RoleResponse>));
+
+        // Act
+        await _sut.ExecuteAsync(EmptyRequest.Instance, cancellationToken);
+
+        // Assert
+        await _mockHandler.Received(1).HandleAsync(
+            Arg.Any<GetRolesQuery>(),
+            Arg.Is(cancellationToken));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCancellationRequested_ShouldCancelOperation()
+    {
+        // Arrange
+        CancellationTokenSource cts = new();
+        TaskCompletionSource<bool> operationStarted = new();
+        TaskCompletionSource<bool> cancellationRequested = new();
+
+        _mockHandler.HandleAsync(Arg.Any<GetRolesQuery>(), Arg.Any<CancellationToken>())
+            .Returns(info => Task.Run(async () =>
+            {
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                info.Arg<CancellationToken>().ThrowIfCancellationRequested();
+                return Result.From(new List<RoleResponse>() as IEnumerable<RoleResponse>);
+            }, info.Arg<CancellationToken>()));
+
+        // Act
+        Task<IResult> operationTask = _sut.ExecuteAsync(EmptyRequest.Instance, cts.Token);
+        await operationStarted.Task;
+        cts.Cancel();
+        cancellationRequested.SetResult(true);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
+    }
+}

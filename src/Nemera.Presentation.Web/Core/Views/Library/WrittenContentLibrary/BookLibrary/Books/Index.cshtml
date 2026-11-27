@@ -1,0 +1,564 @@
+@*
+    FALLBACK BOOKS BROWSING VIEW - READ BEFORE EDITING
+
+    This view is the application fallback of the books browsing page, rendered only when the theme template
+    of the page cannot be loaded. On a healthy site the page comes from the theme's
+    library/written-content-library/book-library/books/index template. It keeps the DOM contract and the
+    client script the theme template mirrors, so that navigation, searching and the card actions menu keep
+    working even without the theme.
+
+    To restyle the page, edit the theme files. This fallback is intentionally plain, so that a broken theme
+    is obvious to the user while the page still functions.
+
+/library/written-content-library/books-library/books?libraryId=...
+*@
+
+@using Nemera.Presentation.Web.Common.DTO.Libraries
+@using Nemera.Presentation.Web.Common.Services
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@{
+    // Generate a unique id for the scripts section of this view, so it can be dynamically loaded/unloaded by the global AJAX navigator handler.
+    var scriptId = ScriptIdentifierHelper.GenerateScriptId();
+}
+
+@inject IViewLocalizer _localizer
+@inject IUrlService _urlService
+
+@model LibraryDto
+
+<div class="cotton-candy">
+    <div style="display: grid; grid-template-rows: auto 1fr;">
+        <!--Container with two rows, one fixed, one filling remaining space.-->
+        <div style="min-height: 1rem;"></div><!--The first row is a dummy row for "margin", because setting a margin on the next row would offset the parent's position.-->
+        <div class="pl-10 pr-10 pb-10">
+            <div class="text-center">
+                <h1 class="text-light-two engraved-title">@(Model.Title ?? string.Empty)</h1>
+            </div>
+            <div class="form-row">
+                <input id="search-input" type="text" class="enlightenment-input w-200px" placeholder="@_localizer["Search"]" />
+                <button id="search-button" type="button" class="confirm-button">@_localizer["Search"]</button>
+                <button id="sort-toggle" type="button" class="confirm-button">@_localizer["SortAscending"]</button>
+                <button id="btn-deleted-books" type="button" class="abort-button">@_localizer["DeletedItems"]</button>
+                <span id="count-label" class="text-light-two"></span>
+            </div>
+            <div style="display: flex; align-items: flex-start;">
+                <div id="books-container" class="cards-container justify-start h-100" style="flex: 1; min-width: 0;">
+                    <p id="no-items" class="hidden text-light-two">@_localizer["NoItems"]</p>
+                    <p id="no-items-matching" class="hidden text-light-two">@_localizer["NoItemsMatchFilters"]</p>
+                </div>
+                <div id="alpha-picker" class="alpha-picker"></div>
+            </div>
+            <div id="pagination" class="form-row mx-auto w-25 hidden" style="justify-content: center;">
+                <button id="prev-page" type="button" class="abort-button">@_localizer["Previous"]</button>
+                <span id="page-indicator" class="text-light-two"></span>
+                <button id="next-page" type="button" class="confirm-button">@_localizer["Next"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <!-- The "text/plain" type is a design choice, not a mistake: it keeps the browser from executing this view script during HTML parsing, before site.js defines the API helpers it calls (callApiGetAsync, callApiPostAsync, ...). site.js (which loads deferred) executes these scripts once it is loaded, both on the initial page load and during AJAX navigation. -->
+    <script type="text/plain" data-form="@scriptId">
+        // Create cleanup registry for this view.
+        const cleanupFunctions = [];
+        let isInitialized = false;
+        let requestSequence = 0;
+        // Book Ids whose deletion request is already in flight, so a second click cannot send a duplicate request.
+        const booksBeingDeleted = new Set();
+
+        const libraryId = '@(Model.Id ?? Guid.Empty)';
+        const readUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.READ, new { bookId = default(Guid) })';
+        const detailsUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.EDIT_BOOK, new { bookId = default(Guid) })';
+        const deleteUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.DELETE_BOOK, new { bookId = default(Guid) })';
+        const deletedBooksUrl = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.DELETED_BOOKS)';
+        const availabilityUrlTemplate = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_READING_AVAILABILITY, new { bookId = default(Guid) })';
+        // The element references are captured once, so that the cleanup can unbind their listeners even after the AJAX navigator has swapped the content out of the document.
+        const booksContainer = document.getElementById('books-container');
+        const noItemsMessage = document.getElementById('no-items');
+        const noItemsMatchingMessage = document.getElementById('no-items-matching');
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const sortToggle = document.getElementById('sort-toggle');
+        const btnDeletedBooks = document.getElementById('btn-deleted-books');
+        const countLabel = document.getElementById('count-label');
+        const alphaPicker = document.getElementById('alpha-picker');
+        const pagination = document.getElementById('pagination');
+        const prevPageButton = document.getElementById('prev-page');
+        const nextPageButton = document.getElementById('next-page');
+        const pageIndicator = document.getElementById('page-indicator');
+
+        // The special alpha keys for numbers and symbols, followed by the letters.
+        const alphaKeys = ['#', '*', ...Array.from({ length: 26 }, (_, index) => String.fromCharCode(65 + index))];
+
+        const state = {
+            currentPage: 1,
+            perPage: null,
+            searchTerm: '',
+            alphaKey: null,
+            ignoreThePrefix: false,
+            sortOrder: 'Ascending'
+        };
+
+        const jsLocalizedStrings = {
+            all: @Json.Serialize(_localizer["All"].Value),
+            items: @Json.Serialize(_localizer["Items"].Value),
+            of: @Json.Serialize(_localizer["Of"].Value),
+            page: @Json.Serialize(_localizer["Page"].Value),
+            sortAscending: @Json.Serialize(_localizer["SortAscending"].Value),
+            sortDescending: @Json.Serialize(_localizer["SortDescending"].Value),
+            readerUnavailable: @Json.Serialize(_localizer["ReaderUnavailable"].Value),
+            readerDisabled: @Json.Serialize(_localizer["ReaderDisabled"].Value),
+            read: @Json.Serialize(_localizer["Read"].Value),
+            viewDetails: @Json.Serialize(_localizer["ViewDetails"].Value),
+            deleteItem: @Json.Serialize(_localizer["Delete"].Value),
+            deleteConfirm: @Json.Serialize(_localizer["DeleteConfirm"].Value),
+            deleteFailed: @Json.Serialize(_localizer["DeleteFailed"].Value)
+        };
+
+        // Builds the URL of the retrieval endpoint, from the current state.
+        function buildItemsUrl() {
+            const url = '@_urlService.GetAbsoluteUrl(WebRoutes.Books.GET_LIBRARY_ITEMS)';
+            const params = new URLSearchParams();
+            params.set('libraryId', libraryId);
+            if (state.perPage !== null) {
+                params.set('currentPage', state.currentPage);
+                params.set('perPage', state.perPage);
+            }
+            if (state.searchTerm !== '')
+                params.set('searchTerm', state.searchTerm);
+            if (state.alphaKey !== null)
+                params.set('filterAlphaKey', state.alphaKey);
+            params.set('shouldIgnoreThePrefixForAlphaPicker', state.ignoreThePrefix);
+            params.set('sortOrder', state.sortOrder);
+            return `${url}?${params.toString()}`;
+        }
+
+        // Retrieves the books and renders them, ignoring stale responses of earlier requests.
+        async function loadItemsAsync() {
+            const requestId = ++requestSequence;
+            const response = await callApiGetAsync(buildItemsUrl());
+            if (requestId !== requestSequence)
+                return;
+            if (response)
+                renderItems(response);
+        }
+
+        // Renders the retrieved books, the count label and the pagination controls.
+        function renderItems(response) {
+            booksContainer.querySelectorAll('.media-card').forEach(card => card.remove());
+
+            const hasActiveFilters = state.searchTerm !== '' || state.alphaKey !== null;
+            if (response.count === 0) {
+                booksContainer.classList.add('justify-center');
+                noItemsMessage.classList.toggle('hidden', hasActiveFilters);
+                noItemsMatchingMessage.classList.toggle('hidden', !hasActiveFilters);
+            } else {
+                booksContainer.classList.remove('justify-center');
+                noItemsMessage.classList.add('hidden');
+                noItemsMatchingMessage.classList.add('hidden');
+                response.data.forEach(book => booksContainer.appendChild(createBookCard(book)));
+            }
+
+            // Bind the AJAX navigation behavior to the book cards, which were created after the initial navigation binding, so that
+            // navigating to the reader does not reload the page (and, for example, does not interrupt the audio player).
+            bindNavigationLinks();
+            updateCountLabel(response);
+            updatePagination(response);
+        }
+
+        // Creates a portrait card for a book, with its cover image (or a placeholder) and its title, that opens the reader when clicked.
+        // The card carries a actions trigger that opens a menu with the actions available for the book, like viewing its details.
+        function createBookCard(book) {
+            const card = document.createElement('div');
+            card.className = 'media-card';
+            card.dataset.bookId = book.id;
+
+            const cardLink = document.createElement('a');
+            cardLink.className = 'media-panel nav-link no-underline';
+            cardLink.style.width = '160px';
+            cardLink.style.height = '240px';
+            cardLink.dataset.bookId = book.id;
+            cardLink.href = readUrlTemplate.replace('/@(default(Guid))', `/${book.id}`) + `?libraryId=${libraryId}`;
+            // Opening the reader is conditional on the reader being available and enabled for the library, so the generic nav-link
+            // navigation is intercepted and replaced by one that first checks the reading availability, warning instead of navigating
+            // when the book cannot be read.
+            cardLink.addEventListener('click', async event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                await handleBookCardClickAsync(cardLink);
+            });
+
+            const image = document.createElement('img');
+            image.src = book.coverPath
+                ? `${globalConfiguration.serverBasePath}${book.coverPath}`
+                : `/images/ui/book-placeholder.svg`;
+            image.alt = book.title;
+
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'text-light-two';
+            const title = document.createElement('strong');
+            title.textContent = book.title;
+            titleSpan.appendChild(title);
+
+            cardLink.appendChild(image);
+            cardLink.appendChild(titleSpan);
+
+            const detailsUrl = detailsUrlTemplate.replace('/@(default(Guid))', `/${book.id}`) + `?libraryId=${libraryId}`;
+
+            const trigger = document.createElement('button');
+            trigger.type = 'button';
+            trigger.className = 'card-actions-trigger';
+            trigger.setAttribute('aria-haspopup', 'menu');
+            trigger.setAttribute('aria-label', jsLocalizedStrings.viewDetails);
+            trigger.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                toggleCardMenu(card, resolveMenuAnchor(event));
+            });
+
+            const menu = document.createElement('nav');
+            menu.className = 'card-actions-menu';
+            menu.setAttribute('role', 'menu');
+            menu.innerHTML = `
+                                <a role="menuitem" href="${readUrlTemplate.replace('/@(default(Guid))', `/${book.id}`) + `?libraryId=${libraryId}`}">${jsLocalizedStrings.read}</a>
+                <a role="menuitem" href="${detailsUrl}">${jsLocalizedStrings.viewDetails}</a>
+                <a role="menuitem" href="#" class="card-action-delete">${jsLocalizedStrings.deleteItem}</a>`;
+
+            // Menu entries navigate through the same AJAX navigation used by the nav-links, so that the persistent chrome keeps running.
+            // The delete entry does not navigate, it deletes the book and reloads the list in place.
+            menu.addEventListener('click', async event => {
+                const deleteItem = event.target.closest('.card-action-delete');
+                const menuItem = event.target.closest('a[role="menuitem"]');
+                if (!menuItem)
+                    return;
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                closeCardMenus();
+                if (deleteItem)
+                    await deleteBookAsync(book.id, deleteItem);
+                else
+                    await updateContentAsync(menuItem.href, true);
+            });
+
+            // The favorite heart is a plain button: the global favorites script finds it by its data attributes, hydrates its state and handles its click.
+            const favoriteToggle = document.createElement('button');
+            favoriteToggle.type = 'button';
+            favoriteToggle.className = 'card-favorite-toggle';
+            favoriteToggle.setAttribute('data-favorite-toggle', '');
+            favoriteToggle.setAttribute('data-favorite-media-kind', 'Book');
+            favoriteToggle.setAttribute('data-favorite-media-item-id', book.id);
+
+            card.appendChild(cardLink);
+            card.appendChild(favoriteToggle);
+            card.appendChild(trigger);
+            card.appendChild(menu);
+
+            // A right click on the card opens the same actions menu.
+            card.addEventListener('contextmenu', event => {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                toggleCardMenu(card, resolveMenuAnchor(event));
+            });
+
+            card.addEventListener('click', event => {
+                // Clicking anywhere on the card outside the trigger and the menu closes the menu, when it is open.
+                if (card.classList.contains('open') && !event.target.closest('.card-actions-menu'))
+                    closeCardMenus();
+            });
+
+            return card;
+        }
+
+        // Toggles the actions menu of the book card, opening it with its top left corner at the given viewport position.
+        function toggleCardMenu(card, anchor) {
+            const wasOpen = card.classList.contains('open');
+            closeCardMenus();
+            if (wasOpen)
+                return;
+            card.classList.add('open');
+            const menu = card.querySelector('.card-actions-menu');
+            if (menu) {
+                menu.classList.add('open');
+                positionActionsMenu(menu, anchor);
+            }
+        }
+
+        // Resolves the viewport point where the card actions menu opens: the pointer tip for mouse gestures, and the lower
+        // left corner of the actions trigger for keyboard activation, whose synthetic click carries no pointer position.
+        function resolveMenuAnchor(event) {
+            if (event.clientX !== 0 || event.clientY !== 0)
+                return { x: event.clientX, y: event.clientY };
+            const triggerRect = event.currentTarget.getBoundingClientRect();
+            return { x: triggerRect.left, y: triggerRect.bottom };
+        }
+
+        // Places the card actions menu with its top left corner at the requested viewport point, moving it left or up only
+        // when it would otherwise run past the viewport edges, like a desktop context menu does.
+        function positionActionsMenu(menu, anchor) {
+            const margin = 4;
+            const maxLeft = Math.max(margin, window.innerWidth - menu.offsetWidth - margin);
+            const maxTop = Math.max(margin, window.innerHeight - menu.offsetHeight - margin);
+            menu.style.position = 'fixed';
+            menu.style.left = `${Math.min(Math.max(margin, anchor.x), maxLeft)}px`;
+            menu.style.top = `${Math.min(Math.max(margin, anchor.y), maxTop)}px`;
+        }
+
+        // Closes the actions menus of all the book cards.
+        function closeCardMenus() {
+            booksContainer.querySelectorAll('.media-card.open').forEach(card => {
+                card.classList.remove('open');
+                const menu = card.querySelector('.card-actions-menu');
+                if (menu)
+                    menu.classList.remove('open');
+            });
+        }
+
+        // Closes the actions menus when clicking or pressing a key outside them.
+        function handleCardMenuDismiss(event) {
+            if (event.type === 'keydown' && event.key !== 'Escape')
+                return;
+            if (event.type === 'click' && event.target.closest('.card-actions-menu, .card-actions-trigger'))
+                return;
+            closeCardMenus();
+        }
+
+        // Opens the reader of the book when it can be read, and warns the user otherwise; the navigation is done through the same
+        // AJAX navigation used by the nav-links, so that the page is not reloaded (and the audio player is not interrupted).
+        async function handleBookCardClickAsync(card) {
+            const availabilityUrl = availabilityUrlTemplate.replace('/@(default(Guid))', `/${card.dataset.bookId}`) + `?libraryId=${libraryId}`;
+            const response = await fetch(availabilityUrl, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            const jsonResponse = await response.json();
+            if (jsonResponse.success) {
+                await updateContentAsync(card.href, true);
+            } else {
+                const message = jsonResponse.errorCode === 'ReaderDisabled' ? jsLocalizedStrings.readerDisabled : jsLocalizedStrings.readerUnavailable;
+                notificationService.show(message, NotificationType.WARNING);
+            }
+        }
+
+        // Deletes the book after confirmation, then reloads the list.
+        async function deleteBookAsync(bookId, actionElement) {
+            if (booksBeingDeleted.has(bookId))
+                return;
+            booksBeingDeleted.add(bookId);
+            if (actionElement) {
+                actionElement.classList.add('disabled');
+                actionElement.setAttribute('aria-disabled', 'true');
+            }
+            try {
+                if (await dialogService.show(jsLocalizedStrings.deleteConfirm, jsLocalizedDialogs.confirmation, DialogButtons.YES_NO, DialogIcon.QUESTION) !== DialogButton.YES)
+                    return;
+                const url = deleteUrlTemplate.replace('/@(default(Guid))', `/${bookId}`) + `?libraryId=${encodeURIComponent(libraryId)}`;
+                const success = await callApiDeleteAsync(url);
+                if (success)
+                    await loadItemsAsync();
+                else
+                    notificationService.show(jsLocalizedStrings.deleteFailed, NotificationType.ERROR);
+            } finally {
+                booksBeingDeleted.delete(bookId);
+                if (actionElement?.isConnected) {
+                    actionElement.classList.remove('disabled');
+                    actionElement.removeAttribute('aria-disabled');
+                }
+            }
+        }
+
+        // Updates the count label: total items when pagination is off, displayed range out of total when it is on.
+        function updateCountLabel(response) {
+            if (!countLabel)
+                return;
+            if (state.perPage === null)
+                countLabel.textContent = `${response.count} ${jsLocalizedStrings.items}`;
+            else if (response.count === 0)
+                countLabel.textContent = `0 ${jsLocalizedStrings.items}`;
+            else {
+                const start = (response.currentPage - 1) * response.perPage + 1;
+                const end = Math.min(response.currentPage * response.perPage, response.count);
+                countLabel.textContent = `${start}-${end} ${jsLocalizedStrings.of} ${response.count}`;
+            }
+        }
+
+        // Updates the pagination controls, which are only visible when pagination is enabled.
+        function updatePagination(response) {
+            if (!pagination)
+                return;
+            if (state.perPage === null) {
+                pagination.classList.add('hidden');
+                return;
+            }
+            const totalPages = Math.max(1, response.numberOfPages);
+            pagination.classList.remove('hidden');
+            pageIndicator.textContent = `${jsLocalizedStrings.page} ${response.currentPage} ${jsLocalizedStrings.of} ${totalPages}`;
+            prevPageButton.disabled = response.currentPage <= 1;
+            nextPageButton.disabled = response.currentPage >= totalPages;
+        }
+
+        // Builds the alpha picker column, with the "All" key followed by the numbers, symbols and letters keys.
+        function buildAlphaPicker() {
+            if (!alphaPicker)
+                return;
+            const allKey = document.createElement('span');
+            allKey.className = 'alpha-key';
+            allKey.dataset.alphaKey = '';
+            allKey.textContent = jsLocalizedStrings.all;
+            allKey.addEventListener('click', () => handleAlphaKeyClick(null));
+            alphaPicker.appendChild(allKey);
+
+            alphaKeys.forEach(key => {
+                const alphaKey = document.createElement('span');
+                alphaKey.className = 'alpha-key';
+                alphaKey.dataset.alphaKey = key;
+                alphaKey.textContent = key;
+                alphaKey.addEventListener('click', () => handleAlphaKeyClick(key));
+                alphaPicker.appendChild(alphaKey);
+            });
+
+            updateAlphaPickerActiveState();
+        }
+
+        // Highlights the currently active key of the alpha picker.
+        function updateAlphaPickerActiveState() {
+            if (!alphaPicker)
+                return;
+            alphaPicker.querySelectorAll('.alpha-key').forEach(key => {
+                const keyValue = key.dataset.alphaKey === '' ? null : key.dataset.alphaKey;
+                key.classList.toggle('alpha-key-active', keyValue === state.alphaKey);
+            });
+        }
+
+        // Applies the given alpha key (null clears the alpha filter) and reloads the books.
+        function handleAlphaKeyClick(key) {
+            state.alphaKey = key;
+            state.currentPage = 1;
+            updateAlphaPickerActiveState();
+            loadItemsAsync();
+        }
+
+        // Applies the search term and reloads the books.
+        function handleSearch() {
+            state.searchTerm = searchInput.value.trim();
+            state.currentPage = 1;
+            loadItemsAsync();
+        }
+
+        // Triggers the search when the Enter key is pressed in the search input.
+        function handleSearchKeydown(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                handleSearch();
+            }
+        }
+
+        // Toggles the sort direction and reloads the books.
+        function handleSortToggle() {
+            state.sortOrder = state.sortOrder === 'Ascending' ? 'Descending' : 'Ascending';
+            sortToggle.textContent = state.sortOrder === 'Ascending' ? jsLocalizedStrings.sortAscending : jsLocalizedStrings.sortDescending;
+            state.currentPage = 1;
+            loadItemsAsync();
+        }
+
+        // Applies an alpha filter when a letter is pressed while the search input does not have focus; Escape clears the alpha filter.
+        function handleAlphaKeydown(event) {
+            if (document.activeElement === searchInput)
+                return;
+            if (event.key.length === 1 && /[a-zA-Z]/.test(event.key))
+                handleAlphaKeyClick(event.key.toUpperCase());
+            else if (event.key === 'Escape')
+                handleAlphaKeyClick(null);
+        }
+
+        // Loads the settings of the current user, which drive pagination and the alpha picker prefix handling.
+        async function loadSettingsAsync() {
+            const data = await callApiGetAsync('@_urlService.GetAbsoluteUrl(WebRoutes.Settings.GET_USER_SETTINGS)');
+            if (data) {
+                state.ignoreThePrefix = data.shouldIgnoreThePrefixForAlphaPicker === true;
+                state.perPage = data.isPaginationEnabled === true ? data.itemsPerPage : null;
+            }
+        }
+
+        // Navigates to the deleted items page of the library.
+        async function handleDeletedBooksAsync() {
+            await updateContentAsync(`${deletedBooksUrl}?libraryId=${encodeURIComponent(libraryId)}`, true);
+        }
+
+        // Navigates to the previous page.
+        function handlePrevPageClick() {
+            state.currentPage = Math.max(1, state.currentPage - 1);
+            loadItemsAsync();
+        }
+
+        // Navigates to the next page.
+        function handleNextPageClick() {
+            state.currentPage = state.currentPage + 1;
+            loadItemsAsync();
+        }
+
+        // Binds an event handler to an element, when the element is present.
+        function bindEventHandler(element, type, handler) {
+            if (element)
+                element.addEventListener(type, handler);
+        }
+
+        // Unbinds an event handler from an element, when the element is present.
+        function unbindEventHandler(element, type, handler) {
+            if (element)
+                element.removeEventListener(type, handler);
+        }
+
+        // Add listeners.
+        bindEventHandler(searchButton, 'click', handleSearch);
+        bindEventHandler(searchInput, 'keydown', handleSearchKeydown);
+        bindEventHandler(sortToggle, 'click', handleSortToggle);
+        bindEventHandler(btnDeletedBooks, 'click', handleDeletedBooksAsync);
+        bindEventHandler(prevPageButton, 'click', handlePrevPageClick);
+        bindEventHandler(nextPageButton, 'click', handleNextPageClick);
+        document.addEventListener('keydown', handleAlphaKeydown);
+        document.addEventListener('click', handleCardMenuDismiss);
+        document.addEventListener('keydown', handleCardMenuDismiss);
+        document.addEventListener('DOMContentLoaded', InitializeAsync);
+
+        // Register cleanup for these listeners.
+        cleanupFunctions.push(() => {
+            unbindEventHandler(searchButton, 'click', handleSearch);
+            unbindEventHandler(searchInput, 'keydown', handleSearchKeydown);
+            unbindEventHandler(sortToggle, 'click', handleSortToggle);
+            unbindEventHandler(btnDeletedBooks, 'click', handleDeletedBooksAsync);
+            unbindEventHandler(prevPageButton, 'click', handlePrevPageClick);
+            unbindEventHandler(nextPageButton, 'click', handleNextPageClick);
+            document.removeEventListener('keydown', handleAlphaKeydown);
+            document.removeEventListener('click', handleCardMenuDismiss);
+            document.removeEventListener('keydown', handleCardMenuDismiss);
+            document.removeEventListener('DOMContentLoaded', InitializeAsync);
+        });
+
+        async function InitializeAsync() {
+            if (isInitialized)
+                return;
+            // When the page is restored from the history cache before its fresh content arrives, its container may be missing;
+            // a fresh copy of this script initializes the page once the fresh content is in place, so this instance gives up.
+            if (!booksContainer || !sortToggle || !countLabel) {
+                isInitialized = true;
+                return;
+            }
+            isInitialized = true;
+            sortToggle.textContent = jsLocalizedStrings.sortAscending;
+            buildAlphaPicker();
+            await loadSettingsAsync();
+            await loadItemsAsync();
+        }
+
+        // Store all cleanups for this view on window object using the scriptId.
+        window.viewCleanups = window.viewCleanups || {};
+        window.viewCleanups['@scriptId'] = () => {
+            cleanupFunctions.forEach(cleanup => cleanup());
+            console.log(`Unloaded @scriptId`);
+        };
+        console.log(`Loaded @scriptId`);
+    </script>
+}

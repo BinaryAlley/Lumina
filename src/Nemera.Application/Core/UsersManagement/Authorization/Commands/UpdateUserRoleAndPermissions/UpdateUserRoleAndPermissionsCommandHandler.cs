@@ -1,0 +1,165 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Contracts.Responses.Authorization;
+using Nemera.Domain.Common.Primitives;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
+#endregion
+
+namespace Nemera.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+
+/// <summary>
+/// Handler for the command to update an authorization role.
+/// </summary>
+public class UpdateUserRoleAndPermissionsCommandHandler : ICommandHandler<UpdateUserRoleAndPermissionsCommand, Result<AuthorizationResponse>>
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IAuthorizationService _authorizationService;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly IValidator<UpdateUserRoleAndPermissionsCommand> _validator;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateUserRoleAndPermissionsCommandHandler"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Injected service for authorization related functionality.</param>
+    /// <param name="currentUserService">Injected service to retrieve the current user information.</param>
+    /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
+    /// <param name="validator">Injected validator for application validation rules.</param>
+    public UpdateUserRoleAndPermissionsCommandHandler(IAuthorizationService authorizationService, ICurrentUserService currentUserService, IUnitOfWork unitOfWork, IValidator<UpdateUserRoleAndPermissionsCommand> validator)
+    {
+        _unitOfWork = unitOfWork;
+        _authorizationService = authorizationService;
+        _currentUserService = currentUserService;
+        _validator = validator;
+    }
+
+    /// <summary>
+    /// Handles the command to update an authorization role.
+    /// </summary>
+    /// <param name="command">The request to be handled.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either a successfully updated <see cref="RoleResponse"/>, or an error message.
+    /// </returns>
+    public async Task<Result<AuthorizationResponse>> HandleAsync(UpdateUserRoleAndPermissionsCommand command, CancellationToken cancellationToken)
+    {
+        List<Error> validationResult = _validator.Validate(command);
+        if (validationResult.Count > 0)
+            return validationResult;
+
+        // An authenticated request must always carry a user identity.
+        Guid? currentUserId = _currentUserService.UserId;
+        if (currentUserId is null)
+            return ApplicationErrors.Authorization.NotAuthorized;
+        Guid userId = currentUserId.Value;
+
+        // Only admins can update user authorizations.
+        bool isAdmin = await _authorizationService.IsInRoleAsync(userId, AuthorizationRoles.ADMIN, cancellationToken).ConfigureAwait(false);
+        if (!isAdmin)
+            return ApplicationErrors.Authorization.NotAuthorized;
+
+        // Get the user to update.
+        Result<UserEntity?> getUserResult = await _unitOfWork.UserRepository.GetByIdAsync(command.UserId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getUserResult.IsFailure || getUserResult.Value is null)
+            return DomainErrors.Users.UserDoesNotExist;
+
+        RoleEntity? newRole = null;
+        if (command.RoleId is not null)
+        {
+            // Get the new role.
+            Result<RoleEntity?> getRoleResult = await _unitOfWork.RoleRepository.GetByIdAsync(command.RoleId!.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
+            if (getRoleResult.IsFailure || getRoleResult.Value is null)
+                return ApplicationErrors.Authorization.RoleNotFound;
+            newRole = getRoleResult.Value;
+
+            // Check if changing the role of an admin would leave the application without any admin.
+            if (getUserResult.Value.UserRole?.Role.RoleName == AuthorizationRoles.ADMIN && newRole.RoleName != AuthorizationRoles.ADMIN)
+            {
+                // Count how many admins exist, so the last one is never demoted.
+                Result<PaginatedResultDto<UserEntity>> getAllUsersResult = await _unitOfWork.UserRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
+                if (getAllUsersResult.IsFailure)
+                    return getAllUsersResult.Errors;
+
+                int adminCount = getAllUsersResult.Value.Data.Count(user => user.UserRole?.Role.RoleName == AuthorizationRoles.ADMIN);
+                if (adminCount <= 1)
+                    return ApplicationErrors.Authorization.CannotRemoveLastAdmin;
+            }
+        }
+
+        // Get the permissions to assign.
+        Result<IEnumerable<PermissionEntity>> getPermissionsResult =
+            await _unitOfWork.PermissionRepository.GetByIdsAsync(command.Permissions, cancellationToken).ConfigureAwait(false);
+        if (getPermissionsResult.IsFailure)
+            return getPermissionsResult.Errors;
+
+        // Every requested permission must exist, otherwise the requested permission set cannot be built and an unknown Id would throw instead of returning a result.
+        Dictionary<Guid, PermissionEntity> permissionsById = getPermissionsResult.Value.ToDictionary(permission => permission.Id);
+        if (command.Permissions.Any(permissionId => !permissionsById.ContainsKey(permissionId)))
+            return ApplicationErrors.Authorization.PermissionNotFound;
+
+        // Update the user.
+        UserEntity userToUpdate = getUserResult.Value;
+
+        // Build the role link for the requested role, keeping the current role untouched when no role was provided.
+        UserRoleEntity? userRole = command.RoleId is null
+            ? userToUpdate.UserRole
+            : new UserRoleEntity
+            {
+                UserId = userToUpdate.Id,
+                RoleId = command.RoleId.Value,
+                Role = newRole!,
+                User = userToUpdate
+            };
+
+        // Build the updated user by copying the unchanged fields and replacing the role and permissions with the requested ones.
+        UserEntity updatedUser = new()
+        {
+            Id = userToUpdate.Id,
+            Username = userToUpdate.Username,
+            Password = userToUpdate.Password,
+            TempPassword = userToUpdate.TempPassword,
+            TotpSecret = userToUpdate.TotpSecret,
+            TempPasswordCreated = userToUpdate.TempPasswordCreated,
+            Libraries = userToUpdate.Libraries,
+            UserRole = userRole,
+            UserPermissions = [.. command.Permissions.Select(permissionId => new UserPermissionEntity
+            {
+                UserId = userToUpdate.Id,
+                PermissionId = permissionId,
+                Permission = permissionsById[permissionId],
+                User = userToUpdate
+            })],
+            LibraryScans = userToUpdate.LibraryScans
+        };
+
+        // Save the changes and return the result.
+        Result<Updated> updateResult = await _unitOfWork.UserRepository.UpdateAsync(updatedUser, cancellationToken).ConfigureAwait(false);
+        if (updateResult.IsFailure)
+            return updateResult.Errors;
+
+        Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (saveChangesResult.IsFailure)
+            return saveChangesResult.Errors;
+
+        return new AuthorizationResponse(
+            userToUpdate.Id,
+            newRole?.RoleName ?? userToUpdate.UserRole?.Role.RoleName,
+            userToUpdate.UserPermissions
+                .Select(up => up.Permission.PermissionName)
+                .ToHashSet()
+        );
+    }
+}

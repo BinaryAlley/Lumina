@@ -1,0 +1,304 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.MusicLibrary;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Queries.GetArtist;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Queries.GetArtist;
+using Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using NSubstitute;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using System.Threading.Tasks;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+#endregion
+
+namespace Nemera.Application.UnitTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Queries.GetArtist;
+
+/// <summary>
+/// Contains unit tests for the <see cref="GetArtistQueryHandler"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class GetArtistQueryHandlerTests
+{
+    private readonly IUnitOfWork _mockUnitOfWork;
+    private readonly IArtistRepository _mockArtistRepository;
+    private readonly IMusicArtworkRepository _mockMusicArtworkRepository;
+    private readonly IAuthorizationService _mockAuthorizationService;
+    private readonly ICurrentUserService _mockCurrentUserService;
+    private readonly IValidator<GetArtistQuery> _mockValidator;
+    private readonly GetArtistQueryHandler _sut;
+    private readonly Guid _userId;
+    private readonly ArtistEntityFixture _artistEntityFixture = new();
+    private readonly MusicArtworkEntityFixture _musicArtworkEntityFixture = new();
+    private readonly GetArtistQueryFixture _getArtistQueryFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetArtistQueryHandlerTests"/> class.
+    /// </summary>
+    public GetArtistQueryHandlerTests()
+    {
+        _mockArtistRepository = Substitute.For<IArtistRepository>();
+        _mockMusicArtworkRepository = Substitute.For<IMusicArtworkRepository>();
+        _mockUnitOfWork = Substitute.For<IUnitOfWork>();
+        _mockUnitOfWork.ArtistRepository.Returns(_mockArtistRepository);
+        _mockUnitOfWork.MusicArtworkRepository.Returns(_mockMusicArtworkRepository);
+        _mockAuthorizationService = Substitute.For<IAuthorizationService>();
+        _mockCurrentUserService = Substitute.For<ICurrentUserService>();
+        _mockValidator = Substitute.For<IValidator<GetArtistQuery>>();
+        _userId = Guid.NewGuid();
+
+        // Default stubs: the current user is authenticated, the library ownership policy allows access, the validator passes, and the artist has no stored artwork.
+        _mockCurrentUserService.UserId.Returns(_userId);
+        _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
+            .Returns(true);
+        _mockValidator.Validate(Arg.Any<GetArtistQuery>()).Returns([]);
+        _mockMusicArtworkRepository.GetByOwnerAsync(Arg.Any<MusicArtworkOwnerType>(), Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<MusicArtworkEntity>>([]));
+
+        _sut = new GetArtistQueryHandler(_mockUnitOfWork, _mockAuthorizationService, _mockCurrentUserService, _mockValidator);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenArtistExists_ShouldReturnMappedArtistResponse()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        ArtistEntity artist = _artistEntityFixture.Create(id: artistId, libraryId: libraryId, includeAlbums: true, includeContributors: true);
+        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<ArtistEntity?>(artist));
+        GetArtistQuery query = _getArtistQueryFixture.Create(libraryId: libraryId.ToString(), artistId: artistId.ToString());
+
+        // Act
+        Result<ArtistResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(artistId, result.Value.Id);
+        Assert.Equal(libraryId, result.Value.LibraryId);
+        Assert.Equal(artist.Name, result.Value.Metadata.Name);
+        Assert.Equal(artist.Website, result.Value.Website);
+        Assert.NotNull(result.Value.Albums);
+        Assert.Equal(artist.Albums.Count, result.Value.Albums!.Count);
+        Assert.NotNull(result.Value.Contributors);
+        Assert.Equal(artist.Contributors.Count, result.Value.Contributors!.Count);
+        await _mockArtistRepository.Received(1).GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>());
+        await _mockAuthorizationService.Received(1).EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
+            _userId, Arg.Is<LibraryOwnershipPolicyContext>(context => context.LibraryId == libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenArtistRepositoryFails_ShouldReturnFailureResultWithoutEvaluatingThePolicy()
+    {
+        // Arrange
+        GetArtistQuery query = _getArtistQueryFixture.Create();
+        _mockArtistRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(ApplicationErrors.Persistence.UniqueConstraintViolation);
+
+        // Act
+        Result<ArtistResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Persistence.UniqueConstraintViolation, result.FirstError);
+        await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenArtistDoesNotExist_ShouldReturnArtistNotFoundError()
+    {
+        // Arrange
+        GetArtistQuery query = _getArtistQueryFixture.Create();
+        _mockArtistRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(_ => Result.From<ArtistEntity?>(null));
+
+        // Act
+        Result<ArtistResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.ArtistNotFound, result.FirstError);
+        await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenArtistBelongsToAnotherLibrary_ShouldReturnArtistNotFoundWithoutEvaluatingThePolicy()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        ArtistEntity artist = _artistEntityFixture.Create(libraryId: Guid.NewGuid());
+        GetArtistQuery query = _getArtistQueryFixture.Create(libraryId: libraryId.ToString(), artistId: artist.Id.ToString());
+        _mockArtistRepository.GetByIdAsync(artist.Id, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<ArtistEntity?>(artist));
+
+        // Act
+        Result<ArtistResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        // The mismatch is reported as not found, without disclosing that the artist exists in another library.
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.ArtistNotFound, result.FirstError);
+        await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenUserDoesNotOwnTheLibrary_ShouldReturnNotAuthorizedError()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        ArtistEntity artist = _artistEntityFixture.Create(id: artistId, libraryId: libraryId);
+        GetArtistQuery query = _getArtistQueryFixture.Create(libraryId: libraryId.ToString(), artistId: artistId.ToString());
+        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<ArtistEntity?>(artist));
+        _mockAuthorizationService.EvaluatePolicyAsync<ILibraryOwnershipPolicy>(_userId, Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>())
+            .Returns(false);
+
+        // Act
+        Result<ArtistResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockAuthorizationService.Received(1).EvaluatePolicyAsync<ILibraryOwnershipPolicy>(
+            _userId, Arg.Is<LibraryOwnershipPolicyContext>(context => context.LibraryId == libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenUserIsNotAuthenticated_ShouldReturnNotAuthorizedError()
+    {
+        // Arrange
+        GetArtistQuery query = _getArtistQueryFixture.Create();
+        _mockCurrentUserService.UserId.Returns((Guid?)null);
+
+        // Act
+        Result<ArtistResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Authorization.NotAuthorized, result.FirstError);
+        await _mockArtistRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenValidationFails_ShouldReturnValidationErrorsWithoutQuerying()
+    {
+        // Arrange
+        GetArtistQuery query = _getArtistQueryFixture.Create();
+        _mockValidator.Validate(Arg.Any<GetArtistQuery>()).Returns([Errors.Music.ArtistIdCannotBeEmpty]);
+
+        // Act
+        Result<ArtistResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Music.ArtistIdCannotBeEmpty, result.FirstError);
+        await _mockArtistRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _mockAuthorizationService.DidNotReceive().EvaluatePolicyAsync<ILibraryOwnershipPolicy>(Arg.Any<Guid>(), Arg.Any<LibraryOwnershipPolicyContext>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenArtworkRepositoryFails_ShouldReturnFailureResult()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        ArtistEntity artist = _artistEntityFixture.Create(id: artistId, libraryId: libraryId);
+        GetArtistQuery query = _getArtistQueryFixture.Create(libraryId: libraryId.ToString(), artistId: artistId.ToString());
+        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<ArtistEntity?>(artist));
+        _mockMusicArtworkRepository.GetByOwnerAsync(MusicArtworkOwnerType.Artist, artistId, Arg.Any<CancellationToken>())
+            .Returns(ApplicationErrors.Persistence.UniqueConstraintViolation);
+
+        // Act
+        Result<ArtistResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(ApplicationErrors.Persistence.UniqueConstraintViolation, result.FirstError);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenArtistHasNoArtwork_ShouldReturnNullCoverPath()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        ArtistEntity artist = _artistEntityFixture.Create(id: artistId, libraryId: libraryId);
+        GetArtistQuery query = _getArtistQueryFixture.Create(libraryId: libraryId.ToString(), artistId: artistId.ToString());
+        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<ArtistEntity?>(artist));
+        _mockMusicArtworkRepository.GetByOwnerAsync(MusicArtworkOwnerType.Artist, artistId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<MusicArtworkEntity>>([]));
+
+        // Act
+        Result<ArtistResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value.CoverPath);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenArtistHasCoverArtwork_ShouldMapCoverPathAndRequestArtistArtwork()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        ArtistEntity artist = _artistEntityFixture.Create(id: artistId, libraryId: libraryId);
+        GetArtistQuery query = _getArtistQueryFixture.Create(libraryId: libraryId.ToString(), artistId: artistId.ToString());
+        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<ArtistEntity?>(artist));
+        List<MusicArtworkEntity> artwork = [
+            _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Artist, ownerId: artistId, artworkType: ArtworkType.Cover, ordinal: 0, fileName: "/media/artist.jpg")
+        ];
+        _mockMusicArtworkRepository.GetByOwnerAsync(MusicArtworkOwnerType.Artist, artistId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<MusicArtworkEntity>>(artwork));
+
+        // Act
+        Result<ArtistResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal("/media/artist.jpg", result.Value.CoverPath);
+        await _mockMusicArtworkRepository.Received(1).GetByOwnerAsync(MusicArtworkOwnerType.Artist, artistId, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenTheCoverHasNoStoredFileName_ShouldReturnNullCoverPath()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        ArtistEntity artist = _artistEntityFixture.Create(id: artistId, libraryId: libraryId);
+        GetArtistQuery query = _getArtistQueryFixture.Create(libraryId: libraryId.ToString(), artistId: artistId.ToString());
+        _mockArtistRepository.GetByIdAsync(artistId, shouldIncludeNavigationProperties: true, shouldTrackEntities: false, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<ArtistEntity?>(artist));
+        // A cover whose file has not been stored yet yields no cover path, even when another piece of artwork is already stored.
+        List<MusicArtworkEntity> artwork = [
+            _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Artist, ownerId: artistId, artworkType: ArtworkType.Cover, ordinal: 0, includeFileName: false),
+            _musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Artist, ownerId: artistId, artworkType: ArtworkType.Back, ordinal: 0, fileName: "/media/back.jpg")
+        ];
+        _mockMusicArtworkRepository.GetByOwnerAsync(MusicArtworkOwnerType.Artist, artistId, Arg.Any<CancellationToken>())
+            .Returns(Result.From<IReadOnlyList<MusicArtworkEntity>>(artwork));
+
+        // Act
+        Result<ArtistResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Null(result.Value.CoverPath);
+    }
+}

@@ -1,0 +1,104 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Mapping.MediaLibrary.Management;
+using Nemera.Application.Core.MediaLibrary.Management.Progress;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Exceptions;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Application.Core.MediaLibrary.Management.Events;
+
+/// <summary>
+/// Handler for the domain event raised when a media library scan has failed.
+/// </summary>
+public class LibraryScanFailedDomainEventHandler : IDomainEventHandler<LibraryScanFailedDomainEvent>
+{
+    private readonly IMediaLibraryScanProgressNotifier _debouncedLibraryScanProgressNotifier;
+    private readonly IMediaLibrariesScanCancellationTracker _mediaLibrariesScanCancellationTracker;
+    private readonly IMediaLibrariesScanProgressTracker _mediaLibrariesScanProgressTracker;
+    private readonly IUnitOfWork _unitOfWork;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LibraryScanFailedDomainEventHandler"/> class.
+    /// </summary>
+    /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
+    /// <param name="mediaLibrariesScanCancellationTracker">Injected tracker used for canceling media library scans.</param>
+    /// <param name="mediaLibrariesScanProgressTracker">Injected tracker used for media library scans progress.</param>
+    /// <param name="debouncedLibraryScanProgressNotifier">Injected service for notifying media libraries scan progress changes to third parties.</param>
+    public LibraryScanFailedDomainEventHandler(
+        IMediaLibraryScanProgressNotifier debouncedLibraryScanProgressNotifier,
+        IMediaLibrariesScanCancellationTracker mediaLibrariesScanCancellationTracker,
+        IMediaLibrariesScanProgressTracker mediaLibrariesScanProgressTracker,
+        IUnitOfWork unitOfWork)
+    {
+        _debouncedLibraryScanProgressNotifier = debouncedLibraryScanProgressNotifier;
+        _mediaLibrariesScanCancellationTracker = mediaLibrariesScanCancellationTracker;
+        _mediaLibrariesScanProgressTracker = mediaLibrariesScanProgressTracker;
+        _unitOfWork = unitOfWork;
+    }
+
+    /// <summary>
+    /// Handles the event raised when a media library scan has failed.
+    /// </summary>
+    /// <param name="domainEvent">The domain event to be handled.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    public async ValueTask HandleAsync(LibraryScanFailedDomainEvent domainEvent, CancellationToken cancellationToken)
+    {
+        // Get the library scan from the repository.
+        Result<LibraryScanEntity?> getLibraryScanResult = await _unitOfWork.LibraryScanRepository.GetByIdAsync(
+            domainEvent.MediaLibraryScanCompositeId.ScanId.Value, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (getLibraryScanResult.IsFailure)
+            throw new EventualConsistencyException(getLibraryScanResult.FirstError, getLibraryScanResult.Errors);
+        if (getLibraryScanResult.Value is null)
+            throw new EventualConsistencyException(Errors.LibraryScanning.LibraryScanNotFound);
+
+        // Convert the repository scan to a domain object.
+        Result<LibraryScan> libraryScanDomainResult = getLibraryScanResult.Value.ToDomainEntity();
+        if (libraryScanDomainResult.IsFailure)
+            throw new EventualConsistencyException(libraryScanDomainResult.FirstError, libraryScanDomainResult.Errors);
+
+        // Mark the media library scan as failed.
+        Result<Success> failScanResult = libraryScanDomainResult.Value.FailScan();
+        // We're going to ignore errors in this point, because scan jobs run in parallel, and two concurrent jobs of the same scan might trigger this domain event,
+        // trying to set as failed a scan that has already been marked as failed by a concurrent job.
+        if (!failScanResult.IsFailure)
+        {
+            // Update the status of the library scan in the repository.
+            Result<Updated> updateLibraryScanResult = await _unitOfWork.LibraryScanRepository.UpdateAsync(libraryScanDomainResult.Value.ToRepositoryEntity(), cancellationToken).ConfigureAwait(false);
+            if (updateLibraryScanResult.IsFailure)
+                throw new EventualConsistencyException(updateLibraryScanResult.FirstError, updateLibraryScanResult.Errors);
+
+            Result<Success> saveChangesResult = await _unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            if (saveChangesResult.IsFailure)
+                throw new EventualConsistencyException(saveChangesResult.FirstError, saveChangesResult.Errors);
+        }
+
+        // Release the scan processing resources, regardless of whether the scan was already marked as failed by a concurrent job.
+        _mediaLibrariesScanCancellationTracker.RemoveScan(domainEvent.MediaLibraryScanCompositeId);
+        _mediaLibrariesScanProgressTracker.RemoveScanProgress(domainEvent.MediaLibraryScanCompositeId);
+        // Releasing the resources cancels the scan's own token, so the cleanup that follows must not observe it, otherwise the staged results of a failed scan
+        // would survive the failure and leak into the storage medium.
+        // A scan that failed after its snapshot was applied has not materialized its items yet, so its snapshot entries are rolled back, allowing the next
+        // scan to treat the files as new and extract their metadata again instead of skipping them as unchanged.
+        Result<Deleted> rollbackSnapshotResult = await _unitOfWork.LibraryScanSnapshotRepository.RollbackSnapshotForScanAsync(
+            domainEvent.LibraryId.Value, domainEvent.MediaLibraryScanCompositeId.ScanId.Value, CancellationToken.None).ConfigureAwait(false);
+        if (rollbackSnapshotResult.IsFailure)
+            throw new EventualConsistencyException(rollbackSnapshotResult.FirstError, rollbackSnapshotResult.Errors);
+        Result<Success> clearStagingResult = await _unitOfWork.LibraryScanStagingResultsRepository.ClearForScanAsync(domainEvent.MediaLibraryScanCompositeId.ScanId.Value, CancellationToken.None).ConfigureAwait(false);
+        if (clearStagingResult.IsFailure)
+            throw new EventualConsistencyException(clearStagingResult.FirstError, clearStagingResult.Errors);
+
+        // Notify SignalR clients that the library scan failed.
+        await _debouncedLibraryScanProgressNotifier.SendLibraryScanFailedEventAsync(domainEvent.MediaLibraryScanCompositeId, CancellationToken.None).ConfigureAwait(false);
+    }
+}

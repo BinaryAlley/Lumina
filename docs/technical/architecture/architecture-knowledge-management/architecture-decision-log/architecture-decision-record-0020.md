@@ -25,7 +25,7 @@ Persisted entity and domain event identifiers are created with `Guid.CreateVersi
 The decision applies to Domain, Application, DataAccess, and Infrastructure:
 
 - Every identifier factory and every code path that mints an entity or domain event identifier in application code calls `Guid.CreateVersion7()` directly.
-- Every Entity Framework Core property of type `Guid` with `ValueGenerated.OnAdd` is assigned the `GuidV7ValueGenerator` in `LuminaDbContext.OnModelCreating`. The loop covers real keys and owned collection shadow keys, so the data seed service can keep leaving seeded permission and role identifiers unset.
+- Every Entity Framework Core property of type `Guid` with `ValueGenerated.OnAdd` is assigned the `GuidV7ValueGenerator` in `NemeraDbContext.OnModelCreating`. The loop covers real keys and owned collection shadow keys, so the data seed service can keep leaving seeded permission and role identifiers unset.
 - Existing rows keep their version 4 identifiers. This is a forward-only change, and no primary key or foreign key is rewritten.
 
 The following identifiers intentionally remain outside the version 7 strategy:
@@ -57,7 +57,7 @@ The following identifiers intentionally remain outside the version 7 strategy:
 | Existing rows keep version 4 identifiers | Do not use identifier order as a chronology across the migration boundary; use `CreatedOnUtc` |
 | The two SQL bulk insert paths keep version 4 identifiers | The exception is documented in this ADR and in both repositories, so it is not changed accidentally |
 | Version 7 ordering depends on the system clock | Clock skew can break ordering, but not uniqueness; do not depend on strict ordering across machines |
-| Entity Framework Core could seed a new key with version 4 again | `LuminaDbContext` applies the generator to every `Guid` property configured with `ValueGenerated.OnAdd`, including owned shadow keys |
+| Entity Framework Core could seed a new key with version 4 again | `NemeraDbContext` applies the generator to every `Guid` property configured with `ValueGenerated.OnAdd`, including owned shadow keys |
 
 ## Alternatives Considered
 
@@ -87,4 +87,4 @@ Migrate every stored primary key and foreign key to a version 7 value.
 
 ## Amendment: Relocation of the SYSTEM Audit Identity (2026-11-25)
 
-The fixed SYSTEM audit identifier is no longer declared inline in `UpdateAuditableEntitiesInterceptor`. It is declared as the static readonly field `AuditIdentities.s_systemUserId` in `Lumina.Application/Common/DataAccess/Entities/Common/AuditIdentities.cs`. The identifier value and its behavior are unchanged.
+The fixed SYSTEM audit identifier is no longer declared inline in `UpdateAuditableEntitiesInterceptor`. It is declared as the static readonly field `AuditIdentities.s_systemUserId` in `Nemera.Application/Common/DataAccess/Entities/Common/AuditIdentities.cs`. The identifier value and its behavior are unchanged.

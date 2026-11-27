@@ -1,0 +1,15 @@
+#region ========================================================================= USING =====================================================================================
+using System;
+#endregion
+
+namespace Nemera.Contracts.Responses.Authorization;
+
+/// <summary>
+/// Represents the response model for a request for an authorization role.
+/// </summary>
+/// <param name="Id">The unique identifier of the requested authorization role.</param>
+/// <param name="RoleName">The requested authorization role.</param>
+public record RoleResponse(
+    Guid Id,
+    string RoleName
+);

@@ -93,7 +93,7 @@ note bottom of ReadingCachePaths
 end note
 
 class ReadingContentSanitizer {
-    + RESOURCE_ATTRIBUTE: string = data-lumina-resource
+    + RESOURCE_ATTRIBUTE: string = data-nemera-resource
     + {static} Sanitize(html: string, shouldPreserveStyles: bool): string
 }
 
@@ -183,7 +183,7 @@ interface IBookReader {
 }
 
 note top of IBookReader
-  Contract of a reader plugin, implemented in Lumina.Plugins.Contracts.
+  Contract of a reader plugin, implemented in Nemera.Plugins.Contracts.
   The plugins are host-trusted: they receive the absolute path of the
   book and a working directory to extract into, while the host
   sanitizes and contained-checks everything they produce before
@@ -227,7 +227,7 @@ end note
 class EpubPlugin {
     + Id: Guid
     + Name: string = EPUB Reader
-    + Author: string = Lumina
+    + Author: string = Nemera
     + Version: Version
     + Description: string
     + GetSettingsSchema(): IReadOnlyList<PluginSettingDescriptorDto>
@@ -237,7 +237,7 @@ class EpubPlugin {
 class PdfPlugin {
     + Id: Guid
     + Name: string = PDF Reader
-    + Author: string = Lumina
+    + Author: string = Nemera
     + Version: Version
     + Description: string
     + GetSettingsSchema(): IReadOnlyList<PluginSettingDescriptorDto>
@@ -284,7 +284,7 @@ PdfReader ..> PdfDocumentParser : parses and renders pages
 EpubPlugin ..> EpubReader : registers as a keyed IBookReader
 PdfPlugin ..> PdfReader : registers as a keyed IBookReader
 
-caption [Code] Lumina - Book Reading 3.2.2 and Book Reader Plugins
+caption [Code] Nemera - Book Reading 3.2.2 and Book Reader Plugins
 
 footer The code diagram for the Book Reading 3.2.2 and the Book Reader Plugins - created with PlantUML
 @enduml

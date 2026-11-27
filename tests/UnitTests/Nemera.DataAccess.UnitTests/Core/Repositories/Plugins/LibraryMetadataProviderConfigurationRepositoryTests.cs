@@ -1,0 +1,169 @@
+#region ========================================================================= USING =====================================================================================
+using EntityFrameworkCore.Testing.NSubstitute;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Nemera.DataAccess.Core.Repositories.Plugins;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.DataAccess.UnitTests.Core.Repositories.Plugins;
+
+/// <summary>
+/// Contains unit tests for the <see cref="LibraryMetadataProviderConfigurationRepository"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class LibraryMetadataProviderConfigurationRepositoryTests
+{
+    private readonly NemeraDbContext _mockContext;
+    private readonly LibraryMetadataProviderConfigurationRepository _sut;
+    private readonly LibraryMetadataProviderConfigurationEntityFixture _libraryMetadataProviderConfigurationEntityFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LibraryMetadataProviderConfigurationRepositoryTests"/> class.
+    /// </summary>
+    public LibraryMetadataProviderConfigurationRepositoryTests()
+    {
+        _mockContext = Create.MockedDbContextFor<NemeraDbContext>();
+        _sut = new LibraryMetadataProviderConfigurationRepository(_mockContext);
+    }
+
+    [Fact]
+    public async Task GetByLibraryIdAsync_WhenCalled_ShouldReturnOnlyConfigurationsOfTheLibrary()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        LibraryMetadataProviderConfigurationEntity configurationOfLibrary = _libraryMetadataProviderConfigurationEntityFixture.Create(libraryId, Guid.NewGuid(), 1);
+        LibraryMetadataProviderConfigurationEntity configurationOfAnotherLibrary = _libraryMetadataProviderConfigurationEntityFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
+        _mockContext.LibraryMetadataProviderConfigurations.AddRange(configurationOfLibrary, configurationOfAnotherLibrary);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<System.Collections.Generic.IReadOnlyList<LibraryMetadataProviderConfigurationEntity>> result = await _sut.GetByLibraryIdAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        LibraryMetadataProviderConfigurationEntity retrievedConfiguration = Assert.Single(result.Value);
+        Assert.Equal(configurationOfLibrary.PluginId, retrievedConfiguration.PluginId);
+    }
+
+    [Fact]
+    public async Task GetByLibraryAndPluginIdAsync_WhenConfigurationExists_ShouldReturnIt()
+    {
+        // Arrange
+        LibraryMetadataProviderConfigurationEntity configuration = _libraryMetadataProviderConfigurationEntityFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
+        _mockContext.LibraryMetadataProviderConfigurations.Add(configuration);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<LibraryMetadataProviderConfigurationEntity?> result = await _sut.GetByLibraryAndPluginIdAsync(configuration.LibraryId, configuration.PluginId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(configuration.Id, result.Value!.Id);
+    }
+
+    [Fact]
+    public async Task UpsertAsync_WhenConfigurationDoesNotExist_ShouldInsertIt()
+    {
+        // Arrange
+        LibraryMetadataProviderConfigurationEntity configuration = _libraryMetadataProviderConfigurationEntityFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
+
+        // Act
+        Result<Updated> result = await _sut.UpsertAsync(configuration, CancellationToken.None);
+        await _mockContext.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Single(_mockContext.LibraryMetadataProviderConfigurations);
+    }
+
+    [Fact]
+    public async Task UpsertAsync_WhenConfigurationExists_ShouldUpdateIt()
+    {
+        // Arrange
+        LibraryMetadataProviderConfigurationEntity configuration = _libraryMetadataProviderConfigurationEntityFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
+        _mockContext.LibraryMetadataProviderConfigurations.Add(configuration);
+        await _mockContext.SaveChangesAsync();
+
+        LibraryMetadataProviderConfigurationEntity updatedConfiguration = _libraryMetadataProviderConfigurationEntityFixture.Create(configuration.LibraryId, configuration.PluginId, 5);
+        updatedConfiguration.IsEnabled = true;
+
+        // Act
+        Result<Updated> result = await _sut.UpsertAsync(updatedConfiguration, CancellationToken.None);
+        await _mockContext.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        LibraryMetadataProviderConfigurationEntity retrievedConfiguration = _mockContext.LibraryMetadataProviderConfigurations.Single();
+        Assert.Equal(5, retrievedConfiguration.Rank);
+        Assert.True(retrievedConfiguration.IsEnabled);
+    }
+
+    [Fact]
+    public async Task DeleteByLibraryIdAsync_WhenCalled_ShouldRemoveOnlyConfigurationsOfTheLibrary()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        LibraryMetadataProviderConfigurationEntity configurationOfLibrary = _libraryMetadataProviderConfigurationEntityFixture.Create(libraryId, Guid.NewGuid(), 1);
+        LibraryMetadataProviderConfigurationEntity configurationOfAnotherLibrary = _libraryMetadataProviderConfigurationEntityFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
+        _mockContext.LibraryMetadataProviderConfigurations.AddRange(configurationOfLibrary, configurationOfAnotherLibrary);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<Deleted> result = await _sut.DeleteByLibraryIdAsync(libraryId, CancellationToken.None);
+        await _mockContext.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        LibraryMetadataProviderConfigurationEntity remainingConfiguration = Assert.Single(_mockContext.LibraryMetadataProviderConfigurations);
+        Assert.Equal(configurationOfAnotherLibrary.Id, remainingConfiguration.Id);
+    }
+
+    [Fact]
+    public async Task DeleteByPluginIdAsync_WhenCalled_ShouldRemoveConfigurationsOfThePlugin()
+    {
+        // Arrange
+        Guid pluginId = Guid.NewGuid();
+        LibraryMetadataProviderConfigurationEntity configurationOfPlugin = _libraryMetadataProviderConfigurationEntityFixture.Create(Guid.NewGuid(), pluginId, 1);
+        LibraryMetadataProviderConfigurationEntity configurationOfAnotherPlugin = _libraryMetadataProviderConfigurationEntityFixture.Create(Guid.NewGuid(), Guid.NewGuid(), 1);
+        _mockContext.LibraryMetadataProviderConfigurations.AddRange(configurationOfPlugin, configurationOfAnotherPlugin);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<Deleted> result = await _sut.DeleteByPluginIdAsync(pluginId, CancellationToken.None);
+        await _mockContext.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        LibraryMetadataProviderConfigurationEntity remainingConfiguration = Assert.Single(_mockContext.LibraryMetadataProviderConfigurations);
+        Assert.Equal(configurationOfAnotherPlugin.Id, remainingConfiguration.Id);
+    }
+
+    [Fact]
+    public async Task DeleteByLibraryIdAndPluginIdsAsync_WhenCalled_ShouldRemoveOnlyTheConfigurationsOfTheProvidedPlugins()
+    {
+        // Arrange
+        Guid libraryId = Guid.NewGuid();
+        Guid removedPluginId = Guid.NewGuid();
+        Guid keptPluginId = Guid.NewGuid();
+        LibraryMetadataProviderConfigurationEntity removedConfiguration = _libraryMetadataProviderConfigurationEntityFixture.Create(libraryId, removedPluginId, 1);
+        LibraryMetadataProviderConfigurationEntity keptConfiguration = _libraryMetadataProviderConfigurationEntityFixture.Create(libraryId, keptPluginId, 2);
+        _mockContext.LibraryMetadataProviderConfigurations.AddRange(removedConfiguration, keptConfiguration);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<Deleted> result = await _sut.DeleteByLibraryIdAndPluginIdsAsync(libraryId, [removedPluginId], CancellationToken.None);
+        await _mockContext.SaveChangesAsync();
+
+        // Assert
+        Assert.False(result.IsFailure);
+        LibraryMetadataProviderConfigurationEntity remainingConfiguration = Assert.Single(_mockContext.LibraryMetadataProviderConfigurations);
+        Assert.Equal(keptConfiguration.Id, remainingConfiguration.Id);
+    }
+}

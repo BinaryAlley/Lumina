@@ -1,0 +1,48 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Repositories.Plugins;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Mapping.Plugins;
+using Nemera.Contracts.Responses.Plugins;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Application.Core.Plugins.Queries.GetPlugins;
+
+/// <summary>
+/// Handler for the query to get all the detected plugins.
+/// </summary>
+public class GetPluginsQueryHandler : IQueryHandler<GetPluginsQuery, Result<IReadOnlyList<PluginResponse>>>
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetPluginsQueryHandler"/> class.
+    /// </summary>
+    /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories.</param>
+    public GetPluginsQueryHandler(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    /// <summary>
+    /// Handles the query to get all the detected plugins.
+    /// </summary>
+    /// <param name="query">The request to be handled.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>
+    /// An <see cref="Result{TValue}"/> containing either a collection of <see cref="PluginResponse"/>, or an error.
+    /// </returns>
+    public async Task<Result<IReadOnlyList<PluginResponse>>> HandleAsync(GetPluginsQuery query, CancellationToken cancellationToken)
+    {
+        Result<PaginatedResultDto<PluginEntity>> getPluginsResult = await _unitOfWork.PluginRepository.GetAllAsync<BaseFilterDto>(cancellationToken: cancellationToken).ConfigureAwait(false);
+        return getPluginsResult.Match(plugins => Result.From<IReadOnlyList<PluginResponse>>([.. plugins.Data.Select(plugin => plugin.ToResponse())]), errors => errors);
+    }
+}

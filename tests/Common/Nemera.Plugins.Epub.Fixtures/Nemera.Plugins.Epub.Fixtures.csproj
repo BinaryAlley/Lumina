@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <BaseOutputPath>$(SolutionDir)..\bin\api\</BaseOutputPath>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>false</IsTestProject>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AutoFixture" />
+        <PackageReference Include="AutoFixture.AutoNSubstitute" />
+        <PackageReference Include="AutoFixture.Xunit2" />
+        <PackageReference Include="Bogus" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\plugins\Nemera.Plugins.Epub\Nemera.Plugins.Epub.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Plugins.Contracts\Nemera.Plugins.Contracts.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Contracts.Fixtures\Nemera.Contracts.Fixtures.csproj" />
+    </ItemGroup>
+</Project>

@@ -1,0 +1,242 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
+using System.Collections.Generic;
+#endregion
+
+namespace Nemera.DataAccess.Common.Configuration;
+
+/// <summary>
+/// Configures the entity mapping for the <see cref="BookEntity"/> entity.
+/// </summary>
+public class BookConfiguration : IEntityTypeConfiguration<BookEntity>
+{
+    /// <summary>
+    /// Configures the <see cref="BookEntity"/> entity.
+    /// </summary>
+    /// <param name="builder">The builder to be used to configure the entity.</param>
+    public void Configure(EntityTypeBuilder<BookEntity> builder)
+    {
+        builder.ToTable("Books");
+        builder.HasKey(book => book.Id);
+        builder.Property(book => book.Id)
+            .ValueGeneratedNever() // Because EF always tries to generate the value for the Id, and because we generate it as part of the aggregate root, we need to tell EF not to generate it.
+            .HasColumnOrder(0);
+
+        builder.Property(book => book.Title)
+            .IsRequired()
+            .HasMaxLength(255)
+            .HasColumnOrder(1);
+        builder.Property(book => book.OriginalTitle)
+            .HasMaxLength(255)
+            .HasColumnOrder(2);
+        builder.Property(book => book.Description)
+            .HasMaxLength(2000)
+            .HasColumnOrder(3);
+        builder.Property(book => book.OriginalReleaseDate)
+            .HasColumnOrder(4);
+        builder.Property(book => book.OriginalReleaseYear)
+            .HasColumnOrder(5);
+        builder.Property(book => book.ReReleaseDate)
+            .HasColumnOrder(6);
+        builder.Property(book => book.ReReleaseYear)
+            .HasColumnOrder(7);
+        builder.Property(book => book.ReleaseCountry)
+            .HasConversion<string>()
+            .HasMaxLength(2)
+            .HasColumnOrder(8);
+        builder.Property(book => book.ReleaseVersion)
+            .HasColumnOrder(9);
+        builder.Property(book => book.LanguageCode)
+            .HasColumnOrder(10);
+        builder.Property(book => book.LanguageName)
+            .HasColumnOrder(11);
+        builder.Property(book => book.LanguageNativeName)
+            .HasColumnOrder(12);
+        builder.Property(book => book.OriginalLanguageCode)
+            .HasColumnOrder(13);
+        builder.Property(book => book.OriginalLanguageName)
+            .HasColumnOrder(14);
+        builder.Property(book => book.OriginalLanguageNativeName)
+            .HasColumnOrder(15);
+        // Since Tag is a Domain ValueObject (no identity), but we also don't want to have duplicates,
+        // we need to configure it as a many-to-many relationship, where the tag itself is the primary key.
+        builder.HasMany(book => book.Tags)
+            .WithMany()
+            .UsingEntity<Dictionary<string, object>>(
+                "BookTags",
+                j => j.HasOne<TagEntity>()
+                    .WithMany()
+                    .HasForeignKey("TagId"),
+                j => j.HasOne<BookEntity>()
+                    .WithMany()
+                    .HasForeignKey("BookId"),
+                j =>
+                {
+                    j.HasKey("BookId", "TagId");
+                    j.ToTable("BookTags");
+                });
+
+        builder.HasMany(book => book.Genres)
+            .WithMany()
+            .UsingEntity<Dictionary<string, object>>(
+                "BookGenres",
+                j => j.HasOne<GenreEntity>()
+                    .WithMany()
+                    .HasForeignKey("GenreId"),
+                j => j.HasOne<BookEntity>()
+                    .WithMany()
+                    .HasForeignKey("BookId"),
+                j =>
+                {
+                    j.HasKey("BookId", "GenreId");
+                    j.ToTable("BookGenres");
+                });
+
+        builder.Property(book => book.Publisher)
+            .HasMaxLength(100)
+            .HasColumnOrder(16);
+        builder.Property(book => book.PageCount)
+            .HasColumnOrder(17);
+        builder.Property(book => book.Format)
+            .HasConversion<string>()
+            .HasColumnOrder(18);
+        builder.Property(book => book.Edition)
+            .HasMaxLength(50)
+            .HasColumnOrder(19);
+        builder.Property(book => book.VolumeNumber)
+            .HasColumnOrder(20);
+        builder.Property(book => book.ASIN)
+            .HasMaxLength(10)
+            .HasColumnOrder(21);
+        builder.Property(book => book.GoodreadsId)
+            .HasColumnOrder(22);
+        builder.Property(book => book.LCCN)
+            .HasColumnOrder(23);
+        builder.Property(book => book.OCLCNumber)
+            .HasColumnOrder(24);
+        builder.Property(book => book.OpenLibraryId)
+            .HasMaxLength(50)
+            .HasColumnOrder(25);
+        builder.Property(book => book.LibraryThingId)
+            .HasMaxLength(50)
+            .HasColumnOrder(26);
+        builder.Property(book => book.GoogleBooksId)
+            .HasMaxLength(12)
+            .HasColumnOrder(27);
+        builder.Property(book => book.BarnesAndNobleId)
+            .HasMaxLength(10)
+            .HasColumnOrder(28);
+        builder.Property(book => book.AppleBooksId)
+            .HasColumnOrder(29);
+        builder.Property(book => book.LibraryId)
+            .IsRequired()
+            .HasColumnOrder(36);
+        builder.Property(book => book.Path)
+            .IsRequired()
+            .HasMaxLength(2048)
+            .HasColumnOrder(37);
+        builder.Property(book => book.MetadataStatus)
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .IsRequired()
+            .HasColumnOrder(38);
+        builder.Property(book => book.LastMetadataUpdateUtc)
+            .HasColumnOrder(39);
+        builder.Property(book => book.MetadataProvider)
+            .HasMaxLength(100)
+            .HasColumnOrder(40);
+        builder.Property(book => book.IsDeleted)
+            .IsRequired()
+            .HasDefaultValue(false)
+            .HasColumnOrder(41);
+        builder.Property(book => book.DeletedOnUtc)
+            .HasDefaultValue(null)
+            .HasColumnOrder(42);
+
+        builder.HasMany(book => book.Contributors)
+            .WithOne()
+            .HasForeignKey(bookContributor => bookContributor.BookId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(book => book.Artwork)
+            .WithOne()
+            .HasForeignKey(bookArtwork => bookArtwork.BookId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.OwnsMany(book => book.Ratings, ratingBuilder =>
+        {
+            ratingBuilder.ToTable("BookRatings");
+            ratingBuilder.WithOwner()
+                .HasForeignKey("BookId");
+            ratingBuilder.Property<Guid>("Id")
+                .ValueGeneratedOnAdd();
+            ratingBuilder.HasKey("Id");
+
+            ratingBuilder.Property(rating => rating.Value)
+                .HasColumnType("decimal(3,2)")
+                .IsRequired();
+
+            ratingBuilder.Property(rating => rating.MaxValue)
+                .HasColumnType("decimal(3,2)")
+                .IsRequired();
+
+            ratingBuilder.Property(rating => rating.VoteCount)
+                .IsRequired(false);
+
+            ratingBuilder.Property(rating => rating.Source)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .IsRequired();
+        });
+
+        builder.OwnsMany(book => book.ISBNs, isbnBuilder =>
+        {
+            isbnBuilder.ToTable("BookISBNs");
+            isbnBuilder.WithOwner()
+                .HasForeignKey("BookId");
+            isbnBuilder.Property<Guid>("Id")
+                .ValueGeneratedOnAdd();
+            isbnBuilder.HasKey("Id");
+
+            isbnBuilder.Property(isbn => isbn.Value)
+                .HasColumnName("ISBN")
+                .HasMaxLength(13)
+                .IsRequired();
+
+            isbnBuilder.Property(isbn => isbn.Format)
+                .HasConversion<string>()
+                .HasMaxLength(6)
+                .IsRequired();
+        });
+
+        // Audit.
+        builder.Property(book => book.CreatedOnUtc)
+            .IsRequired()
+            .HasColumnOrder(32);
+
+        builder.Property(book => book.CreatedBy)
+            .IsRequired()
+            .HasColumnOrder(33);
+
+        builder.Property(book => book.UpdatedOnUtc)
+            .HasDefaultValue(null)
+            .HasColumnOrder(34);
+
+        builder.Property(book => book.UpdatedBy)
+            .HasDefaultValue(null)
+            .HasColumnOrder(35);
+
+        builder.HasIndex(book => new { book.LibraryId, book.Path })
+            .IsUnique(); // The same physical book on disk cannot appear twice in the same library.
+        builder.HasIndex(book => new { book.LibraryId, book.MetadataStatus });
+        // The deleted items page filters by library and deletion state, and orders by the stored deletion time, the title and the Id, so the
+        // index follows the same order and no temporary B-tree is needed for the sort.
+        // Only deleted books maintain an entry in the index, since visible books never appear in the listing.
+        builder.HasIndex(book => new { book.LibraryId, book.IsDeleted, book.DeletedOnUtc, book.Title, book.Id })
+            .HasFilter("\"IsDeleted\" = 1");
+    }
+}

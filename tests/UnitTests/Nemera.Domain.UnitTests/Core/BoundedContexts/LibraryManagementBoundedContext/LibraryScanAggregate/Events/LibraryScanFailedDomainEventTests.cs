@@ -1,0 +1,63 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using System;
+using System.Diagnostics.CodeAnalysis;
+#endregion
+
+namespace Nemera.Domain.UnitTests.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+
+/// <summary>
+/// Contains unit tests for the <see cref="LibraryScanFailedDomainEvent"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class LibraryScanFailedDomainEventTests
+{
+    private readonly LibraryIdFixture _libraryIdFixture = new();
+    private readonly MediaLibraryScanCompositeIdFixture _mediaLibraryScanCompositeIdFixture = new();
+    private readonly LibraryScanFailedDomainEventFixture _libraryScanFailedDomainEventFixture = new();
+
+    [Fact]
+    public void Constructor_WhenCalledWithErrorMessage_ShouldSetAllProperties()
+    {
+        // Arrange
+        Guid id = Guid.NewGuid();
+        LibraryId libraryId = _libraryIdFixture.Create();
+        MediaLibraryScanCompositeId compositeId = _mediaLibraryScanCompositeIdFixture.Create();
+        DateTime occurredOnUtc = DateTime.UtcNow;
+        string errorMessage = "Scan failed unexpectedly.";
+
+        // Act
+        LibraryScanFailedDomainEvent domainEvent = _libraryScanFailedDomainEventFixture.Create(
+            id: id,
+            libraryId: libraryId,
+            mediaLibraryScanCompositeId: compositeId,
+            occurredOnUtc: occurredOnUtc,
+            errorMessage: errorMessage);
+
+        // Assert
+        Assert.Equal(id, domainEvent.Id);
+        Assert.Equal(libraryId, domainEvent.LibraryId);
+        Assert.Equal(compositeId, domainEvent.MediaLibraryScanCompositeId);
+        Assert.Equal(occurredOnUtc, domainEvent.OccurredOnUtc);
+        Assert.True(domainEvent.ErrorMessage.HasValue);
+        Assert.Equal(errorMessage, domainEvent.ErrorMessage.Value);
+        Assert.IsType<IDomainEvent>(domainEvent, exactMatch: false);
+    }
+
+    [Fact]
+    public void Constructor_WhenCalledWithoutErrorMessage_ShouldLeaveErrorMessageUnset()
+    {
+        // Act
+        LibraryScanFailedDomainEvent domainEvent = _libraryScanFailedDomainEventFixture.Create(includeErrorMessage: false);
+
+        // Assert
+        Assert.False(domainEvent.ErrorMessage.HasValue);
+        Assert.IsType<IDomainEvent>(domainEvent, exactMatch: false);
+    }
+}

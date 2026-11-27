@@ -1,0 +1,69 @@
+#region ========================================================================= USING =====================================================================================
+using Bogus;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Queries.GetArtistsLite;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+#endregion
+
+namespace Nemera.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Queries.GetArtistsLite;
+
+/// <summary>
+/// Fixture class for the <see cref="GetArtistsLiteQuery"/> record.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class GetArtistsLiteQueryFixture
+{
+    private readonly Faker _faker = new();
+    private readonly PaginationDataDtoFixture _paginationDataDtoFixture = new();
+
+    /// <summary>
+    /// Creates a random valid <see cref="GetArtistsLiteQuery"/>.
+    /// </summary>
+    /// <param name="libraryId">Optional. The Id of the media library whose artists are retrieved, taken from the route.</param>
+    /// <param name="paginationData">Optional. The pagination data of the query.</param>
+    /// <param name="searchTerm">Optional. The search term used to filter the artists by name.</param>
+    /// <param name="filterAlphaKey">Optional. The alpha key used to filter the results by the first character of their name, for the alpha picker.</param>
+    /// <param name="shouldIgnoreThePrefixForAlphaPicker">Optional. Whether the leading "The " prefix of a name should be ignored when computing the alpha key, or not.</param>
+    /// <param name="sortBy">Optional. The name of the field by which to sort the results.</param>
+    /// <param name="sortOrder">Optional. The direction in which to sort the results.</param>
+    /// <param name="includeLibraryId">Whether the library Id should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includePaginationData">Whether the pagination data should be included, or forced to <see langword="null"/>.</param>
+    /// <param name="includeSearchTerm">Whether the search term should be included, or forced to <see langword="null"/>.</param>
+    /// <returns>The created <see cref="GetArtistsLiteQuery"/>.</returns>
+    public GetArtistsLiteQuery Create(
+        string? libraryId = null,
+        PaginationDataDto? paginationData = null,
+        string? searchTerm = null,
+        string? filterAlphaKey = null,
+        bool shouldIgnoreThePrefixForAlphaPicker = false,
+        string? sortBy = null,
+        SortOrder? sortOrder = null,
+        bool includeLibraryId = true,
+        bool includePaginationData = true,
+        bool includeSearchTerm = true)
+    {
+        return new GetArtistsLiteQuery(
+            includeLibraryId ? (libraryId ?? Guid.NewGuid().ToString()) : null,
+            includePaginationData ? (paginationData ?? _paginationDataDtoFixture.Create()) : null,
+            includeSearchTerm ? (searchTerm ?? _faker.Name.FullName()) : null,
+            filterAlphaKey,
+            shouldIgnoreThePrefixForAlphaPicker,
+            sortBy ?? _faker.Lorem.Word(),
+            sortOrder ?? _faker.PickRandom<SortOrder>());
+    }
+
+    /// <summary>
+    /// Creates a list of <see cref="GetArtistsLiteQuery"/>.
+    /// </summary>
+    /// <param name="count">Number of instances to create.</param>
+    /// <returns>List of configured <see cref="GetArtistsLiteQuery"/> instances.</returns>
+    public List<GetArtistsLiteQuery> CreateMany(int count = 3)
+    {
+        return [.. Enumerable.Range(0, count).Select(_ => Create())];
+    }
+}

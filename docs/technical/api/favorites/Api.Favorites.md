@@ -1,6 +1,6 @@
-# Lumina API
+# Nemera API
 
-- [Lumina API](#lumina-api)
+- [Nemera API](#nemera-api)
   - [Favorites](#favorites)
     - [Add Favorite](#add-favorite)
       - [Add Favorite Request](#add-favorite-request)

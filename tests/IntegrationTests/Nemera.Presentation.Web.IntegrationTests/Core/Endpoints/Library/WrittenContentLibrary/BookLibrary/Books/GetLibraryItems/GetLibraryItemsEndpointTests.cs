@@ -1,0 +1,65 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetLibraryItems;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetLibraryItems;
+
+/// <summary>
+/// Contains integration tests for the <see cref="GetLibraryItemsEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class GetLibraryItemsEndpointTests : IClassFixture<NemeraWebFactory>
+{
+    private readonly NemeraWebFactory _apiFactory;
+    private readonly PaginatedDtoFixture<BookLiteDto> _paginatedBookLiteDtoFixture = new();
+    private readonly BookLiteDtoFixture _bookLiteDtoFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetLibraryItemsEndpointTests"/> class.
+    /// </summary>
+    /// <param name="apiFactory">Injected Web application factory.</param>
+    public GetLibraryItemsEndpointTests(NemeraWebFactory apiFactory)
+    {
+        _apiFactory = apiFactory;
+    }
+
+    [Fact]
+    public async Task GetLibraryItems_WhenCalledByAuthenticatedUser_ShouldReturnBooksFromApi()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        Guid libraryId = Guid.NewGuid();
+        string searchTerm = "Harry";
+        PaginatedDto<BookLiteDto> expectedResponse = _paginatedBookLiteDtoFixture.Create(data: [_bookLiteDtoFixture.Create(title: "Harry Potter")]);
+        string expectedEndpoint = $"libraries/{libraryId}/books/lite?currentPage=1&perPage=20&searchTerm={searchTerm}&shouldIgnoreThePrefixForAlphaPicker=True";
+        _apiFactory.ApiClientStub.RegisterGetResponse(expectedEndpoint, expectedResponse);
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        HttpRequestMessage getRequest = new(HttpMethod.Get, $"/en-us/library/written-content-library/books-library/books/api-get-library-items?libraryId={libraryId}&currentPage=1&perPage=20&searchTerm={searchTerm}&shouldIgnoreThePrefixForAlphaPicker=true");
+        getRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(getRequest);
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using JsonDocument json = JsonDocument.Parse(content);
+        Assert.True(json.RootElement.GetProperty("success").GetBoolean());
+        Assert.Equal(expectedResponse.Data.Count, json.RootElement.GetProperty("data").GetProperty("data").GetArrayLength());
+        Assert.Contains(expectedEndpoint, _apiFactory.ApiClientStub.GetEndpointsCalled);
+    }
+}

@@ -1,0 +1,134 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
+using Nemera.Application.Fixtures.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
+using Nemera.Contracts.Responses.FileSystemManagement.Path;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using NSubstitute;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Application.UnitTests.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
+
+/// <summary>
+/// Contains unit tests for the <see cref="CheckPathExistsQueryHandler"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class CheckPathExistsQueryHandlerTests
+{
+    private readonly IPathService _mockPathService;
+    private readonly CheckPathExistsQueryHandler _sut;
+    private readonly CheckPathExistsQueryFixture _checkPathExistsQueryFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CheckPathExistsQueryHandlerTests"/> class.
+    /// </summary>
+    public CheckPathExistsQueryHandlerTests()
+    {
+        _mockPathService = Substitute.For<IPathService>();
+        IValidator<CheckPathExistsQuery> mockValidator = Substitute.For<IValidator<CheckPathExistsQuery>>();
+        mockValidator.Validate(Arg.Any<CheckPathExistsQuery>())
+            .Returns([]);
+        _sut = new CheckPathExistsQueryHandler(_mockPathService, mockValidator);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenPathExistsAndIsNotHidden_ShouldReturnTrueResponse()
+    {
+        // Arrange
+        CheckPathExistsQuery query = _checkPathExistsQueryFixture.Create();
+        _mockPathService.Exists(query.Path!).Returns(true);
+
+        // Act
+        Result<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.True(result.Value.Exists);
+        _mockPathService.Received(1).Exists(query.Path!);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenPathExistsAndIsHiddenAndShouldIncludeHiddenElementsIsTrue_ShouldReturnTrueResponse()
+    {
+        // Arrange
+        CheckPathExistsQuery query = _checkPathExistsQueryFixture.Create(shouldIncludeHiddenElements: true);
+        _mockPathService.Exists(query.Path!).Returns(true);
+
+        // Act
+        Result<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.True(result.Value.Exists);
+        _mockPathService.Received(1).Exists(query.Path!);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenPathExistsAndIsHiddenAndShouldIncludeHiddenElementsIsFalse_ShouldReturnFalseResponse()
+    {
+        // Arrange
+        CheckPathExistsQuery query = _checkPathExistsQueryFixture.Create(shouldIncludeHiddenElements: false);
+        _mockPathService.Exists(query.Path!, false).Returns(false);
+
+        // Act
+        Result<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.False(result.Value.Exists);
+        _mockPathService.Received(1).Exists(query.Path!, false);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenPathDoesNotExist_ShouldReturnFalseResponse()
+    {
+        // Arrange
+        CheckPathExistsQuery query = _checkPathExistsQueryFixture.Create();
+        _mockPathService.Exists(query.Path!).Returns(false);
+
+        // Act
+        Result<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.False(result.Value.Exists);
+        _mockPathService.Received(1).Exists(query.Path!);
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenCalledWithNullPath_ShouldStillCallPathService()
+    {
+        // Arrange
+        CheckPathExistsQuery query = _checkPathExistsQueryFixture.Create(includePath: false, shouldIncludeHiddenElements: false);
+        _mockPathService.Exists(Arg.Any<string>(), Arg.Any<bool>()).Returns(false);
+
+        // Act
+        Result<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.False(result.Value.Exists);
+        _mockPathService.Received(1).Exists(Arg.Any<string>(), Arg.Any<bool>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenCancellationRequested_ShouldStillCompleteOperation()
+    {
+        // Arrange
+        CheckPathExistsQuery query = _checkPathExistsQueryFixture.Create();
+        _mockPathService.Exists(query.Path!).Returns(true);
+        CancellationToken cancellationToken = new(true);
+
+        // Act
+        Result<PathExistsResponse> result = await _sut.HandleAsync(query, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.True(result.Value.Exists);
+        _mockPathService.Received(1).Exists(query.Path!);
+    }
+}

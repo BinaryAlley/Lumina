@@ -1,15 +1,15 @@
 # This file is required because the default base output path for the projects has been changed, and we need to tell docker compose where to take the files from, in debug mode.
 # This file is the last in the chain of files when docker-compose commands are called, so it always takes precedence.
 services:
-  lumina-api:
+  nemera-api:
     labels:
-      com.microsoft.visualstudio.debuggee.program: "/app/Lumina.Presentation.Api.dll"
+      com.microsoft.visualstudio.debuggee.program: "/app/Nemera.Presentation.Api.dll"
       com.microsoft.visualstudio.debuggee.workingdirectory: "/app"
     volumes:
       - ../bin/api/Debug/net10.0:/app
-  lumina-web:
+  nemera-web:
     labels:
-      com.microsoft.visualstudio.debuggee.program: "/app/Lumina.Presentation.Web.dll"
+      com.microsoft.visualstudio.debuggee.program: "/app/Nemera.Presentation.Web.dll"
       com.microsoft.visualstudio.debuggee.workingdirectory: "/app"
     volumes:
       - ../bin/web/Debug/net10.0:/app 

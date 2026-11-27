@@ -19,7 +19,7 @@ The remaining publish half carries the same third-party dependency and source-ge
 
 Replace Mediator's notification publishing with a first-party domain event publisher.
 
-### New Abstractions (in `Lumina.Domain.Common.Events`)
+### New Abstractions (in `Nemera.Domain.Common.Events`)
 
 - `IDomainEvent` no longer inherits `INotification`.
 - `IDomainEventPublisher` exposes `ValueTask PublishAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = default)`.

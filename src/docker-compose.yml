@@ -1,10 +1,10 @@
 services:
-  lumina-api:
-    container_name: lumina-api
-    image: ${DOCKER_REGISTRY-}lumina-api
+  nemera-api:
+    container_name: nemera-api
+    image: ${DOCKER_REGISTRY-}nemera-api
     build:
       context: .
-      dockerfile: Lumina.Presentation.Api/Dockerfile
+      dockerfile: Nemera.Presentation.Api/Dockerfile
     environment:
       - LOG_PATH=/logs
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
@@ -22,19 +22,19 @@ services:
       retries: 3
       start_period: 60s
 
-  lumina-web:
-    container_name: lumina-web
-    image: ${DOCKER_REGISTRY-}lumina-web
+  nemera-web:
+    container_name: nemera-web
+    image: ${DOCKER_REGISTRY-}nemera-web
     build:
       context: .
-      dockerfile: Lumina.Presentation.Web/Dockerfile
+      dockerfile: Nemera.Presentation.Web/Dockerfile
     environment:
       - LOG_PATH=/logs
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
-      - ServerConfiguration__BaseAddress=http://lumina-api
+      - ServerConfiguration__BaseAddress=http://nemera-api
     depends_on:
       - otel-collector
-      - lumina-api
+      - nemera-api
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:5012/health/ready || exit 1"]
       interval: 30s
@@ -82,7 +82,7 @@ services:
     image: grafana/grafana:13.0.7-ubuntu-slim
     environment:
       # Dev-only stack: set a non-default admin password (override GRAFANA_ADMIN_PASSWORD in real deployments).
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-lumina-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-nemera-admin}
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro

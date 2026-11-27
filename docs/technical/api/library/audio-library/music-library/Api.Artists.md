@@ -1,6 +1,6 @@
-# Lumina API
+# Nemera API
 
-- [Lumina API](#lumina-api)
+- [Nemera API](#nemera-api)
   - [Artist](#artist)
     - [Add Artist](#add-artist)
       - [Add Artist Request](#add-artist-request)
@@ -2104,14 +2104,14 @@ Updates the cover image of the artist identified by `artistId` with the image up
 
 ```js
 PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/artists/{artistId}/cover
-Content-Type: multipart/form-data; boundary=LuminaBoundary
+Content-Type: multipart/form-data; boundary=NemeraBoundary
 
---LuminaBoundary
+--NemeraBoundary
 Content-Disposition: form-data; name="cover"; filename="cover.jpg"
 Content-Type: image/jpeg
 
 < ./cover.jpg
---LuminaBoundary--
+--NemeraBoundary--
 ```
 
 #### Update Artist Cover Response

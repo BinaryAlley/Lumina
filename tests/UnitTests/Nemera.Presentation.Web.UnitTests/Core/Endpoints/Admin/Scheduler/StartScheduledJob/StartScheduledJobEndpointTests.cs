@@ -1,0 +1,57 @@
+#region ========================================================================= USING =====================================================================================
+using FastEndpoints;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.Requests.Scheduling;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Scheduler.StartScheduledJob;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Scheduling;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Microsoft.AspNetCore.Http;
+using NSubstitute;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Admin.Scheduler.StartScheduledJob;
+
+/// <summary>
+/// Contains unit tests for the <see cref="StartScheduledJobEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class StartScheduledJobEndpointTests
+{
+    private readonly IApiHttpClient _mockApiHttpClient;
+    private readonly StartScheduledJobEndpoint _sut;
+    private readonly StartScheduledJobRequestFixture _startScheduledJobRequestFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StartScheduledJobEndpointTests"/> class.
+    /// </summary>
+    public StartScheduledJobEndpointTests()
+    {
+        _mockApiHttpClient = Substitute.For<IApiHttpClient>();
+        _sut = Factory.Create<StartScheduledJobEndpoint>(_mockApiHttpClient);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCalled_ShouldStartScheduledJobViaApiAndReturnSuccess()
+    {
+        // Arrange
+        StartScheduledJobRequest request = _startScheduledJobRequestFixture.Create();
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(request, CancellationToken.None);
+        string body = await JsonResultTestHelper.GetResponseBodyAsync(result);
+
+        // Assert
+        string expectedEndpoint = ApiRoutes.ScheduledJobs.START_SCHEDULED_JOB.Replace("{scheduledJobId}", request.ScheduledJobId.ToString());
+        await _mockApiHttpClient.Received(1).PutIgnoringResponseAsync<StartScheduledJobRequest>(
+            expectedEndpoint,
+            Arg.Is<StartScheduledJobRequest>(forwardedRequest => forwardedRequest.ScheduledJobId == request.ScheduledJobId),
+            Arg.Any<CancellationToken>());
+        using JsonDocument jsonDocument = JsonDocument.Parse(body);
+        Assert.True(jsonDocument.RootElement.GetProperty("success").GetBoolean());
+    }
+}

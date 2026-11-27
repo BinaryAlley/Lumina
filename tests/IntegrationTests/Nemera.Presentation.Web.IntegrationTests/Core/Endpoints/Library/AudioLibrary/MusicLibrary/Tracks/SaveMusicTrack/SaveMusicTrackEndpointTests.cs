@@ -1,0 +1,194 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.SaveMusicTrack;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.SaveMusicTrack;
+
+/// <summary>
+/// Contains integration tests for the <see cref="SaveMusicTrackEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class SaveMusicTrackEndpointTests : IClassFixture<NemeraWebFactory>
+{
+    private static readonly JsonSerializerOptions s_jsonOptions = new(JsonSerializerDefaults.Web)
+    {
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+    };
+
+    private readonly NemeraWebFactory _apiFactory;
+    private readonly UpdateMusicTrackRequestFixture _updateMusicTrackRequestFixture = new();
+    private readonly MusicTrackDtoFixture _musicTrackDtoFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SaveMusicTrackEndpointTests"/> class.
+    /// </summary>
+    /// <param name="apiFactory">Injected Web application factory.</param>
+    public SaveMusicTrackEndpointTests(NemeraWebFactory apiFactory)
+    {
+        _apiFactory = apiFactory;
+    }
+
+    [Fact]
+    public async Task SaveMusicTrack_WhenCalledByAuthenticatedUserWithAntiforgeryToken_ShouldForwardUpdateAndReturnSuccess()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        Guid libraryId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
+        Guid trackId = Guid.NewGuid();
+        UpdateMusicTrackRequest request = _updateMusicTrackRequestFixture.Create();
+        MusicTrackDto expectedTrack = _musicTrackDtoFixture.Create(id: trackId, albumId: albumId, libraryId: libraryId);
+        _apiFactory.ApiClientStub.RegisterPutResponse($"libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}", expectedTrack);
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        HttpRequestMessage saveRequest = CreateSaveRequest(artistId, albumId, trackId, libraryId, request);
+        saveRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(saveRequest);
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using JsonDocument json = JsonDocument.Parse(content);
+        Assert.True(json.RootElement.GetProperty("success").GetBoolean());
+        Assert.Equal(trackId, json.RootElement.GetProperty("data").GetProperty("id").GetGuid());
+        Assert.Contains(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}" && putRequest.Data is UpdateMusicTrackRequest forwarded && forwarded.Metadata!.Title == request.Metadata!.Title);
+    }
+
+    [Fact]
+    public async Task SaveMusicTrack_WhenPostedBodyCarriesAFilePath_ShouldNotForwardAFilePathToTheApi()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        Guid libraryId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
+        Guid trackId = Guid.NewGuid();
+        string attemptedPath = Path.Combine(Path.GetTempPath(), "nemera-outside-content-root", "etc", "hosts");
+        UpdateMusicTrackRequest request = _updateMusicTrackRequestFixture.Create();
+        MusicTrackDto expectedTrack = _musicTrackDtoFixture.Create(id: trackId, albumId: albumId, libraryId: libraryId);
+        _apiFactory.ApiClientStub.RegisterPutResponse($"libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}", expectedTrack);
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        HttpRequestMessage saveRequest = CreateSaveRequest(artistId, albumId, trackId, libraryId, request, attemptedPath);
+        saveRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(saveRequest);
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using JsonDocument json = JsonDocument.Parse(content);
+        Assert.True(json.RootElement.GetProperty("success").GetBoolean());
+        (string Endpoint, object? Data) forwardedRequest = Assert.Single(
+            _apiFactory.ApiClientStub.PutRequests,
+            putRequest => putRequest.Endpoint == $"libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}");
+        UpdateMusicTrackRequest forwarded = Assert.IsType<UpdateMusicTrackRequest>(forwardedRequest.Data);
+        Assert.Equal(request.Metadata!.Title, forwarded.Metadata!.Title);
+        // The Web request type has no file system path, so the posted path is dropped before the API call.
+        using JsonDocument forwardedJson = JsonDocument.Parse(JsonSerializer.Serialize(forwarded, s_jsonOptions));
+        Assert.False(forwardedJson.RootElement.TryGetProperty("path", out _));
+    }
+
+    [Fact]
+    public async Task SaveMusicTrack_WhenCalledWithoutAntiforgeryToken_ShouldRejectRequest()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        Guid libraryId = Guid.NewGuid();
+        Guid artistId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
+        Guid trackId = Guid.NewGuid();
+        UpdateMusicTrackRequest request = _updateMusicTrackRequestFixture.Create();
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        HttpRequestMessage saveRequest = CreateSaveRequest(artistId, albumId, trackId, libraryId, request);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(saveRequest);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.DoesNotContain(_apiFactory.ApiClientStub.PutRequests, putRequest => putRequest.Endpoint == $"libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}");
+    }
+
+    [Fact]
+    public async Task SaveMusicTrack_WhenNotAuthenticated_ShouldRedirectToLogin()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        HttpClient anonymousClient = WebTestHelpers.CreateAnonymousClient(_apiFactory);
+        HttpRequestMessage saveRequest = CreateSaveRequest(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), _updateMusicTrackRequestFixture.Create());
+
+        // Act
+        HttpResponseMessage response = await anonymousClient.SendAsync(saveRequest);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+        Assert.Empty(_apiFactory.ApiClientStub.PutRequests);
+    }
+
+    /// <summary>
+    /// Builds the save request that PUTs the given <paramref name="request"/> to the track identified by the route,
+    /// with the owning library passed through the query string.
+    /// </summary>
+    /// <param name="artistId">The route Id of the artist the track belongs to.</param>
+    /// <param name="albumId">The route Id of the album the track belongs to.</param>
+    /// <param name="trackId">The route Id of the track to save.</param>
+    /// <param name="libraryId">The Id of the media library the track belongs to.</param>
+    /// <param name="request">The track data to send.</param>
+    /// <returns>The configured save request.</returns>
+    private static HttpRequestMessage CreateSaveRequest(Guid artistId, Guid albumId, Guid trackId, Guid libraryId, UpdateMusicTrackRequest request)
+    {
+        HttpRequestMessage saveRequest = new(HttpMethod.Put, $"/en-us/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/{trackId}/api-save-track?libraryId={libraryId}")
+        {
+            Content = JsonContent.Create(request)
+        };
+        saveRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        saveRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        return saveRequest;
+    }
+
+    /// <summary>
+    /// Builds the save request that PUTs the given <paramref name="request"/>, carrying an extra file system path property,
+    /// to the track identified by the route, with the owning library passed through the query string.
+    /// </summary>
+    /// <param name="artistId">The route Id of the artist the track belongs to.</param>
+    /// <param name="albumId">The route Id of the album the track belongs to.</param>
+    /// <param name="trackId">The route Id of the track to save.</param>
+    /// <param name="libraryId">The Id of the media library the track belongs to.</param>
+    /// <param name="request">The track data to send.</param>
+    /// <param name="attemptedPath">The file system path to inject into the posted body.</param>
+    /// <returns>The configured save request.</returns>
+    private static HttpRequestMessage CreateSaveRequest(Guid artistId, Guid albumId, Guid trackId, Guid libraryId, UpdateMusicTrackRequest request, string attemptedPath)
+    {
+        JsonObject body = JsonSerializer.SerializeToNode(request, s_jsonOptions)!.AsObject();
+        body["path"] = attemptedPath;
+        HttpRequestMessage saveRequest = new(HttpMethod.Put, $"/en-us/library/audio-library/music-library/artists/{artistId}/albums/{albumId}/tracks/{trackId}/api-save-track?libraryId={libraryId}")
+        {
+            Content = new StringContent(body.ToJsonString(s_jsonOptions), Encoding.UTF8, "application/json")
+        };
+        saveRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        saveRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        return saveRequest;
+    }
+}

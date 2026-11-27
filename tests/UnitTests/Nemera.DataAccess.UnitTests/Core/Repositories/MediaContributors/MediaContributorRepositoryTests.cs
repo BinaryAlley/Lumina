@@ -1,0 +1,242 @@
+#region ========================================================================= USING =====================================================================================
+using EntityFrameworkCore.Testing.NSubstitute;
+using Nemera.Application.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
+using Nemera.DataAccess.Core.Repositories.MediaContributors;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.DataAccess.UnitTests.Core.Repositories.MediaContributors;
+
+/// <summary>
+/// Contains unit tests for the <see cref="MediaContributorRepository"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class MediaContributorRepositoryTests
+{
+    private readonly NemeraDbContext _mockContext;
+    private readonly MediaContributorRepository _sut;
+    private readonly MediaContributorEntityFixture _mediaContributorEntityFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MediaContributorRepositoryTests"/> class.
+    /// </summary>
+    public MediaContributorRepositoryTests()
+    {
+        _mockContext = Create.MockedDbContextFor<NemeraDbContext>();
+        _sut = new MediaContributorRepository(_mockContext);
+    }
+
+    [Fact]
+    public async Task FindOrCreateByDisplayNameAsync_WhenContributorExists_ShouldReturnTheExistingContributor()
+    {
+        // Arrange
+        MediaContributorEntity existingContributor = _mediaContributorEntityFixture.Create(displayName: "Stephen King");
+        _mockContext.MediaContributors.Add(existingContributor);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<MediaContributorEntity> result = await _sut.FindOrCreateByDisplayNameAsync("stephen king", null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        // The comparison is case-insensitive, so the existing contributor is returned and no new one is created.
+        Assert.Equal(existingContributor.Id, result.Value.Id);
+        Assert.Equal("Stephen King", result.Value.DisplayName);
+        Assert.Single(_mockContext.ChangeTracker.Entries<MediaContributorEntity>());
+    }
+
+    [Fact]
+    public async Task FindOrCreateByDisplayNameAsync_WhenContributorDoesNotExist_ShouldCreateAndAddANewContributor()
+    {
+        // Arrange
+        string displayName = "Frank Herbert";
+
+        // Act
+        Result<MediaContributorEntity> result = await _sut.FindOrCreateByDisplayNameAsync(displayName, "Franklin Patrick Herbert", CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(displayName, result.Value.DisplayName);
+        Assert.Equal("Franklin Patrick Herbert", result.Value.LegalName);
+
+        EntityEntry<MediaContributorEntity>? addedContributor = _mockContext.ChangeTracker.Entries<MediaContributorEntity>()
+            .FirstOrDefault(entityEntry => entityEntry.State == EntityState.Added && entityEntry.Entity.Id == result.Value.Id);
+        Assert.NotNull(addedContributor);
+    }
+
+    [Fact]
+    public async Task FindOrCreateByDisplayNameAsync_WhenContributorWithSameNameExistsInDifferentCase_ShouldNotCreateADuplicate()
+    {
+        // Arrange
+        MediaContributorEntity existingContributor = _mediaContributorEntityFixture.Create(displayName: "Frank Herbert");
+        _mockContext.MediaContributors.Add(existingContributor);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<MediaContributorEntity> result = await _sut.FindOrCreateByDisplayNameAsync("FRANK HERBERT", "Franklin Patrick Herbert", CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(existingContributor.Id, result.Value.Id);
+        Assert.Equal(existingContributor.DisplayName, result.Value.DisplayName);
+        Assert.Single(_mockContext.ChangeTracker.Entries<MediaContributorEntity>());
+    }
+
+    [Fact]
+    public async Task FindOrCreateByDisplayNameAsync_WhenExistingNameStartsWithNonAsciiUppercase_ShouldReturnTheExistingContributor()
+    {
+        // Arrange
+        // The storage medium folds only ASCII case, so a name starting with a non-ASCII uppercase letter would previously not be found by the lookup
+        // and would be inserted again, violating the unique index on the display name.
+        MediaContributorEntity existingContributor = _mediaContributorEntityFixture.Create(displayName: "Лев Ошанин");
+        _mockContext.MediaContributors.Add(existingContributor);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<MediaContributorEntity> result = await _sut.FindOrCreateByDisplayNameAsync("Лев Ошанин", null, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(existingContributor.Id, result.Value.Id);
+        Assert.Single(_mockContext.ChangeTracker.Entries<MediaContributorEntity>());
+    }
+
+    [Fact]
+    public async Task FindOrCreateByDisplayNameAsync_WhenContributorWasAddedButNotSaved_ShouldReturnTheTrackedContributor()
+    {
+        // Arrange
+        Result<MediaContributorEntity> firstResult = await _sut.FindOrCreateByDisplayNameAsync("Bob Ludwig", null, CancellationToken.None);
+        Assert.False(firstResult.IsFailure);
+
+        // Act
+        Result<MediaContributorEntity> secondResult = await _sut.FindOrCreateByDisplayNameAsync("BOB LUDWIG", null, CancellationToken.None);
+
+        // Assert
+        Assert.False(secondResult.IsFailure);
+        // The contributor added earlier in the same unit of work is tracked, so it is returned instead of a duplicate being added.
+        Assert.Equal(firstResult.Value.Id, secondResult.Value.Id);
+        Assert.Single(_mockContext.ChangeTracker.Entries<MediaContributorEntity>(), entityEntry => entityEntry.State == EntityState.Added);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenCalled_ShouldReturnOnlyTheContributorsWithTheProvidedIds()
+    {
+        // Arrange
+        MediaContributorEntity firstContributor = _mediaContributorEntityFixture.Create();
+        MediaContributorEntity secondContributor = _mediaContributorEntityFixture.Create();
+        MediaContributorEntity thirdContributor = _mediaContributorEntityFixture.Create();
+        _mockContext.MediaContributors.AddRange(firstContributor, secondContributor, thirdContributor);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<MediaContributorEntity>> result = await _sut.GetByIdsAsync([firstContributor.Id, thirdContributor.Id], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(2, result.Value.Count);
+        Assert.Contains(result.Value, contributor => contributor.Id == firstContributor.Id);
+        Assert.Contains(result.Value, contributor => contributor.Id == thirdContributor.Id);
+    }
+
+    [Fact]
+    public async Task InsertAsync_WhenCalled_ShouldAddContributorToContextAndReturnCreated()
+    {
+        // Arrange
+        MediaContributorEntity contributor = _mediaContributorEntityFixture.Create();
+
+        // Act
+        Result<Created> result = await _sut.InsertAsync(contributor, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Created, result.Value);
+
+        EntityEntry<MediaContributorEntity>? addedContributor = _mockContext.ChangeTracker.Entries<MediaContributorEntity>()
+            .FirstOrDefault(entityEntry => entityEntry.State == EntityState.Added && entityEntry.Entity.Id == contributor.Id);
+        Assert.NotNull(addedContributor);
+    }
+
+    [Fact]
+    public async Task InsertAsync_WhenContributorWithSameIdAlreadyExists_ShouldReturnError()
+    {
+        // Arrange
+        MediaContributorEntity existingContributor = _mediaContributorEntityFixture.Create();
+        _mockContext.MediaContributors.Add(existingContributor);
+        await _mockContext.SaveChangesAsync();
+        MediaContributorEntity contributor = _mediaContributorEntityFixture.Create(id: existingContributor.Id);
+
+        // Act
+        Result<Created> result = await _sut.InsertAsync(contributor, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.MediaContributor.MediaContributorAlreadyExists, result.FirstError);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenIdsIsEmpty_ShouldReturnAnEmptyList()
+    {
+        // Arrange
+        MediaContributorEntity contributor = _mediaContributorEntityFixture.Create();
+        _mockContext.MediaContributors.Add(contributor);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<MediaContributorEntity>> result = await _sut.GetByIdsAsync([], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenAnIdDoesNotExist_ShouldIgnoreIt()
+    {
+        // Arrange
+        MediaContributorEntity contributor = _mediaContributorEntityFixture.Create();
+        _mockContext.MediaContributors.Add(contributor);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<IReadOnlyList<MediaContributorEntity>> result = await _sut.GetByIdsAsync([contributor.Id, Guid.NewGuid()], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        MediaContributorEntity returnedContributor = Assert.Single(result.Value);
+        Assert.Equal(contributor.Id, returnedContributor.Id);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenMoreThanFiveHundredIdsAreRequested_ShouldReturnEveryContributor()
+    {
+        // Arrange
+        const int CONTRIBUTOR_COUNT = 501;
+        List<MediaContributorEntity> contributors = _mediaContributorEntityFixture.CreateMany(CONTRIBUTOR_COUNT);
+        _mockContext.MediaContributors.AddRange(contributors);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        // The lookup is chunked in batches of 500, so the 501st Id proves the second chunk is queried as well.
+        Result<IReadOnlyList<MediaContributorEntity>> result = await _sut.GetByIdsAsync(
+            [.. contributors.Select(contributor => contributor.Id)], CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(CONTRIBUTOR_COUNT, result.Value.Count);
+        Assert.Equal(
+            contributors.Select(contributor => contributor.Id).OrderBy(id => id),
+            result.Value.Select(contributor => contributor.Id).OrderBy(id => id));
+    }
+}

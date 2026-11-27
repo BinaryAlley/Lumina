@@ -1,0 +1,96 @@
+#region ========================================================================= USING =====================================================================================
+using FastEndpoints;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.FileSystemManagement.Paths.Queries.GetPathSeparator;
+using Nemera.Contracts.Fixtures.Core.Responses.FileSystemManagement.Path;
+using Nemera.Contracts.Responses.FileSystemManagement.Path;
+using Nemera.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPathSeparator;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using NSubstitute;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Path;
+
+/// <summary>
+/// Contains unit tests for the <see cref="GetPathSeparatorEndpoint"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class GetPathSeparatorEndpointTests
+{
+    private readonly IQueryHandler<GetPathSeparatorQuery, PathSeparatorResponse> _mockHandler;
+    private readonly GetPathSeparatorEndpoint _sut;
+    private readonly PathSeparatorResponseFixture _pathSeparatorResponseFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetPathSeparatorEndpointTests"/> class.
+    /// </summary>
+    public GetPathSeparatorEndpointTests()
+    {
+        _mockHandler = Substitute.For<IQueryHandler<GetPathSeparatorQuery, PathSeparatorResponse>>();
+        _sut = Factory.Create<GetPathSeparatorEndpoint>(_mockHandler);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCalled_ShouldReturnOkResultWithPathSeparatorResponse()
+    {
+        // Arrange
+        CancellationToken cancellationToken = CancellationToken.None;
+        PathSeparatorResponse expectedResponse = _pathSeparatorResponseFixture.Create();
+        _mockHandler.HandleAsync(Arg.Any<GetPathSeparatorQuery>(), Arg.Any<CancellationToken>())
+            .Returns(expectedResponse);
+
+        // Act
+        IResult result = await _sut.ExecuteAsync(cancellationToken);
+
+        // Assert
+        Ok<PathSeparatorResponse> okResult = Assert.IsType<Ok<PathSeparatorResponse>>(result);
+        Assert.Equal(expectedResponse, okResult.Value);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCalled_ShouldSendGetPathSeparatorQueryToSender()
+    {
+        // Arrange
+        CancellationToken cancellationToken = CancellationToken.None;
+        _mockHandler.HandleAsync(Arg.Any<GetPathSeparatorQuery>(), Arg.Any<CancellationToken>())
+            .Returns(_pathSeparatorResponseFixture.Create());
+
+        // Act
+        await _sut.ExecuteAsync(cancellationToken);
+
+        // Assert
+        await _mockHandler.Received(1).HandleAsync(Arg.Any<GetPathSeparatorQuery>(), Arg.Is(cancellationToken));
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenCancellationRequested_ShouldCancelOperation()
+    {
+        // Arrange
+        CancellationTokenSource cts = new();
+        TaskCompletionSource<bool> operationStarted = new();
+        TaskCompletionSource<bool> cancellationRequested = new();
+
+        _mockHandler.HandleAsync(Arg.Any<GetPathSeparatorQuery>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Task.Run(async () =>
+            {
+                operationStarted.SetResult(true);
+                await cancellationRequested.Task;
+                callInfo.Arg<CancellationToken>().ThrowIfCancellationRequested();
+                return _pathSeparatorResponseFixture.Create();
+            }, callInfo.Arg<CancellationToken>()));
+
+        // Act
+        Task<IResult> operationTask = _sut.ExecuteAsync(cts.Token);
+        await operationStarted.Task;
+        cts.Cancel();
+        cancellationRequested.SetResult(true);
+
+        // Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => operationTask);
+    }
+}

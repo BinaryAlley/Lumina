@@ -1,0 +1,374 @@
+#region ========================================================================= USING =====================================================================================
+using FastEndpoints;
+using FastEndpoints.Swagger;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.Authorization;
+using Nemera.Presentation.Web.Common.Enums.Authorization;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Http;
+using Nemera.Presentation.Web.Common.Localization;
+using Nemera.Presentation.Web.Common.Security;
+using Nemera.Presentation.Web.Common.Services;
+using Nemera.Presentation.Web.Core.Themes;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Localization.Routing;
+using Microsoft.AspNetCore.Mvc.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.DependencyInjection;
+using Polly;
+using Polly.CircuitBreaker;
+using Polly.Retry;
+using Polly.Wrap;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Security.Claims;
+using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.Presentation.Web.Common.DependencyInjection;
+
+/// <summary>
+/// Utility class for registering the services of the Presentation Web layer into the Dependency Injection container.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public static class PresentationWebLayerServices
+{
+    /// <summary>
+    /// The name of the rate limiting policy that bounds the number of concurrent track streams held by a single user.
+    /// </summary>
+    public const string TRACK_STREAM_RATE_LIMIT_POLICY = "trackStreamPolicy";
+
+    /// <summary>
+    /// Registers the services of the Presentation Web layer into the Dependency Injection container.
+    /// </summary>
+    /// <param name="services">The service collection to add the services to.</param>
+    /// <returns>The updated <see cref="IServiceCollection"/>.</returns>
+    public static IServiceCollection AddPresentationWebLayerServices(this IServiceCollection services)
+    {
+        services.AddControllersWithViews()
+            .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+            .AddDataAnnotationsLocalization()
+            .AddJsonOptions(jsonOptions =>
+            {
+                jsonOptions.JsonSerializerOptions.MaxDepth = 256;
+                jsonOptions.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // Needed because file system API responses can have very nested structures.
+                jsonOptions.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
+
+        // Configure the locations where the Razor view engine looks for views and layouts, since the views live under the Core directory.
+        services.Configure<RazorViewEngineOptions>(razorViewEngineOptions =>
+        {
+            razorViewEngineOptions.ViewLocationFormats.Clear();
+            razorViewEngineOptions.ViewLocationFormats.Add("/Core/Views/{1}/{0}.cshtml");
+            razorViewEngineOptions.ViewLocationFormats.Add("/Core/Views/Shared/{0}.cshtml");
+        });
+
+        // Configure the JSON serialization settings used by Results.Json, so that the JSON responses of the endpoints match the MVC responses they replace.
+        services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(jsonOptions =>
+        {
+            jsonOptions.SerializerOptions.MaxDepth = 256;
+            jsonOptions.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // Needed because file system API responses can have very nested structures.
+            jsonOptions.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+
+        // Register the FastEndpoints library, which replaces the MVC controllers for handling the application routes.
+        services.AddFastEndpoints();
+        // Add OpenAPI document generation, so that the endpoints exposed by the web application are discoverable and their contracts are visible.
+        services.AddOpenApi();
+        services.SwaggerDocument(documentOptions =>
+        {
+            documentOptions.SerializerSettings = jsonSerializerOptions =>
+            {
+                jsonSerializerOptions.PropertyNamingPolicy = null;
+                jsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            };
+            documentOptions.DocumentSettings = aspNetCoreOpenApiDocumentGeneratorSettings =>
+            {
+                aspNetCoreOpenApiDocumentGeneratorSettings.DocumentName = "v1";
+                aspNetCoreOpenApiDocumentGeneratorSettings.Title = "Nemera Web";
+                aspNetCoreOpenApiDocumentGeneratorSettings.Version = "v1";
+            };
+            documentOptions.RemoveEmptyRequestSchema = true;
+            documentOptions.ShortSchemaNames = true;
+        });
+        // Configure URL-based localization.
+        services.AddLocalization(localizationOptions => localizationOptions.ResourcesPath = "Core/Resources");
+        // Resolve the resources of the views that live under the Core/Views directory.
+        services.AddSingleton<IHtmlLocalizerFactory, CoreHtmlLocalizerFactory>();
+
+        services.Configure<RequestLocalizationOptions>(requestLocalizationOptions =>
+        {
+            CultureInfo[] supportedCultures = 
+            [
+                new CultureInfo("ar-SA"),
+                new CultureInfo("de-DE"),
+                new CultureInfo("en-US"),
+                new CultureInfo("es-ES"),
+                new CultureInfo("fr-FR"),
+                new CultureInfo("it-IT"),
+                new CultureInfo("ja-JP"),
+                new CultureInfo("ro-RO"),
+                new CultureInfo("uk-UA"),
+                new CultureInfo("zh-CN"),
+            ];
+            requestLocalizationOptions.DefaultRequestCulture = new RequestCulture("en-US");
+            requestLocalizationOptions.SupportedCultures = supportedCultures;
+            requestLocalizationOptions.SupportedUICultures = supportedCultures;
+
+            // Configure route-based culture provider.
+            RouteDataRequestCultureProvider routeDataRequestCultureProvider = new()
+            {
+                RouteDataStringKey = "culture",
+                UIRouteDataStringKey = "culture",
+                Options = requestLocalizationOptions
+            };
+            // Make the route culture provider the first one to be evaluated.
+            requestLocalizationOptions.RequestCultureProviders = 
+            [
+                routeDataRequestCultureProvider, // Keep route-based culture handling,
+                new CookieRequestCultureProvider(), // But also add cookie option, so the application "remembers" the last used language the next time it's opened.
+                new AcceptLanguageHeaderRequestCultureProvider()
+            ];
+        });
+
+        // Configure cookie-based authentication.
+        services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(cookieAuthenticationOptions =>
+            {
+                // Basic path configuration.
+                cookieAuthenticationOptions.LoginPath = "/auth/login";
+                cookieAuthenticationOptions.LogoutPath = "/auth/logout";
+                cookieAuthenticationOptions.AccessDeniedPath = "/auth/access-denied";
+
+                // Cookie configuration.
+                cookieAuthenticationOptions.Cookie = new CookieBuilder
+                {
+                    Name = ".Nemera.Auth", // Unique name to avoid conflicts.
+                    HttpOnly = true,       // Prevent JavaScript access.
+                    SameSite = SameSiteMode.Strict,
+                    SecurePolicy = CookieSecurePolicy.Always, // Require HTTPS.
+                    Path = "/",            // Make cookie available for all paths.
+                    IsEssential = true     // Mark as essential for GDPR.
+                };
+
+                // Security settings.
+                cookieAuthenticationOptions.ExpireTimeSpan = TimeSpan.FromHours(24); // TODO: perhaps make it configurable by user?
+                cookieAuthenticationOptions.SlidingExpiration = true;
+
+                // Handle validation to support various deployment scenarios.
+                cookieAuthenticationOptions.Events = new CookieAuthenticationEvents
+                {
+                    // Handle redirects to work with different base paths.
+                    OnRedirectToLogin = redirectContext =>
+                    {
+                        HttpContext httpContext = redirectContext.HttpContext;
+                        string culture = httpContext.Request.RouteValues["culture"]?.ToString()?.ToLower() ?? "en-us";
+                        // A page the browser navigated to is itself the page to return to after login. Any other request (an AJAX call to an
+                        // "api-" endpoint, for example) is not a page, so the last page that was displayed in this session is used instead.
+                        bool isPageNavigation = HttpMethods.IsGet(httpContext.Request.Method)
+                            && (string.Equals(httpContext.Request.Headers["Sec-Fetch-Mode"].ToString(), "navigate", StringComparison.OrdinalIgnoreCase)
+                                || httpContext.Request.Headers.Accept.Any(accept => accept?.Contains("text/html", StringComparison.OrdinalIgnoreCase) == true));
+                        string? pageToReturnTo = isPageNavigation
+                            ? $"{httpContext.Request.Path}{httpContext.Request.QueryString}"
+                            : httpContext.Session.GetString(HttpContextItemKeys.LAST_DISPLAYED_VIEW);
+
+                        // Build the login path considering reverse proxy and subfolder scenarios.
+                        string? originalHost = httpContext.Request.Headers["X-Forwarded-Host"].FirstOrDefault() ?? httpContext.Request.Host.Value;
+                        string? originalScheme = httpContext.Request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? httpContext.Request.Scheme;
+                        string? originalPathBase = httpContext.Request.Headers["X-Forwarded-Prefix"].FirstOrDefault() ?? httpContext.Request.PathBase.Value;
+
+                        string baseUrl = $"{originalScheme}://{originalHost}{originalPathBase}";
+                        string loginPath = $"{baseUrl}/{culture}/auth/login";
+
+                        if (!string.IsNullOrEmpty(pageToReturnTo))
+                        {
+                            string returnUrl = Uri.EscapeDataString(pageToReturnTo);
+                            redirectContext.RedirectUri = $"{loginPath}?returnUrl={returnUrl}";
+                        }
+                        else
+                            redirectContext.RedirectUri = loginPath;
+
+                        httpContext.Response.Redirect(redirectContext.RedirectUri);
+                        return Task.CompletedTask;
+                    },
+                    OnRedirectToLogout = redirectContext =>
+                    {
+                        HttpContext httpContext = redirectContext.HttpContext;
+                        string culture = httpContext.Request.RouteValues["culture"]?.ToString()?.ToLower() ?? "en-us";
+
+                        string? originalHost = httpContext.Request.Headers["X-Forwarded-Host"].FirstOrDefault() ?? httpContext.Request.Host.Value;
+                        string? originalScheme = httpContext.Request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? httpContext.Request.Scheme;
+                        string? originalPathBase = httpContext.Request.Headers["X-Forwarded-Prefix"].FirstOrDefault() ?? httpContext.Request.PathBase.Value;
+
+                        string baseUrl = $"{originalScheme}://{originalHost}{originalPathBase}";
+                        string logoutPath = $"{baseUrl}/{culture}/auth/logout";
+
+                        redirectContext.RedirectUri = logoutPath;
+                        httpContext.Response.Redirect(redirectContext.RedirectUri);
+                        return Task.CompletedTask;
+                    },
+                    OnRedirectToAccessDenied = redirectContext =>
+                    {
+                        HttpContext httpContext = redirectContext.HttpContext;
+                        string culture = httpContext.Request.RouteValues["culture"]?.ToString()?.ToLower() ?? "en-us";
+
+                        string? originalHost = httpContext.Request.Headers["X-Forwarded-Host"].FirstOrDefault() ?? httpContext.Request.Host.Value;
+                        string? originalScheme = httpContext.Request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? httpContext.Request.Scheme;
+                        string? originalPathBase = httpContext.Request.Headers["X-Forwarded-Prefix"].FirstOrDefault() ?? httpContext.Request.PathBase.Value;
+
+                        string baseUrl = $"{originalScheme}://{originalHost}{originalPathBase}";
+                        string accessDeniedPath = $"{baseUrl}/{culture}/auth/access-denied";
+
+                        redirectContext.RedirectUri = accessDeniedPath;
+                        httpContext.Response.Redirect(redirectContext.RedirectUri);
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
+        // Add authorization policies that ensure the application is initialized with the super admin account before allowing access,
+        // and that restrict access based on the roles and permissions retrieved from the remote API.
+        services.AddAuthorizationBuilder()
+            .AddPolicy(AuthorizationPolicies.REQUIRE_INITIALIZATION, authorizationPolicyBuilder => authorizationPolicyBuilder.Requirements.Add(new InitializationRequirement()))
+            .AddPolicy(AuthorizationPolicies.REQUIRE_ADMIN_ROLE, authorizationPolicyBuilder =>
+            {
+                authorizationPolicyBuilder.Requirements.Add(new RoleRequirement("Admin"));
+                authorizationPolicyBuilder.RequireAuthenticatedUser();
+            })
+            .AddPolicy(AuthorizationPolicies.REQUIRE_CREATE_LIBRARIES_PERMISSION, authorizationPolicyBuilder =>
+            {
+                authorizationPolicyBuilder.Requirements.Add(new PermissionRequirement(AuthorizationPermission.CanCreateLibraries));
+                authorizationPolicyBuilder.RequireAuthenticatedUser();
+            });
+
+        // Add forwarded headers middleware to handle reverse proxy scenarios.
+        services.Configure<ForwardedHeadersOptions>(forwardedHeadersOptions =>
+        {
+            forwardedHeadersOptions.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+            forwardedHeadersOptions.KnownIPNetworks.Clear();
+            forwardedHeadersOptions.KnownProxies.Clear();
+        });
+
+        // Configure session management to maintain user-specific data across requests.
+        services.AddSession(sessionOptions =>
+        {
+            sessionOptions.IdleTimeout = TimeSpan.FromMinutes(30); // Session expires after 30 minutes of inactivity.
+            sessionOptions.Cookie.HttpOnly = true; // Prevent JavaScript access to session cookie, for security.
+            sessionOptions.Cookie.IsEssential = true; // Mark session cookie as essential, for GDPR compliance.
+        });
+
+        // Scan the current assembly for validators and register them as singletons in the DI container.
+        foreach (Type validatorType in typeof(Program).Assembly.GetTypes())
+        {
+            if (validatorType.IsInterface || validatorType.IsAbstract || validatorType.IsGenericTypeDefinition)
+                continue;
+
+            foreach (Type contract in validatorType.GetInterfaces())
+            {
+                if (contract.IsGenericType && contract.GetGenericTypeDefinition() == typeof(Validation.IValidator<>))
+                {
+                    services.AddSingleton(contract, validatorType);
+                    break;
+                }
+            }
+        }
+
+        // Handle transient errors like network timeouts or intermittent failures.
+        AsyncRetryPolicy<HttpResponseMessage> retryPolicy = Policy<HttpResponseMessage>
+            .Handle<HttpRequestException>()
+            .OrInner<ApiException>(apiException =>
+                apiException.HttpStatusCode != HttpStatusCode.BadRequest && // Do not retry Bad Request and Forbidden responses, it's pointless.
+                apiException.HttpStatusCode != HttpStatusCode.Forbidden)
+            .WaitAndRetryAsync(3, retryAttempt =>
+                TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+
+        // Use a circuit breaker to prevent repeatedly calling a failing service.
+        AsyncCircuitBreakerPolicy<HttpResponseMessage> circuitBreakerPolicy = Policy<HttpResponseMessage>
+            .Handle<HttpRequestException>()
+            .OrInner<ApiException>(apiException => apiException.HttpStatusCode == HttpStatusCode.InternalServerError)
+            .CircuitBreakerAsync(3, TimeSpan.FromSeconds(30));
+
+        AsyncPolicyWrap<HttpResponseMessage> policy = Policy.WrapAsync(retryPolicy, circuitBreakerPolicy);
+
+        // Bound the number of long lived streams a single user can hold open at once, mirroring the concurrency limit the API server applies to
+        // its own stream route. Without it, an authenticated user could make this application open an unbounded number of parallel streams, each
+        // pinning a connection towards the API for the whole duration of a track, turning this application into an exhaustion amplifier.
+        services.AddRateLimiter(rateLimiterOptions =>
+        {
+            rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            rateLimiterOptions.AddPolicy(TRACK_STREAM_RATE_LIMIT_POLICY, httpContext =>
+            {
+                // The limit is partitioned per authenticated user, and it is a concurrency limit, not a per IP attempt window, so it is deliberately separate from any login throttling.
+                string userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "anonymous";
+                return RateLimitPartition.GetConcurrencyLimiter(
+                    partitionKey: $"trackStream_{userId}",
+                    factory: _ => new ConcurrencyLimiterOptions
+                    {
+                        PermitLimit = 4, // Allow 4 concurrent audio streams per user, matching the API server.
+                        QueueLimit = 0 // Don't queue requests, a request beyond the limit is rejected instead of waiting.
+                    });
+            });
+        });
+
+        // Register the HTTP typed client used for the API interaction.
+        services.AddHttpClient<IApiHttpClient, ApiHttpClient>()
+            .AddHttpMessageHandler<CachedAuthorizationHandler>()
+            .AddHttpMessageHandler<CachedThemeHandler>()
+            .AddPolicyHandler(retryPolicy)
+            .AddPolicyHandler(circuitBreakerPolicy);
+
+        // Register the HTTP typed client used for streaming responses from the API. It deliberately has no retry and no circuit breaker policy,
+        // because a stream cannot be transparently retried once its content has started reaching the client. It configures a bounded, generous
+        // timeout itself, because a stream stays open for as long as the client keeps reading it, yet a stalled one must never be held forever.
+        services.AddHttpClient<IStreamingApiHttpClient, StreamingApiHttpClient>()
+            // Cap the connections a stream can pin towards the API, as a backstop on top of the per user concurrency limit of the stream route.
+            .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+            {
+                // A blackholed connection attempt must fail on its own, well before the request timeout, instead of holding a stream permit.
+                ConnectTimeout = TimeSpan.FromSeconds(30),
+                MaxConnectionsPerServer = 64
+            });
+
+        services.AddScoped<CachedAuthorizationHandler>();
+        services.AddScoped<CachedThemeHandler>();
+        services.AddScoped<ThemeCachePreferenceService>();
+
+        // Enable access to the current HTTP context in non-controller classes.
+        services.AddHttpContextAccessor();
+        services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = 10 * 1024 * 1024);
+
+        services.AddScoped<ThemeService>();
+        services.AddSingleton<ThemeTemplateEngine>();
+        services.AddScoped<ThemePageRenderer>();
+        services.AddScoped<RazorViewToStringRenderer>();
+        services.AddScoped<ThemeNavBuilder>();
+        services.AddScoped<ThemeLayoutRenderer>();
+        services.AddScoped<ThemeFileSystemBrowserBuilder>();
+        services.AddScoped<ThemeFileSystemBrowserRenderer>();
+        services.AddScoped<ThemeAudioPlayerBuilder>();
+        services.AddScoped<ThemeAudioPlayerRenderer>();
+
+        services.AddScoped<IAuthorizationHandler, InitializationHandler>();
+        services.AddScoped<IAuthorizationHandler, RoleAuthorizationHandler>();
+        services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        services.AddScoped<Authorization.IAuthorizationService, AuthorizationService>();
+        services.AddSingleton<ICryptographyService, CryptographyService>();
+        services.AddSingleton<IUrlService, UrlService>();
+        services.AddHybridCache(); // Used for caching authorization roles, permissions, policies and theme data.
+
+        return services;
+    }
+}

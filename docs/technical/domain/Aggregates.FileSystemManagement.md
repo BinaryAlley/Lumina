@@ -1,9 +1,9 @@
-- [Lumina Domain](#lumina-domain)
+- [Nemera Domain](#nemera-domain)
   - [File Management Aggregate](#file-management-aggregate)
     - [File Info](#file-info)
     - [Stream Info](#stream-info)
 
-# [Lumina Domain](#lumina-domain)
+# [Nemera Domain](#nemera-domain)
 
 ## [File Management Aggregate](#file-management-aggregate)
 

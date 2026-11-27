@@ -1,0 +1,143 @@
+#region ========================================================================= USING =====================================================================================
+using EntityFrameworkCore.Testing.NSubstitute;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.DataAccess.Core.Repositories.Authorization;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+#endregion
+
+namespace Nemera.DataAccess.UnitTests.Core.Repositories.Authorization;
+
+/// <summary>
+/// Contains unit tests for the <see cref="PermissionRepository"/> class.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public class PermissionRepositoryTests
+{
+    private readonly NemeraDbContext _mockContext;
+    private readonly PermissionRepository _sut;
+    private readonly PermissionEntityFixture _permissionEntityFixture = new();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PermissionRepositoryTests"/> class.
+    /// </summary>
+    public PermissionRepositoryTests()
+    {
+        _mockContext = Create.MockedDbContextFor<NemeraDbContext>();
+        _sut = new PermissionRepository(_mockContext);
+    }
+
+    [Fact]
+    public async Task InsertAsync_WhenPermissionDoesNotExist_ShouldAddPermissionToContextAndReturnCreated()
+    {
+        // Arrange
+        PermissionEntity permissionModel = _permissionEntityFixture.Create();
+
+        // Act
+        Result<Created> result = await _sut.InsertAsync(permissionModel, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Created, result.Value);
+
+        // Check if the permission was added to the context's ChangeTracker.
+        EntityEntry<PermissionEntity>? addedPermission = _mockContext.ChangeTracker.Entries<PermissionEntity>()
+        .FirstOrDefault(e => e.State == EntityState.Added && e.Entity.Id == permissionModel.Id);
+        Assert.NotNull(addedPermission);
+    }
+
+    [Fact]
+    public async Task InsertAsync_WhenPermissionAlreadyExists_ShouldReturnError()
+    {
+        // Arrange
+        PermissionEntity permissionModel = _permissionEntityFixture.Create();
+
+        _mockContext.Permissions.Add(permissionModel);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<Created> result = await _sut.InsertAsync(permissionModel, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(Errors.Authorization.PermissionAlreadyExists, result.FirstError);
+        Assert.Single(_mockContext.ChangeTracker.Entries<PermissionEntity>());
+    }
+
+    [Fact]
+    public async Task GetAllAsync_WhenPermissionsExist_ShouldReturnAllPermissions()
+    {
+        // Arrange
+        List<PermissionEntity> permissions = _permissionEntityFixture.CreateMany(3);
+        _mockContext.Permissions.AddRange(permissions);
+        await _mockContext.SaveChangesAsync();
+
+        // Act
+        Result<PaginatedResultDto<PermissionEntity>> result = await _sut.GetAllAsync<BaseFilterDto>(cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal(3, result.Value.Data.Count);
+        Assert.Equal(permissions, result.Value.Data);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_WhenNoPermissionsExist_ShouldReturnEmptyList()
+    {
+        // Act
+        Result<PaginatedResultDto<PermissionEntity>> result = await _sut.GetAllAsync<BaseFilterDto>(cancellationToken: CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value.Data);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenPermissionsExist_ShouldReturnMatchingPermissions()
+    {
+        // Arrange
+        List<PermissionEntity> permissions = _permissionEntityFixture.CreateMany(3);
+        _mockContext.Permissions.AddRange(permissions);
+        await _mockContext.SaveChangesAsync();
+
+        List<Guid> requestedIds = [.. permissions.Take(2).Select(p => p.Id)];
+
+        // Act
+        Result<IEnumerable<PermissionEntity>> result = await _sut.GetByIdsAsync(requestedIds, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Equal(2, result.Value.Count());
+        Assert.Equal(requestedIds, [.. result.Value.Select(p => p.Id)]);
+    }
+
+    [Fact]
+    public async Task GetByIdsAsync_WhenNoPermissionsMatch_ShouldReturnEmptyList()
+    {
+        // Arrange
+        List<Guid> requestedIds = [Guid.NewGuid(), Guid.NewGuid()];
+
+        // Act
+        Result<IEnumerable<PermissionEntity>> result = await _sut.GetByIdsAsync(requestedIds, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value);
+    }
+}

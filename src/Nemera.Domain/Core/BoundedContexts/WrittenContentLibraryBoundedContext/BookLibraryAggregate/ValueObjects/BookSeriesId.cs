@@ -1,0 +1,57 @@
+#region ========================================================================= USING =====================================================================================
+using Nemera.Domain.Common.Models.Core;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+#endregion
+
+namespace Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+
+/// <summary>
+/// Value Object for the Id of a book series.
+/// </summary>
+[DebuggerDisplay("{Value}")]
+public sealed class BookSeriesId : ValueObject
+{
+    /// <summary>
+    /// Gets the unique identifier value of the book series.
+    /// </summary>
+    public Guid Value { get; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BookSeriesId"/> class.
+    /// </summary>
+    /// <param name="value">The value representing this object.</param>
+    private BookSeriesId(Guid value)
+    {
+        Value = value;
+    }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="BookSeriesId"/> class.
+    /// </summary>
+    /// <returns>The created <see cref="BookSeriesId"/> instance.</returns>
+    public static BookSeriesId CreateUnique()
+    {
+        return new BookSeriesId(Guid.CreateVersion7());
+    }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="BookSeriesId"/> class, from a pre-existing <paramref name="value"/>.
+    /// </summary>
+    /// <param name="value">The value used to create the <see cref="BookSeriesId"/> instance.</param>
+    /// <returns>The created <see cref="BookSeriesId"/> instance.</returns>
+    public static BookSeriesId Create(Guid value)
+    {
+        return new BookSeriesId(value);
+    }
+
+    /// <summary>
+    /// Gets the list of items that define equality of the object.
+    /// </summary>
+    /// <returns>A list of items defining the equality.</returns>
+    public override IEnumerable<object> GetEqualityComponents()
+    {
+        yield return Value;
+    }
+}
