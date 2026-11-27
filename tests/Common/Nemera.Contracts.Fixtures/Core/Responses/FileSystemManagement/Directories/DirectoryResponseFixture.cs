@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Fixtures.Core.DTO.FileSystemManagement;
-using Lumina.Contracts.Responses.FileSystemManagement.Directories;
+using Nemera.Contracts.Fixtures.Core.DTO.FileSystemManagement;
+using Nemera.Contracts.Responses.FileSystemManagement.Directories;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Directories;
+namespace Nemera.Contracts.Fixtures.Core.Responses.FileSystemManagement.Directories;
 
 /// <summary>
 /// Fixture class for the <see cref="DirectoryResponse"/> class.

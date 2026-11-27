@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.StreamMusicTrackSegment;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.StreamMusicTrackSegment;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -17,21 +17,21 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.StreamMusicTrackSegment;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.StreamMusicTrackSegment;
 
 /// <summary>
 /// Contains integration tests for the <see cref="StreamMusicTrackSegmentEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class StreamMusicTrackSegmentEndpointTests : IClassFixture<LuminaWebFactory>
+public class StreamMusicTrackSegmentEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StreamMusicTrackSegmentEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public StreamMusicTrackSegmentEndpointTests(LuminaWebFactory apiFactory)
+    public StreamMusicTrackSegmentEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

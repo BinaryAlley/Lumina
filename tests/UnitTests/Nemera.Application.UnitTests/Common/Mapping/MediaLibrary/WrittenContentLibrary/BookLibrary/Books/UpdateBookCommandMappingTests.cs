@@ -1,21 +1,21 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.UpdateBook;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Fixtures.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.UpdateBook;
-using Lumina.Contracts.Fixtures.Core.DTO.Common;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.UpdateBook;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Fixtures.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.UpdateBook;
+using Nemera.Contracts.Fixtures.Core.DTO.Common;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+namespace Nemera.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdateBookCommandMapping"/> class.

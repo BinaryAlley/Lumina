@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Common.ValueObjects.Metadata;
-using Lumina.Domain.Fixtures.Common.ValueObjects.Metadata;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.ValueObjects.Metadata;
+using Nemera.Domain.Fixtures.Common.ValueObjects.Metadata;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 #endregion
 
-namespace Lumina.Domain.UnitTests.Common.ValueObjects.Metadata;
+namespace Nemera.Domain.UnitTests.Common.ValueObjects.Metadata;
 
 /// <summary>
 /// Contains unit tests for the <see cref="Genre"/> class.

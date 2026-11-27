@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.ID3.Common.Models.DTO.Tags;
+using Nemera.Plugins.ID3.Common.Models.DTO.Tags;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 #endregion
 
-namespace Lumina.Plugins.ID3.Core.Tags;
+namespace Nemera.Plugins.ID3.Core.Tags;
 
 /// <summary>
 /// Reads the embedded tags of an audio file into a snapshot, caching the snapshot per path so that the tags of a single file are read only once.

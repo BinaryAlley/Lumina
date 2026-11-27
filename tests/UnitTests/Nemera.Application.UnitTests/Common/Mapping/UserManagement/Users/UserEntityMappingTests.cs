@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.Mapping.Common.Metadata;
-using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
-using Lumina.Application.Common.Mapping.UsersManagement.Users;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Responses.UsersManagement.Users;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.Mapping.Common.Metadata;
+using Nemera.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
+using Nemera.Application.Common.Mapping.UsersManagement.Users;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Responses.UsersManagement.Users;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.UserManagement.Users;
+namespace Nemera.Application.UnitTests.Common.Mapping.UserManagement.Users;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UserEntityMapping"/> class.

@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Dapper;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.DataAccess.Core.UoW;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Libraries;
+namespace Nemera.DataAccess.Core.Repositories.Libraries;
 
 /// <summary>
 /// Repository for directory scan fingerprints.
@@ -23,15 +23,15 @@ namespace Lumina.DataAccess.Core.Repositories.Libraries;
 internal sealed class DirectoryScanFingerprintRepository : IDirectoryScanFingerprintRepository
 {
     private const int UPSERT_BATCH_SIZE = 500; // Keeps the number of bound parameters of a single UPSERT statement well under the SQLite parameter limit.
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DirectoryScanFingerprintRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext, used to derive the database connection string.</param>
-    public DirectoryScanFingerprintRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext, used to derive the database connection string.</param>
+    public DirectoryScanFingerprintRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -63,7 +63,7 @@ internal sealed class DirectoryScanFingerprintRepository : IDirectoryScanFingerp
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        await _luminaDbContext.DirectoryScanFingerprints
+        await _nemeraDbContext.DirectoryScanFingerprints
             .Where(fingerprint => fingerprint.LibraryId == libraryId)
             .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
         return Result.Deleted;
@@ -102,7 +102,7 @@ internal sealed class DirectoryScanFingerprintRepository : IDirectoryScanFingerp
     /// <returns>The opened database connection.</returns>
     private async Task<SqliteConnection> OpenConnectionAsync(CancellationToken cancellationToken)
     {
-        SqliteConnection connection = new(_luminaDbContext.Database.GetDbConnection().ConnectionString);
+        SqliteConnection connection = new(_nemeraDbContext.Database.GetDbConnection().ConnectionString);
         await connection.OpenAsync(cancellationToken);
         return connection;
     }

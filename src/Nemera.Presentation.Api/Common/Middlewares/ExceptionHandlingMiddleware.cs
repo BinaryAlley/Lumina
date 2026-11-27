@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Common.Middlewares;
+namespace Nemera.Presentation.Api.Common.Middlewares;
 
 /// <summary>
 /// Middleware that catches unhandled exceptions and converts them into a ProblemDetails response.

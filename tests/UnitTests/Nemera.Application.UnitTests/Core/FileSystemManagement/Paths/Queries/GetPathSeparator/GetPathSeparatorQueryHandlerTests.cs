@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathSeparator;
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Application.Core.FileSystemManagement.Paths.Queries.GetPathSeparator;
+using Nemera.Contracts.Responses.FileSystemManagement.Path;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Paths.Queries.GetPathSeparator;
+namespace Nemera.Application.UnitTests.Core.FileSystemManagement.Paths.Queries.GetPathSeparator;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetPathSeparatorQueryHandler"/> class.

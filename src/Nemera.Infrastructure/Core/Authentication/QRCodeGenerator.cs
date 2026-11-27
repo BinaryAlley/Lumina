@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authentication;
 using OtpNet;
 using QRCoder;
 using System;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Authentication;
+namespace Nemera.Infrastructure.Core.Authentication;
 
 /// <summary>
 /// Service for generating QR codes for TOTP.
 /// </summary>
 public class QRCodeGenerator : IQRCodeGenerator
 {
-    private const string ISSUER = "Lumina";
+    private const string ISSUER = "Nemera";
 
     /// <summary>
     /// Generates a QR code Data URI for the specified TOTP secret.

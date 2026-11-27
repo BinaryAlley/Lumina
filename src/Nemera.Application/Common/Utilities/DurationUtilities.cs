@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Application.Common.Utilities;
+namespace Nemera.Application.Common.Utilities;
 
 /// <summary>
 /// Extension methods for converting stored duration values to <see cref="TimeSpan"/>.

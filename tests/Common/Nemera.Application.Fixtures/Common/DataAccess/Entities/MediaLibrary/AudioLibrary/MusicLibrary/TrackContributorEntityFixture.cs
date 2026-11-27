@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+namespace Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 
 /// <summary>
 /// Fixture class for the <see cref="TrackContributorEntity"/> class.

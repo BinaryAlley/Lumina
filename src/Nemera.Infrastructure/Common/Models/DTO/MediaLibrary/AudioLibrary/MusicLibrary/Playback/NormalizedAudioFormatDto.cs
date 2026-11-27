@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Models.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Infrastructure.Common.Models.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Describes how a single container and codec combination of the audio normalization pipeline is muxed and, when it has to be re-encoded, encoded.

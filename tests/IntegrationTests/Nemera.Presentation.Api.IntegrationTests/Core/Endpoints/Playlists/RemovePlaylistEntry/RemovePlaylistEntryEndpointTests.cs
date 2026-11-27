@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Playlists;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Playlists;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Responses.Playlists;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
-using Lumina.Presentation.Api.Core.Endpoints.Playlists.RemovePlaylistEntry;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Playlists;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Playlists;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Responses.Playlists;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Presentation.Api.Core.Endpoints.Playlists.RemovePlaylistEntry;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -21,18 +21,18 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Playlists.RemovePlaylistEntry;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Playlists.RemovePlaylistEntry;
 
 /// <summary>
 /// Contains integration tests for the <see cref="RemovePlaylistEntryEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private const string PATH = "/api/v1/users/me/playlists";
 
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -48,7 +48,7 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedLumin
     /// Initializes a new instance of the <see cref="RemovePlaylistEntryEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public RemovePlaylistEntryEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public RemovePlaylistEntryEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -86,7 +86,7 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedLumin
         Assert.NotEqual(default, removedEntry.UpdatedOnUtc);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.False(await dbContext.PlaylistEntries.AnyAsync(entry => entry.Id == secondEntryId));
         List<Guid> orderedEntryIds = await GetOrderedEntryIdsAsync(dbContext, playlistId);
         Assert.Equal([firstEntryId, thirdEntryId], orderedEntryIds);
@@ -111,7 +111,7 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedLumin
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.False(await dbContext.PlaylistEntries.AnyAsync(entry => entry.PlaylistId == playlistId));
         PlaylistEntity playlist = await dbContext.Playlists.AsNoTracking().FirstAsync(candidate => candidate.Id == playlistId);
         Assert.Equal(0, playlist.EntryCount);
@@ -134,7 +134,7 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedLumin
         await AssertProblemAsync(secondResponse, HttpStatusCode.NotFound, "General.NotFound", "PlaylistEntryNotFound", url);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         PlaylistEntity playlist = await dbContext.Playlists.AsNoTracking().FirstAsync(candidate => candidate.Id == playlistId);
         Assert.Equal(2, playlist.EntryCount);
         Assert.True(await dbContext.PlaylistEntries.AnyAsync(entry => entry.Id == firstEntryId));
@@ -155,7 +155,7 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedLumin
         await AssertProblemAsync(response, HttpStatusCode.NotFound, "General.NotFound", "PlaylistNotFound", url);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.True(await dbContext.PlaylistEntries.AnyAsync(entry => entry.Id == otherEntryId));
         PlaylistEntity otherPlaylist = await dbContext.Playlists.AsNoTracking().FirstAsync(candidate => candidate.Id == otherPlaylistId);
         Assert.Equal(3, otherPlaylist.EntryCount);
@@ -178,7 +178,7 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedLumin
         await AssertProblemAsync(response, HttpStatusCode.NotFound, "General.NotFound", "PlaylistEntryNotFound", url);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.True(await dbContext.PlaylistEntries.AnyAsync(entry => entry.Id == otherPlaylistEntryId));
         List<Guid> orderedEntryIds = await GetOrderedEntryIdsAsync(dbContext, playlistId);
         Assert.Equal([firstEntryId, secondEntryId, thirdEntryId], orderedEntryIds);
@@ -201,7 +201,7 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedLumin
         await AssertProblemAsync(response, HttpStatusCode.NotFound, "General.NotFound", "PlaylistEntryNotFound", url);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.True(await dbContext.PlaylistEntries.AnyAsync(entry => entry.Id == otherEntryId));
         List<Guid> orderedEntryIds = await GetOrderedEntryIdsAsync(dbContext, playlistId);
         Assert.Equal([firstEntryId, secondEntryId, thirdEntryId], orderedEntryIds);
@@ -270,7 +270,7 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedLumin
     /// <param name="dbContext">The database context to read from.</param>
     /// <param name="playlistId">The Id of the playlist whose entries are read.</param>
     /// <returns>The entry Ids in stored order.</returns>
-    private static async Task<List<Guid>> GetOrderedEntryIdsAsync(LuminaDbContext dbContext, Guid playlistId)
+    private static async Task<List<Guid>> GetOrderedEntryIdsAsync(NemeraDbContext dbContext, Guid playlistId)
     {
         return await dbContext.PlaylistEntries
             .AsNoTracking()
@@ -290,7 +290,7 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedLumin
     private async Task<Guid> SeedPlaylistAsync(Guid userId, string name, int entryCount)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid playlistId = Guid.NewGuid();
         dbContext.Playlists.Add(_playlistEntityFixture.Create(
             id: playlistId,
@@ -315,7 +315,7 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedLumin
     private async Task<Guid> SeedPlaylistEntryAsync(Guid playlistId, Guid mediaItemId, long position)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid entryId = Guid.NewGuid();
         dbContext.PlaylistEntries.Add(_playlistEntryEntityFixture.Create(
             id: entryId,
@@ -334,7 +334,7 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedLumin
     private async Task<Guid> SeedOtherUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: $"otheruser_{Guid.NewGuid()}", password: "TestPass123!"));
         await dbContext.SaveChangesAsync();
@@ -349,7 +349,7 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedLumin
     private Guid GetCurrentUserId()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         UserEntity user = dbContext.Users.First(candidate => candidate.Username == _apiFactory.TestUsername);
         return user.Id;
     }
@@ -388,7 +388,7 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedLumin
         Assert.Equal(expectedInstance, problemDetails["instance"].GetString());
         Assert.False(string.IsNullOrEmpty(problemDetails["traceId"].GetString()));
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina.", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera.", content, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -416,7 +416,7 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedLumin
         Assert.NotNull(errors);
         Assert.Contains(expectedErrorCode, errors!["General.Validation"]);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina.", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera.", content, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -426,7 +426,7 @@ public class RemovePlaylistEntryEndpointTests : IClassFixture<AuthenticatedLumin
     {
         using (IServiceScope scope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             List<Guid> playlistIds = [.. _seededPlaylistIds];
             dbContext.PlaylistEntries.RemoveRange(dbContext.PlaylistEntries.Where(entry => playlistIds.Contains(entry.PlaylistId)));
             dbContext.Playlists.RemoveRange(dbContext.Playlists.Where(playlist => playlistIds.Contains(playlist.Id)));

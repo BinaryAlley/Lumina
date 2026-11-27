@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Themes.Management.Commands.RestoreTheme;
+using Nemera.Application.Core.Themes.Management.Commands.RestoreTheme;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Themes.Management.Commands.RestoreTheme;
+namespace Nemera.Application.Fixtures.Core.Themes.Management.Commands.RestoreTheme;
 
 /// <summary>
 /// Fixture class for the <see cref="RestoreThemeCommand"/> class.

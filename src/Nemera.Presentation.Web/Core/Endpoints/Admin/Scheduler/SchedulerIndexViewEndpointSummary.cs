@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Admin.Scheduler;
+namespace Nemera.Presentation.Web.Core.Endpoints.Admin.Scheduler;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="SchedulerIndexViewEndpoint"/> endpoint, for OpenAPI.

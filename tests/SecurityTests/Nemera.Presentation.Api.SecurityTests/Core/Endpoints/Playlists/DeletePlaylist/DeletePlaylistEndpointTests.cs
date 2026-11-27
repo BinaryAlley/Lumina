@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Playlists;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Playlists;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
-using Lumina.Presentation.Api.Core.Endpoints.Playlists.DeletePlaylist;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Playlists;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Playlists;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Presentation.Api.Core.Endpoints.Playlists.DeletePlaylist;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,18 +18,18 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Playlists.DeletePlaylist;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Playlists.DeletePlaylist;
 
 /// <summary>
 /// Contains security tests for the <see cref="DeletePlaylistEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class DeletePlaylistEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class DeletePlaylistEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
     private const string JWT_SECRET = "test-key-thats-at-least-32-chars-long-for-jwt";
     private const string PATH = "/api/v1/users/me/playlists";
 
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly PlaylistEntityFixture _playlistEntityFixture = new();
     private readonly PlaylistEntryEntityFixture _playlistEntryEntityFixture = new();
@@ -40,12 +40,12 @@ public class DeletePlaylistEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     /// Initializes a new instance of the <see cref="DeletePlaylistEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public DeletePlaylistEndpointTests(LuminaApiFactory apiFactory)
+    public DeletePlaylistEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
     }
 
     [Fact]
@@ -153,7 +153,7 @@ public class DeletePlaylistEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     private async Task<Guid> SeedPlaylistAsync(Guid userId, string name, int entryCount)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid playlistId = Guid.NewGuid();
         dbContext.Playlists.Add(_playlistEntityFixture.Create(
             id: playlistId,
@@ -185,7 +185,7 @@ public class DeletePlaylistEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     private async Task<bool> PlaylistExistsAsync(Guid playlistId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         return await dbContext.Playlists.AnyAsync(playlist => playlist.Id == playlistId);
     }
 
@@ -262,7 +262,7 @@ public class DeletePlaylistEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina.", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera.", content, StringComparison.Ordinal);
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(JWT_SECRET, content, StringComparison.Ordinal);
         Assert.DoesNotContain("Data Source", content, StringComparison.OrdinalIgnoreCase);
@@ -276,7 +276,7 @@ public class DeletePlaylistEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         _client.Dispose();
         using (IServiceScope scope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             List<Guid> playlistIds = [.. _seededPlaylistIds];
             dbContext.PlaylistEntries.RemoveRange(dbContext.PlaylistEntries.Where(entry => playlistIds.Contains(entry.PlaylistId)));
             dbContext.Playlists.RemoveRange(dbContext.Playlists.Where(playlist => playlistIds.Contains(playlist.Id)));

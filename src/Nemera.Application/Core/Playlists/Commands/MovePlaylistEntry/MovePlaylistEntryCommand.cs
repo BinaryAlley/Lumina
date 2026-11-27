@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Playlists.Commands.MovePlaylistEntry;
+namespace Nemera.Application.Core.Playlists.Commands.MovePlaylistEntry;
 
 /// <summary>
 /// Command for moving one entry of a playlist of the current user to a new position.

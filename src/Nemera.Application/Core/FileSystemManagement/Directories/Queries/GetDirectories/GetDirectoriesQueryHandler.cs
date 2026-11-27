@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.FileSystemManagement.Directories;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Contracts.Responses.FileSystemManagement.Directories;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Directories;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Contracts.Responses.FileSystemManagement.Directories;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
+namespace Nemera.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
 
 /// <summary>
 /// Handler for the query to get all directories.

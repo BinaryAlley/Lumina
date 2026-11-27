@@ -1,26 +1,26 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Library.Management.Index;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Management.Index;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.Index;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.Index;
 
 /// <summary>
 /// Contains security tests for the <see cref="LibrariesIndexViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class LibrariesIndexViewEndpointTests : IClassFixture<LuminaWebFactory>
+public class LibrariesIndexViewEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibrariesIndexViewEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public LibrariesIndexViewEndpointTests(LuminaWebFactory apiFactory)
+    public LibrariesIndexViewEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

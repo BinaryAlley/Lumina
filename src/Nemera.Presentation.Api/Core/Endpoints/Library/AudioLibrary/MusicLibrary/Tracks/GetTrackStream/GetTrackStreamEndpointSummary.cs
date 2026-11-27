@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackStream;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackStream;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetTrackStreamEndpoint"/> API endpoint, for OpenAPI.

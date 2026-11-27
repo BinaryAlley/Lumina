@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Configuration;
-using Lumina.Presentation.Web.Common.Primitives;
-using Lumina.Presentation.Web.Common.Utilities;
-using Lumina.Presentation.Web.Common.Validation;
+using Nemera.Presentation.Web.Common.DTO.Configuration;
+using Nemera.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.Utilities;
+using Nemera.Presentation.Web.Common.Validation;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Validators;
+namespace Nemera.Presentation.Web.Common.Validators;
 
 /// <summary>
 /// Validates the needed validation rules for the ServerConfiguration application configuration settings section.

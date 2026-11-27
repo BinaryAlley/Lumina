@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Themes.Management.Commands.SetCurrentTheme;
-using Lumina.Contracts.Fixtures.Core.Requests.Themes;
-using Lumina.Contracts.Fixtures.Core.Responses.Themes;
-using Lumina.Contracts.Requests.Themes;
-using Lumina.Contracts.Responses.Themes;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Themes.Management.SetCurrentTheme;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Themes.Management.Commands.SetCurrentTheme;
+using Nemera.Contracts.Fixtures.Core.Requests.Themes;
+using Nemera.Contracts.Fixtures.Core.Responses.Themes;
+using Nemera.Contracts.Requests.Themes;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Themes.Management.SetCurrentTheme;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -15,11 +15,11 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Themes.Management.SetCurrentTheme;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Themes.Management.SetCurrentTheme;
 
 /// <summary>
 /// Contains unit tests for the <see cref="SetCurrentThemeEndpoint"/> class.

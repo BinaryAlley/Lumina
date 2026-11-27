@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.Plugins;
-using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Contracts.Responses.Plugins;
+using Nemera.Plugins.Contracts.Common.Models.DTO.Settings;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Plugins;
+namespace Nemera.Application.Common.Mapping.Plugins;
 
 /// <summary>
 /// Extension methods for converting <see cref="PluginSettingDescriptorDto"/>.

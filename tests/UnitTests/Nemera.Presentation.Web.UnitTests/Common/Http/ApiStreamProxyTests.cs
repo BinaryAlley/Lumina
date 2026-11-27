@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.Http;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.Http;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.Http;
+namespace Nemera.Presentation.Web.UnitTests.Common.Http;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ApiStreamProxy"/> class.

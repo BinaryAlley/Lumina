@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 #endregion
 
-namespace Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Data transfer object for a single produced segment of the normalized audio of a track, ready to be written to the response.

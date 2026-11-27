@@ -1,28 +1,28 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DomainEvents;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Mapping.Scheduling;
-using Lumina.Contracts.Responses.Scheduling;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ExternalIdentifiers.UserManagementBoundedContext.UserAggregate;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DomainEvents;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Mapping.Scheduling;
+using Nemera.Contracts.Responses.Scheduling;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ExternalIdentifiers.UserManagementBoundedContext.UserAggregate;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.Core.Scheduling.Commands.AddScheduledJob;
+namespace Nemera.Application.Core.Scheduling.Commands.AddScheduledJob;
 
 /// <summary>
 /// Handler for the command to add a scheduled job.

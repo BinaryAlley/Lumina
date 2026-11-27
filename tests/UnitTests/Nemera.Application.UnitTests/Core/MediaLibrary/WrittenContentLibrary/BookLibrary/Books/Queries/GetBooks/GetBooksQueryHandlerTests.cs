@@ -1,32 +1,32 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooks;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.Application.Fixtures.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooks;
-using Lumina.Contracts.Responses.Common;
-using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.BookLibrary;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooks;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Application.Fixtures.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooks;
+using Nemera.Contracts.Responses.Common;
+using Nemera.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooks;
+namespace Nemera.Application.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooks;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetBooksQueryHandler"/> class.

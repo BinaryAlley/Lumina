@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Playlists.Commands.UpdatePlaylist;
-using Lumina.Application.Fixtures.Core.Playlists.Commands.UpdatePlaylist;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Core.Playlists.Commands.UpdatePlaylist;
+using Nemera.Application.Fixtures.Core.Playlists.Commands.UpdatePlaylist;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Playlists.Commands.UpdatePlaylist;
+namespace Nemera.Application.UnitTests.Core.Playlists.Commands.UpdatePlaylist;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdatePlaylistCommandValidator"/> class.

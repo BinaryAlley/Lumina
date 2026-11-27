@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.Api;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Http;
+namespace Nemera.Presentation.Web.Common.Http;
 
 /// <summary>
 /// Writes a streamed API response to the browser, so the direct track stream and the normalized segment proxy share the same status, header, caching and body forwarding rules and cannot drift apart.

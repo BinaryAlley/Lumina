@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.StreamMusicTrack;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.StreamMusicTrack;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.StreamMusicTrack;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.StreamMusicTrack;
 
 /// <summary>
 /// Contains security tests for the <see cref="StreamMusicTrackEndpoint"/> class.
@@ -25,15 +25,15 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibr
 /// normalization pipeline and ffmpeg, neither of which is available in the test environment.
 /// </remarks>
 [ExcludeFromCodeCoverage]
-public class StreamMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
+public class StreamMusicTrackEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StreamMusicTrackEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public StreamMusicTrackEndpointTests(LuminaWebFactory apiFactory)
+    public StreamMusicTrackEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -91,7 +91,7 @@ public class StreamMusicTrackEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Equal(contentBytes, responseBytes);
         Assert.DoesNotContain("SQL", responseText, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", responseText, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("at Lumina", responseText, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("at Nemera", responseText, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(PAYLOAD, responseText, StringComparison.Ordinal);
         Assert.Single(_apiFactory.StreamingApiClientStub.GetEndpointsCalled);
         Assert.Equal(expectedEndpoint, _apiFactory.StreamingApiClientStub.GetEndpointsCalled[0]);

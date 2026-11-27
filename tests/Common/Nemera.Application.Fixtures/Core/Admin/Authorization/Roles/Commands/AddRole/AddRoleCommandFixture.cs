@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
+using Nemera.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Admin.Authorization.Roles.Commands.AddRole;
+namespace Nemera.Application.Fixtures.Core.Admin.Authorization.Roles.Commands.AddRole;
 
 /// <summary>
 /// Fixture class for the <see cref="AddRoleCommand"/> class.

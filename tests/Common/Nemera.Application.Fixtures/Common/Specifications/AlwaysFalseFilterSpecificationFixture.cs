@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Specifications;
+using Nemera.Application.Common.Specifications;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.Specifications;
+namespace Nemera.Application.Fixtures.Common.Specifications;
 
 /// <summary>
 /// Fixture class for generating a <see cref="FilterSpecification{T}"/> instance that is never satisfied, regardless of the entity being evaluated.

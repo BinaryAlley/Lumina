@@ -3,7 +3,7 @@ using FastEndpoints;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Admin.ManagePermissions;
+namespace Nemera.Presentation.Web.Core.Endpoints.Admin.ManagePermissions;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="ManagePermissionsViewEndpoint"/> endpoint, for OpenAPI.

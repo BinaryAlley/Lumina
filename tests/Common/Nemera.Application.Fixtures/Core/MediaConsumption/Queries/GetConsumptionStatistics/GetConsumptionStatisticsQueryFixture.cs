@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.MediaConsumption.Queries.GetConsumptionStatistics;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Core.MediaConsumption.Queries.GetConsumptionStatistics;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.MediaConsumption.Queries.GetConsumptionStatistics;
+namespace Nemera.Application.Fixtures.Core.MediaConsumption.Queries.GetConsumptionStatistics;
 
 /// <summary>
 /// Fixture class for the <see cref="GetConsumptionStatisticsQuery"/> record.

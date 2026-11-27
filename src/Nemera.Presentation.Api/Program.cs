@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.DependencyInjection;
-using Lumina.DataAccess.Common.DependencyInjection;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.DependencyInjection;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Infrastructure.Common.DependencyInjection;
-using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
-using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Infrastructure.Core.Scheduling.Notifications;
-using Lumina.Presentation.Api.Common.DependencyInjection;
-using Lumina.Presentation.Api.Common.Middlewares;
-using Lumina.Presentation.Api.Common.Utilities;
+using Nemera.Application.Common.DependencyInjection;
+using Nemera.DataAccess.Common.DependencyInjection;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.DependencyInjection;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Infrastructure.Common.DependencyInjection;
+using Nemera.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
+using Nemera.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Infrastructure.Core.Scheduling.Notifications;
+using Nemera.Presentation.Api.Common.DependencyInjection;
+using Nemera.Presentation.Api.Common.Middlewares;
+using Nemera.Presentation.Api.Common.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -33,7 +33,7 @@ using System.Linq;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api;
+namespace Nemera.Presentation.Api;
 
 /// <summary>
 /// Application entry point, contains the composition root module, wires up all dependencies of the application.
@@ -93,7 +93,7 @@ public class Program
             IServiceProvider services = scope.ServiceProvider;
             try
             {
-                LuminaDbContext context = services.GetRequiredService<LuminaDbContext>();
+                NemeraDbContext context = services.GetRequiredService<NemeraDbContext>();
                 // Migrations can need a temporary store for an update or a table rebuild. The process can run in an environment whose
                 // temporary directory is missing or read-only, so the migration connection keeps the temporary store in memory instead
                 // of failing with SQLite error 14 while it tries to create a temporary file.
@@ -150,7 +150,7 @@ public class Program
         app.UseOpenApi(openApiDocumentMiddlewareSettings => openApiDocumentMiddlewareSettings.Path = "/openapi/{documentName}.json"); // This is needed for API versioning to work correctly with Scalar.
         app.MapScalarApiReference(scalarOptions =>
         {
-            scalarOptions.WithTitle("Lumina API")
+            scalarOptions.WithTitle("Nemera API")
                 .WithTheme(ScalarTheme.BluePlanet)
                 .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
                 //.WithFavicon() // TODO: enable when favicon is added.

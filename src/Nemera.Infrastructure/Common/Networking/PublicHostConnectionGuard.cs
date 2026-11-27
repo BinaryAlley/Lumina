@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Common.Http;
+using Nemera.Plugins.Contracts.Common.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Networking;
+namespace Nemera.Infrastructure.Common.Networking;
 
 /// <summary>
 /// Creates the primary message handler used by the outbound HTTP clients, whose connect callback resolves each host and connects only to an address that was

@@ -1,4 +1,4 @@
-namespace Lumina.Domain.Common.Primitives;
+namespace Nemera.Domain.Common.Primitives;
 
 /// <summary>
 /// Represents a successful update operation result.

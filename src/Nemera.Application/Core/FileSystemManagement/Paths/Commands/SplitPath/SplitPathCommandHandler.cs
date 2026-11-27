@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Paths;
+using Nemera.Contracts.Responses.FileSystemManagement.Path;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
+namespace Nemera.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
 
 /// <summary>
 /// Handler for the command to split a file system path.

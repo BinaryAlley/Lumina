@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Fixtures.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Fixtures.Common.Setup;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
+namespace Nemera.Application.Fixtures.Common.DataAccess.Entities.Common;
 
 /// <summary>
 /// Fixture class for the <see cref="TagEntity"/> record.

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Models.Core;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.PlaylistBoundedContext.ExternalIdentifiers.MediaLibraryBoundedContext.MediaItemAggregate;
-using Lumina.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Domain.Common.Models.Core;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.PlaylistBoundedContext.ExternalIdentifiers.MediaLibraryBoundedContext.MediaItemAggregate;
+using Nemera.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.Entities;
+namespace Nemera.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.Entities;
 
 /// <summary>
 /// Entity for an ordered entry of a playlist.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Fixtures.Core.Authorization;
+namespace Nemera.Infrastructure.Fixtures.Core.Authorization;
 
 /// <summary>
 /// Test policy implementation for registered policy scenarios.

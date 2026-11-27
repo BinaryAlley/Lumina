@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Libraries;
-using Lumina.Presentation.Web.Common.Requests.Library.Management;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Library.Management.GetLibraryPathTemplateParts;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Libraries;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.Management;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Common.Requests.Library.Management;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Management.GetLibraryPathTemplateParts;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Library.Management;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Library.Management.GetLibraryPathTemplateParts;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Library.Management.GetLibraryPathTemplateParts;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetLibraryPathTemplatePartsEndpoint"/> class.

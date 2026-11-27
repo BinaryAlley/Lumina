@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.Plugins.Commands.UpdatePluginSettings;
-using Lumina.Application.Fixtures.Core.Plugins.Commands.UpdatePluginSettings;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Repositories.Plugins;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.Plugins.Commands.UpdatePluginSettings;
+using Nemera.Application.Fixtures.Core.Plugins.Commands.UpdatePluginSettings;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Plugins.Commands.UpdatePluginSettings;
+namespace Nemera.Application.UnitTests.Core.Plugins.Commands.UpdatePluginSettings;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdatePluginSettingsCommandHandler"/> class.

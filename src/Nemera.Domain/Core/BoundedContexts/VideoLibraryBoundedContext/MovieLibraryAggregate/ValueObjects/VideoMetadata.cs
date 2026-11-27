@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Common.ValueObjects.Metadata;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Domain.Core.BoundedContexts.VideoLibraryBoundedContext.MovieLibraryAggregate.ValueObjects;
+namespace Nemera.Domain.Core.BoundedContexts.VideoLibraryBoundedContext.MovieLibraryAggregate.ValueObjects;
 
 /// <summary>
 /// Value Object for the video metadata of a media element.

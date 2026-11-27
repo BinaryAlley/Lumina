@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
-using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
-using Lumina.Contracts.Fixtures.Core.Responses.Authorization;
-using Lumina.Contracts.Requests.Authorization;
-using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
-using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.GetAuthorization;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
+using Nemera.Contracts.Fixtures.Core.Requests.Authorization;
+using Nemera.Contracts.Fixtures.Core.Responses.Authorization;
+using Nemera.Contracts.Requests.Authorization;
+using Nemera.Contracts.Responses.Authorization;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.GetAuthorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -20,7 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authorization.GetAuthorization;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authorization.GetAuthorization;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetAuthorizationEndpoint"/> class.

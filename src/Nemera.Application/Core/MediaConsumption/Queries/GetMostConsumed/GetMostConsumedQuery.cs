@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DTO.Pagination;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.MediaConsumption.Queries.GetMostConsumed;
+namespace Nemera.Application.Core.MediaConsumption.Queries.GetMostConsumed;
 
 /// <summary>
 /// Query for getting the most consumed media items of a user.

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Networking;
-using Lumina.Plugins.Contracts.Common.Http;
+using Nemera.Domain.SharedKernel.Common.Enums.Networking;
+using Nemera.Plugins.Contracts.Common.Http;
 using Microsoft.Extensions.Logging;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Networking;
+namespace Nemera.Infrastructure.Common.Networking;
 
 /// <summary>
 /// Message handler that validates the host of the outbound requests it sees, resolving it and rejecting it when it is not public, so that a URL chosen by a provider

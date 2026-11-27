@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Validation;
+using Nemera.Presentation.Web.Common.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Utilities;
+namespace Nemera.Presentation.Web.Common.Utilities;
 
 /// <summary>
 /// Extension methods for adding configuration related options services to the DI container via <see cref="OptionsBuilder{TOptions}"/>.

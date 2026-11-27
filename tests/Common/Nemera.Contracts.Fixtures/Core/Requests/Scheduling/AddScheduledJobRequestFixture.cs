@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Requests.Scheduling;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Contracts.Requests.Scheduling;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Requests.Scheduling;
+namespace Nemera.Contracts.Fixtures.Core.Requests.Scheduling;
 
 /// <summary>
 /// Fixture class for the <see cref="AddScheduledJobRequest"/> class.

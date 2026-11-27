@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
+namespace Nemera.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 
 /// <summary>
 /// Interface defining the artwork enrichment of the media library items of a specific media library type.

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.Utilities;
+namespace Nemera.Application.Common.Utilities;
 
 /// <summary>
 /// Task extension method to handle exceptions (avoid littering whole project with try...catch'es).

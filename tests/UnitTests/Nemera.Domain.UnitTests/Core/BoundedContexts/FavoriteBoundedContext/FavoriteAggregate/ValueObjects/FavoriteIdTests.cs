@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Domain.UnitTests.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate.ValueObjects;
+namespace Nemera.Domain.UnitTests.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate.ValueObjects;
 
 /// <summary>
 /// Contains unit tests for the <see cref="FavoriteId"/> class.

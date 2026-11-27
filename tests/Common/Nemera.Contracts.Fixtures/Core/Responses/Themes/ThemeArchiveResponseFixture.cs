@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Responses.Themes;
+using Nemera.Contracts.Responses.Themes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Responses.Themes;
+namespace Nemera.Contracts.Fixtures.Core.Responses.Themes;
 
 /// <summary>
 /// Fixture class for the <see cref="ThemeArchiveResponse"/> record.

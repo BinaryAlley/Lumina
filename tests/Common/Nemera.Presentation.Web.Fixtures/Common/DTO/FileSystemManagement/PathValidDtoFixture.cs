@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
+using Nemera.Presentation.Web.Common.DTO.FileSystemManagement;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
+namespace Nemera.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
 
 /// <summary>
 /// Fixture class for the <see cref="PathValidDto"/> record.

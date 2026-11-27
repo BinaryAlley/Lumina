@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.DataAccess.Common.Configuration;
+namespace Nemera.DataAccess.Common.Configuration;
 
 /// <summary>
 /// Configures the entity mapping for the <see cref="TrackEntity"/> entity.

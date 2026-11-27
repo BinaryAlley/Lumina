@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.UsersManagement.Settings.Queries.GetUserSettings;
-using Lumina.Contracts.Responses.UsersManagement.Settings;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.UsersManagement;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.UsersManagement.Settings.Queries.GetUserSettings;
+using Nemera.Contracts.Responses.UsersManagement.Settings;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.UsersManagement;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Settings.GetUserSettings;
+namespace Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Settings.GetUserSettings;
 
 /// <summary>
 /// API endpoint for the <c>/users/me/settings</c> route.

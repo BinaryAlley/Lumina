@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DTO.Playlists;
+using Nemera.Application.Common.DTO.Playlists;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.DTO.Playlists;
+namespace Nemera.Application.Fixtures.Common.DTO.Playlists;
 
 /// <summary>
 /// Fixture class for the <see cref="PlaylistBulkAddResultDto"/> record.

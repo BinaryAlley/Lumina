@@ -1,21 +1,21 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.AddAlbum;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Commands.UpdateArtist;
-using Lumina.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.AddAlbum;
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.AddAlbum;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Commands.UpdateArtist;
+using Nemera.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.AddAlbum;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaContributors;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Commands.UpdateArtist;
+namespace Nemera.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Commands.UpdateArtist;
 
 /// <summary>
 /// Fixture class for the <see cref="UpdateArtistCommand"/> record.

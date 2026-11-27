@@ -1,30 +1,30 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Enums.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Scheduler.UpdateSchedulerDisplayPreferences;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Scheduler.UpdateSchedulerDisplayPreferences;
 
 /// <summary>
 /// Contains security tests for the <see cref="UpdateSchedulerDisplayPreferencesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class UpdateSchedulerDisplayPreferencesEndpointTests : IClassFixture<LuminaWebFactory>
+public class UpdateSchedulerDisplayPreferencesEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateSchedulerDisplayPreferencesEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public UpdateSchedulerDisplayPreferencesEndpointTests(LuminaWebFactory apiFactory)
+    public UpdateSchedulerDisplayPreferencesEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

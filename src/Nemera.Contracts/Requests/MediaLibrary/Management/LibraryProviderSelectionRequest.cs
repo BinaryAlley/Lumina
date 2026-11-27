@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.MediaLibrary.Management;
+namespace Nemera.Contracts.Requests.MediaLibrary.Management;
 
 /// <summary>
 /// Represents the choice made for one metadata provider, artwork provider or book reader of a media library.

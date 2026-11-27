@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Playback;
+using Nemera.Presentation.Web.Common.Playback;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.Playback;
+namespace Nemera.Presentation.Web.UnitTests.Common.Playback;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PlaybackDeliveryId"/> class.

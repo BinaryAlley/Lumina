@@ -1,21 +1,21 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.FileSystemManagement.Directories;
-using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
-using Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
-using Lumina.Contracts.Requests.FileSystemManagement.Directories;
-using Lumina.Contracts.Responses.FileSystemManagement.Directories;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Directories;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Paths;
+using Nemera.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
+using Nemera.Contracts.Requests.FileSystemManagement.Directories;
+using Nemera.Contracts.Responses.FileSystemManagement.Directories;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.FileSystemManagement;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Directories.GetDirectories;
+namespace Nemera.Presentation.Api.Core.Endpoints.FileSystemManagement.Directories.GetDirectories;
 
 /// <summary>
 /// API endpoint for the <c>/directories/get-directories</c> route.

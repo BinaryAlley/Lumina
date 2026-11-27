@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.Authorization;
+namespace Nemera.Application.Common.DataAccess.Entities.Authorization;
 
 /// <summary>
 /// Data Transfer Object containing all the authorization info of a user.

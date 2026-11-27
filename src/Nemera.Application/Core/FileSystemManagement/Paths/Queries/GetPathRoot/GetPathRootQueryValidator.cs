@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
-using Lumina.Domain.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
+using Nemera.Domain.Common.Errors;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
+namespace Nemera.Application.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="GetPathRootQuery"/>.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Domain.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Domain.Common.Errors;
 using System;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Queries.GetTrackSegment;
+namespace Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Queries.GetTrackSegment;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="GetTrackSegmentQuery"/>.

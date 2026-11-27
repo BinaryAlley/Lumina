@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Authorization.Policies.Over18;
+namespace Nemera.Application.Common.Infrastructure.Authorization.Policies.Over18;
 
 /// <summary>
 /// Interface for the Over18 authorization policy.

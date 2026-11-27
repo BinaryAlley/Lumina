@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Admin.Authorization.Permissions.Queries.GetPermissions;
+using Nemera.Application.Core.Admin.Authorization.Permissions.Queries.GetPermissions;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Admin.Authorization.Permissions.Queries.GetPermissions;
+namespace Nemera.Application.Fixtures.Core.Admin.Authorization.Permissions.Queries.GetPermissions;
 
 /// <summary>
 /// Fixture class for the <see cref="GetPermissionsQuery"/> class.

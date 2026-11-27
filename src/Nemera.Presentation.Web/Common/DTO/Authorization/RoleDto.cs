@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Authorization;
+namespace Nemera.Presentation.Web.Common.DTO.Authorization;
 
 /// <summary>
 /// Data transfer object for an authorization role.

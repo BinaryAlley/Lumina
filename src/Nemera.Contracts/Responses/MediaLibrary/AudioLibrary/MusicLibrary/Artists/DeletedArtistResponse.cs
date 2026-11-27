@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+namespace Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 
 /// <summary>
 /// Represents a music artist that the user deleted and can restore.

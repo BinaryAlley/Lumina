@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Plugins;
-using Lumina.Plugins.Contracts.Core.Plugins;
+using Nemera.Application.Common.Infrastructure.Plugins;
+using Nemera.Plugins.Contracts.Core.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Plugins;
+namespace Nemera.Infrastructure.Core.Plugins;
 
 /// <summary>
 /// Manager of the plugins loaded by the host application.

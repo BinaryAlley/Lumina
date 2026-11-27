@@ -1,26 +1,26 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.Common.Metadata;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Common;
-using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Common.ValueObjects.Metadata;
-using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.ExternalIdentifiers.MediaContributorBoundedContext.MediaContributorAggregate;
-using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
-using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Application.Common.Mapping.Common.Metadata;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Common;
+using Nemera.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.ValueObjects.Metadata;
+using Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.ExternalIdentifiers.MediaContributorBoundedContext.MediaContributorAggregate;
+using Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Entities;
+using Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+namespace Nemera.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 
 /// <summary>
 /// Extension methods for converting <see cref="AlbumEntity"/>.

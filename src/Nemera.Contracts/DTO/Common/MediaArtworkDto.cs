@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.DTO.Common;
+namespace Nemera.Contracts.DTO.Common;
 
 /// <summary>
 /// Data transfer object for a stored piece of artwork of a media item.

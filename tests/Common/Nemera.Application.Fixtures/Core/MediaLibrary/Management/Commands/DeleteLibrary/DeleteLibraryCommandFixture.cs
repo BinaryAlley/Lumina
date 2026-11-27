@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.MediaLibrary.Management.Commands.DeleteLibrary;
+using Nemera.Application.Core.MediaLibrary.Management.Commands.DeleteLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.MediaLibrary.Management.Commands.DeleteLibrary;
+namespace Nemera.Application.Fixtures.Core.MediaLibrary.Management.Commands.DeleteLibrary;
 
 /// <summary>
 /// Fixture class for the <see cref="DeleteLibraryCommand"/> class.

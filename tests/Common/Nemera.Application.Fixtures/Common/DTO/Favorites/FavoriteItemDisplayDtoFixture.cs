@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DTO.Favorites;
+using Nemera.Application.Common.DTO.Favorites;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.DTO.Favorites;
+namespace Nemera.Application.Fixtures.Common.DTO.Favorites;
 
 /// <summary>
 /// Fixture class for the <see cref="FavoriteItemDisplayDto"/> record.

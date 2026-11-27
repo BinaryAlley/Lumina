@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.DataAccess.Common.Persistence;
-using Lumina.DataAccess.Core.UoW;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.DataAccess.Common.Persistence;
+using Nemera.DataAccess.Core.UoW;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Common.Persistence;
+namespace Nemera.DataAccess.UnitTests.Common.Persistence;
 
 /// <summary>
 /// Contains unit tests for the <see cref="EditableValuesCopier"/> class.
@@ -17,7 +17,7 @@ namespace Lumina.DataAccess.UnitTests.Common.Persistence;
 [ExcludeFromCodeCoverage]
 public class EditableValuesCopierTests
 {
-    private readonly LuminaDbContext _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
+    private readonly NemeraDbContext _mockContext = Create.MockedDbContextFor<NemeraDbContext>();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
 
     [Fact]

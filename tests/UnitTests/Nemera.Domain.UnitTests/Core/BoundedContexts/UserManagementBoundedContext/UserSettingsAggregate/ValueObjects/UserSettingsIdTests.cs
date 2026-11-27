@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate.ValueObjects;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Domain.UnitTests.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate.ValueObjects;
+namespace Nemera.Domain.UnitTests.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate.ValueObjects;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UserSettingsId"/> class.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Infrastructure.Common.Models.DTO.Configuration;
-using Lumina.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
+using Nemera.Infrastructure.Common.Models.DTO.Configuration;
+using Nemera.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.Fixtures.Core.Authentication;
+namespace Nemera.Infrastructure.Fixtures.Core.Authentication;
 
 /// <summary>
 /// Test-support class for JWT token generation tests.

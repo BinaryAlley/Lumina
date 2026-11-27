@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.Common.Models.DTO.Settings;
+namespace Nemera.Plugins.CoverArtArchive.Common.Models.DTO.Settings;
 
 /// <summary>
 /// Data transfer object for the settings that configure the Cover Art Archive artwork plugin.
@@ -12,7 +12,7 @@ internal sealed class CoverArtArchiveSettingsDto
     /// <summary>
     /// Gets or sets the user agent sent with every request to the Cover Art Archive API.
     /// </summary>
-    public string UserAgent { get; set; } = "Lumina-CoverArtArchive/1.0";
+    public string UserAgent { get; set; } = "Nemera-CoverArtArchive/1.0";
 
     /// <summary>
     /// Gets or sets the contact email sent with every request to the Cover Art Archive API.

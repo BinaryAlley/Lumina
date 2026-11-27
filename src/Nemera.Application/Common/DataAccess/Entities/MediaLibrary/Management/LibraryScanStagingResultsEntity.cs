@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.Common;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+namespace Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 
 /// <summary>
 /// Repository entity for a media library scan staging result, holding the file system items discovered during a scan, before they are compared against the media library scan snapshot of the previous scan.

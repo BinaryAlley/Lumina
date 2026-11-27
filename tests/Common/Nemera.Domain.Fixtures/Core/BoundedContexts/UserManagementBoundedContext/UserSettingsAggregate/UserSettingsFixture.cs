@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
+namespace Nemera.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
 
 /// <summary>
 /// Fixture class for the <see cref="UserSettings"/> domain aggregate.

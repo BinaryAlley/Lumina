@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Lumina.DataAccess.Common.Migrations
+namespace Nemera.DataAccess.Common.Migrations
 {
     /// <summary>
     /// Normalizes the existing tag and genre names to their trimmed lowercase form, and merges the rows that differ only by casing.

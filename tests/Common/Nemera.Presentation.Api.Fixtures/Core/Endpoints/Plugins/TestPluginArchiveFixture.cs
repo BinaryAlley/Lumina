@@ -5,7 +5,7 @@ using System.IO;
 using System.IO.Compression;
 #endregion
 
-namespace Lumina.Presentation.Api.Fixtures.Core.Endpoints.Plugins;
+namespace Nemera.Presentation.Api.Fixtures.Core.Endpoints.Plugins;
 
 /// <summary>
 /// Fixture class for building plugin archives used by the plugin integration tests.

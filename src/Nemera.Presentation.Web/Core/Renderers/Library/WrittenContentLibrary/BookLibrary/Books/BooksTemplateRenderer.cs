@@ -1,4 +1,4 @@
-﻿namespace Lumina.Presentation.Web.Core.Renderers.Library.WrittenContentLibrary.BookLibrary.Books;
+﻿namespace Nemera.Presentation.Web.Core.Renderers.Library.WrittenContentLibrary.BookLibrary.Books;
 
 /// <summary>
 /// Renders the book template elements.

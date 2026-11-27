@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+namespace Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
 
 /// <summary>
 /// Data transfer object for the response of an update music cover operation.

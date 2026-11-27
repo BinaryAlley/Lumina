@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.UsersManagement.Settings;
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Contracts.Requests.UsersManagement.Settings;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Settings.UpdateUserSettings;
+namespace Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Settings.UpdateUserSettings;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="UpdateUserSettingsEndpoint"/> API endpoint, for OpenAPI.

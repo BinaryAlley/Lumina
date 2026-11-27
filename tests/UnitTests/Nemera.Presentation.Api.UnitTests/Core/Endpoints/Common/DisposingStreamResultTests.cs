@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Common;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Common;
 
 /// <summary>
 /// Contains unit tests for the <see cref="DisposingStreamResult"/> class.

@@ -1,22 +1,22 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Security;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Contracts.Responses.Authentication;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Repositories.Users;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Security;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Contracts.Responses.Authentication;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
+namespace Nemera.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
 
 /// <summary>
 /// Handler for the query to authenticate an account.

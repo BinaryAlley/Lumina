@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.Themes;
-using Lumina.Application.Core.Themes.Management.Commands.RestoreTheme;
-using Lumina.Contracts.Requests.Themes;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.Themes;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.Themes;
+using Nemera.Application.Core.Themes.Management.Commands.RestoreTheme;
+using Nemera.Contracts.Requests.Themes;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.Themes;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Themes.Management.RestoreTheme;
+namespace Nemera.Presentation.Api.Core.Endpoints.Themes.Management.RestoreTheme;
 
 /// <summary>
 /// API endpoint for the <c>/themes/{themeId}/restore</c> route.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
-using Lumina.Contracts.Requests.Authentication;
+using Nemera.Contracts.Fixtures.Core.Requests.Authentication;
+using Nemera.Contracts.Requests.Authentication;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Contracts.UnitTests.Requests.Authentication;
+namespace Nemera.Contracts.UnitTests.Requests.Authentication;
 
 /// <summary>
 /// Contains unit tests for the <see cref="RegistrationRequest"/> record.

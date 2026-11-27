@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Services.Scanners;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners;
-using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Scanners;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.Services.Scanners;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners;
+using Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Services.Scanners;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Domain.UnitTests.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners;
+namespace Nemera.Domain.UnitTests.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Scanners;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MediaLibraryScannerFactory"/> class.

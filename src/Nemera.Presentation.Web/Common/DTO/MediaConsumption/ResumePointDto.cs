@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.MediaConsumption;
+using Nemera.Presentation.Web.Common.Enums.MediaConsumption;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.MediaConsumption;
+namespace Nemera.Presentation.Web.Common.DTO.MediaConsumption;
 
 /// <summary>
 /// Data transfer object for the point at which a user can resume consuming a media item.

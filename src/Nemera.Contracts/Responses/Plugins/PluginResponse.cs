@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.Plugins;
+namespace Nemera.Contracts.Responses.Plugins;
 
 /// <summary>
 /// Represents a detected plugin.

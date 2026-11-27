@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
+using Nemera.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.UnitTests.Common.Models.Contracts.Responses;
+namespace Nemera.Plugins.MusicBrainz.UnitTests.Common.Models.Contracts.Responses;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MusicBrainzRecordingListResponse"/> class.

@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Infrastructure.Validation;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.CQRS;
+namespace Nemera.Application.UnitTests.Common.CQRS;
 
 /// <summary>
 /// Contains tests that enforce the convention that command and query handlers always call the validator defined for their command or query.

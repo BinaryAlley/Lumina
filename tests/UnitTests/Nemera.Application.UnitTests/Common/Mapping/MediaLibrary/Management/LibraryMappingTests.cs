@@ -1,20 +1,20 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.Mapping.Common.Metadata;
-using Lumina.Application.Common.Mapping.MediaLibrary.Management;
-using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.Mapping.Common.Metadata;
+using Nemera.Application.Common.Mapping.MediaLibrary.Management;
+using Nemera.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.Management;
+namespace Nemera.Application.UnitTests.Common.Mapping.MediaLibrary.Management;
 
 /// <summary>
 /// Contains unit tests for the <see cref="LibraryMapping"/> class.

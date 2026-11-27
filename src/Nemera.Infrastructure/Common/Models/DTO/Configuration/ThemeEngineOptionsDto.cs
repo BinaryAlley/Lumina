@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Models.DTO.Configuration;
+namespace Nemera.Infrastructure.Common.Models.DTO.Configuration;
 
 /// <summary>
 /// Data transfer object for deserializing theme engine settings.
@@ -28,7 +28,7 @@ public sealed class ThemeEngineOptionsDto
     /// <summary>
     /// Gets or sets the identifier of the theme selected when no valid current theme is persisted.
     /// </summary>
-    public string DefaultThemeId { get; set; } = "lumina-default";
+    public string DefaultThemeId { get; set; } = "nemera-default";
 
     /// <summary>
     /// Gets or sets the maximum allowed size of an uploaded theme archive, in bytes.

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Domain.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.Common.Errors;
 using System;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary;
+namespace Nemera.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="UpdateLibraryCommand"/>.

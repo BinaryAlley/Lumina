@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Core.MediaConsumption.Queries.GetRecentlyConsumed;
-using Lumina.Contracts.Requests.MediaConsumption;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Core.MediaConsumption.Queries.GetRecentlyConsumed;
+using Nemera.Contracts.Requests.MediaConsumption;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.MediaConsumption;
+namespace Nemera.Application.Common.Mapping.MediaConsumption;
 
 /// <summary>
 /// Extension methods for converting <see cref="GetRecentlyConsumedRequest"/>.

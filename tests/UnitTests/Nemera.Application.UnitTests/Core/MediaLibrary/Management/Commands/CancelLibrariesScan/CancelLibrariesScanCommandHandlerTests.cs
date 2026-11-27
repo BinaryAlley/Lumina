@@ -1,26 +1,26 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DomainEvents;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DomainEvents;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
+namespace Nemera.Application.UnitTests.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CancelLibrariesScanCommandHandler"/> class.
@@ -185,7 +185,7 @@ public class CancelLibrariesScanCommandHandlerTests
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(Lumina.Domain.Common.Errors.Errors.LibraryScanning.CanOnlyCancelPendingOrRunningScans, result.FirstError);
+        Assert.Equal(Nemera.Domain.Common.Errors.Errors.LibraryScanning.CanOnlyCancelPendingOrRunningScans, result.FirstError);
         await _mockLibraryScanRepository.DidNotReceive().UpdateAsync(Arg.Any<LibraryScanEntity>(), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }

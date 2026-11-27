@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Security;
-using Lumina.Infrastructure.Common.Models.DTO.Configuration;
+using Nemera.Application.Common.Infrastructure.Security;
+using Nemera.Infrastructure.Common.Models.DTO.Configuration;
 using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Security;
+namespace Nemera.Infrastructure.Core.Security;
 
 /// <summary>
 /// Provides encryption and decryption services using AES encryption.

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Models.Core;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.Common.Models.Core;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Domain.Common.ValueObjects.Metadata;
+namespace Nemera.Domain.Common.ValueObjects.Metadata;
 
 /// <summary>
 /// Value Object for the release info of a media element.

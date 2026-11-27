@@ -1,24 +1,24 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.DTO.MediaConsumption;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Mapping.Common.Metadata;
-using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Responses.Common;
-using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Common.DTO.MediaConsumption;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Mapping.Common.Metadata;
+using Nemera.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Contracts.Responses.Common;
+using Nemera.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+namespace Nemera.Application.UnitTests.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 
 /// <summary>
 /// Contains unit tests for the <see cref="BookEntityMapping"/> class.

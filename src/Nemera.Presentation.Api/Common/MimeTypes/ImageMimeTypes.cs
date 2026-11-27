@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using System.Collections.Frozen;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Presentation.Api.Common.MimeTypes;
+namespace Nemera.Presentation.Api.Common.MimeTypes;
 
 /// <summary>
 /// Resolves the MIME content type of image types.

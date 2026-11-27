@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,7 +11,7 @@ using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Themes;
+namespace Nemera.Presentation.Web.Core.Themes;
 
 /// <summary>
 /// A small, non-executable Mustache-style renderer. Theme templates can place values, iterate collections and test truthiness, but cannot execute C#.

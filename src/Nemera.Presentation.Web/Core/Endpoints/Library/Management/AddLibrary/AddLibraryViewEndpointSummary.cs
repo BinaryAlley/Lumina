@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.Management.AddLibrary;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.Management.AddLibrary;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="AddLibraryViewEndpoint"/> endpoint, for OpenAPI.

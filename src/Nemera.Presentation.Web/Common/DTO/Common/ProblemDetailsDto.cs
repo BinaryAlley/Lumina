@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Common;
+namespace Nemera.Presentation.Web.Common.DTO.Common;
 
 /// <summary>
 /// Data transfer object that follows the RFC 9457 standard for problem details in HTTP APIs.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Services;
+using Nemera.Presentation.Web.Common.Services;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.Services;
+namespace Nemera.Presentation.Web.UnitTests.Common.Services;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ScriptIdentifierHelper"/> class.

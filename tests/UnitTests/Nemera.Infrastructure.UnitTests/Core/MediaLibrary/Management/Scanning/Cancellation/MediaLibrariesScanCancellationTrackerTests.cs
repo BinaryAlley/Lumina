@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Cancellation;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Nemera.Infrastructure.Core.MediaLibrary.Management.Scanning.Cancellation;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.MediaLibrary.Management.Scanning.Cancellation;
+namespace Nemera.Infrastructure.UnitTests.Core.MediaLibrary.Management.Scanning.Cancellation;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MediaLibrariesScanCancellationTracker"/> class.

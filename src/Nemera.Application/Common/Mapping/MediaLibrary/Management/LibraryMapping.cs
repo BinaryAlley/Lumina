@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.MediaLibrary.Management;
+namespace Nemera.Application.Common.Mapping.MediaLibrary.Management;
 
 /// <summary>
 /// Extension methods for converting <see cref="Library"/>.

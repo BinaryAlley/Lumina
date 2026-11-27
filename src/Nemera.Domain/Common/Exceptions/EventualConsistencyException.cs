@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Domain.Common.Exceptions;
+namespace Nemera.Domain.Common.Exceptions;
 
 /// <summary>
 /// Custom exception for domain aggregates eventual consistency.

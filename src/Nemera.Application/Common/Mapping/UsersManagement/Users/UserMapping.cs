@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.UsersManagement.Users;
+namespace Nemera.Application.Common.Mapping.UsersManagement.Users;
 
 /// <summary>
 /// Extension methods for converting <see cref="User"/>.

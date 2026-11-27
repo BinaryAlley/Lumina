@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Libraries;
-using Lumina.Presentation.Web.Common.Requests.Library.Management;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Common;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Common.Requests.Library.Management;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.Management.ScanLibrary;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.Management.ScanLibrary;
 
 /// <summary>
 /// API endpoint for the <c>/{culture}/libraries/manage/api-scan-library/{id}</c> route.

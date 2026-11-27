@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate;
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate;
+using Nemera.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate;
+namespace Nemera.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate;
 
 /// <summary>
 /// Fixture class for the <see cref="User"/> domain aggregate.

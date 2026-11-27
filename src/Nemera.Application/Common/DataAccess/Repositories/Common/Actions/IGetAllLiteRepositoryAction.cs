@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
+namespace Nemera.Application.Common.DataAccess.Repositories.Common.Actions;
 
 /// <summary>
 /// Interface defining the "get all lite" action for interacting with a generic persistence medium.

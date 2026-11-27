@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Requests.FileSystemManagement.Thumbnails;
+using Nemera.Contracts.Requests.FileSystemManagement.Thumbnails;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Thumbnails;
+namespace Nemera.Contracts.Fixtures.Core.Requests.FileSystemManagement.Thumbnails;
 
 /// <summary>
 /// Fixture class for the <see cref="GetThumbnailRequest"/> record.

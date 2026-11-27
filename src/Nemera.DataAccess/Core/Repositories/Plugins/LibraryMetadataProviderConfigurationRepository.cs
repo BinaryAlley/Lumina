@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
-using Lumina.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Repositories.Plugins;
+using Nemera.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,22 +11,22 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Plugins;
+namespace Nemera.DataAccess.Core.Repositories.Plugins;
 
 /// <summary>
 /// Repository for the metadata provider configurations of media libraries.
 /// </summary>
 internal sealed class LibraryMetadataProviderConfigurationRepository : ILibraryMetadataProviderConfigurationRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryMetadataProviderConfigurationRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public LibraryMetadataProviderConfigurationRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public LibraryMetadataProviderConfigurationRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -37,7 +37,7 @@ internal sealed class LibraryMetadataProviderConfigurationRepository : ILibraryM
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryMetadataProviderConfigurationEntity"/>, or an error.</returns>
     public async Task<Result<IReadOnlyList<LibraryMetadataProviderConfigurationEntity>>> GetByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.LibraryMetadataProviderConfigurations
+        return await _nemeraDbContext.LibraryMetadataProviderConfigurations
             .Where(configuration => configuration.LibraryId == libraryId)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -51,7 +51,7 @@ internal sealed class LibraryMetadataProviderConfigurationRepository : ILibraryM
     /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="LibraryMetadataProviderConfigurationEntity"/>, or an error.</returns>
     public async Task<Result<LibraryMetadataProviderConfigurationEntity?>> GetByLibraryAndPluginIdAsync(Guid libraryId, Guid pluginId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.LibraryMetadataProviderConfigurations
+        return await _nemeraDbContext.LibraryMetadataProviderConfigurations
             .FirstOrDefaultAsync(configuration => configuration.LibraryId == libraryId && configuration.PluginId == pluginId, cancellationToken).ConfigureAwait(false);
     }
 
@@ -63,10 +63,10 @@ internal sealed class LibraryMetadataProviderConfigurationRepository : ILibraryM
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpsertAsync(LibraryMetadataProviderConfigurationEntity configuration, CancellationToken cancellationToken)
     {
-        LibraryMetadataProviderConfigurationEntity? existingConfiguration = await _luminaDbContext.LibraryMetadataProviderConfigurations
+        LibraryMetadataProviderConfigurationEntity? existingConfiguration = await _nemeraDbContext.LibraryMetadataProviderConfigurations
             .FirstOrDefaultAsync(repositoryConfiguration => repositoryConfiguration.LibraryId == configuration.LibraryId && repositoryConfiguration.PluginId == configuration.PluginId, cancellationToken).ConfigureAwait(false);
         if (existingConfiguration is null)
-            _luminaDbContext.LibraryMetadataProviderConfigurations.Add(configuration);
+            _nemeraDbContext.LibraryMetadataProviderConfigurations.Add(configuration);
         else
         {
             // Update only the mutable fields, preserving the Id of the existing configuration.
@@ -86,11 +86,11 @@ internal sealed class LibraryMetadataProviderConfigurationRepository : ILibraryM
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        List<LibraryMetadataProviderConfigurationEntity> configurations = await _luminaDbContext.LibraryMetadataProviderConfigurations
+        List<LibraryMetadataProviderConfigurationEntity> configurations = await _nemeraDbContext.LibraryMetadataProviderConfigurations
             .Where(configuration => configuration.LibraryId == libraryId)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
         if (configurations.Count > 0)
-            _luminaDbContext.LibraryMetadataProviderConfigurations.RemoveRange(configurations);
+            _nemeraDbContext.LibraryMetadataProviderConfigurations.RemoveRange(configurations);
         return Result.Deleted;
     }
 
@@ -102,11 +102,11 @@ internal sealed class LibraryMetadataProviderConfigurationRepository : ILibraryM
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Deleted>> DeleteByPluginIdAsync(Guid pluginId, CancellationToken cancellationToken)
     {
-        List<LibraryMetadataProviderConfigurationEntity> configurations = await _luminaDbContext.LibraryMetadataProviderConfigurations
+        List<LibraryMetadataProviderConfigurationEntity> configurations = await _nemeraDbContext.LibraryMetadataProviderConfigurations
             .Where(configuration => configuration.PluginId == pluginId)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
         if (configurations.Count > 0)
-            _luminaDbContext.LibraryMetadataProviderConfigurations.RemoveRange(configurations);
+            _nemeraDbContext.LibraryMetadataProviderConfigurations.RemoveRange(configurations);
         return Result.Deleted;
     }
 
@@ -121,11 +121,11 @@ internal sealed class LibraryMetadataProviderConfigurationRepository : ILibraryM
     public async Task<Result<Deleted>> DeleteByLibraryIdAndPluginIdsAsync(Guid libraryId, IEnumerable<Guid> pluginIds, CancellationToken cancellationToken)
     {
         List<Guid> pluginIdList = [.. pluginIds];
-        List<LibraryMetadataProviderConfigurationEntity> configurations = await _luminaDbContext.LibraryMetadataProviderConfigurations
+        List<LibraryMetadataProviderConfigurationEntity> configurations = await _nemeraDbContext.LibraryMetadataProviderConfigurations
             .Where(configuration => configuration.LibraryId == libraryId && pluginIdList.Contains(configuration.PluginId))
             .ToListAsync(cancellationToken).ConfigureAwait(false);
         if (configurations.Count > 0)
-            _luminaDbContext.LibraryMetadataProviderConfigurations.RemoveRange(configurations);
+            _nemeraDbContext.LibraryMetadataProviderConfigurations.RemoveRange(configurations);
         return Result.Deleted;
     }
 }

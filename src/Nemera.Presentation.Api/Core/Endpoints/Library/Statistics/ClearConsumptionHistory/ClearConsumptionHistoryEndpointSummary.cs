@@ -3,7 +3,7 @@ using FastEndpoints;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.Statistics.ClearConsumptionHistory;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.Statistics.ClearConsumptionHistory;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="ClearConsumptionHistoryEndpoint"/> API endpoint, for OpenAPI.

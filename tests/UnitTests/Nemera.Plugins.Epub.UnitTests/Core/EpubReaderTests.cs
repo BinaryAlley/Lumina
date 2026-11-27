@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.Epub.Core;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.Epub.Core;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.Epub.UnitTests.Core;
+namespace Nemera.Plugins.Epub.UnitTests.Core;
 
 /// <summary>
 /// Contains unit tests for the <see cref="EpubReader"/> class.

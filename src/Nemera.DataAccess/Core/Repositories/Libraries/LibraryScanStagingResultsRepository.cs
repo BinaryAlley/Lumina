@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using Dapper;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
-using Lumina.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
+using Nemera.DataAccess.Core.UoW;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Libraries;
+namespace Nemera.DataAccess.Core.Repositories.Libraries;
 
 /// <summary>
 /// Repository for media library scan staging results.
@@ -24,15 +24,15 @@ namespace Lumina.DataAccess.Core.Repositories.Libraries;
 internal sealed class LibraryScanStagingResultsRepository : ILibraryScanStagingResultsRepository
 {
     private const int INSERT_BATCH_SIZE = 500; // Keeps the number of bound parameters of a single INSERT statement well under the SQLite parameter limit.
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryScanStagingResultsRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext, used to derive the database connection string.</param>
-    public LibraryScanStagingResultsRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext, used to derive the database connection string.</param>
+    public LibraryScanStagingResultsRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -244,7 +244,7 @@ internal sealed class LibraryScanStagingResultsRepository : ILibraryScanStagingR
     /// <returns>The opened database connection.</returns>
     private async Task<SqliteConnection> OpenConnectionAsync(CancellationToken cancellationToken)
     {
-        SqliteConnection connection = new(_luminaDbContext.Database.GetDbConnection().ConnectionString);
+        SqliteConnection connection = new(_nemeraDbContext.Database.GetDbConnection().ConnectionString);
         await connection.OpenAsync(cancellationToken);
         return connection;
     }

@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.Authorization;
-using Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
-using Lumina.Contracts.Requests.Authorization;
-using Lumina.Contracts.Responses.Authorization;
-using Lumina.Presentation.Api.Common.Routes.UsersManagement;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.Authorization;
+using Nemera.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
+using Nemera.Contracts.Requests.Authorization;
+using Nemera.Contracts.Responses.Authorization;
+using Nemera.Presentation.Api.Common.Routes.UsersManagement;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.UpdateRole;
+namespace Nemera.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.UpdateRole;
 
 /// <summary>
 /// API endpoint for the <c>/auth/roles</c> route.

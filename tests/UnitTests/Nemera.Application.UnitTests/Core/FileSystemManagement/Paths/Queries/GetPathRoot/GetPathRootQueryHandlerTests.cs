@@ -1,19 +1,19 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
-using Lumina.Application.Fixtures.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
+using Nemera.Application.Fixtures.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
+using Nemera.Contracts.Responses.FileSystemManagement.Path;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
+namespace Nemera.Application.UnitTests.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetPathRootQueryHandler"/> class.

@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.DataAccess.Core.Repositories.BookLibrary.Specifications;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.DataAccess.Core.Repositories.BookLibrary.Specifications;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.BookLibrary.Specifications;
+namespace Nemera.DataAccess.UnitTests.Core.Repositories.BookLibrary.Specifications;
 
 /// <summary>
 /// Contains unit tests for the <see cref="BookSearchSpecification"/> class.

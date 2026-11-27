@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Requests.Authorization;
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Authorization.Roles.AddRole;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Requests.Authorization;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Authorization.Roles.AddRole;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -16,15 +16,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Authorization.Roles.AddRole;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Authorization.Roles.AddRole;
 
 /// <summary>
 /// Contains integration tests for the <see cref="AddRoleEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AddRoleEndpointTests : IClassFixture<LuminaWebFactory>
+public class AddRoleEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly AddRoleRequestFixture _addRoleRequestFixture = new();
     private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
     private readonly RolePermissionsDtoFixture _rolePermissionsDtoFixture = new();
@@ -33,7 +33,7 @@ public class AddRoleEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="AddRoleEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public AddRoleEndpointTests(LuminaWebFactory apiFactory)
+    public AddRoleEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

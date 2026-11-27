@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.Common;
+namespace Nemera.Application.Common.DataAccess.Entities.Common;
 
 /// <summary>
 /// Defines the fixed audit identities used by the persistence layer.

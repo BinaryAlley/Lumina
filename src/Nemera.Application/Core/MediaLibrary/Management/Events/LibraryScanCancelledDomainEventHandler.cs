@@ -1,24 +1,24 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Mapping.MediaLibrary.Management;
-using Lumina.Application.Core.MediaLibrary.Management.Progress;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Common.Exceptions;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Mapping.MediaLibrary.Management;
+using Nemera.Application.Core.MediaLibrary.Management.Progress;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Exceptions;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Events;
+namespace Nemera.Application.Core.MediaLibrary.Management.Events;
 
 /// <summary>
 /// Handler for the domain event raised when a media library scan is cancelled.

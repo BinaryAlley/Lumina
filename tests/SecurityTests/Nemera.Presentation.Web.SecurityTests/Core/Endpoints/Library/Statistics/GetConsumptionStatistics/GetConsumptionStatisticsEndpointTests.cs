@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Requests.Library.Statistics;
-using Lumina.Presentation.Web.Core.Endpoints.Library.Statistics.GetConsumptionStatistics;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.Statistics;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Statistics.GetConsumptionStatistics;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -16,17 +16,17 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Statistics.GetConsumptionStatistics;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Library.Statistics.GetConsumptionStatistics;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetConsumptionStatisticsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetConsumptionStatisticsEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class GetConsumptionStatisticsEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string WEB_ROUTE = "/en-us/library/statistics/api-get-statistics";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly GetConsumptionStatisticsRequestFixture _getConsumptionStatisticsRequestFixture = new();
     private readonly ConsumptionSummaryDtoFixture _consumptionSummaryDtoFixture = new();
 
@@ -34,7 +34,7 @@ public class GetConsumptionStatisticsEndpointTests : IClassFixture<LuminaWebFact
     /// Initializes a new instance of the <see cref="GetConsumptionStatisticsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetConsumptionStatisticsEndpointTests(LuminaWebFactory apiFactory)
+    public GetConsumptionStatisticsEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -76,7 +76,7 @@ public class GetConsumptionStatisticsEndpointTests : IClassFixture<LuminaWebFact
         using JsonDocument json = JsonDocument.Parse(content);
         Assert.False(json.RootElement.GetProperty("success").GetBoolean());
         Assert.DoesNotContain(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint.StartsWith("users/", StringComparison.Ordinal));
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class GetConsumptionStatisticsEndpointTests : IClassFixture<LuminaWebFact
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     /// <summary>

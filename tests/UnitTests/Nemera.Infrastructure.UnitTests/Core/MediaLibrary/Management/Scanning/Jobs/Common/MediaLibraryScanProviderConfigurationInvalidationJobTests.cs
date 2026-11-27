@@ -1,30 +1,30 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.PathTemplate;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
-using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.WrittenContent.Books;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Repositories.BookLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.Plugins;
+using Nemera.Application.Common.DataAccess.Repositories.Users;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.PathTemplate;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
+using Nemera.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.WrittenContent.Books;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -35,7 +35,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.MediaLibrary.Management.Scanning.Jobs.Common;
+namespace Nemera.Infrastructure.UnitTests.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MediaLibraryScanProviderConfigurationInvalidationJob"/> class.

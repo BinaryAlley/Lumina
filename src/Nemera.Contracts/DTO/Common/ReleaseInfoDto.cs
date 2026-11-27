@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.DTO.Common;
+namespace Nemera.Contracts.DTO.Common;
 
 /// <summary>
 /// Data transfer object for a release information.

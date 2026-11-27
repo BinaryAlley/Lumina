@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.DeleteTrack;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.DeleteTrack;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="DeleteTrackEndpoint"/> API endpoint, for OpenAPI.

@@ -5,7 +5,7 @@
  * renderer. The buffering scheduler holds the decoded audio of a gapless prefetch until the handoff appends it to the
  * shared schedule. They are the only pipeline stages that know how decoded AudioData is shaped and laid on the timeline.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -36,7 +36,7 @@
      * @returns {number|null} The finite number, or null.
      */
     function toFiniteNumber(value) {
-        return LuminaAudioPlayer.toFiniteNumber(value);
+        return NemeraAudioPlayer.toFiniteNumber(value);
     }
 
     /**
@@ -383,8 +383,8 @@
         }
     }
 
-    LuminaAudioPlayer.GAPLESS_PRELOAD_SECONDS = GAPLESS_PRELOAD_SECONDS;
-    LuminaAudioPlayer.SEEK_TRIM_EPSILON_SECONDS = SEEK_TRIM_EPSILON_SECONDS;
-    LuminaAudioPlayer.SeekableScheduler = SeekableScheduler;
-    LuminaAudioPlayer.BufferingScheduler = BufferingScheduler;
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+    NemeraAudioPlayer.GAPLESS_PRELOAD_SECONDS = GAPLESS_PRELOAD_SECONDS;
+    NemeraAudioPlayer.SEEK_TRIM_EPSILON_SECONDS = SEEK_TRIM_EPSILON_SECONDS;
+    NemeraAudioPlayer.SeekableScheduler = SeekableScheduler;
+    NemeraAudioPlayer.BufferingScheduler = BufferingScheduler;
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

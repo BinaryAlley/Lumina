@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.AddBook;
-using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Contracts.Fixtures.Core.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.AddBook;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.AddBook;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Contracts.Fixtures.Core.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.AddBook;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.AddBook;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.AddBook;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AddBookEndpoint"/> class.
@@ -26,7 +26,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Library.WrittenConten
 [ExcludeFromCodeCoverage]
 public class AddBookEndpointTests
 {
-    private readonly Lumina.Application.Common.CQRS.ICommandHandler<AddBookCommand, Result<BookResponse>> _mockHandler;
+    private readonly Nemera.Application.Common.CQRS.ICommandHandler<AddBookCommand, Result<BookResponse>> _mockHandler;
     private readonly AddBookEndpoint _sut;
     private readonly AddBookRequestFixture _addBookRequestFixture = new();
     private readonly BookResponseFixture _bookResponseFixture = new();
@@ -36,7 +36,7 @@ public class AddBookEndpointTests
     /// </summary>
     public AddBookEndpointTests()
     {
-        _mockHandler = Substitute.For<Lumina.Application.Common.CQRS.ICommandHandler<AddBookCommand, Result<BookResponse>>>();
+        _mockHandler = Substitute.For<Nemera.Application.Common.CQRS.ICommandHandler<AddBookCommand, Result<BookResponse>>>();
         _sut = Factory.Create<AddBookEndpoint>(_mockHandler);
     }
 

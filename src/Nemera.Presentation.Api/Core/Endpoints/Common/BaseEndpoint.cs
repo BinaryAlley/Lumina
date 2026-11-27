@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Primitives;
-using Lumina.Presentation.Api.Common.Http;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Primitives;
+using Nemera.Presentation.Api.Common.Http;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Common;
+namespace Nemera.Presentation.Api.Core.Endpoints.Common;
 
 /// <summary>
 /// Base class for API endpoints.

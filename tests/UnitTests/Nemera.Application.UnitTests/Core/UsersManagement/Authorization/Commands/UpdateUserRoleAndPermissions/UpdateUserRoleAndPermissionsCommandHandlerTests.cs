@@ -1,22 +1,22 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Authorization;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
-using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Repositories.Authorization;
+using Nemera.Application.Common.DataAccess.Repositories.Users;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Application.Fixtures.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+using Nemera.Contracts.Responses.Authorization;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -24,11 +24,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+namespace Nemera.Application.UnitTests.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdateUserRoleAndPermissionsCommandHandler"/> class.

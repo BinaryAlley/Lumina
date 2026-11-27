@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+namespace Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 
 /// <summary>
 /// Represents a response of an update artist cover operation.

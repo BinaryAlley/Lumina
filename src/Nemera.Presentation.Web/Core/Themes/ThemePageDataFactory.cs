@@ -3,7 +3,7 @@ using Microsoft.Extensions.Localization;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Themes;
+namespace Nemera.Presentation.Web.Core.Themes;
 
 /// <summary>
 /// Builds the page data entries that the themed endpoints expose to their templates.

@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Domain.Common.Errors;
-using Lumina.Application.Core.Scheduling.Commands.FireScheduledJob;
-using Lumina.Contracts.Fixtures.Core.Requests.Scheduling;
-using Lumina.Contracts.Fixtures.Core.Responses.Scheduling;
-using Lumina.Contracts.Requests.Scheduling;
-using Lumina.Contracts.Responses.Scheduling;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
-using Lumina.Presentation.Api.Core.Endpoints.Scheduling.FireScheduledJob;
+using Nemera.Domain.Common.Errors;
+using Nemera.Application.Core.Scheduling.Commands.FireScheduledJob;
+using Nemera.Contracts.Fixtures.Core.Requests.Scheduling;
+using Nemera.Contracts.Fixtures.Core.Responses.Scheduling;
+using Nemera.Contracts.Requests.Scheduling;
+using Nemera.Contracts.Responses.Scheduling;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Presentation.Api.Core.Endpoints.Scheduling.FireScheduledJob;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -16,10 +16,10 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Scheduling.FireScheduledJob;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Scheduling.FireScheduledJob;
 
 /// <summary>
 /// Contains unit tests for the <see cref="FireScheduledJobEndpoint"/> class.

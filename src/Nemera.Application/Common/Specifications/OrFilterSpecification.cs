@@ -3,7 +3,7 @@ using System;
 using System.Linq.Expressions;
 #endregion
 
-namespace Lumina.Application.Common.Specifications;
+namespace Nemera.Application.Common.Specifications;
 
 /// <summary>
 /// Represents a filter specification that combines two filter specifications using a logical OR operation.

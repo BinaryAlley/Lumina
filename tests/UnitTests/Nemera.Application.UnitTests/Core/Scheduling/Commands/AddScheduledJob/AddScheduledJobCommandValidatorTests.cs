@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Scheduling.Commands.AddScheduledJob;
-using Lumina.Application.Fixtures.Core.Scheduling.Commands.AddScheduledJob;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Application.Core.Scheduling.Commands.AddScheduledJob;
+using Nemera.Application.Fixtures.Core.Scheduling.Commands.AddScheduledJob;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Scheduling.Commands.AddScheduledJob;
+namespace Nemera.Application.UnitTests.Core.Scheduling.Commands.AddScheduledJob;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AddScheduledJobCommandValidator"/> class.

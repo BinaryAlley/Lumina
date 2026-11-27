@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 #endregion
 
-namespace Lumina.Presentation.Api.Fixtures.Core.Endpoints.FileSystemManagement;
+namespace Nemera.Presentation.Api.Fixtures.Core.Endpoints.FileSystemManagement;
 
 /// <summary>
 /// Fixture class for creating and managing a test image for integration testing purposes.

@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.Utilities;
+namespace Nemera.Application.Fixtures.Common.Utilities;
 
 /// <summary>
-/// Request used to exercise the <see cref="Lumina.Application.Common.Utilities.ValidatorUtilities"/> extension methods.
+/// Request used to exercise the <see cref="Nemera.Application.Common.Utilities.ValidatorUtilities"/> extension methods.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public sealed record ValidatorUtilitiesTestRequest(

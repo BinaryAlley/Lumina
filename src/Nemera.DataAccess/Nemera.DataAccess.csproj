@@ -12,7 +12,7 @@
     </ItemGroup>
     
     <ItemGroup>
-        <ProjectReference Include="..\Lumina.Application\Lumina.Application.csproj" />
+        <ProjectReference Include="..\Nemera.Application\Nemera.Application.csproj" />
     </ItemGroup>
 
     <ItemGroup>

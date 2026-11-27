@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.GetDeletedAlbums;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.GetDeletedAlbums;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -17,15 +17,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.GetDeletedAlbums;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.GetDeletedAlbums;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetDeletedAlbumsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetDeletedAlbumsEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class GetDeletedAlbumsEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
     private readonly List<string> _seededUsernames = [];
@@ -38,11 +38,11 @@ public class GetDeletedAlbumsEndpointTests : IClassFixture<LuminaApiFactory>, ID
     /// Initializes a new instance of the <see cref="GetDeletedAlbumsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetDeletedAlbumsEndpointTests(LuminaApiFactory apiFactory)
+    public GetDeletedAlbumsEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
     }
 
     [Fact]
@@ -122,7 +122,7 @@ public class GetDeletedAlbumsEndpointTests : IClassFixture<LuminaApiFactory>, ID
     private async Task<Guid> SeedLibraryAndDeletedAlbumAsync(Guid userId, string title, string coverPath)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.NewGuid();
         Guid artistId = Guid.NewGuid();
         AlbumEntity album = _albumEntityFixture.Create(

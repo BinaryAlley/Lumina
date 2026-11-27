@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Lumina.Domain.Fixtures")]
-[assembly: AssemblyProduct("Lumina.Domain.Fixtures")]
+[assembly: AssemblyTitle("Nemera.Domain.Fixtures")]
+[assembly: AssemblyProduct("Nemera.Domain.Fixtures")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -16,6 +16,6 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("A1B2C3D4-0001-4A5B-9C0D-111111111111")]
 
-[assembly: InternalsVisibleTo("Lumina.Domain.UnitTests")]
-[assembly: InternalsVisibleTo("Lumina.Application.UnitTests")]
+[assembly: InternalsVisibleTo("Nemera.Domain.UnitTests")]
+[assembly: InternalsVisibleTo("Nemera.Application.UnitTests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

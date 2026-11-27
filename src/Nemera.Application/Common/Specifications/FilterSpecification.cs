@@ -3,7 +3,7 @@ using System;
 using System.Linq.Expressions;
 #endregion
 
-namespace Lumina.Application.Common.Specifications;
+namespace Nemera.Application.Common.Specifications;
 
 /// <summary>
 /// Represents the abstract base for a filtering specification, enabling the encapsulation of business query logic as reusable objects.

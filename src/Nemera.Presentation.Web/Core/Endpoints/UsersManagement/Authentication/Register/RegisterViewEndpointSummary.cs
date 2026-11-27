@@ -3,7 +3,7 @@ using FastEndpoints;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Register;
+namespace Nemera.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Register;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="RegisterViewEndpoint"/> endpoint, for OpenAPI.

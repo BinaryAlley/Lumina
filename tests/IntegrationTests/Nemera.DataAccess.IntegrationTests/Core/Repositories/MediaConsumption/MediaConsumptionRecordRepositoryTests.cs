@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Common.Interceptors;
-using Lumina.DataAccess.Core.Repositories.MediaConsumption;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Common.Interceptors;
+using Nemera.DataAccess.Core.Repositories.MediaConsumption;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -22,7 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.MediaConsumption;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.MediaConsumption;
 
 /// <summary>
 /// Contains integration tests for the <see cref="MediaConsumptionRecordRepository"/> class, exercising it against a real SQLite database.
@@ -37,11 +37,11 @@ public class MediaConsumptionRecordRepositoryTests
     public async Task InsertAsync_WhenRecordsAreNew_ShouldPersistEveryStoredColumn()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaconsumptionrepo-insert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaconsumptionrepo-insert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         MediaConsumptionRecordRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         Guid libraryId = Guid.NewGuid();
@@ -95,7 +95,7 @@ public class MediaConsumptionRecordRepositoryTests
         Assert.Equal(Result.Created, locationResult.Value);
 
         // A fresh context round-trips the stored rows, which proves the values went through the real provider instead of the identity map.
-        using LuminaDbContext verificationContext = CreateContext(anchorConnection);
+        using NemeraDbContext verificationContext = CreateContext(anchorConnection);
         MediaConsumptionRecordEntity storedTimeOffsetRecord = await verificationContext.MediaConsumptionRecords
             .AsNoTracking()
             .SingleAsync(record => record.Id == timeOffsetRecord.Id);
@@ -145,11 +145,11 @@ public class MediaConsumptionRecordRepositoryTests
     public async Task GetByIdForUserAsync_WhenTheRecordBelongsToTheUser_ShouldReturnTheStoredRecord()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaconsumptionrepo-get-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaconsumptionrepo-get-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         MediaConsumptionRecordRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         MediaConsumptionRecordEntity record = _mediaConsumptionRecordEntityFixture.Create(
@@ -177,12 +177,12 @@ public class MediaConsumptionRecordRepositoryTests
     public async Task GetByIdForUserAsync_WhenTheRecordBelongsToAnotherUser_ShouldReturnNull()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaconsumptionrepo-get-other-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaconsumptionrepo-get-other-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         Guid otherUserId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         MediaConsumptionRecordRepository sut = new(context);
         context.Users.AddRange(_userEntityFixture.Create(id: userId), _userEntityFixture.Create(id: otherUserId));
         MediaConsumptionRecordEntity record = _mediaConsumptionRecordEntityFixture.Create(userId: userId);
@@ -201,11 +201,11 @@ public class MediaConsumptionRecordRepositoryTests
     public async Task GetByIdForUserAsync_WhenEntitiesShouldNotBeTracked_ShouldReturnADetachedInstance()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaconsumptionrepo-get-detached-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaconsumptionrepo-get-detached-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         MediaConsumptionRecordRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         MediaConsumptionRecordEntity record = _mediaConsumptionRecordEntityFixture.Create(userId: userId);
@@ -227,14 +227,14 @@ public class MediaConsumptionRecordRepositoryTests
     public async Task UpdateForUserAsync_WhenNothingChanged_ShouldNotWriteOrBumpTheVersion()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaconsumptionrepo-update-noop-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaconsumptionrepo-update-noop-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         DateTime laterUtcNow = new(2025, 1, 1, 13, 0, 0, DateTimeKind.Utc);
         MediaConsumptionRecordEntity record;
         long storedVersion;
-        using (LuminaDbContext seedContext = CreateAuditedContext(anchorConnection, userId, utcNow))
+        using (NemeraDbContext seedContext = CreateAuditedContext(anchorConnection, userId, utcNow))
         {
             seedContext.Users.Add(_userEntityFixture.Create(id: userId));
             record = _mediaConsumptionRecordEntityFixture.Create(userId: userId, mediaKind: MediaKind.Movie, lastProgressFraction: 0.4);
@@ -242,7 +242,7 @@ public class MediaConsumptionRecordRepositoryTests
             await seedContext.SaveChangesAsync();
             storedVersion = record.Version;
         }
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, laterUtcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, laterUtcNow);
         MediaConsumptionRecordRepository sut = new(context);
         // A detached copy is the shape the command mapping produces for an update, so this is a real no-op round-trip.
         MediaConsumptionRecordEntity incoming = await context.MediaConsumptionRecords
@@ -272,7 +272,7 @@ public class MediaConsumptionRecordRepositoryTests
     public async Task UpdateForUserAsync_WhenEditableValuesChanged_ShouldIncrementTheVersionAndStampTheAudit()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaconsumptionrepo-update-changed-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaconsumptionrepo-update-changed-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
@@ -282,7 +282,7 @@ public class MediaConsumptionRecordRepositoryTests
         DateTime startedOnUtc = new(2025, 1, 1, 8, 0, 0, DateTimeKind.Utc);
         MediaConsumptionRecordEntity record;
         long storedVersion;
-        using (LuminaDbContext seedContext = CreateAuditedContext(anchorConnection, userId, utcNow))
+        using (NemeraDbContext seedContext = CreateAuditedContext(anchorConnection, userId, utcNow))
         {
             seedContext.Users.Add(_userEntityFixture.Create(id: userId));
             record = _mediaConsumptionRecordEntityFixture.Create(
@@ -305,7 +305,7 @@ public class MediaConsumptionRecordRepositoryTests
             await seedContext.SaveChangesAsync();
             storedVersion = record.Version;
         }
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, laterUtcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, laterUtcNow);
         MediaConsumptionRecordRepository sut = new(context);
         DateTime endedOnUtc = new(2025, 1, 1, 11, 0, 0, DateTimeKind.Utc);
         MediaConsumptionRecordEntity incoming = _mediaConsumptionRecordEntityFixture.Create(
@@ -364,13 +364,13 @@ public class MediaConsumptionRecordRepositoryTests
     public async Task UpdateForUserAsync_WhenAnotherContextAlreadyBumpedTheVersion_ShouldThrowDbUpdateConcurrencyException()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaconsumptionrepo-update-concurrency-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaconsumptionrepo-update-concurrency-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         DateTime laterUtcNow = new(2025, 1, 1, 13, 0, 0, DateTimeKind.Utc);
         MediaConsumptionRecordEntity record;
-        using (LuminaDbContext seedContext = CreateAuditedContext(anchorConnection, userId, utcNow))
+        using (NemeraDbContext seedContext = CreateAuditedContext(anchorConnection, userId, utcNow))
         {
             seedContext.Users.Add(_userEntityFixture.Create(id: userId));
             record = _mediaConsumptionRecordEntityFixture.Create(
@@ -382,12 +382,12 @@ public class MediaConsumptionRecordRepositoryTests
             seedContext.MediaConsumptionRecords.Add(record);
             await seedContext.SaveChangesAsync();
         }
-        using LuminaDbContext firstContext = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext firstContext = CreateAuditedContext(anchorConnection, userId, utcNow);
         MediaConsumptionRecordRepository firstSut = new(firstContext);
         Result<MediaConsumptionRecordEntity?> readResult = await firstSut.GetByIdForUserAsync(record.Id, userId, cancellationToken: CancellationToken.None);
         Assert.False(readResult.IsFailure);
         Assert.NotNull(readResult.Value);
-        using LuminaDbContext secondContext = CreateAuditedContext(anchorConnection, userId, laterUtcNow);
+        using NemeraDbContext secondContext = CreateAuditedContext(anchorConnection, userId, laterUtcNow);
         MediaConsumptionRecordRepository secondSut = new(secondContext);
         MediaConsumptionRecordEntity secondIncoming = _mediaConsumptionRecordEntityFixture.Create(
             id: record.Id,
@@ -430,12 +430,12 @@ public class MediaConsumptionRecordRepositoryTests
     public async Task DeleteForUserAsync_WhenTheRecordBelongsToTheUser_ShouldDeleteOnlyThatRow()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaconsumptionrepo-delete-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaconsumptionrepo-delete-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         Guid otherUserId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         MediaConsumptionRecordRepository sut = new(context);
         context.Users.AddRange(_userEntityFixture.Create(id: userId), _userEntityFixture.Create(id: otherUserId));
         MediaConsumptionRecordEntity record = _mediaConsumptionRecordEntityFixture.Create(userId: userId);
@@ -452,7 +452,7 @@ public class MediaConsumptionRecordRepositoryTests
         Assert.Equal(EntityState.Deleted, context.Entry(record).State);
 
         await context.SaveChangesAsync();
-        using LuminaDbContext verificationContext = CreateContext(anchorConnection);
+        using NemeraDbContext verificationContext = CreateContext(anchorConnection);
         Assert.False(await verificationContext.MediaConsumptionRecords.AsNoTracking().AnyAsync(candidate => candidate.Id == record.Id));
         Assert.True(await verificationContext.MediaConsumptionRecords.AsNoTracking().AnyAsync(candidate => candidate.Id == otherUserRecord.Id));
     }
@@ -461,12 +461,12 @@ public class MediaConsumptionRecordRepositoryTests
     public async Task DeleteAllByMediaItemIdForUserAsync_WhenRecordsMatchAllFourParts_ShouldRemoveOnlyTheMatchingRecords()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaconsumptionrepo-delete-item-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaconsumptionrepo-delete-item-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         Guid otherUserId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         MediaConsumptionRecordRepository sut = new(context);
         context.Users.AddRange(_userEntityFixture.Create(id: userId), _userEntityFixture.Create(id: otherUserId));
         Guid libraryId = Guid.NewGuid();
@@ -514,7 +514,7 @@ public class MediaConsumptionRecordRepositoryTests
         Assert.Equal(Result.Deleted, result.Value);
 
         await context.SaveChangesAsync();
-        using LuminaDbContext verificationContext = CreateContext(anchorConnection);
+        using NemeraDbContext verificationContext = CreateContext(anchorConnection);
         List<Guid> remainingRecordIds = await verificationContext.MediaConsumptionRecords
             .AsNoTracking()
             .Select(record => record.Id)
@@ -528,12 +528,12 @@ public class MediaConsumptionRecordRepositoryTests
     public async Task DeleteAllForUserAsync_WhenTheUserHasRecords_ShouldRemoveOnlyTheirRecords()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaconsumptionrepo-delete-user-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaconsumptionrepo-delete-user-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         Guid otherUserId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         MediaConsumptionRecordRepository sut = new(context);
         context.Users.AddRange(_userEntityFixture.Create(id: userId), _userEntityFixture.Create(id: otherUserId));
         MediaConsumptionRecordEntity firstRecord = _mediaConsumptionRecordEntityFixture.Create(userId: userId);
@@ -550,7 +550,7 @@ public class MediaConsumptionRecordRepositoryTests
         Assert.Equal(Result.Deleted, result.Value);
 
         await context.SaveChangesAsync();
-        using LuminaDbContext verificationContext = CreateContext(anchorConnection);
+        using NemeraDbContext verificationContext = CreateContext(anchorConnection);
         List<Guid> remainingRecordIds = await verificationContext.MediaConsumptionRecords
             .AsNoTracking()
             .Select(record => record.Id)
@@ -562,11 +562,11 @@ public class MediaConsumptionRecordRepositoryTests
     public async Task UserDeletion_WhenTheUserOwnsConsumptionRecords_ShouldCascadeToTheRecords()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaconsumptionrepo-cascade-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaconsumptionrepo-cascade-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         UserEntity user = _userEntityFixture.Create(id: userId);
         context.Users.Add(user);
         MediaConsumptionRecordEntity firstRecord = _mediaConsumptionRecordEntityFixture.Create(userId: userId);
@@ -582,7 +582,7 @@ public class MediaConsumptionRecordRepositoryTests
         await context.SaveChangesAsync();
 
         // Assert
-        using LuminaDbContext verificationContext = CreateContext(anchorConnection);
+        using NemeraDbContext verificationContext = CreateContext(anchorConnection);
         Assert.False(await verificationContext.MediaConsumptionRecords.AsNoTracking().AnyAsync(record => record.UserId == userId));
     }
 
@@ -593,13 +593,13 @@ public class MediaConsumptionRecordRepositoryTests
     /// <param name="userId">The Id of the user reported as the current user.</param>
     /// <param name="utcNow">The current UTC time reported by the time provider.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
+    private static NemeraDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
     {
         ICurrentUserService currentUserService = Substitute.For<ICurrentUserService>();
         currentUserService.UserId.Returns(userId);
         IDateTimeProvider dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(utcNow);
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .AddInterceptors(new UpdateAuditableEntitiesInterceptor(currentUserService, dateTimeProvider))
             .Options);
@@ -612,9 +612,9 @@ public class MediaConsumptionRecordRepositoryTests
     /// </summary>
     /// <param name="anchorConnection">The open in-memory SQLite connection that keeps the database alive for the duration of the test.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateContext(SqliteConnection anchorConnection)
+    private static NemeraDbContext CreateContext(SqliteConnection anchorConnection)
     {
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .Options);
         context.Database.EnsureCreated();
@@ -627,7 +627,7 @@ public class MediaConsumptionRecordRepositoryTests
     /// <param name="context">The context to read through.</param>
     /// <param name="recordId">The Id of the record to read.</param>
     /// <returns>The stored media kind and status names.</returns>
-    private static async Task<(string MediaKind, string Status)> ReadStoredEnumColumnsAsync(LuminaDbContext context, Guid recordId)
+    private static async Task<(string MediaKind, string Status)> ReadStoredEnumColumnsAsync(NemeraDbContext context, Guid recordId)
     {
         string mediaKind = await context.Database
             .SqlQueryRaw<string>("SELECT MediaKind AS \"Value\" FROM MediaConsumptionRecords WHERE Id = {0}", recordId)

@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Common.Mapping.Themes;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Themes;
-using Lumina.Contracts.Responses.Themes;
-using Lumina.Domain.SharedKernel.Common.Enums.Themes;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Common.Mapping.Themes;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Themes;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.Domain.SharedKernel.Common.Enums.Themes;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.Themes;
+namespace Nemera.Application.UnitTests.Common.Mapping.Themes;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ThemeEntityMapping"/> class.

@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaConsumption.Queries.GetRecentlyConsumed;
-using Lumina.Application.Fixtures.Core.MediaConsumption.Queries.GetRecentlyConsumed;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Core.MediaConsumption.Queries.GetRecentlyConsumed;
+using Nemera.Application.Fixtures.Core.MediaConsumption.Queries.GetRecentlyConsumed;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.MediaConsumption.Queries.GetRecentlyConsumed;
+namespace Nemera.Application.UnitTests.Core.MediaConsumption.Queries.GetRecentlyConsumed;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetRecentlyConsumedQueryValidator"/> class.

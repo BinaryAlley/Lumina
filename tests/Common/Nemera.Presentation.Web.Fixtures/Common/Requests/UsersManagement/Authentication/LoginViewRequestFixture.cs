@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Presentation.Web.Common.Requests.UsersManagement.Authentication;
+using Nemera.Presentation.Web.Common.Requests.UsersManagement.Authentication;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement.Authentication;
+namespace Nemera.Presentation.Web.Fixtures.Common.Requests.UsersManagement.Authentication;
 
 /// <summary>
 /// Fixture class for the <see cref="LoginViewRequest"/> record.

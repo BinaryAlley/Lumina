@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Primitives;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Themes;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Themes;
+namespace Nemera.Presentation.Web.UnitTests.Core.Themes;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ThemePageRenderer"/> class.
@@ -66,10 +66,10 @@ public class ThemePageRendererTests
     public async Task RenderAsync_WhenThemeIdMissing_ShouldResolveCurrentThemeBeforeRendering()
     {
         // Arrange
-        ThemeResponseDto currentTheme = _themeResponseDtoFixture.Create(themeId: "lumina-default");
+        ThemeResponseDto currentTheme = _themeResponseDtoFixture.Create(themeId: "nemera-default");
         string pageKey = "home/index";
         string expectedEndpoint = ApiRoutes.Themes.GET_THEME_TEMPLATE
-            .Replace("{themeId}", "lumina-default")
+            .Replace("{themeId}", "nemera-default")
             .Replace("{*pageKey}", pageKey);
         _mockApiHttpClient.GetAsync<ThemeResponseDto>(ApiRoutes.Themes.GET_CURRENT_THEME, Arg.Any<CancellationToken>())
             .Returns(currentTheme);
@@ -82,7 +82,7 @@ public class ThemePageRendererTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal("lumina-default", model.ThemeId);
+        Assert.Equal("nemera-default", model.ThemeId);
         Assert.Equal("Home", result.Value.Content);
         await _mockApiHttpClient.Received(1).GetAsync<ThemeResponseDto>(ApiRoutes.Themes.GET_CURRENT_THEME, Arg.Any<CancellationToken>());
     }

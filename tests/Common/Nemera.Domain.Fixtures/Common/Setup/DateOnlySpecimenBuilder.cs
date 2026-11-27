@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Domain.Fixtures.Common.Setup;
+namespace Nemera.Domain.Fixtures.Common.Setup;
 
 /// <summary>
 /// Represents a specimen builder for the <see cref="DateOnly"/> type.

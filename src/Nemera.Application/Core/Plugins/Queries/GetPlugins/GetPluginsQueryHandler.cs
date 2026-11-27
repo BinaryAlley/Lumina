@@ -1,20 +1,20 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Mapping.Plugins;
-using Lumina.Contracts.Responses.Plugins;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Repositories.Plugins;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Mapping.Plugins;
+using Nemera.Contracts.Responses.Plugins;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.Plugins.Queries.GetPlugins;
+namespace Nemera.Application.Core.Plugins.Queries.GetPlugins;
 
 /// <summary>
 /// Handler for the query to get all the detected plugins.

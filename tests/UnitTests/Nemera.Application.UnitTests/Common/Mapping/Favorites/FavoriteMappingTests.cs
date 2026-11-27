@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Common.Mapping.Favorites;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FavoriteBoundedContext.ExternalIdentifiers.MediaLibraryBoundedContext.MediaItemAggregate;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FavoriteBoundedContext.ExternalIdentifiers.UserManagementBoundedContext.UserAggregate;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Application.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Common.Mapping.Favorites;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FavoriteBoundedContext.ExternalIdentifiers.MediaLibraryBoundedContext.MediaItemAggregate;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FavoriteBoundedContext.ExternalIdentifiers.UserManagementBoundedContext.UserAggregate;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.Favorites;
+namespace Nemera.Application.UnitTests.Common.Mapping.Favorites;
 
 /// <summary>
 /// Contains unit tests for the <see cref="FavoriteMapping"/> class.

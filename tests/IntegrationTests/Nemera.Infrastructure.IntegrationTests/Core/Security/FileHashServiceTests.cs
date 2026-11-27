@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
-using Lumina.Application.Fixtures.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
-using Lumina.Infrastructure.Core.Security;
+using Nemera.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
+using Nemera.Application.Fixtures.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
+using Nemera.Infrastructure.Core.Security;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.IntegrationTests.Core.Security;
+namespace Nemera.Infrastructure.IntegrationTests.Core.Security;
 
 /// <summary>
 /// Contains integration tests for the <see cref="FileHashService"/> class.
@@ -232,7 +232,7 @@ public class FileHashServiceTests
 
         public TemporaryTestDirectory()
         {
-            Path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"lumina-file-hash-tests-{Guid.NewGuid()}");
+            Path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"nemera-file-hash-tests-{Guid.NewGuid()}");
             Directory.CreateDirectory(Path);
         }
 

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Application.Core.Plugins.Commands.UpdatePluginSettings;
+namespace Nemera.Application.Core.Plugins.Commands.UpdatePluginSettings;
 
 /// <summary>
 /// Command for updating the settings of a plugin.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Common;
 using System;
 using System.Net;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Exceptions;
+namespace Nemera.Presentation.Web.Common.Exceptions;
 
 /// <summary>
 /// Custom exception for interaction with the remote API.

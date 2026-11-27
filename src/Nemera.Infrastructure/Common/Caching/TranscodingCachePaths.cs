@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Caching;
+namespace Nemera.Infrastructure.Common.Caching;
 
 /// <summary>
 /// Provides the location, the ownership marker and the permissions of the temporary directory into which the audio normalization pipeline writes the normalized audio.
@@ -16,12 +16,12 @@ internal static class TranscodingCachePaths
     /// <summary>
     /// The name of the temporary directory that is used when no cache directory is configured.
     /// </summary>
-    public const string DEFAULT_DIRECTORY_NAME = "lumina-transcoding-cache";
+    public const string DEFAULT_DIRECTORY_NAME = "nemera-transcoding-cache";
 
     /// <summary>
     /// The name of the file that marks a directory as a normalized audio cache created and owned by this application.
     /// </summary>
-    public const string CACHE_MARKER_FILE_NAME = ".lumina-transcoding-cache";
+    public const string CACHE_MARKER_FILE_NAME = ".nemera-transcoding-cache";
 
     /// <summary>
     /// The prefix of the temporary directories of the normalization jobs that have not been published to the cache yet.
@@ -81,7 +81,7 @@ internal static class TranscodingCachePaths
     {
         if (HasCacheMarker(directoryPath))
             return;
-        File.WriteAllText(Path.Combine(directoryPath, CACHE_MARKER_FILE_NAME), "Lumina normalized audio cache." + Environment.NewLine);
+        File.WriteAllText(Path.Combine(directoryPath, CACHE_MARKER_FILE_NAME), "Nemera normalized audio cache." + Environment.NewLine);
     }
 
     /// <summary>

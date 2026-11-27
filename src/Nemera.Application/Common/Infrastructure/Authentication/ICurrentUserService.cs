@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Authentication;
+namespace Nemera.Application.Common.Infrastructure.Authentication;
 
 /// <summary>
 /// Defines a contract for accessing the current user's information.

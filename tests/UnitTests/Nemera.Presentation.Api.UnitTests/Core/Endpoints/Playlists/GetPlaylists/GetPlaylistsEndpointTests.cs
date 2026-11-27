@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Playlists.Queries.GetPlaylists;
-using Lumina.Contracts.Fixtures.Core.Responses.Playlists;
-using Lumina.Contracts.Responses.Playlists;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Playlists.GetPlaylists;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Playlists.Queries.GetPlaylists;
+using Nemera.Contracts.Fixtures.Core.Responses.Playlists;
+using Nemera.Contracts.Responses.Playlists;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Playlists.GetPlaylists;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +14,10 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Playlists.GetPlaylists;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Playlists.GetPlaylists;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetPlaylistsEndpoint"/> class.

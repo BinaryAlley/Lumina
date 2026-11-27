@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.DTO.Libraries;
-using Lumina.Presentation.Web.Common.Enums.Common;
-using Lumina.Presentation.Web.Common.Requests.Libraries;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetLibraryItems;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Libraries;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Libraries;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Common.Enums.Common;
+using Nemera.Presentation.Web.Common.Requests.Libraries;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetLibraryItems;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Libraries;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System;
@@ -21,7 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetLibraryItems;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetLibraryItems;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetLibraryItemsEndpoint"/> class.

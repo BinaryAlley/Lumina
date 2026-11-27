@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Domain.UnitTests.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+namespace Nemera.Domain.UnitTests.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 
 /// <summary>
 /// Contains unit tests for the <see cref="LibraryPathPart"/> class.
@@ -51,7 +51,7 @@ public class LibraryPathPartTests
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(Lumina.Domain.Common.Errors.Errors.Library.PathTemplateLiteralCannotBeEmpty, result.FirstError);
+        Assert.Equal(Nemera.Domain.Common.Errors.Errors.Library.PathTemplateLiteralCannotBeEmpty, result.FirstError);
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public class LibraryPathPartTests
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(Lumina.Domain.Common.Errors.Errors.Library.PathTemplateValuePartMustContainSinglePlaceholder, result.FirstError);
+        Assert.Equal(Nemera.Domain.Common.Errors.Errors.Library.PathTemplateValuePartMustContainSinglePlaceholder, result.FirstError);
     }
 
     [Fact]

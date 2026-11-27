@@ -11,7 +11,7 @@ using System.IO;
 using System.Security.Claims;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+namespace Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 
 /// <summary>
 /// Factory for creating and configuring <see cref="HttpContext"/> instances for unit testing Web endpoints.

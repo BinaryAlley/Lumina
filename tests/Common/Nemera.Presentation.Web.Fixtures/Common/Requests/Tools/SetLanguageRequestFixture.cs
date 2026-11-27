@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Presentation.Web.Common.Requests.Tools;
+using Nemera.Presentation.Web.Common.Requests.Tools;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Tools;
+namespace Nemera.Presentation.Web.Fixtures.Common.Requests.Tools;
 
 /// <summary>
 /// Fixture class for the <see cref="SetLanguageRequest"/> record.

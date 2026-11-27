@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Calibre.Common.Models.DTO.Opf;
-using Lumina.Plugins.Calibre.Core.Opf;
+using Nemera.Plugins.Calibre.Common.Models.DTO.Opf;
+using Nemera.Plugins.Calibre.Core.Opf;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 #endregion
 
-namespace Lumina.Plugins.Calibre.IntegrationTests.Core.Opf;
+namespace Nemera.Plugins.Calibre.IntegrationTests.Core.Opf;
 
 /// <summary>
 /// Contains integration tests for the <see cref="OpfReader"/> class.

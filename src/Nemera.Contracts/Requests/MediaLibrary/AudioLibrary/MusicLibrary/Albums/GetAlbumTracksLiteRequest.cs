@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+namespace Nemera.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 
 /// <summary>
 /// Represents a request to get the lightweight read models of the tracks of an album.

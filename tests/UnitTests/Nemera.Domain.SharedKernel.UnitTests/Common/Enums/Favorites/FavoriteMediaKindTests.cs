@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.UnitTests.Common.Enums.Favorites;
+namespace Nemera.Domain.SharedKernel.UnitTests.Common.Enums.Favorites;
 
 /// <summary>
 /// Contains unit tests for the <see cref="FavoriteMediaKind"/> enumeration.

@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.GetMusicAlbum;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.GetMusicAlbum;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -13,22 +13,22 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.GetMusicAlbum;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.GetMusicAlbum;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetMusicAlbumEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetMusicAlbumEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetMusicAlbumEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly MusicAlbumDtoFixture _musicAlbumDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetMusicAlbumEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetMusicAlbumEndpointTests(LuminaWebFactory apiFactory)
+    public GetMusicAlbumEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

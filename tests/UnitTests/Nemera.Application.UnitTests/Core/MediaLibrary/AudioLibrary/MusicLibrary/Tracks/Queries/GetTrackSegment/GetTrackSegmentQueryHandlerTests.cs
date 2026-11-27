@@ -1,27 +1,27 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Queries.GetTrackSegment;
-using Lumina.Application.Fixtures.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Queries.GetTrackSegment;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Queries.GetTrackSegment;
+using Nemera.Application.Fixtures.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Queries.GetTrackSegment;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Queries.GetTrackSegment;
+namespace Nemera.Application.UnitTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Queries.GetTrackSegment;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetTrackSegmentQueryHandler"/> class.
@@ -58,7 +58,7 @@ public class GetTrackSegmentQueryHandlerTests
         _mockPathService = Substitute.For<IPathService>();
         _mockValidator = Substitute.For<IValidator<GetTrackSegmentQuery>>();
         _userId = Guid.NewGuid();
-        _allowedRoot = Path.Combine(Path.GetTempPath(), "lumina-tests", "music");
+        _allowedRoot = Path.Combine(Path.GetTempPath(), "nemera-tests", "music");
 
         // Default stubs: the user is authenticated, the library ownership policy allows access, the query validates and the source path is inside an allowed root.
         _mockCurrentUserService.UserId.Returns(_userId);

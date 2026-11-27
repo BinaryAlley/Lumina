@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.Authorization;
-using Lumina.Presentation.Web.Common.DTO.Plugins;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Common;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.Authorization;
+using Nemera.Presentation.Web.Common.DTO.Plugins;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Plugins.Index;
+namespace Nemera.Presentation.Web.Core.Endpoints.Plugins.Index;
 
 /// <summary>
 /// API endpoint for the <c>/{culture}/admin/manage-plugins</c> route.
@@ -55,7 +55,7 @@ public class PluginsIndexViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
         Dictionary<Guid, PluginSettingsDto> settingsByPluginId = [];
         foreach (PluginDto plugin in plugins)
         {
-            if (plugin.LoadStatus == Lumina.Presentation.Web.Common.Enums.Plugins.PluginLoadStatus.Loaded)
+            if (plugin.LoadStatus == Nemera.Presentation.Web.Common.Enums.Plugins.PluginLoadStatus.Loaded)
             {
                 PluginSettingsDto pluginSettings = await _apiHttpClient.GetAsync<PluginSettingsDto>(ApiRoutes.Plugins.GET_PLUGIN_SETTINGS.Replace("{pluginId}", plugin.Id.ToString()), cancellationToken).ConfigureAwait(false);
                 // A plugin that exposes an empty settings schema has nothing to configure, so it is left out of the map the view renders

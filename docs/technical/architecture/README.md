@@ -1,6 +1,6 @@
 # Architecture Diagrams
 
-This folder contains the C4 architecture diagrams of Lumina. Every diagram is maintained as a PlantUML source file (`.puml`) and rendered to a committed SVG (`.svg`) with the same base name.
+This folder contains the C4 architecture diagrams of Nemera. Every diagram is maintained as a PlantUML source file (`.puml`) and rendered to a committed SVG (`.svg`) with the same base name.
 
 ## Layout
 

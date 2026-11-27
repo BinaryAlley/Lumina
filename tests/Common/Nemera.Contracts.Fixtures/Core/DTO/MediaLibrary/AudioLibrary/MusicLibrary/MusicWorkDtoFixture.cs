@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.Common;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+namespace Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 
 /// <summary>
 /// Fixture class for the <see cref="MusicWorkDto"/> record.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Albums;
-using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.SaveMusicAlbum;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.AudioLibrary.MusicLibrary.Albums;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Albums;
+using Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.SaveMusicAlbum;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Library.AudioLibrary.MusicLibrary.Albums;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -16,15 +16,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.SaveMusicAlbum;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.SaveMusicAlbum;
 
 /// <summary>
 /// Contains integration tests for the <see cref="SaveMusicAlbumEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class SaveMusicAlbumEndpointTests : IClassFixture<LuminaWebFactory>
+public class SaveMusicAlbumEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly UpdateMusicAlbumRequestFixture _updateMusicAlbumRequestFixture = new();
     private readonly MusicAlbumDtoFixture _musicAlbumDtoFixture = new();
 
@@ -32,7 +32,7 @@ public class SaveMusicAlbumEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="SaveMusicAlbumEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public SaveMusicAlbumEndpointTests(LuminaWebFactory apiFactory)
+    public SaveMusicAlbumEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

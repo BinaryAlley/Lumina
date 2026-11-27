@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.Plugins;
+namespace Nemera.Contracts.Requests.Plugins;
 
 /// <summary>
 /// Represents a request to get the artwork providers available for a media library type.

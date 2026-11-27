@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Plugins;
+namespace Nemera.Presentation.Web.Common.DTO.Plugins;
 
 /// <summary>
 /// Data transfer object for a book reader configured for a media library.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.DataAccess.Common.Persistence;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.DataAccess.Common.Persistence;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.Common.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -14,22 +14,22 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Libraries;
+namespace Nemera.DataAccess.Core.Repositories.Libraries;
 
 /// <summary>
 /// Repository for media library scans.
 /// </summary>
 internal sealed class LibraryScanRepository : ILibraryScanRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryScanRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public LibraryScanRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public LibraryScanRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -40,12 +40,12 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(LibraryScanEntity libraryScan, CancellationToken cancellationToken)
     {
-        bool doesLibraryScanExist = await _luminaDbContext.LibraryScans.AnyAsync(
+        bool doesLibraryScanExist = await _nemeraDbContext.LibraryScans.AnyAsync(
             repositoryScanLibrary => repositoryScanLibrary.Id == libraryScan.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (doesLibraryScanExist)
             return Errors.LibraryScanning.LibraryScanAlreadyExists;
 
-        _luminaDbContext.LibraryScans.Add(libraryScan);
+        _nemeraDbContext.LibraryScans.Add(libraryScan);
         return Result.Created;
     }
 
@@ -59,7 +59,7 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="LibraryScanEntity"/> identified by <paramref name="id"/>, or an error.</returns>
     public async Task<Result<LibraryScanEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
-        IQueryable<LibraryScanEntity> query = _luminaDbContext.LibraryScans;
+        IQueryable<LibraryScanEntity> query = _nemeraDbContext.LibraryScans;
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         if (shouldIncludeNavigationProperties)
@@ -78,7 +78,7 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryScanEntity"/>, or an error.</returns>
     public async Task<Result<IEnumerable<LibraryScanEntity>>> GetPastMonthScansByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.LibraryScans
+        return await _nemeraDbContext.LibraryScans
             .Include(library => library.Library)
             .AsSplitQuery()
             .Where(library => library.LibraryId == libraryId && library.CreatedOnUtc >= DateTime.UtcNow.AddMonths(-1))
@@ -93,7 +93,7 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryScanEntity"/>, or an error.</returns>
     public async Task<Result<IEnumerable<LibraryScanEntity>>> GetActiveScansAsync(CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.LibraryScans
+        return await _nemeraDbContext.LibraryScans
             .Include(library => library.Library)
             .AsSplitQuery()
             .Where(library => library.Status == LibraryScanJobStatus.Pending || library.Status == LibraryScanJobStatus.Running)
@@ -108,14 +108,14 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpdateAsync(LibraryScanEntity data, CancellationToken cancellationToken)
     {
-        LibraryScanEntity? foundLibraryScan = await _luminaDbContext.LibraryScans
+        LibraryScanEntity? foundLibraryScan = await _nemeraDbContext.LibraryScans
             .Include(libraryScan => libraryScan.Library)
             .AsSplitQuery()
             .FirstOrDefaultAsync(libraryScan => libraryScan.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundLibraryScan is null)
             return Errors.LibraryScanning.LibraryScanNotFound;
         // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
-        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundLibraryScan, data);
+        EditableValuesCopier.CopyEditableValues(_nemeraDbContext, foundLibraryScan, data);
         return Result.Updated;
     }
 
@@ -129,7 +129,7 @@ internal sealed class LibraryScanRepository : ILibraryScanRepository
     {
         // The scans that were pending or running when the application stopped cannot survive the restart, because their jobs,
         // progress and cancellation tokens live only in memory, so they are marked as failed and can be triggered again.
-        await _luminaDbContext.LibraryScans
+        await _nemeraDbContext.LibraryScans
             .Where(libraryScan => libraryScan.Status == LibraryScanJobStatus.Pending || libraryScan.Status == LibraryScanJobStatus.Running)
             .ExecuteUpdateAsync(setters => setters.SetProperty(libraryScan => libraryScan.Status, LibraryScanJobStatus.Failed), cancellationToken).ConfigureAwait(false);
         return Result.Updated;

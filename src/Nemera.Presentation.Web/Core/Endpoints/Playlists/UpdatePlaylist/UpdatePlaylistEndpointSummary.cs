@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.DTO.Playlists;
-using Lumina.Presentation.Web.Common.Requests.Playlists;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Playlists;
+using Nemera.Presentation.Web.Common.Requests.Playlists;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Playlists.UpdatePlaylist;
+namespace Nemera.Presentation.Web.Core.Endpoints.Playlists.UpdatePlaylist;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="UpdatePlaylistEndpoint"/> endpoint, for OpenAPI.

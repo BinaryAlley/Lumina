@@ -1,26 +1,26 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.UpdateAlbum;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.UpdateAlbum;
-using Lumina.Contracts.Fixtures.Core.DTO.Common;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Repositories.MediaContributors;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.MusicLibrary;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.UpdateAlbum;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.UpdateAlbum;
+using Nemera.Contracts.Fixtures.Core.DTO.Common;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaContributors;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -28,10 +28,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.UpdateAlbum;
+namespace Nemera.Application.UnitTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.UpdateAlbum;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdateAlbumCommandHandler"/> class.

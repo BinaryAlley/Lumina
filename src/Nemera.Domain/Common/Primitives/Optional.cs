@@ -1,4 +1,4 @@
-namespace Lumina.Domain.Common.Primitives;
+namespace Nemera.Domain.Common.Primitives;
 
 /// <summary>
 /// Primitive struct for explicitly handling cases when a value might be unknown or not applicable, 

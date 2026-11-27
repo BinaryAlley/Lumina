@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserRole;
-using Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetUserRole;
-using Lumina.Application.Common.Errors;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Core.UsersManagement.Authorization.Queries.GetUserRole;
+using Nemera.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetUserRole;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetUserRole;
+namespace Nemera.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetUserRole;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetUserRoleQueryValidator"/> class.

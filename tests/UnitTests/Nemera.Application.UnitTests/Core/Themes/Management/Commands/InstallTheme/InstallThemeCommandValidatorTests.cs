@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Themes.Management.Commands.InstallTheme;
-using Lumina.Application.Fixtures.Core.Themes.Management.Commands.InstallTheme;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Core.Themes.Management.Commands.InstallTheme;
+using Nemera.Application.Fixtures.Core.Themes.Management.Commands.InstallTheme;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Themes.Management.Commands.InstallTheme;
+namespace Nemera.Application.UnitTests.Core.Themes.Management.Commands.InstallTheme;
 
 /// <summary>
 /// Contains unit tests for the <see cref="InstallThemeCommandValidator"/> class.

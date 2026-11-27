@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 #endregion
 
-namespace Lumina.Application.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
+namespace Nemera.Application.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
 
 /// <summary>
 /// Command for updating the playback state the player reports for the current user automatically. These values are not part of the settings the user edits.

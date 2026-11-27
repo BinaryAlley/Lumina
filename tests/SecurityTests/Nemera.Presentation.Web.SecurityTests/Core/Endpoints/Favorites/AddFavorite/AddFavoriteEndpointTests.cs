@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Favorites;
-using Lumina.Presentation.Web.Common.Enums.Favorites;
-using Lumina.Presentation.Web.Core.Endpoints.Favorites.AddFavorite;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Favorites;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Favorites;
+using Nemera.Presentation.Web.Common.Enums.Favorites;
+using Nemera.Presentation.Web.Core.Endpoints.Favorites.AddFavorite;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Favorites;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,25 +17,25 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Favorites.AddFavorite;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Favorites.AddFavorite;
 
 /// <summary>
 /// Contains security tests for the <see cref="AddFavoriteEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AddFavoriteEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class AddFavoriteEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string WEB_ROUTE = "/en-us/favorites/api-add-favorite";
     private const string UPSTREAM_ENDPOINT = "users/me/favorites";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly FavoriteDtoFixture _favoriteDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddFavoriteEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public AddFavoriteEndpointTests(LuminaWebFactory apiFactory)
+    public AddFavoriteEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -113,7 +113,7 @@ public class AddFavoriteEndpointTests : IClassFixture<LuminaWebFactory>, IDispos
         Assert.DoesNotContain(payload, content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
     }
 
@@ -140,7 +140,7 @@ public class AddFavoriteEndpointTests : IClassFixture<LuminaWebFactory>, IDispos
         Assert.DoesNotContain(payload, content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
     }
 
@@ -165,7 +165,7 @@ public class AddFavoriteEndpointTests : IClassFixture<LuminaWebFactory>, IDispos
         Assert.Single(GetAddRequests());
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     /// <summary>

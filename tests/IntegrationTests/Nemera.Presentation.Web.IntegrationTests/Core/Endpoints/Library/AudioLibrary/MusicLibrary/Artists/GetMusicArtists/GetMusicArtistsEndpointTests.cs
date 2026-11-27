@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.GetMusicArtists;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.GetMusicArtists;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -15,15 +15,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.GetMusicArtists;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.GetMusicArtists;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetMusicArtistsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetMusicArtistsEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetMusicArtistsEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly PaginatedDtoFixture<MusicArtistLiteDto> _paginatedMusicArtistLiteDtoFixture = new();
     private readonly MusicArtistLiteDtoFixture _musicArtistLiteDtoFixture = new();
 
@@ -31,7 +31,7 @@ public class GetMusicArtistsEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="GetMusicArtistsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetMusicArtistsEndpointTests(LuminaWebFactory apiFactory)
+    public GetMusicArtistsEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

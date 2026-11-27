@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.Core.Api;
+namespace Nemera.Plugins.CoverArtArchive.Core.Api;
 
 /// <summary>
 /// In-memory cache of the responses returned by the Cover Art Archive API, keyed by the requested URL.

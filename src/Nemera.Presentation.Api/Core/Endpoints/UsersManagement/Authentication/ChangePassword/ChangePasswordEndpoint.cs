@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.Authentication;
-using Lumina.Application.Core.UsersManagement.Authentication.Commands.ChangePassword;
-using Lumina.Contracts.Requests.Authentication;
-using Lumina.Contracts.Responses.Authentication;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.UsersManagement;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.Authentication;
+using Nemera.Application.Core.UsersManagement.Authentication.Commands.ChangePassword;
+using Nemera.Contracts.Requests.Authentication;
+using Nemera.Contracts.Responses.Authentication;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.UsersManagement;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
+namespace Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
 
 /// <summary>
 /// API endpoint for the <c>/auth/change-password</c> route.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Events;
+using Nemera.Domain.Common.Events;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
+namespace Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
 
 /// <summary>
 /// Domain event raised when a libary is deleted.

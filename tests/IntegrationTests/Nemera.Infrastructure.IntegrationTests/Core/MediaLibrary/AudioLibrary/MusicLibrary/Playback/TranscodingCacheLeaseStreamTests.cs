@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Infrastructure.Fixtures.Common.Models.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Infrastructure.Fixtures.Common.Models.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.IntegrationTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Infrastructure.IntegrationTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Contains integration tests for the <see cref="TranscodingCacheLeaseStream"/> class.
@@ -27,7 +27,7 @@ public class TranscodingCacheLeaseStreamTests : IDisposable
     /// </summary>
     public TranscodingCacheLeaseStreamTests()
     {
-        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"lumina-transcoding-cache-stream-{Guid.NewGuid():N}");
+        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"nemera-transcoding-cache-stream-{Guid.NewGuid():N}");
         _cacheRoot = Path.Combine(_temporaryDirectory, "cache");
         Directory.CreateDirectory(_cacheRoot);
         _coordinator = TranscodingCacheCoordinator.AcquireForRoot(_cacheRoot);

@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.Core.Api;
+namespace Nemera.Plugins.MusicBrainz.Core.Api;
 
 /// <summary>
 /// Spaces out the requests sent to the MusicBrainz web service, so the configured minimum request interval is respected across every caller in the process.

@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Fixtures.Responses.Common;
-using Lumina.Contracts.Responses.Common;
-using Lumina.Contracts.Responses.Playlists;
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Contracts.Fixtures.Responses.Common;
+using Nemera.Contracts.Responses.Common;
+using Nemera.Contracts.Responses.Playlists;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Responses.Playlists;
+namespace Nemera.Contracts.Fixtures.Core.Responses.Playlists;
 
 /// <summary>
 /// Fixture class for the <see cref="PlaylistResponse"/> record.

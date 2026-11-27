@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Common;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
+namespace Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
 
 /// <summary>
 /// Fixture class for the <see cref="ProblemDetailsDto"/> class.

@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Core.Repositories.Users;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Core.Repositories.Users;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -20,7 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.Users;
+namespace Nemera.DataAccess.UnitTests.Core.Repositories.Users;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UserRepository"/> class.
@@ -28,7 +28,7 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.Users;
 [ExcludeFromCodeCoverage]
 public class UserRepositoryTests
 {
-    private readonly LuminaDbContext _mockContext;
+    private readonly NemeraDbContext _mockContext;
     private readonly UserRepository _sut;
     private readonly UserEntityFixture _userEntityFixture = new();
     private readonly PermissionEntityFixture _permissionEntityFixture = new();
@@ -41,7 +41,7 @@ public class UserRepositoryTests
     /// </summary>
     public UserRepositoryTests()
     {
-        _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
+        _mockContext = Create.MockedDbContextFor<NemeraDbContext>();
         _sut = new UserRepository(_mockContext);
     }
 

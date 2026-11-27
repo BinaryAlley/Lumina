@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.MediaLibrary.Management;
+namespace Nemera.Contracts.Requests.MediaLibrary.Management;
 
 /// <summary>
 /// Represents a request to delete a media library by its Id.

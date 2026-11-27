@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.Common;
+using Nemera.Contracts.Responses.Common;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Contracts.UnitTests.Responses.Common;
+namespace Nemera.Contracts.UnitTests.Responses.Common;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PaginatedResponse{TData}"/> record.

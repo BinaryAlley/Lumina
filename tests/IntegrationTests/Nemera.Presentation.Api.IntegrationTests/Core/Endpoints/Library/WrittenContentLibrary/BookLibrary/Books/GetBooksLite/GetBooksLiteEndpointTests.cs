@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Responses.Common;
-using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Responses.Common;
+using Nemera.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -23,16 +23,16 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBooksLite;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBooksLite;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetBooksLiteEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -46,7 +46,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     /// Initializes a new instance of the <see cref="GetBooksLiteEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetBooksLiteEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetBooksLiteEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -544,7 +544,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private async Task SeedBookAsync(Guid libraryId, string title, string? originalTitle = null)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         dbContext.Books.Add(_bookEntityFixture.Create(libraryId: libraryId, title: title, originalTitle: originalTitle, path: $"/books/{Guid.NewGuid()}.epub", includeMetadata: false));
         await dbContext.SaveChangesAsync();
     }
@@ -558,7 +558,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private async Task SeedLibraryAsync(Guid libraryId, Guid userId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []));
         await dbContext.SaveChangesAsync();
     }
@@ -570,7 +570,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private async Task<Guid> SeedUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: $"otheruser_{Guid.NewGuid()}", password: "TestPass123!"));
         await dbContext.SaveChangesAsync();
@@ -584,7 +584,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private Guid GetCurrentUserId()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         UserEntity user = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername);
         return user.Id;
     }

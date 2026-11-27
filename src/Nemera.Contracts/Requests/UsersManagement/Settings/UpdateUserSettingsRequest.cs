@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.UsersManagement.Settings;
+namespace Nemera.Contracts.Requests.UsersManagement.Settings;
 
 /// <summary>
 /// Represents a request to update the settings of the current user.

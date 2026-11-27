@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Queries.GetTrackSegment;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.DependencyInjection;
-using Lumina.Presentation.Api.Common.Http;
-using Lumina.Presentation.Api.Common.MimeTypes;
-using Lumina.Presentation.Api.Common.Routes.Library.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Queries.GetTrackSegment;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.DependencyInjection;
+using Nemera.Presentation.Api.Common.Http;
+using Nemera.Presentation.Api.Common.MimeTypes;
+using Nemera.Presentation.Api.Common.Routes.Library.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Globalization;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackSegment;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackSegment;
 
 /// <summary>
 /// API endpoint for the <c>/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}/stream/deliveries/{deliveryId}/segments/{segmentIndex}</c> route.
@@ -24,9 +24,9 @@ namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibra
 public class GetTrackSegmentEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
     // The name is repeated in the web client application, which is a separate project that keeps its own contracts, so both sides must change together.
-    private const string SEGMENT_COUNT_HEADER_NAME = "X-Lumina-Segment-Count";
+    private const string SEGMENT_COUNT_HEADER_NAME = "X-Nemera-Segment-Count";
     private const string SEGMENT_START_SECONDS_HEADER_NAME = "X-Segment-Start-Seconds";
-    private const string TRACK_DURATION_SECONDS_HEADER_NAME = "X-Lumina-Track-Duration-Seconds";
+    private const string TRACK_DURATION_SECONDS_HEADER_NAME = "X-Nemera-Track-Duration-Seconds";
 
     private readonly IQueryHandler<GetTrackSegmentQuery, Result<NormalizedTrackSegmentDataDto>> _getTrackSegmentQueryHandler;
 

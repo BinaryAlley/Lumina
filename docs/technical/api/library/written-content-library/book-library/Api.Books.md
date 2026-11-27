@@ -1,6 +1,6 @@
-# Lumina API
+# Nemera API
 
-- [Lumina API](#lumina-api)
+- [Nemera API](#nemera-api)
   - [Book](#book)
     - [Add Book](#add-book)
       - [Add Book Request](#add-book-request)
@@ -736,14 +736,14 @@ Updates the cover image of the book identified by `bookId` with the image upload
 
 ```js
 PUT api/v1/libraries/3b3a19f3-1f5a-4d5a-9a3a-5c5a4a3a2a1a/books/{bookId}/cover
-Content-Type: multipart/form-data; boundary=LuminaBoundary
+Content-Type: multipart/form-data; boundary=NemeraBoundary
 
---LuminaBoundary
+--NemeraBoundary
 Content-Disposition: form-data; name="cover"; filename="cover.jpg"
 Content-Type: image/jpeg
 
 < ./cover.jpg
---LuminaBoundary--
+--NemeraBoundary--
 ```
 
 #### Update Book Cover Response

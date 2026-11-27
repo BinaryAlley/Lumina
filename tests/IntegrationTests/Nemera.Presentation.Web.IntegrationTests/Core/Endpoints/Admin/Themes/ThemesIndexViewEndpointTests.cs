@@ -1,31 +1,31 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Themes;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Themes;
 
 /// <summary>
 /// Contains integration tests for the <see cref="ThemesIndexViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class ThemesIndexViewEndpointTests : IClassFixture<LuminaWebFactory>
+public class ThemesIndexViewEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly ThemeResponseDtoFixture _themeResponseDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ThemesIndexViewEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public ThemesIndexViewEndpointTests(LuminaWebFactory apiFactory)
+    public ThemesIndexViewEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

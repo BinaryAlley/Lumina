@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Middlewares;
+using Nemera.Presentation.Web.Common.Middlewares;
 using Microsoft.AspNetCore.Builder;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Utilities;
+namespace Nemera.Presentation.Web.Common.Utilities;
 
 /// <summary>
 /// Extension methods for adding the <see cref="CacheControlHeaderMiddleware"/> to the request pipeline.

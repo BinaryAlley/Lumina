@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.UsersManagement;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Common.Services;
-using Lumina.Presentation.Web.Core.Endpoints.Common;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.UsersManagement;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Common.Services;
+using Nemera.Presentation.Web.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Security.Claims;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Tools.Settings.UpdateUserSettings;
+namespace Nemera.Presentation.Web.Core.Endpoints.Tools.Settings.UpdateUserSettings;
 
 /// <summary>
 /// API endpoint for the <c>/{culture}/tools/settings/api-update-user-settings</c> route.

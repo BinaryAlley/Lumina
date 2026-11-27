@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
+namespace Nemera.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
 
 /// <summary>
 /// Query for checking the existence of a file system path.

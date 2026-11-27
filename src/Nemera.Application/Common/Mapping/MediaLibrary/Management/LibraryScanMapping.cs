@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.MediaLibrary.Management;
+namespace Nemera.Application.Common.Mapping.MediaLibrary.Management;
 
 /// <summary>
 /// Extension methods for converting <see cref="LibraryScan"/>.

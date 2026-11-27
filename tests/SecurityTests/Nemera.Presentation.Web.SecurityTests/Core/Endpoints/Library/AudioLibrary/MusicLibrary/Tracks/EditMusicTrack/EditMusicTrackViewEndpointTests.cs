@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.EditMusicTrack;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.EditMusicTrack;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -11,15 +11,15 @@ using System.Net.Http;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.EditMusicTrack;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.EditMusicTrack;
 
 /// <summary>
 /// Contains security tests for the <see cref="EditMusicTrackViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class EditMusicTrackViewEndpointTests : IClassFixture<LuminaWebFactory>
+public class EditMusicTrackViewEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly MusicTrackDtoFixture _musicTrackDtoFixture = new();
     private readonly MusicAlbumDtoFixture _musicAlbumDtoFixture = new();
 
@@ -27,7 +27,7 @@ public class EditMusicTrackViewEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="EditMusicTrackViewEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public EditMusicTrackViewEndpointTests(LuminaWebFactory apiFactory)
+    public EditMusicTrackViewEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -71,7 +71,7 @@ public class EditMusicTrackViewEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("at Lumina", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("at Nemera", content, StringComparison.OrdinalIgnoreCase);
         Assert.Contains(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint == $"libraries/{libraryId}/artists/{normalizedId}/albums/{normalizedId}/tracks/{normalizedId}");
         Assert.Contains(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint == $"libraries/{libraryId}/artists/{normalizedId}/albums/{normalizedId}");
     }

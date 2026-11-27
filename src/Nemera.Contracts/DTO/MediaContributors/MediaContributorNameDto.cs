@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.DTO.MediaContributors;
+namespace Nemera.Contracts.DTO.MediaContributors;
 
 /// <summary>
 /// Data transfer object for a media contributor name.

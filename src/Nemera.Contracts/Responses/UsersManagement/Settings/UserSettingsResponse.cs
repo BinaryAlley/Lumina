@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.UsersManagement.Settings;
+namespace Nemera.Contracts.Responses.UsersManagement.Settings;
 
 /// <summary>
 /// Represents the settings of a user.

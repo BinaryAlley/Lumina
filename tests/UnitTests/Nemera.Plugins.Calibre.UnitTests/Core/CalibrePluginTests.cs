@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Calibre.Core;
-using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
-using Lumina.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.Calibre.Core;
+using Nemera.Plugins.Contracts.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.Calibre.UnitTests.Core;
+namespace Nemera.Plugins.Calibre.UnitTests.Core;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CalibrePlugin"/> class.
@@ -46,7 +46,7 @@ public class CalibrePluginTests
         string result = _sut.Author;
 
         // Assert
-        Assert.Equal("Lumina", result);
+        Assert.Equal("Nemera", result);
     }
 
     [Fact]

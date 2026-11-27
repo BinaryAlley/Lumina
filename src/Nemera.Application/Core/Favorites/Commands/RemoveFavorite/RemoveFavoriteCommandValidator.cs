@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
 using System;
 #endregion
 
-namespace Lumina.Application.Core.Favorites.Commands.RemoveFavorite;
+namespace Nemera.Application.Core.Favorites.Commands.RemoveFavorite;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="RemoveFavoriteCommand"/>.

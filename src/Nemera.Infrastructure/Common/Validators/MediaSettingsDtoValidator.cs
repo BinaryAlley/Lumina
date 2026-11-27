@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
-using Lumina.Application.Common.Utilities;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Application.Common.Utilities;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Validators;
+namespace Nemera.Infrastructure.Common.Validators;
 
 /// <summary>
 /// Validates the needed validation rules for the MediaSettings application configuration settings section.

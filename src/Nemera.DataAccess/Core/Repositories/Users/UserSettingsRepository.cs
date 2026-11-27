@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
-using Lumina.DataAccess.Common.Persistence;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Repositories.Users;
+using Nemera.DataAccess.Common.Persistence;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -12,22 +12,22 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Users;
+namespace Nemera.DataAccess.Core.Repositories.Users;
 
 /// <summary>
 /// Repository for user settings.
 /// </summary>
 internal sealed class UserSettingsRepository : IUserSettingsRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserSettingsRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public UserSettingsRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public UserSettingsRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -38,11 +38,11 @@ internal sealed class UserSettingsRepository : IUserSettingsRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(UserSettingsEntity data, CancellationToken cancellationToken)
     {
-        bool doesSettingsExist = await _luminaDbContext.UserSettings.AnyAsync(settings => settings.UserId == data.UserId, cancellationToken: cancellationToken).ConfigureAwait(false);
+        bool doesSettingsExist = await _nemeraDbContext.UserSettings.AnyAsync(settings => settings.UserId == data.UserId, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (doesSettingsExist)
             return Errors.UserSettings.UserSettingsAlreadyExists;
 
-        _luminaDbContext.UserSettings.Add(data);
+        _nemeraDbContext.UserSettings.Add(data);
         return Result.Created;
     }
 
@@ -56,7 +56,7 @@ internal sealed class UserSettingsRepository : IUserSettingsRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="UserSettingsEntity"/> identified by <paramref name="id"/>, or an error.</returns>
     public async Task<Result<UserSettingsEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
-        IQueryable<UserSettingsEntity> query = _luminaDbContext.UserSettings;
+        IQueryable<UserSettingsEntity> query = _nemeraDbContext.UserSettings;
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         return await query.FirstOrDefaultAsync(settings => settings.Id == id, cancellationToken)
@@ -71,7 +71,7 @@ internal sealed class UserSettingsRepository : IUserSettingsRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="UserSettingsEntity"/> of the user, or an error.</returns>
     public async Task<Result<UserSettingsEntity?>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.UserSettings
+        return await _nemeraDbContext.UserSettings
             .FirstOrDefaultAsync(settings => settings.UserId == userId, cancellationToken)
             .ConfigureAwait(false);
     }
@@ -84,14 +84,14 @@ internal sealed class UserSettingsRepository : IUserSettingsRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpdateAsync(UserSettingsEntity data, CancellationToken cancellationToken)
     {
-        UserSettingsEntity? foundSettings = await _luminaDbContext.UserSettings
+        UserSettingsEntity? foundSettings = await _nemeraDbContext.UserSettings
             .FirstOrDefaultAsync(settings => settings.Id == data.Id, cancellationToken)
             .ConfigureAwait(false);
         if (foundSettings is null)
             return Errors.UserSettings.UserSettingsNotFound;
 
         // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
-        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundSettings, data);
+        EditableValuesCopier.CopyEditableValues(_nemeraDbContext, foundSettings, data);
         return Result.Updated;
     }
 }

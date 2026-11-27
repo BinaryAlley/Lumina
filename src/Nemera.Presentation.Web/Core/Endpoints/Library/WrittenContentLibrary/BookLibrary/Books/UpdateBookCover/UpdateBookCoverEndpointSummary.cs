@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Common;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBookCover;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBookCover;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="UpdateBookCoverEndpoint"/> endpoint, for OpenAPI.

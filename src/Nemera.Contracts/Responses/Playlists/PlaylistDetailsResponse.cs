@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.Playlists;
+namespace Nemera.Contracts.Responses.Playlists;
 
 /// <summary>
 /// Represents a response for the editable scalars of a playlist after a details update.

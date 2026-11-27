@@ -1,20 +1,20 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Queries.GetArtistAlbumsLite;
-using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
-using Lumina.Contracts.Responses.Common;
-using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.Library.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Queries.GetArtistAlbumsLite;
+using Nemera.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+using Nemera.Contracts.Responses.Common;
+using Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.Library.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.GetArtistAlbumsLite;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.GetArtistAlbumsLite;
 
 /// <summary>
 /// API endpoint for the <c>/libraries/{libraryId}/artists/{artistId}/albums/lite</c> route.

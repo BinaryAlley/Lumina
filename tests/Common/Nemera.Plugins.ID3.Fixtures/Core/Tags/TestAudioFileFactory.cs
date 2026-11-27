@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 #endregion
 
-namespace Lumina.Plugins.ID3.Fixtures.Core.Tags;
+namespace Nemera.Plugins.ID3.Fixtures.Core.Tags;
 
 /// <summary>
 /// Builds minimal, structurally valid WAV files used as test input for the ID3 tag reading tests.

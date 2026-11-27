@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Data transfer object for the delivery a playback manifest issued to a user. It composes the exact normalization request the delivery declares,

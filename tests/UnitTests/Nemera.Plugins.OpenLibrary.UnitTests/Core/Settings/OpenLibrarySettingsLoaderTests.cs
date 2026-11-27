@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.OpenLibrary.Common.Models.DTO.Settings;
-using Lumina.Plugins.OpenLibrary.Core.Settings;
-using Lumina.Plugins.OpenLibrary.Fixtures.Common.Models.DTO.Settings;
+using Nemera.Plugins.OpenLibrary.Common.Models.DTO.Settings;
+using Nemera.Plugins.OpenLibrary.Core.Settings;
+using Nemera.Plugins.OpenLibrary.Fixtures.Common.Models.DTO.Settings;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.UnitTests.Core.Settings;
+namespace Nemera.Plugins.OpenLibrary.UnitTests.Core.Settings;
 
 /// <summary>
 /// Contains unit tests for the <see cref="OpenLibrarySettingsLoader"/> class.
@@ -45,7 +45,7 @@ public class OpenLibrarySettingsLoaderTests
     {
         // Arrange
         OpenLibrarySettingsDto settings = _openLibrarySettingsDtoFixture.Create(
-            userAgent: "Lumina-OpenLibrary/1.0",
+            userAgent: "Nemera-OpenLibrary/1.0",
             searchResultLimit: 10,
             workEditionLimit: 50,
             minimumRequestInterval: TimeSpan.FromSeconds(1.1));
@@ -55,7 +55,7 @@ public class OpenLibrarySettingsLoaderTests
         OpenLibrarySettingsLoader.Apply(settings, storedSettings);
 
         // Assert
-        Assert.Equal("Lumina-OpenLibrary/1.0", settings.UserAgent);
+        Assert.Equal("Nemera-OpenLibrary/1.0", settings.UserAgent);
         Assert.Null(settings.ContactEmail);
         Assert.Equal(10, settings.SearchResultLimit);
         Assert.Equal(50, settings.WorkEditionLimit);

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Themes;
+using Nemera.Domain.SharedKernel.Common.Enums.Themes;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.Themes;
+namespace Nemera.Contracts.Responses.Themes;
 
 /// <summary>
 /// Represents a theme response.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Scheduling;
+using Nemera.Presentation.Web.Common.Enums.Scheduling;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Scheduling;
+namespace Nemera.Presentation.Web.Common.DTO.Scheduling;
 
 /// <summary>
 /// Data transfer object for the display preferences of the scheduler page.

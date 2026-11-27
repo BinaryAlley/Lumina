@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Common.Caching;
-using Lumina.Infrastructure.Common.Models.DTO.Configuration;
-using Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
+using Nemera.Infrastructure.Common.Caching;
+using Nemera.Infrastructure.Common.Models.DTO.Configuration;
+using Nemera.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.IntegrationTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Infrastructure.IntegrationTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Contains integration tests for the <see cref="TranscodingStartupInitializer"/> class.
@@ -36,7 +36,7 @@ public class TranscodingStartupInitializerTests : IDisposable
     /// </summary>
     public TranscodingStartupInitializerTests()
     {
-        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"lumina-transcoding-startup-{Guid.NewGuid():N}");
+        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"nemera-transcoding-startup-{Guid.NewGuid():N}");
         Directory.CreateDirectory(_temporaryDirectory);
         _cacheDirectory = Path.Combine(_temporaryDirectory, "cache");
         string missingFfmpegPath = Path.Combine(_temporaryDirectory, "missing-ffmpeg-binary");

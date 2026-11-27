@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.RestoreMusicArtist;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.RestoreMusicArtist;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -12,21 +12,21 @@ using System.Text;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.RestoreMusicArtist;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.RestoreMusicArtist;
 
 /// <summary>
 /// Contains security tests for the <see cref="RestoreMusicArtistEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RestoreMusicArtistEndpointTests : IClassFixture<LuminaWebFactory>
+public class RestoreMusicArtistEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RestoreMusicArtistEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public RestoreMusicArtistEndpointTests(LuminaWebFactory apiFactory)
+    public RestoreMusicArtistEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -53,7 +53,7 @@ public class RestoreMusicArtistEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("at Lumina", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("at Nemera", content, StringComparison.OrdinalIgnoreCase);
         Assert.Contains($"libraries/{libraryId}/artists/{normalizedId}/restore", _apiFactory.ApiClientStub.PostRequests.Select(postRequest => postRequest.Endpoint));
     }
 
@@ -79,7 +79,7 @@ public class RestoreMusicArtistEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("at Lumina", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("at Nemera", content, StringComparison.OrdinalIgnoreCase);
         Assert.Contains($"libraries/{normalizedId}/artists/{artistId}/restore", _apiFactory.ApiClientStub.PostRequests.Select(postRequest => postRequest.Endpoint));
     }
 

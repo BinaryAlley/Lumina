@@ -39,7 +39,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Lumina.Presentation.Web\Lumina.Presentation.Web.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Presentation.Web.Fixtures\Lumina.Presentation.Web.Fixtures.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Presentation.Web\Nemera.Presentation.Web.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Presentation.Web.Fixtures\Nemera.Presentation.Web.Fixtures.csproj" />
     </ItemGroup>
 </Project>

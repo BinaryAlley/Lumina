@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Services;
+namespace Nemera.Presentation.Web.Common.Services;
 
 /// <summary>
 /// Service that stores and retrieves the per-user preference for the theme cache, so the theme caching can be toggled for a user from the settings page.

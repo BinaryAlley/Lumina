@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Themes;
+namespace Nemera.Presentation.Web.Common.DTO.Themes;
 
 /// <summary>
 /// Data transfer object for a menu entry of the themed navigation menu, either a link or a submenu.

@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
-using Lumina.Contracts.Responses.Authentication;
-using Lumina.DataAccess.Common.Interceptors;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Infrastructure.Core.Security;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.Authentication;
+using Nemera.Contracts.Responses.Authentication;
+using Nemera.DataAccess.Common.Interceptors;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Infrastructure.Core.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -27,13 +27,13 @@ using System.Text;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Common.Setup;
+namespace Nemera.Presentation.Api.SecurityTests.Common.Setup;
 
 /// <summary>
 /// Factory for creating a web application for security tests.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
+public class NemeraApiFactory : WebApplicationFactory<Program>, IDisposable
 {
     private readonly SqliteConnection _connection;
     private readonly string _sharedInMemoryConnectionString;
@@ -51,12 +51,12 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly BookEntityFixture _bookEntityFixture = new();
     private const string TEST_ENCRYPTION_KEY = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=";
-    private const string SHARED_IN_MEMORY_CONNECTION_STRING_PREFIX = "Data Source=lumina-tests-{0};Mode=Memory;Cache=Shared";
+    private const string SHARED_IN_MEMORY_CONNECTION_STRING_PREFIX = "Data Source=nemera-tests-{0};Mode=Memory;Cache=Shared";
     
     /// <summary>
-    /// Initializes a new instance of the <see cref="LuminaApiFactory"/> class.
+    /// Initializes a new instance of the <see cref="NemeraApiFactory"/> class.
     /// </summary>
-    public LuminaApiFactory()
+    public NemeraApiFactory()
     {
         // Each factory gets its own uniquely named shared in-memory database, so that parallel test classes remain isolated from one another;
         // the shared cache allows each DbContext to open its own pooled connection to the same database, instead of sharing a single connection,
@@ -87,8 +87,8 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
             {
                 ["JwtSettings:SecretKey"] = "test-key-thats-at-least-32-chars-long-for-jwt",
                 ["JwtSettings:ExpiryMinutes"] = "15", // Control the expiry time during tests.
-                ["JwtSettings:Issuer"] = "Lumina",
-                ["JwtSettings:Audience"] = "Lumina",
+                ["JwtSettings:Issuer"] = "Nemera",
+                ["JwtSettings:Audience"] = "Nemera",
                 ["CorsSettings:AllowedOrigins:0"] = "http://localhost:5012",
                 ["EncryptionSettings:SecretKey"] = TEST_ENCRYPTION_KEY // Base64 encoded test key.
             });
@@ -96,11 +96,11 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
         builder.ConfigureServices(services =>
         {
             // Remove existing DbContext configuration.
-            ServiceDescriptor? descriptor = services.SingleOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(DbContextOptions<LuminaDbContext>));
+            ServiceDescriptor? descriptor = services.SingleOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(DbContextOptions<NemeraDbContext>));
             if (descriptor is not null)
                 services.Remove(descriptor);
             // Add SQLite DbContext configuration.
-            services.AddDbContext<LuminaDbContext>((serviceProvider, options) =>
+            services.AddDbContext<NemeraDbContext>((serviceProvider, options) =>
             {
                 options.UseSqlite(_sharedInMemoryConnectionString);
                 options.AddInterceptors(serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>());
@@ -114,8 +114,8 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = "Lumina",
-                    ValidAudience = "Lumina",
+                    ValidIssuer = "Nemera",
+                    ValidAudience = "Nemera",
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("test-key-thats-at-least-32-chars-long-for-jwt"))
                 };
             });
@@ -124,7 +124,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
             using (IServiceScope scope = servicePreovider.CreateScope())
             {
                 IServiceProvider scopedServices = scope.ServiceProvider;
-                LuminaDbContext dbContext = scopedServices.GetRequiredService<LuminaDbContext>();
+                NemeraDbContext dbContext = scopedServices.GetRequiredService<NemeraDbContext>();
                 dbContext.Database.Migrate();
             }
         });
@@ -152,7 +152,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
         client.DefaultRequestHeaders.Add("X-Forwarded-For", GetUniqueTestIp());
 
         using IServiceScope scope = Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         Guid userId = Guid.NewGuid();
         string username = $"testuser_{Guid.NewGuid()}";
@@ -188,7 +188,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
         client.DefaultRequestHeaders.Add("X-Forwarded-For", GetUniqueTestIp());
 
         using IServiceScope scope = Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         Guid userId = Guid.NewGuid();
         string username = $"testuser_{Guid.NewGuid()}";
@@ -218,7 +218,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
         client.DefaultRequestHeaders.Add("X-Forwarded-For", GetUniqueTestIp());
 
         using IServiceScope scope = Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         Guid userId = Guid.NewGuid();
         string username = $"testuser_{Guid.NewGuid()}";
@@ -246,7 +246,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     public async Task RemoveTestUserAsync(string username)
     {
         using IServiceScope scope = Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         UserEntity? user = await dbContext.Users.Include(candidate => candidate.Libraries).FirstOrDefaultAsync(candidate => candidate.Username == username).ConfigureAwait(false);
         if (user is not null)
@@ -264,7 +264,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     public void RemoveTestUser(string username)
     {
         using IServiceScope scope = Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         UserEntity? user = dbContext.Users.Include(candidate => candidate.Libraries).FirstOrDefault(candidate => candidate.Username == username);
         if (user is not null)
@@ -282,7 +282,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     public async Task RemoveAdminUserAsync(Guid userId)
     {
         using IServiceScope scope = Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         UserRoleEntity? userRole = await dbContext.UserRoles.FirstOrDefaultAsync(candidate => candidate.UserId == userId).ConfigureAwait(false);
         if (userRole is not null)
@@ -306,7 +306,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     public async Task SeedLibraryAsync(Guid libraryId, Guid userId)
     {
         using IServiceScope scope = Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []));
         await dbContext.SaveChangesAsync();
     }
@@ -319,7 +319,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     public async Task SeedBookAsync(Guid libraryId, string title)
     {
         using IServiceScope scope = Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         dbContext.Books.Add(_bookEntityFixture.Create(libraryId: libraryId, title: title, path: $"/books/{Guid.NewGuid()}.epub", includeMetadata: false));
         await dbContext.SaveChangesAsync();
     }

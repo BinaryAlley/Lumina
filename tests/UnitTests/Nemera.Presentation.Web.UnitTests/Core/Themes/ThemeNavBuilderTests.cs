@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Authorization;
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Enums.Authorization;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Common.Services;
-using Lumina.Presentation.Web.Core.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Authorization;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Enums.Authorization;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Common.Services;
+using Nemera.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using NSubstitute;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Themes;
+namespace Nemera.Presentation.Web.UnitTests.Core.Themes;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ThemeNavBuilder"/> class.
@@ -258,7 +258,7 @@ public class ThemeNavBuilderTests
         await _sut.BuildAsync(CancellationToken.None);
 
         // Assert
-        _mockStringLocalizerFactory.Received(1).Create("Lumina.Presentation.Web.Views.Shared._NavMenu", "Lumina.Presentation.Web");
+        _mockStringLocalizerFactory.Received(1).Create("Nemera.Presentation.Web.Views.Shared._NavMenu", "Nemera.Presentation.Web");
     }
 
     [Fact]

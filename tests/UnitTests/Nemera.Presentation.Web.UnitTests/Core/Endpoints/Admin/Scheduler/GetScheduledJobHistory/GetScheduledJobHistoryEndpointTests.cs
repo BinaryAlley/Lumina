@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Scheduling;
-using Lumina.Presentation.Web.Common.Requests.Scheduling;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Scheduler.GetScheduledJobHistory;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Scheduling;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Scheduling;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Scheduling;
+using Nemera.Presentation.Web.Common.Requests.Scheduling;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Scheduler.GetScheduledJobHistory;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Scheduling;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Scheduling;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System;
@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Admin.Scheduler.GetScheduledJobHistory;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Admin.Scheduler.GetScheduledJobHistory;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetScheduledJobHistoryEndpoint"/> class.

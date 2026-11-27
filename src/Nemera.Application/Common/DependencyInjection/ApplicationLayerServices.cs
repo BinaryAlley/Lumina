@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Telemetry;
-using Lumina.Application.Core.MediaLibrary.Management.Deletion;
-using Lumina.Domain.Common.Events;
+using Nemera.Application.Common.Telemetry;
+using Nemera.Application.Core.MediaLibrary.Management.Deletion;
+using Nemera.Domain.Common.Events;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Reflection;
 #endregion
 
-namespace Lumina.Application.Common.DependencyInjection;
+namespace Nemera.Application.Common.DependencyInjection;
 
 /// <summary>
 /// Utility class for registering the services of the Application layer into the Dependency Injection container.

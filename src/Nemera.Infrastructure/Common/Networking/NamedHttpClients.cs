@@ -1,4 +1,4 @@
-namespace Lumina.Infrastructure.Common.Networking;
+namespace Nemera.Infrastructure.Common.Networking;
 
 /// <summary>
 /// Names of the named HTTP clients registered by the infrastructure layer.

@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.Library.Statistics;
+namespace Nemera.Presentation.Web.Common.Requests.Library.Statistics;
 
 /// <summary>
 /// Represents a request to delete the resume points of a user.

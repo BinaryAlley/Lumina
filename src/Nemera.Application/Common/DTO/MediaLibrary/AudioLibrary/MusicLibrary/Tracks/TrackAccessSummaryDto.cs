@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+namespace Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 
 /// <summary>
 /// Data transfer object for the access information of a set of existing tracks.

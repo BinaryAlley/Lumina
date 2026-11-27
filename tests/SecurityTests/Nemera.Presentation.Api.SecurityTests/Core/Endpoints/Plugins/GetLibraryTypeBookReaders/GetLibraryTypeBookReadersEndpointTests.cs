@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.Core.Endpoints.Plugins.GetLibraryTypeBookReaders;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Presentation.Api.Core.Endpoints.Plugins.GetLibraryTypeBookReaders;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -8,15 +8,15 @@ using System.Net;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.GetLibraryTypeBookReaders;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.GetLibraryTypeBookReaders;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetLibraryTypeBookReadersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetLibraryTypeBookReadersEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class GetLibraryTypeBookReadersEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -27,12 +27,12 @@ public class GetLibraryTypeBookReadersEndpointTests : IClassFixture<LuminaApiFac
     /// Initializes a new instance of the <see cref="GetLibraryTypeBookReadersEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetLibraryTypeBookReadersEndpointTests(LuminaApiFactory apiFactory)
+    public GetLibraryTypeBookReadersEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
     }
 
     [Fact]

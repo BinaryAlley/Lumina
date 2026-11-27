@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaLibrary.Management.Progress;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
+using Nemera.Application.Core.MediaLibrary.Management.Progress;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Events;
+namespace Nemera.Application.Core.MediaLibrary.Management.Events;
 
 /// <summary>
 /// Handler for the domain event raised when a media library's scan progress changes.

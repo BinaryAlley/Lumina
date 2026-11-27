@@ -1,23 +1,23 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.AddTrack;
-using Lumina.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.AddTrack;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.Fixtures.Core.DTO.Common;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.AddTrack;
+using Nemera.Application.Fixtures.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.AddTrack;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.Fixtures.Core.DTO.Common;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaContributors;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.AddTrack;
+namespace Nemera.Application.UnitTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Commands.AddTrack;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AddTrackCommandValidator"/> class.

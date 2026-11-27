@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Common.Caching;
-using Lumina.Infrastructure.Common.Models.DTO.Configuration;
+using Nemera.Infrastructure.Common.Caching;
+using Nemera.Infrastructure.Common.Models.DTO.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Startup component that owns the normalized audio cache lifecycle and verifies the ffmpeg toolchain before any playback request is served.
@@ -87,7 +87,7 @@ internal sealed class TranscodingStartupInitializer : IHostedService
                 else if (!Directory.EnumerateFileSystemEntries(cacheDirectory).Any())
                     TranscodingCachePaths.WriteCacheMarker(cacheDirectory); // An empty directory is adopted, so a cache directory created ahead of the first run works without manual preparation.
                 else // A non-empty directory without the marker was not created by this application. It is never wiped, because only the operator can tell whether its entries are safe to remove.                    
-                    throw new IOException("The configured normalized audio cache directory exists, is not empty and does not carry the Lumina cache marker, so it was not wiped.");
+                    throw new IOException("The configured normalized audio cache directory exists, is not empty and does not carry the Nemera cache marker, so it was not wiped.");
             }
             else
                 TranscodingCachePaths.EnsureDirectoryExists(cacheDirectory);

@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaConsumption.Commands.ClearConsumptionHistory;
-using Lumina.Application.Fixtures.Core.MediaConsumption.Commands.ClearConsumptionHistory;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Core.MediaConsumption.Commands.ClearConsumptionHistory;
+using Nemera.Application.Fixtures.Core.MediaConsumption.Commands.ClearConsumptionHistory;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.MediaConsumption.Commands.ClearConsumptionHistory;
+namespace Nemera.Application.UnitTests.Core.MediaConsumption.Commands.ClearConsumptionHistory;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ClearConsumptionHistoryCommandValidator"/> class.

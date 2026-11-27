@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.UsersManagement.Users;
-using Lumina.Application.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
-using Lumina.Contracts.Requests.UsersManagement.Settings;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.UsersManagement;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.UsersManagement.Users;
+using Nemera.Application.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
+using Nemera.Contracts.Requests.UsersManagement.Settings;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.UsersManagement;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Settings.UpdatePlaybackState;
+namespace Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Settings.UpdatePlaybackState;
 
 /// <summary>
 /// API endpoint for the <c>/users/me/settings/playback-state</c> route.

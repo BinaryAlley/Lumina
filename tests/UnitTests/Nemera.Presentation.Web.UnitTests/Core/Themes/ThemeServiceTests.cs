@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Enums.Themes;
-using Lumina.Presentation.Web.Common.Requests.Themes;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Enums.Themes;
+using Nemera.Presentation.Web.Common.Requests.Themes;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Themes;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Themes;
+namespace Nemera.Presentation.Web.UnitTests.Core.Themes;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ThemeService"/> class.
@@ -46,7 +46,7 @@ public class ThemeServiceTests
         ThemeResponseDto[] themes =
         [
             _themeResponseDtoFixture.Create(themeId: "editorial-paper", name: "Editorial Paper", previewPath: "preview.png", includePreviewPath: true, installSource: ThemeInstallSource.Bundled),
-            _themeResponseDtoFixture.Create(themeId: "lumina-default", name: "Lumina Default", previewPath: "preview.png", includePreviewPath: true, installSource: ThemeInstallSource.Uploaded)
+            _themeResponseDtoFixture.Create(themeId: "nemera-default", name: "Nemera Default", previewPath: "preview.png", includePreviewPath: true, installSource: ThemeInstallSource.Uploaded)
         ];
         _mockApiHttpClient.GetAsync<ThemeResponseDto[]>(ApiRoutes.Themes.GET_THEMES, Arg.Any<CancellationToken>())
             .Returns(themes);
@@ -201,10 +201,10 @@ public class ThemeServiceTests
     {
         // Arrange
         string pageKey = "home/index";
-        ThemeResponseDto currentTheme = _themeResponseDtoFixture.Create(themeId: "lumina-default");
-        ThemeTemplateResponseDto templateResponse = _themeTemplateResponseDtoFixture.Create(theme: _themeResponseDtoFixture.Create(themeId: "lumina-default"), template: "Home");
+        ThemeResponseDto currentTheme = _themeResponseDtoFixture.Create(themeId: "nemera-default");
+        ThemeTemplateResponseDto templateResponse = _themeTemplateResponseDtoFixture.Create(theme: _themeResponseDtoFixture.Create(themeId: "nemera-default"), template: "Home");
         string expectedEndpoint = ApiRoutes.Themes.GET_THEME_TEMPLATE
-            .Replace("{themeId}", "lumina-default")
+            .Replace("{themeId}", "nemera-default")
             .Replace("{*pageKey}", pageKey);
         _mockApiHttpClient.GetAsync<ThemeResponseDto>(ApiRoutes.Themes.GET_CURRENT_THEME, Arg.Any<CancellationToken>())
             .Returns(currentTheme);
@@ -215,7 +215,7 @@ public class ThemeServiceTests
         ThemeRenderDocumentDto result = await _sut.GetRenderDocumentAsync(pageKey, null, CancellationToken.None);
 
         // Assert
-        Assert.Equal("lumina-default", result.Theme.Id);
+        Assert.Equal("nemera-default", result.Theme.Id);
         await _mockApiHttpClient.Received(1).GetAsync<ThemeResponseDto>(ApiRoutes.Themes.GET_CURRENT_THEME, Arg.Any<CancellationToken>());
         await _mockApiHttpClient.Received(1).GetAsync<ThemeTemplateResponseDto>(expectedEndpoint, Arg.Any<CancellationToken>());
     }

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Core.Repositories.Libraries;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Core.Repositories.Libraries;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.Libraries;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.Libraries;
 
 /// <summary>
 /// Contains integration tests for the <see cref="LibraryScanRepository"/> class, exercising it against a real SQLite database.
@@ -31,9 +31,9 @@ public class LibraryScanRepositoryTests
     public async Task UpdateAsync_WhenAnEditableValueChanges_ShouldPreserveTheStoredAuditColumns()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryscanrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-libraryscanrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         LibraryScanRepository sut = new(context);
 
@@ -78,9 +78,9 @@ public class LibraryScanRepositoryTests
     public async Task FailInterruptedScansAsync_WhenScansArePendingOrRunning_ShouldMarkThemAsFailedAndLeaveTheOthersUnchanged()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryscanrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-libraryscanrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         LibraryScanRepository sut = new(context);
 

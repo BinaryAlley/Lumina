@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Contracts.Responses.Plugins;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Contracts.Responses.Plugins;
 using System.Collections.Generic;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Plugins;
+namespace Nemera.Application.Common.Mapping.Plugins;
 
 /// <summary>
 /// Extension methods for converting <see cref="PluginEntity"/>.

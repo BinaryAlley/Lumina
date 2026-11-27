@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.DataAccess.Core.Repositories.MediaConsumption;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.DataAccess.Core.Repositories.MediaConsumption;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.MediaConsumption;
+namespace Nemera.DataAccess.UnitTests.Core.Repositories.MediaConsumption;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MediaConsumptionRecordRepository"/> class.
@@ -26,7 +26,7 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.MediaConsumption;
 [ExcludeFromCodeCoverage]
 public class MediaConsumptionRecordRepositoryTests
 {
-    private readonly LuminaDbContext _mockContext;
+    private readonly NemeraDbContext _mockContext;
     private readonly MediaConsumptionRecordRepository _sut;
     private readonly MediaConsumptionRecordEntityFixture _mediaConsumptionRecordEntityFixture = new();
 
@@ -35,7 +35,7 @@ public class MediaConsumptionRecordRepositoryTests
     /// </summary>
     public MediaConsumptionRecordRepositoryTests()
     {
-        _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
+        _mockContext = Create.MockedDbContextFor<NemeraDbContext>();
         _sut = new MediaConsumptionRecordRepository(_mockContext);
     }
 

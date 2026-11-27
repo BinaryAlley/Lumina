@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+using Nemera.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+namespace Nemera.Application.Fixtures.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
 
 /// <summary>
 /// Fixture class for the <see cref="UpdateUserRoleAndPermissionsCommand"/> class.

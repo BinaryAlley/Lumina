@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+namespace Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 
 /// <summary>
 /// Data transfer object for the data of the audio file of a track, needed to stream it.

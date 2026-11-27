@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.Authentication;
-using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
-using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
-using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
-using Lumina.Contracts.Requests.Authentication;
+using Nemera.Application.Common.Mapping.Authentication;
+using Nemera.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
+using Nemera.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
+using Nemera.Contracts.Fixtures.Core.Requests.Authentication;
+using Nemera.Contracts.Requests.Authentication;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.Authentication;
+namespace Nemera.Application.UnitTests.Common.Mapping.Authentication;
 
 /// <summary>
 /// Contains unit tests for the <see cref="RegistrationRequestMapping"/> class.

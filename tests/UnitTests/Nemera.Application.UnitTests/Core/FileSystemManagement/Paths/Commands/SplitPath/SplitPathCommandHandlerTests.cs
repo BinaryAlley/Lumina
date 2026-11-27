@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
-using Lumina.Application.Fixtures.Core.FileSystemManagement.Paths.Commands.SplitPath;
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
+using Nemera.Application.Fixtures.Core.FileSystemManagement.Paths.Commands.SplitPath;
+using Nemera.Contracts.Responses.FileSystemManagement.Path;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Paths.Commands.SplitPath;
+namespace Nemera.Application.UnitTests.Core.FileSystemManagement.Paths.Commands.SplitPath;
 
 /// <summary>
 /// Contains unit tests for the <see cref="SplitPathCommandHandler"/> class.

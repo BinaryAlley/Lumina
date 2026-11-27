@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+namespace Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
 
 /// <summary>
 /// Data transfer object for a lightweight track element, containing only the properties needed by the client to display the tracks of an album.

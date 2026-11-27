@@ -1,4 +1,4 @@
-namespace Lumina.Domain.Common.Primitives;
+namespace Nemera.Domain.Common.Primitives;
 
 /// <summary>
 /// Provides predefined success results for operations that don't return meaningful data, and factory methods for results.

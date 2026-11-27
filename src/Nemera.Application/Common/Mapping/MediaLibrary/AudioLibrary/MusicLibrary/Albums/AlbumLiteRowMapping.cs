@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Contracts.Responses.Common;
-using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+using Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Contracts.Responses.Common;
+using Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+namespace Nemera.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 
 /// <summary>
 /// Extension methods for converting <see cref="AlbumLiteRow"/>.

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Presentation.Web.Common.Enums.Scheduling;
-using Lumina.Presentation.Web.Common.Requests.Scheduling;
+using Nemera.Presentation.Web.Common.Enums.Scheduling;
+using Nemera.Presentation.Web.Common.Requests.Scheduling;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Scheduling;
+namespace Nemera.Presentation.Web.Fixtures.Common.Requests.Scheduling;
 
 /// <summary>
 /// Fixture class for the <see cref="UpdateSchedulerDisplayPreferencesRequest"/> record.

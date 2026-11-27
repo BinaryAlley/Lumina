@@ -1,26 +1,26 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Home;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Home;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Home;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Home;
 
 /// <summary>
 /// Contains security tests for the <see cref="HomeNotFoundViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class HomeNotFoundViewEndpointTests : IClassFixture<LuminaWebFactory>
+public class HomeNotFoundViewEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HomeNotFoundViewEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public HomeNotFoundViewEndpointTests(LuminaWebFactory apiFactory)
+    public HomeNotFoundViewEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

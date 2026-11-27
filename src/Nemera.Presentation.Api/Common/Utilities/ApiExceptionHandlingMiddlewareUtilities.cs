@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.Common.Middlewares;
+using Nemera.Presentation.Api.Common.Middlewares;
 using Microsoft.AspNetCore.Builder;
 #endregion
 
-namespace Lumina.Presentation.Api.Common.Utilities;
+namespace Nemera.Presentation.Api.Common.Utilities;
 
 /// <summary>
 /// Extension methods for adding the <see cref="ExceptionHandlingMiddleware"/> to the request pipeline.

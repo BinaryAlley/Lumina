@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Contracts.Fixtures.Core.DTO.Common;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
-using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Common;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Contracts.Fixtures.Core.DTO.Common;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,15 +24,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.AddBook;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.AddBook;
 
 /// <summary>
 /// Contains security tests for the <see cref="AddBookEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class AddBookEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly AddBookRequestFixture _addBookRequestFixture = new();
     private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
@@ -50,7 +50,7 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     /// Initializes a new instance of the <see cref="AddBookEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public AddBookEndpointTests(LuminaApiFactory apiFactory)
+    public AddBookEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
@@ -123,7 +123,7 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         string injectedPath = Path.Combine(contentLocation, $"{maliciousPath}.epub");
         using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             seedDbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: [contentLocation]));
             await seedDbContext.SaveChangesAsync();
         }
@@ -139,7 +139,7 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         Assert.DoesNotContain("SqliteException", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.Equal(1, await dbContext.Libraries.CountAsync(library => library.Id == libraryId));
         // The single book in the library is the one inserted by this request, with the malicious path stored as data.
         Assert.Equal(1, await dbContext.Books.CountAsync(book => book.LibraryId == libraryId));
@@ -159,7 +159,7 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         string contentLocation = Path.GetTempPath();
         using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             seedDbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: [contentLocation]));
             await seedDbContext.SaveChangesAsync();
         }
@@ -176,7 +176,7 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         Assert.DoesNotContain("SqliteException", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         BookEntity storedBook = await dbContext.Books.SingleAsync(book => book.LibraryId == libraryId);
         Assert.Equal(maliciousTitle, storedBook.Title);
 
@@ -198,7 +198,7 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         string seededGenreName = $"seeded-genre-{suffix}";
         using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             seedDbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: [contentLocation]));
             seedDbContext.Set<TagEntity>().Add(_tagEntityFixture.Create(name: seededTagName));
             seedDbContext.Set<GenreEntity>().Add(_genreEntityFixture.Create(name: seededGenreName));
@@ -226,7 +226,7 @@ public class AddBookEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 
         using (IServiceScope scope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             Assert.Equal(1, await dbContext.Libraries.CountAsync(library => library.Id == libraryId));
             Assert.Equal(1, await dbContext.Books.CountAsync(book => book.LibraryId == libraryId));
             // The join rows must still exist and point at the normalized tag and genre that the request supplied.

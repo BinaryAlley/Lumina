@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
+namespace Nemera.Presentation.Web.Common.DTO.FileSystemManagement;
 
 /// <summary>
 /// Data transfer object for a file system path separator.

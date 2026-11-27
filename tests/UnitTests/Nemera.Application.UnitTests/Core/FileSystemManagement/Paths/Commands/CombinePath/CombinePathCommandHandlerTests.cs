@@ -1,19 +1,19 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePath;
-using Lumina.Application.Fixtures.Core.FileSystemManagement.Paths.Commands.CombinePath;
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.FileSystemManagement.Paths.Commands.CombinePath;
+using Nemera.Application.Fixtures.Core.FileSystemManagement.Paths.Commands.CombinePath;
+using Nemera.Contracts.Responses.FileSystemManagement.Path;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Paths.Commands.CombinePath;
+namespace Nemera.Application.UnitTests.Core.FileSystemManagement.Paths.Commands.CombinePath;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CombinePathCommandHandler"/> class.

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.DTO.Configuration;
-using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
-using Lumina.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Configuration;
+using Nemera.Presentation.Web.Common.DTO.FileSystemManagement;
+using Nemera.Presentation.Web.Common.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using System;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Api;
+namespace Nemera.Presentation.Web.Common.Api;
 
 /// <summary>
 /// Typed client for API access.

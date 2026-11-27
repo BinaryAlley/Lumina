@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Common.Http;
-using Lumina.Plugins.CoverArtArchive.Common.Models.Contracts.Responses;
-using Lumina.Plugins.CoverArtArchive.Common.Models.DTO.Settings;
-using Lumina.Plugins.CoverArtArchive.Core.Settings;
+using Nemera.Plugins.Contracts.Common.Http;
+using Nemera.Plugins.CoverArtArchive.Common.Models.Contracts.Responses;
+using Nemera.Plugins.CoverArtArchive.Common.Models.DTO.Settings;
+using Nemera.Plugins.CoverArtArchive.Core.Settings;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.Core.Api;
+namespace Nemera.Plugins.CoverArtArchive.Core.Api;
 
 /// <summary>
 /// HTTP client that calls the Cover Art Archive API and deserializes its JSON responses into typed response models.

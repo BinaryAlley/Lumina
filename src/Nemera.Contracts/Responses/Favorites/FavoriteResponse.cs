@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.Favorites;
+namespace Nemera.Contracts.Responses.Favorites;
 
 /// <summary>
 /// Represents a response for a favorite of the current user.

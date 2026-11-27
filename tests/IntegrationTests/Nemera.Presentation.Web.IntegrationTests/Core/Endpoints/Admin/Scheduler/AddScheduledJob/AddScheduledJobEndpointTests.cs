@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Scheduling;
-using Lumina.Presentation.Web.Common.Requests.Scheduling;
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Scheduler.AddScheduledJob;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Scheduling;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Scheduling;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Scheduling;
+using Nemera.Presentation.Web.Common.Requests.Scheduling;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Scheduler.AddScheduledJob;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Scheduling;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Scheduling;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -15,15 +15,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Scheduler.AddScheduledJob;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Scheduler.AddScheduledJob;
 
 /// <summary>
 /// Contains integration tests for the <see cref="AddScheduledJobEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AddScheduledJobEndpointTests : IClassFixture<LuminaWebFactory>
+public class AddScheduledJobEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly AddScheduledJobRequestFixture _addScheduledJobRequestFixture = new();
     private readonly ScheduledJobDtoFixture _scheduledJobDtoFixture = new();
 
@@ -31,7 +31,7 @@ public class AddScheduledJobEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="AddScheduledJobEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public AddScheduledJobEndpointTests(LuminaWebFactory apiFactory)
+    public AddScheduledJobEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

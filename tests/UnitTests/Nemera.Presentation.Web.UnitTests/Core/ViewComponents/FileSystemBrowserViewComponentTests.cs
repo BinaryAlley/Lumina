@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Primitives;
-using Lumina.Presentation.Web.Core.Themes;
-using Lumina.Presentation.Web.Core.ViewComponents;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Core.ViewComponents;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.ViewComponents;
+namespace Nemera.Presentation.Web.UnitTests.Core.ViewComponents;
 
 /// <summary>
 /// Contains unit tests for the <see cref="FileSystemBrowserViewComponent"/> class.

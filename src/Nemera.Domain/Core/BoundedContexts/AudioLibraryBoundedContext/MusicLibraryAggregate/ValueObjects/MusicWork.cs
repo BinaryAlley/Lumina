@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Models.Core;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Common.ValueObjects.Metadata;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Models.Core;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
+namespace Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
 
 /// <summary>
 /// Value Object for a MusicBrainz work, the musical composition a track is a recording of.

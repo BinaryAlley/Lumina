@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Library.Management.GetEnabledLibraries;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Library.Management.GetEnabledLibraries;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -18,16 +18,16 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Library.Management.GetEnabledLibraries;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Library.Management.GetEnabledLibraries;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetEnabledLibrariesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetEnabledLibrariesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetEnabledLibrariesEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -39,7 +39,7 @@ public class GetEnabledLibrariesEndpointTests : IClassFixture<AuthenticatedLumin
     /// Initializes a new instance of the <see cref="GetEnabledLibrariesEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetEnabledLibrariesEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetEnabledLibrariesEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -101,7 +101,7 @@ public class GetEnabledLibrariesEndpointTests : IClassFixture<AuthenticatedLumin
     private async Task SeedLibraryAsync(Guid libraryId, Guid userId, string title, bool isEnabled)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: title, libraryType: LibraryType.EBook, contentLocations: [], isEnabled: isEnabled));
         await dbContext.SaveChangesAsync();
     }
@@ -113,7 +113,7 @@ public class GetEnabledLibrariesEndpointTests : IClassFixture<AuthenticatedLumin
     private Guid GetCurrentUserId()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         UserEntity user = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername);
         return user.Id;
     }

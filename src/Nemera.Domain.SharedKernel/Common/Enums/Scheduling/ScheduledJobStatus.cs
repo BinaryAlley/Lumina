@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+namespace Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 
 /// <summary>
 /// Enumeration for the statuses of scheduled jobs.

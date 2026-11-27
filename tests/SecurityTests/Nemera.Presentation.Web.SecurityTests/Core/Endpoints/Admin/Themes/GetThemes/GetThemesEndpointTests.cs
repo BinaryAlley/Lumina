@@ -1,26 +1,26 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Enums.Authorization;
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.GetThemes;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Enums.Authorization;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Themes.GetThemes;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Themes.GetThemes;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Themes.GetThemes;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetThemesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetThemesEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetThemesEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
     private readonly ThemeResponseDtoFixture _themeResponseDtoFixture = new();
     private readonly ThemeSettingsResponseDtoFixture _themeSettingsResponseDtoFixture = new();
@@ -29,7 +29,7 @@ public class GetThemesEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="GetThemesEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetThemesEndpointTests(LuminaWebFactory apiFactory)
+    public GetThemesEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

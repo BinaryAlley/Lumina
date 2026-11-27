@@ -1,27 +1,27 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Common.DataAccess.Repositories.Favorites;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DomainEvents;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.Favorites.Commands.RemoveFavorite;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Fixtures.Core.Favorites.Commands.RemoveFavorite;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate.Events;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Application.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Common.DataAccess.Repositories.Favorites;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DomainEvents;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.Favorites.Commands.RemoveFavorite;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Fixtures.Core.Favorites.Commands.RemoveFavorite;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate.Events;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Favorites.Commands.RemoveFavorite;
+namespace Nemera.Application.UnitTests.Core.Favorites.Commands.RemoveFavorite;
 
 /// <summary>
 /// Contains unit tests for the <see cref="RemoveFavoriteCommandHandler"/> class.

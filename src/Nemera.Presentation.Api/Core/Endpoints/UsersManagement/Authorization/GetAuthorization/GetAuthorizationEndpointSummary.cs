@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Contracts.Requests.Authorization;
-using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Contracts.Requests.Authorization;
+using Nemera.Contracts.Responses.Authorization;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.GetAuthorization;
+namespace Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.GetAuthorization;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetAuthorizationEndpoint"/> API endpoint, for OpenAPI.

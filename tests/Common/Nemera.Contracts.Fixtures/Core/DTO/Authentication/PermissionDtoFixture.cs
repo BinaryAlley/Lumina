@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.DTO.Authentication;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Contracts.DTO.Authentication;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.DTO.Authentication;
+namespace Nemera.Contracts.Fixtures.Core.DTO.Authentication;
 
 /// <summary>
 /// Fixture class for the <see cref="PermissionDto"/> record.

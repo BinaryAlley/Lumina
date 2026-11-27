@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Authentication;
+using Nemera.Contracts.DTO.Authentication;
 #endregion
 
-namespace Lumina.Contracts.Responses.Authorization;
+namespace Nemera.Contracts.Responses.Authorization;
 
 /// <summary>
 /// Represents an authorizaton role permissions response.

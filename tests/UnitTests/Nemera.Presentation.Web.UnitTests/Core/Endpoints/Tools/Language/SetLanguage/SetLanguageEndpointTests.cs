@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Core.Endpoints.Tools.Language.SetLanguage;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Tools;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Core.Endpoints.Tools.Language.SetLanguage;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Tools;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Localization;
@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Tools.Language.SetLanguage;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Tools.Language.SetLanguage;
 
 /// <summary>
 /// Contains unit tests for the <see cref="SetLanguageEndpoint"/> class.
@@ -67,13 +67,13 @@ public class SetLanguageEndpointTests
     {
         // Arrange
         TestHttpContextFactory.ConfigureCulture(_sut.HttpContext, "en-us");
-        _sut.HttpContext.Request.PathBase = "/lumina";
+        _sut.HttpContext.Request.PathBase = "/nemera";
 
         // Act
         IResult result = await _sut.ExecuteAsync(_setLanguageRequestFixture.Create(newCulture: "fr-FR", returnUrl: "/en-us/tools/settings"), CancellationToken.None);
 
         // Assert
         RedirectHttpResult redirectResult = Assert.IsType<RedirectHttpResult>(result);
-        Assert.Equal("/lumina/fr-fr/tools/settings", redirectResult.Url);
+        Assert.Equal("/nemera/fr-fr/tools/settings", redirectResult.Url);
     }
 }

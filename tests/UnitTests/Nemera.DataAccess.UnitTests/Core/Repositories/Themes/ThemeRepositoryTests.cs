@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Themes;
-using Lumina.DataAccess.Core.Repositories.Themes;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Themes;
+using Nemera.DataAccess.Core.Repositories.Themes;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.Themes;
+namespace Nemera.DataAccess.UnitTests.Core.Repositories.Themes;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ThemeRepository"/> class.
@@ -26,7 +26,7 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.Themes;
 [ExcludeFromCodeCoverage]
 public class ThemeRepositoryTests
 {
-    private readonly LuminaDbContext _mockContext;
+    private readonly NemeraDbContext _mockContext;
     private readonly ThemeRepository _sut;
     private readonly ThemeEntityFixture _themeEntityFixture = new();
 
@@ -35,7 +35,7 @@ public class ThemeRepositoryTests
     /// </summary>
     public ThemeRepositoryTests()
     {
-        _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
+        _mockContext = Create.MockedDbContextFor<NemeraDbContext>();
         _sut = new ThemeRepository(_mockContext);
     }
 

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.GetAlbumTracksLite;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.GetAlbumTracksLite;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -18,15 +18,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.GetAlbumTracksLite;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.GetAlbumTracksLite;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetAlbumTracksLiteEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetAlbumTracksLiteEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class GetAlbumTracksLiteEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -43,12 +43,12 @@ public class GetAlbumTracksLiteEndpointTests : IClassFixture<LuminaApiFactory>, 
     /// Initializes a new instance of the <see cref="GetAlbumTracksLiteEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetAlbumTracksLiteEndpointTests(LuminaApiFactory apiFactory)
+    public GetAlbumTracksLiteEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
     }
 
     [Fact]
@@ -180,7 +180,7 @@ public class GetAlbumTracksLiteEndpointTests : IClassFixture<LuminaApiFactory>, 
     private async Task<Guid> SeedOtherUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         string username = $"otheruser_{Guid.NewGuid()}";
         dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: username, password: "TestPass123!"));
@@ -197,7 +197,7 @@ public class GetAlbumTracksLiteEndpointTests : IClassFixture<LuminaApiFactory>, 
     private async Task<(Guid libraryId, Guid artistId, Guid albumId, Guid trackId)> SeedArtistAlbumWithTrackAsync(Guid userId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.NewGuid();
         Guid artistId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();

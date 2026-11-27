@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
-using Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBookDetails;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.WrittenContentLibrary.BookLibrary;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
+using Nemera.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBookDetails;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.WrittenContentLibrary.BookLibrary;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -12,22 +12,22 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBookDetails;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBookDetails;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetBookDetailsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetBookDetailsEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetBookDetailsEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly BookDetailsDtoFixture _bookDetailsDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetBookDetailsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetBookDetailsEndpointTests(LuminaWebFactory apiFactory)
+    public GetBookDetailsEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -73,7 +73,7 @@ public class GetBookDetailsEndpointTests : IClassFixture<LuminaWebFactory>
             Assert.True(json.RootElement.GetProperty("success").GetBoolean());
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("at Lumina", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("at Nemera", content, StringComparison.OrdinalIgnoreCase);
         Assert.Contains(_apiFactory.ApiClientStub.GetEndpointsCalled, endpoint => endpoint == $"libraries/{libraryId}/books/{normalizedBookId}");
     }
 }

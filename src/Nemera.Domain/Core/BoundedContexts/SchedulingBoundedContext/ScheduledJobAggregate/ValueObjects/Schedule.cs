@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Models.Core;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Domain.Common.Models.Core;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 using System;
 #endregion
 
-namespace Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
+namespace Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
 
 /// <summary>
 /// Value Object for the abstract schedule for a scheduled job.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Models.Core;
+using Nemera.Domain.Common.Models.Core;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+namespace Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
 
 /// <summary>
 /// Value Object for the ordered sequence of parts that make up the structure of a media library on disk.

@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.UsersManagement.Authentication.Commands.RecoverPassword;
+namespace Nemera.Application.Core.UsersManagement.Authentication.Commands.RecoverPassword;
 
 /// <summary>
 /// Represents the request model for account password recovery.

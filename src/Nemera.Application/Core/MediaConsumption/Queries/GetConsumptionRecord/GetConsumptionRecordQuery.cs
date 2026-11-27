@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.MediaConsumption.Queries.GetConsumptionRecord;
+namespace Nemera.Application.Core.MediaConsumption.Queries.GetConsumptionRecord;
 
 /// <summary>
 /// Query for getting a consumption record of the current user.

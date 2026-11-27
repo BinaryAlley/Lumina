@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Contracts.Responses.Common;
+namespace Nemera.Contracts.Responses.Common;
 
 /// <summary>
 /// Represents a paginated response containing a subset of data and pagination metadata for the current page.

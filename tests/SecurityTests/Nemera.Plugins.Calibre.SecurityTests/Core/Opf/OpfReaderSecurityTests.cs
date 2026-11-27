@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Plugins.Calibre.Core;
-using Lumina.Plugins.Calibre.Core.Opf;
-using Lumina.Plugins.Contracts.Core.Metadata;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Plugins.Calibre.Core;
+using Nemera.Plugins.Calibre.Core.Opf;
+using Nemera.Plugins.Contracts.Core.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.Calibre.SecurityTests.Core.Opf;
+namespace Nemera.Plugins.Calibre.SecurityTests.Core.Opf;
 
 /// <summary>
 /// Contains security tests for the <see cref="OpfReader"/> class, exercised through the public metadata provider surface.
@@ -152,7 +152,7 @@ public class OpfReaderSecurityTests
     /// <returns>The file system path of the created temporary directory.</returns>
     private static string CreateTempDirectory()
     {
-        string directoryPath = Path.Combine(Path.GetTempPath(), $"lumina-security-opf-{Guid.NewGuid():N}");
+        string directoryPath = Path.Combine(Path.GetTempPath(), $"nemera-security-opf-{Guid.NewGuid():N}");
         Directory.CreateDirectory(directoryPath);
         return directoryPath;
     }

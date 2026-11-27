@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
+namespace Nemera.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
 
 /// <summary>
 /// Query for retrieving the file system type.

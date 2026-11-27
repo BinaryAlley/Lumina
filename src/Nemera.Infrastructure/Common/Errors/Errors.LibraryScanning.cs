@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
+using Nemera.Domain.Common.Primitives;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Errors;
+namespace Nemera.Infrastructure.Common.Errors;
 
 /// <summary>
 /// Media Library Scan error types.

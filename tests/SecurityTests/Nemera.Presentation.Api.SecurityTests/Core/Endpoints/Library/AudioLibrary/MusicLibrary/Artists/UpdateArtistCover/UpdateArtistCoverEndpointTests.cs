@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.UpdateArtistCover;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.UpdateArtistCover;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,15 +21,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.UpdateArtistCover;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.UpdateArtistCover;
 
 /// <summary>
 /// Contains security tests for the <see cref="UpdateArtistCoverEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class UpdateArtistCoverEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class UpdateArtistCoverEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly List<string> _seededUsernames = [];
@@ -38,7 +38,7 @@ public class UpdateArtistCoverEndpointTests : IClassFixture<LuminaApiFactory>, I
     /// Initializes a new instance of the <see cref="UpdateArtistCoverEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public UpdateArtistCoverEndpointTests(LuminaApiFactory apiFactory)
+    public UpdateArtistCoverEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -48,7 +48,7 @@ public class UpdateArtistCoverEndpointTests : IClassFixture<LuminaApiFactory>, I
     {
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
-        client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
         Guid libraryId = Guid.NewGuid();
         Guid artistId = Guid.NewGuid();
         MultipartFormDataContent form = CreateCoverForm("cover.jpg");
@@ -73,7 +73,7 @@ public class UpdateArtistCoverEndpointTests : IClassFixture<LuminaApiFactory>, I
     {
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
-        client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
         MultipartFormDataContent form = CreateCoverForm("cover.jpg");
 
         // Act
@@ -232,7 +232,7 @@ public class UpdateArtistCoverEndpointTests : IClassFixture<LuminaApiFactory>, I
 
         // The other user's artist is untouched.
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         ArtistEntity? storedArtist = await dbContext.Artists.FirstOrDefaultAsync(artist => artist.Id == victimArtistId);
         Assert.NotNull(storedArtist);
         Assert.Equal("Queen", storedArtist.Name);
@@ -278,7 +278,7 @@ public class UpdateArtistCoverEndpointTests : IClassFixture<LuminaApiFactory>, I
     private async Task<(Guid libraryId, Guid artistId)> SeedLibraryAndArtistAsync(Guid userId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.NewGuid();
         Guid artistId = Guid.NewGuid();
         dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Security Audio Library", libraryType: LibraryType.Music, contentLocations: []));

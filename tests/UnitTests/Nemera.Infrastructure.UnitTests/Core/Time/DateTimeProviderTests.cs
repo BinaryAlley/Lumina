@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Core.Time;
+using Nemera.Infrastructure.Core.Time;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Time;
+namespace Nemera.Infrastructure.UnitTests.Core.Time;
 
 /// <summary>
 /// Contains unit tests for the <see cref="DateTimeProvider"/> class.

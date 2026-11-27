@@ -4,7 +4,7 @@
  * It fetches an uncovered demuxer window on demand, coalesced into an aligned block, while a seek or a gapless prefetch
  * needs bytes the regular download loop is not fetching, and it never issues a duplicate request for a window the running loop is already reading.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -49,14 +49,14 @@
     class SeekAwareByteSource {
         /**
          * Creates an instance of SeekAwareByteSource.
-         * @param {LuminaAudioPlayer.TrackDownloader} downloader - The downloader of the track.
+         * @param {NemeraAudioPlayer.TrackDownloader} downloader - The downloader of the track.
          */
         constructor(downloader) {
             this.downloader = downloader;
             // The regular byte source owns the end-of-stream behavior of a downloader read: a window that reaches past the
             // end is shortened, and a window that can no longer be filled reads as the end of the file. Delegating to it
             // keeps that behavior identical whether the window came from a one-shot seek fetch or from the download loop.
-            this.standard = new LuminaAudioPlayer.DemuxerByteSource(downloader);
+            this.standard = new NemeraAudioPlayer.DemuxerByteSource(downloader);
             this.isSeeking = false;
             this.destroyed = false;
             // Incremented by every new seek, so a read that is still waiting for a previous seek can tell that a newer seek
@@ -90,14 +90,14 @@
          * @param {number} offset - The first byte to read.
          * @param {number} length - The number of bytes to read.
          * @returns {Promise<Uint8Array>} The bytes, possibly shorter at the end of the stream.
-         * @throws {LuminaAudioPlayer.PlayerError} When the seek range cannot be fetched, or the read was aborted.
+         * @throws {NemeraAudioPlayer.PlayerError} When the seek range cannot be fetched, or the read was aborted.
          */
         async readAsync(offset, length) {
             if (this.destroyed)
                 return new Uint8Array(0);
             const seekGeneration = this.seekGeneration;
             if (this.isDownloaderAborted())
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The seek range request was aborted.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The seek range request was aborted.');
             const start = Math.max(0, Math.floor(offset));
             let size = Math.max(0, Math.floor(length));
             if (size === 0)
@@ -163,13 +163,13 @@
                 // A read that the loop can no longer fill falls back to a one-shot, exactly like a watchdog that saw the
                 // loop stop fetching. Any other failure, including an abort, propagates.
                 if (!result.error)
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The seek range request failed.');
-                if (LuminaAudioPlayer.isDownloadAbort(result.error)
+                    throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The seek range request failed.');
+                if (NemeraAudioPlayer.isDownloadAbort(result.error)
                     || !result.error.details
-                    || result.error.details.reason !== LuminaAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE)
+                    || result.error.details.reason !== NemeraAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE)
                     throw result.error;
                 if (this.isDownloaderAborted() || this.seekGeneration !== seekGeneration)
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The seek range request was aborted.');
+                    throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The seek range request was aborted.');
                 if (this.isWindowCovered(start, size))
                     return this.standard.readAsync(start, size);
                 return this.fetchOnDemandAsync(start, size, total, seekGeneration);
@@ -179,7 +179,7 @@
             readPromise.catch(() => {});
             if (result.reason === 'aborted' || result.reason === 'superseded'
                 || this.isDownloaderAborted() || this.seekGeneration !== seekGeneration)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The seek range request was aborted.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The seek range request was aborted.');
             if (this.isWindowCovered(start, size))
                 return this.standard.readAsync(start, size);
             return this.fetchOnDemandAsync(start, size, total, seekGeneration);
@@ -287,7 +287,7 @@
          */
         async fetchOnDemandAsync(start, size, total, seekGeneration) {
             if (this.isDownloaderAborted() || this.seekGeneration !== seekGeneration)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The seek range request was aborted.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The seek range request was aborted.');
             const window = this.getFetchWindow(start, size, total);
             if (window === null)
                 return new Uint8Array(0);
@@ -296,13 +296,13 @@
             // the file, while the byte buffer merges the overlapping ranges.
             const outcome = await this.downloader.downloadRangeAsync(window.start, window.end);
             if (outcome.isAborted || outcome.isDestroyed)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The seek range request was aborted.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The seek range request was aborted.');
             if (outcome.isFailed)
-                throw outcome.error || new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The seek range request failed.');
+                throw outcome.error || new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The seek range request failed.');
             // Every one-shot fetch is validated, not only a satisfied response: a short body or a changed file must not fall
             // through to a read that waits for a loop window below its target that will never be fetched.
             if (!this.isWindowCovered(start, size) && total !== null)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The seek range did not cover the requested window.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The seek range did not cover the requested window.');
             return this.standard.readAsync(start, size);
         }
 
@@ -348,5 +348,5 @@
         }
     }
 
-    LuminaAudioPlayer.SeekAwareByteSource = SeekAwareByteSource;
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+    NemeraAudioPlayer.SeekAwareByteSource = SeekAwareByteSource;
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

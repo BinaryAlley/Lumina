@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Favorites;
+using Nemera.Presentation.Web.Common.Enums.Favorites;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Favorites;
+namespace Nemera.Presentation.Web.Common.DTO.Favorites;
 
 /// <summary>
 /// Data transfer object for a favorite of the current user together with the display details of the media item it references.

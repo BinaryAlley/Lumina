@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.Infrastructure.Themes;
-using Lumina.Contracts.Responses.Themes;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Presentation.Api.Core.Endpoints.Themes.Management.DeleteTheme;
-using Lumina.Presentation.Api.Fixtures.Core.Endpoints.Themes;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.Infrastructure.Themes;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Presentation.Api.Core.Endpoints.Themes.Management.DeleteTheme;
+using Nemera.Presentation.Api.Fixtures.Core.Endpoints.Themes;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,16 +24,16 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Management.DeleteTheme;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Management.DeleteTheme;
 
 /// <summary>
 /// Contains integration tests for the <see cref="DeleteThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class DeleteThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class DeleteThemeEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly TestThemeArchiveFixture _testThemeArchiveFixture = new();
     private readonly List<string> _installedThemeIds = [];
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -46,7 +46,7 @@ public class DeleteThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     /// Initializes a new instance of the <see cref="DeleteThemeEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public DeleteThemeEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public DeleteThemeEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -74,7 +74,7 @@ public class DeleteThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
 
         // The theme row is removed from the database.
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.Null(await dbContext.Themes.FirstOrDefaultAsync(theme => theme.ThemeId == themeId));
 
         // The theme no longer appears in GET /themes.
@@ -119,7 +119,7 @@ public class DeleteThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Assert.Equal(HttpStatusCode.NoContent, firstDeletionResponse.StatusCode);
 
         // Act: the last remaining bundled theme cannot be deleted.
-        HttpResponseMessage response = await _client.DeleteAsync("/api/v1/themes/lumina-default");
+        HttpResponseMessage response = await _client.DeleteAsync("/api/v1/themes/nemera-default");
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -131,7 +131,7 @@ public class DeleteThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
         Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails["type"].GetString());
         Assert.Equal("General.Forbidden", problemDetails["title"].GetString());
         Assert.Equal("LastBundledThemeCannotBeDeleted", problemDetails["detail"].GetString());
-        Assert.Equal("/api/v1/themes/lumina-default", problemDetails["instance"].GetString());
+        Assert.Equal("/api/v1/themes/nemera-default", problemDetails["instance"].GetString());
         Assert.NotNull(problemDetails["traceId"].GetString());
         Assert.NotEmpty(problemDetails["traceId"].GetString()!);
 
@@ -203,7 +203,7 @@ public class DeleteThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         foreach (string themeId in _installedThemeIds)
         {

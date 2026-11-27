@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
-using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
-using Lumina.Contracts.Requests.Authorization;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.DeleteRole;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
+using Nemera.Contracts.Fixtures.Core.Requests.Authorization;
+using Nemera.Contracts.Requests.Authorization;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.DeleteRole;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Admin.Authorization.Roles.DeleteRole;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Admin.Authorization.Roles.DeleteRole;
 
 /// <summary>
 /// Contains unit tests for the <see cref="DeleteRoleEndpoint"/> class.

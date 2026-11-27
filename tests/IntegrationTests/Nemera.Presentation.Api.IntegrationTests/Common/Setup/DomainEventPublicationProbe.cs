@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+namespace Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 
 /// <summary>
 /// Observes the domain events published through the real domain event publisher.

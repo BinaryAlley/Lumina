@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
+using Nemera.Domain.Common.Primitives;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Domain.UnitTests.Common.Primitives;
+namespace Nemera.Domain.UnitTests.Common.Primitives;
 
 /// <summary>
 /// Contains unit tests for the <see cref="Optional{T}"/> class.

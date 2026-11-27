@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.Specifications;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Common.Specifications;
 using System;
 using System.Linq.Expressions;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.BookLibrary.Specifications;
+namespace Nemera.DataAccess.Core.Repositories.BookLibrary.Specifications;
 
 /// <summary>
 /// Represents a filter specification for filtering or searching book entities based on a search term.

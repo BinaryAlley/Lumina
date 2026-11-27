@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Domain.Common.Errors;
-using Lumina.Application.Core.Scheduling.Commands.AddScheduledJob;
-using Lumina.Contracts.Fixtures.Core.Requests.Scheduling;
-using Lumina.Contracts.Fixtures.Core.Responses.Scheduling;
-using Lumina.Contracts.Requests.Scheduling;
-using Lumina.Contracts.Responses.Scheduling;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
-using Lumina.Presentation.Api.Core.Endpoints.Scheduling.AddScheduledJob;
+using Nemera.Domain.Common.Errors;
+using Nemera.Application.Core.Scheduling.Commands.AddScheduledJob;
+using Nemera.Contracts.Fixtures.Core.Requests.Scheduling;
+using Nemera.Contracts.Fixtures.Core.Responses.Scheduling;
+using Nemera.Contracts.Requests.Scheduling;
+using Nemera.Contracts.Responses.Scheduling;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Presentation.Api.Core.Endpoints.Scheduling.AddScheduledJob;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Scheduling.AddScheduledJob;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Scheduling.AddScheduledJob;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AddScheduledJobEndpoint"/> class.
@@ -71,7 +71,7 @@ public class AddScheduledJobEndpointTests
         // Arrange
         AddScheduledJobRequest request = _addScheduledJobRequestFixture.Create();
         CancellationToken cancellationToken = CancellationToken.None;
-        Error expectedError = Lumina.Domain.Common.Errors.Errors.Scheduling.ScheduledJobNameCannotBeEmpty;
+        Error expectedError = Nemera.Domain.Common.Errors.Errors.Scheduling.ScheduledJobNameCannotBeEmpty;
         _mockHandler.HandleAsync(Arg.Any<AddScheduledJobCommand>(), Arg.Any<CancellationToken>())
             .Returns(expectedError);
 

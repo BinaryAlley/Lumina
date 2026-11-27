@@ -1,21 +1,21 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Mapping.MediaConsumption;
-using Lumina.Contracts.Responses.MediaConsumption;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Mapping.MediaConsumption;
+using Nemera.Contracts.Responses.MediaConsumption;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.Core.MediaConsumption.Queries.GetConsumptionRecord;
+namespace Nemera.Application.Core.MediaConsumption.Queries.GetConsumptionRecord;
 
 /// <summary>
 /// Handler for the query to get a consumption record of the current user.

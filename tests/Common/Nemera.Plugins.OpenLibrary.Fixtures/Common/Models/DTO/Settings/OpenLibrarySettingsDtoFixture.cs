@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Plugins.OpenLibrary.Common.Models.DTO.Settings;
+using Nemera.Plugins.OpenLibrary.Common.Models.DTO.Settings;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.Fixtures.Common.Models.DTO.Settings;
+namespace Nemera.Plugins.OpenLibrary.Fixtures.Common.Models.DTO.Settings;
 
 /// <summary>
 /// Fixture class for the <see cref="OpenLibrarySettingsDto"/> class.

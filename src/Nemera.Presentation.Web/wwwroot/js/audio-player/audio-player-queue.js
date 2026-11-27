@@ -1,14 +1,14 @@
 /**
  * Queue model, play context resolution and client storage of the audio player.
  *
- * The player owns exactly one queue. This module defines that queue as a value object ({@link LuminaAudioPlayer.AudioQueue}),
+ * The player owns exactly one queue. This module defines that queue as a value object ({@link NemeraAudioPlayer.AudioQueue}),
  * the service that builds a queue from a play context through the web endpoints of the music pages
- * ({@link LuminaAudioPlayer.QueueContextService}), and the sampler that draws randomized tracks for a shuffle scope
- * ({@link LuminaAudioPlayer.ShuffleSource}).
+ * ({@link NemeraAudioPlayer.QueueContextService}), and the sampler that draws randomized tracks for a shuffle scope
+ * ({@link NemeraAudioPlayer.ShuffleSource}).
  *
  * Play contexts and the web endpoints used for each
  * --------------------------------------------------
- * The pages hand the player a play descriptor, per LuminaAudioPlayer.createPlayDescriptor. A descriptor that carries an
+ * The pages hand the player a play descriptor, per NemeraAudioPlayer.createPlayDescriptor. A descriptor that carries an
  * explicit queue is used as is: the page already knows the ordered tracks of its context. A descriptor that names only
  * a context is resolved here:
  *   - Album context (libraryId, artistId, albumId, without a trackId; optionally with a queue):
@@ -54,7 +54,7 @@
  * The queue lives only in memory for the current page. A full page load creates a new player with an empty queue and the
  * bar hidden. An in-place navigation does not recreate the player, so the queue survives those swaps.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -62,7 +62,7 @@
      * @readonly
      * @enum {string}
      */
-    LuminaAudioPlayer.QueueRepeatMode = Object.freeze({
+    NemeraAudioPlayer.QueueRepeatMode = Object.freeze({
         // Playback stops at the end of the queue.
         OFF: 'off',
         // Playback wraps to the first entry at the end of the queue.
@@ -76,7 +76,7 @@
      * @readonly
      * @enum {string}
      */
-    LuminaAudioPlayer.QueueShuffleScope = Object.freeze({
+    NemeraAudioPlayer.QueueShuffleScope = Object.freeze({
         // The tracks of the release that is playing.
         RELEASE: 'release',
         // All tracks of all releases of the artist that is playing.
@@ -90,7 +90,7 @@
      * @readonly
      * @enum {string}
      */
-    LuminaAudioPlayer.PlayContextKind = Object.freeze({
+    NemeraAudioPlayer.PlayContextKind = Object.freeze({
         ALBUM: 'album',
         ARTIST: 'artist',
         LIBRARY: 'library',
@@ -304,10 +304,10 @@
      * @returns {never} Never returns; it always throws.
      */
     function throwSessionExpired() {
-        throw new LuminaAudioPlayer.PlayerError(
-            LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED,
+        throw new NemeraAudioPlayer.PlayerError(
+            NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED,
             'The session expired while the play context was loaded.',
-            { reason: LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED });
+            { reason: NemeraAudioPlayer.PlayerErrorReason.SESSION_EXPIRED });
     }
 
     /**
@@ -333,11 +333,11 @@
             this.currentIndex = -1;
             // The identities of the entries that were current before the current one, most recent last, used by previous.
             this.history = [];
-            this.repeatMode = LuminaAudioPlayer.QueueRepeatMode.OFF;
+            this.repeatMode = NemeraAudioPlayer.QueueRepeatMode.OFF;
             // True while the queue is a shuffled selection, so the queue extension adds another shuffle batch instead of
             // the autoplay continuation.
             this.shuffle = false;
-            this.shuffleScope = LuminaAudioPlayer.QueueShuffleScope.RELEASE;
+            this.shuffleScope = NemeraAudioPlayer.QueueShuffleScope.RELEASE;
             // The play context the queue was built from: { kind, libraryId, albumId, artistId, title, coverArtPath, coverArtUrl }.
             this.context = null;
             // True while the autoplay continuation of an album or artist may still append entries.
@@ -366,11 +366,11 @@
          * Creates the identity of a new queue entry. Every occurrence in the queue gets its own identity, so two entries
          * that repeat the same track are never confused.
          * @returns {string} The new entry Id.
-         * @throws {LuminaAudioPlayer.PlayerError} When the safe identity space is exhausted.
+         * @throws {NemeraAudioPlayer.PlayerError} When the safe identity space is exhausted.
          */
         createEntryId() {
             if (this.entrySequence >= MAX_ENTRY_SEQUENCE)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The queue entry identity space is exhausted.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The queue entry identity space is exhausted.');
             this.entrySequence += 1;
             return `queue-entry-${this.entrySequence}`;
         }
@@ -557,7 +557,7 @@
         resolveStartIndex(startIndex, startTrackId) {
             if (this.entries.length === 0)
                 return -1;
-            const trackId = LuminaAudioPlayer.toIdString(startTrackId);
+            const trackId = NemeraAudioPlayer.toIdString(startTrackId);
             if (trackId) {
                 const trackIndex = this.entries.findIndex((entry) => entry.descriptor.trackId
                     && entry.descriptor.trackId.toLowerCase() === trackId.toLowerCase());
@@ -612,7 +612,7 @@
                 return this.entries.length > 0 ? this.entries[0] : null;
             if (this.currentIndex + 1 < this.entries.length)
                 return this.entries[this.currentIndex + 1];
-            if (options.allowWrap !== false && this.repeatMode === LuminaAudioPlayer.QueueRepeatMode.ALL)
+            if (options.allowWrap !== false && this.repeatMode === NemeraAudioPlayer.QueueRepeatMode.ALL)
                 return this.entries[0];
             return null;
         }
@@ -635,7 +635,7 @@
                 return { entry: this.entries[this.currentIndex - 1], fromHistory: false };
             if (this.currentIndex < 0)
                 return { entry: this.entries[0], fromHistory: false };
-            if (this.repeatMode === LuminaAudioPlayer.QueueRepeatMode.ALL && this.entries.length > 1)
+            if (this.repeatMode === NemeraAudioPlayer.QueueRepeatMode.ALL && this.entries.length > 1)
                 return { entry: this.entries[this.entries.length - 1], fromHistory: false };
             return null;
         }
@@ -879,7 +879,7 @@
 
         /**
          * Gets the shuffle scope of the current selection.
-         * @returns {string} One of the {@link LuminaAudioPlayer.QueueShuffleScope} values.
+         * @returns {string} One of the {@link NemeraAudioPlayer.QueueShuffleScope} values.
          */
         getShuffleScope() {
             return this.shuffleScope;
@@ -919,7 +919,7 @@
 
         /**
          * Gets the repeat mode.
-         * @returns {string} One of the {@link LuminaAudioPlayer.QueueRepeatMode} values.
+         * @returns {string} One of the {@link NemeraAudioPlayer.QueueRepeatMode} values.
          */
         getRepeatMode() {
             return this.repeatMode;
@@ -927,11 +927,11 @@
 
         /**
          * Sets the repeat mode.
-         * @param {string} mode - One of the {@link LuminaAudioPlayer.QueueRepeatMode} values.
+         * @param {string} mode - One of the {@link NemeraAudioPlayer.QueueRepeatMode} values.
          * @returns {boolean} True when the mode changed.
          */
         setRepeatMode(mode) {
-            const modes = Object.values(LuminaAudioPlayer.QueueRepeatMode);
+            const modes = Object.values(NemeraAudioPlayer.QueueRepeatMode);
             if (!modes.includes(mode))
                 return false;
             const changed = this.repeatMode !== mode;
@@ -945,9 +945,9 @@
          */
         cycleRepeatMode() {
             const modes = [
-                LuminaAudioPlayer.QueueRepeatMode.OFF,
-                LuminaAudioPlayer.QueueRepeatMode.ALL,
-                LuminaAudioPlayer.QueueRepeatMode.ONE
+                NemeraAudioPlayer.QueueRepeatMode.OFF,
+                NemeraAudioPlayer.QueueRepeatMode.ALL,
+                NemeraAudioPlayer.QueueRepeatMode.ONE
             ];
             const index = modes.indexOf(this.repeatMode);
             this.repeatMode = modes[(index + 1) % modes.length];
@@ -1073,39 +1073,39 @@
          * @param {Object} descriptor - The normalized play descriptor.
          * @param {AbortSignal} [signal] - The signal that cancels the request when the player supersedes or stops it.
          * @returns {Promise<{ descriptors: Array<Object>, context: Object, continuationEnabled: boolean }>} The queue.
-         * @throws {LuminaAudioPlayer.PlayerError} When the context is incomplete, the session expired, or an endpoint failed.
+         * @throws {NemeraAudioPlayer.PlayerError} When the context is incomplete, the session expired, or an endpoint failed.
          */
         async buildQueueAsync(descriptor, signal) {
-            if (!descriptor || !LuminaAudioPlayer.isGuid(descriptor.libraryId))
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor carries no valid library Id.', { field: 'libraryId' });
+            if (!descriptor || !NemeraAudioPlayer.isGuid(descriptor.libraryId))
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor carries no valid library Id.', { field: 'libraryId' });
             // A page that already knows the ordered tracks of its context hands them over: it is the only way a themed page
             // can provide an order this client does not know how to fetch. Only full track descriptors are accepted, because
             // an album or artist context entry has no track to load and would become a dead queue item.
             const queueDescriptors = Array.isArray(descriptor.queue)
                 ? descriptor.queue.filter((entry) => entry
-                    && LuminaAudioPlayer.isGuid(entry.trackId)
-                    && LuminaAudioPlayer.isGuid(entry.albumId)
-                    && LuminaAudioPlayer.isGuid(entry.artistId)
-                    && LuminaAudioPlayer.isGuid(entry.libraryId))
+                    && NemeraAudioPlayer.isGuid(entry.trackId)
+                    && NemeraAudioPlayer.isGuid(entry.albumId)
+                    && NemeraAudioPlayer.isGuid(entry.artistId)
+                    && NemeraAudioPlayer.isGuid(entry.libraryId))
                 : [];
             if (queueDescriptors.length > 0) {
                 return {
                     descriptors: queueDescriptors,
-                    context: this.createContext(descriptor, LuminaAudioPlayer.PlayContextKind.QUEUE),
+                    context: this.createContext(descriptor, NemeraAudioPlayer.PlayContextKind.QUEUE),
                     continuationEnabled: false
                 };
             }
             if (descriptor.trackId) {
-                if (!LuminaAudioPlayer.isGuid(descriptor.trackId))
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor carries an invalid track Id.', { field: 'trackId' });
+                if (!NemeraAudioPlayer.isGuid(descriptor.trackId))
+                    throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor carries an invalid track Id.', { field: 'trackId' });
                 return {
                     descriptors: [descriptor],
-                    context: this.createContext(descriptor, LuminaAudioPlayer.PlayContextKind.TRACK),
+                    context: this.createContext(descriptor, NemeraAudioPlayer.PlayContextKind.TRACK),
                     continuationEnabled: false
                 };
             }
             if (descriptor.albumId) {
-                const context = this.createContext(descriptor, LuminaAudioPlayer.PlayContextKind.ALBUM);
+                const context = this.createContext(descriptor, NemeraAudioPlayer.PlayContextKind.ALBUM);
                 this.assertContextIds(context, true);
                 const tracks = await this.fetchAlbumTracksAsync(context.artistId, context.albumId, context.libraryId, signal);
                 const descriptors = this.createTrackDescriptors(tracks, {
@@ -1119,7 +1119,7 @@
                 return { descriptors, context, continuationEnabled: descriptors.length > 0 };
             }
             if (descriptor.artistId) {
-                const context = this.createContext(descriptor, LuminaAudioPlayer.PlayContextKind.ARTIST);
+                const context = this.createContext(descriptor, NemeraAudioPlayer.PlayContextKind.ARTIST);
                 this.assertContextIds(context, false);
                 // An artist context is the whole discography in artist page order. The track lists are fetched with a small
                 // concurrency bound, so a prolific artist does not turn into hundreds of sequential requests.
@@ -1128,7 +1128,7 @@
             }
             // A descriptor with only a library Id plays the whole library in artist page order. The first artist with
             // tracks starts the queue, and the library continuation moves through the remaining artists.
-            const context = this.createContext(descriptor, LuminaAudioPlayer.PlayContextKind.LIBRARY);
+            const context = this.createContext(descriptor, NemeraAudioPlayer.PlayContextKind.LIBRARY);
             const descriptors = await this.buildLibraryDescriptorsAsync(context, signal);
             return { descriptors, context, continuationEnabled: descriptors.length > 0 };
         }
@@ -1139,7 +1139,7 @@
          * @param {Object} context - The library play context.
          * @param {AbortSignal} [signal] - The signal that cancels the request when the player supersedes or stops it.
          * @returns {Promise<Array<Object>>} The play descriptors of the first artist that has tracks.
-         * @throws {LuminaAudioPlayer.PlayerError} When the session expired or an endpoint failed.
+         * @throws {NemeraAudioPlayer.PlayerError} When the session expired or an endpoint failed.
          */
         async buildLibraryDescriptorsAsync(context, signal) {
             const artists = await this.fetchArtistsAsync(context.libraryId, signal);
@@ -1166,13 +1166,13 @@
          * @param {AudioQueue} queue - The queue, used to skip what it already holds.
          * @param {AbortSignal} [signal] - The signal that cancels the request when the player supersedes or stops it.
          * @returns {Promise<{ descriptors: Array<Object>, isExhausted: boolean }>} The next batch.
-         * @throws {LuminaAudioPlayer.PlayerError} When the session expired or an endpoint failed.
+         * @throws {NemeraAudioPlayer.PlayerError} When the session expired or an endpoint failed.
          */
         async buildContinuationBatchAsync(context, queue, signal) {
             if (!context)
                 return { descriptors: [], isExhausted: true };
-            if (context.kind === LuminaAudioPlayer.PlayContextKind.ALBUM) {
-                if (!LuminaAudioPlayer.isGuid(context.artistId) || !LuminaAudioPlayer.isGuid(context.albumId))
+            if (context.kind === NemeraAudioPlayer.PlayContextKind.ALBUM) {
+                if (!NemeraAudioPlayer.isGuid(context.artistId) || !NemeraAudioPlayer.isGuid(context.albumId))
                     return { descriptors: [], isExhausted: true };
                 const albums = await this.fetchArtistAlbumsAsync(context.artistId, context.libraryId, signal);
                 const currentIndex = albums.findIndex((album) => String(album.id).toLowerCase() === context.albumId.toLowerCase());
@@ -1191,8 +1191,8 @@
                 // The discography of the artist is over, so autoplay continues with the next artist of the library.
                 return this.buildNextArtistBatchAsync(context, queue, signal);
             }
-            if (context.kind === LuminaAudioPlayer.PlayContextKind.ARTIST
-                || context.kind === LuminaAudioPlayer.PlayContextKind.LIBRARY)
+            if (context.kind === NemeraAudioPlayer.PlayContextKind.ARTIST
+                || context.kind === NemeraAudioPlayer.PlayContextKind.LIBRARY)
                 return this.buildNextArtistBatchAsync(context, queue, signal);
             return { descriptors: [], isExhausted: true };
         }
@@ -1205,10 +1205,10 @@
          * @returns {Promise<{ descriptors: Array<Object>, isExhausted: boolean }>} The next artist batch.
          */
         async buildNextArtistBatchAsync(context, queue, signal) {
-            if (!LuminaAudioPlayer.isGuid(context.libraryId))
+            if (!NemeraAudioPlayer.isGuid(context.libraryId))
                 return { descriptors: [], isExhausted: true };
             const artists = await this.fetchArtistsAsync(context.libraryId, signal);
-            const currentIndex = LuminaAudioPlayer.isGuid(context.artistId)
+            const currentIndex = NemeraAudioPlayer.isGuid(context.artistId)
                 ? artists.findIndex((artist) => String(artist.id).toLowerCase() === context.artistId.toLowerCase())
                 : -1;
             const candidates = artists
@@ -1230,53 +1230,53 @@
         /**
          * Creates the shuffle source of a scope. The source requests each batch from the shuffle endpoint, which samples the
          * database uniformly at random from every track of the scope and excludes the tracks already queued.
-         * @param {string} scope - One of the {@link LuminaAudioPlayer.QueueShuffleScope} values.
+         * @param {string} scope - One of the {@link NemeraAudioPlayer.QueueShuffleScope} values.
          * @param {AudioQueue} queue - The queue the shuffle replaces.
          * @param {Object|null} descriptor - The descriptor that is playing, used to resolve the category when the context is incomplete.
-         * @returns {Promise<LuminaAudioPlayer.ShuffleSource>} The shuffle source.
-         * @throws {LuminaAudioPlayer.PlayerError} When the scope cannot be resolved for this queue.
+         * @returns {Promise<NemeraAudioPlayer.ShuffleSource>} The shuffle source.
+         * @throws {NemeraAudioPlayer.PlayerError} When the scope cannot be resolved for this queue.
          */
         async createShuffleSourceAsync(scope, queue, descriptor) {
             const context = queue && queue.context ? queue.context : null;
             const libraryId = (context && context.libraryId) || (descriptor && descriptor.libraryId);
             const artistId = (descriptor && descriptor.artistId) || (context && context.artistId);
             const albumId = (descriptor && descriptor.albumId) || (context && context.albumId);
-            if (!LuminaAudioPlayer.isGuid(libraryId))
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The shuffle scope carries no valid library Id.', { field: 'libraryId' });
-            if (scope === LuminaAudioPlayer.QueueShuffleScope.RELEASE && (!LuminaAudioPlayer.isGuid(artistId) || !LuminaAudioPlayer.isGuid(albumId)))
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The release shuffle scope needs an album and its artist.');
-            if (scope === LuminaAudioPlayer.QueueShuffleScope.ARTIST && !LuminaAudioPlayer.isGuid(artistId))
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The artist shuffle scope needs an artist Id.');
-            if (scope !== LuminaAudioPlayer.QueueShuffleScope.RELEASE
-                && scope !== LuminaAudioPlayer.QueueShuffleScope.ARTIST
-                && scope !== LuminaAudioPlayer.QueueShuffleScope.LIBRARY)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The shuffle scope is not known.');
+            if (!NemeraAudioPlayer.isGuid(libraryId))
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The shuffle scope carries no valid library Id.', { field: 'libraryId' });
+            if (scope === NemeraAudioPlayer.QueueShuffleScope.RELEASE && (!NemeraAudioPlayer.isGuid(artistId) || !NemeraAudioPlayer.isGuid(albumId)))
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The release shuffle scope needs an album and its artist.');
+            if (scope === NemeraAudioPlayer.QueueShuffleScope.ARTIST && !NemeraAudioPlayer.isGuid(artistId))
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The artist shuffle scope needs an artist Id.');
+            if (scope !== NemeraAudioPlayer.QueueShuffleScope.RELEASE
+                && scope !== NemeraAudioPlayer.QueueShuffleScope.ARTIST
+                && scope !== NemeraAudioPlayer.QueueShuffleScope.LIBRARY)
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The shuffle scope is not known.');
 
             const url = this.buildUrl('shuffleTracksUrl', {}, {});
-            return new LuminaAudioPlayer.ShuffleSource({
+            return new NemeraAudioPlayer.ShuffleSource({
                 // The server picks the random tracks from every matching row of the database, so the browser never has to enumerate the albums and tracks of a library before it can draw a batch.
                 fetchBatchAsync: async (excludedTrackIds, count, signal) => {
                     if (typeof this.postJsonAsync !== 'function')
-                        throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The shuffle endpoint is not available.');
+                        throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The shuffle endpoint is not available.');
                     const request = {
                         libraryId,
                         count,
                         excludedTrackIds: excludedTrackIds instanceof Set ? [...excludedTrackIds] : []
                     };
-                    if (scope === LuminaAudioPlayer.QueueShuffleScope.RELEASE || scope === LuminaAudioPlayer.QueueShuffleScope.ARTIST)
+                    if (scope === NemeraAudioPlayer.QueueShuffleScope.RELEASE || scope === NemeraAudioPlayer.QueueShuffleScope.ARTIST)
                         request.artistId = artistId;
-                    if (scope === LuminaAudioPlayer.QueueShuffleScope.RELEASE)
+                    if (scope === NemeraAudioPlayer.QueueShuffleScope.RELEASE)
                         request.albumId = albumId;
                     const rows = await this.postJsonAsync(url, request, { signal, label: 'the shuffled tracks' });
                     if (signal && signal.aborted)
-                        throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The request for the shuffled tracks was aborted.');
-                    if (rows === LuminaAudioPlayer.REDIRECTED)
+                        throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The request for the shuffled tracks was aborted.');
+                    if (rows === NemeraAudioPlayer.REDIRECTED)
                         throwSessionExpired();
                     if (rows === undefined || rows === null)
-                        throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The shuffled tracks could not be loaded.');
+                        throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The shuffled tracks could not be loaded.');
                     if (!Array.isArray(rows))
-                        throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The shuffled tracks response is not a list.');
-                    return rows.map((row) => LuminaAudioPlayer.createPlayDescriptor({
+                        throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The shuffled tracks response is not a list.');
+                    return rows.map((row) => NemeraAudioPlayer.createPlayDescriptor({
                         trackId: row.trackId,
                         albumId: row.albumId,
                         artistId: row.artistId,
@@ -1293,7 +1293,7 @@
         /**
          * Creates the play context of a descriptor.
          * @param {Object} descriptor - The normalized play descriptor.
-         * @param {string} kind - One of the {@link LuminaAudioPlayer.PlayContextKind} values.
+         * @param {string} kind - One of the {@link NemeraAudioPlayer.PlayContextKind} values.
          * @returns {Object} The play context.
          */
         createContext(descriptor, kind) {
@@ -1312,13 +1312,13 @@
          * Checks the Ids a context needs for its kind.
          * @param {Object} context - The context to check.
          * @param {boolean} needsAlbum - True when the context needs an album.
-         * @throws {LuminaAudioPlayer.PlayerError} When an Id is missing or malformed.
+         * @throws {NemeraAudioPlayer.PlayerError} When an Id is missing or malformed.
          */
         assertContextIds(context, needsAlbum) {
-            if (!LuminaAudioPlayer.isGuid(context.artistId))
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor carries no valid artist Id.', { field: 'artistId' });
-            if (needsAlbum && !LuminaAudioPlayer.isGuid(context.albumId))
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor carries no valid album Id.', { field: 'albumId' });
+            if (!NemeraAudioPlayer.isGuid(context.artistId))
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor carries no valid artist Id.', { field: 'artistId' });
+            if (needsAlbum && !NemeraAudioPlayer.isGuid(context.albumId))
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor carries no valid album Id.', { field: 'albumId' });
         }
 
         /**
@@ -1393,19 +1393,19 @@
          * @param {string} libraryId - The Id of the library.
          * @param {AbortSignal} [signal] - The signal that cancels the request when the player supersedes or stops it.
          * @returns {Promise<Object>} The album details, with its metadata and stored artwork.
-         * @throws {LuminaAudioPlayer.PlayerError} When the album details cannot be loaded.
+         * @throws {NemeraAudioPlayer.PlayerError} When the album details cannot be loaded.
          */
         async fetchAlbumDetailsAsync(artistId, albumId, libraryId, signal) {
-            if (!LuminaAudioPlayer.isGuid(artistId) || !LuminaAudioPlayer.isGuid(albumId) || !LuminaAudioPlayer.isGuid(libraryId))
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The album details request carries no valid album context.');
+            if (!NemeraAudioPlayer.isGuid(artistId) || !NemeraAudioPlayer.isGuid(albumId) || !NemeraAudioPlayer.isGuid(libraryId))
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The album details request carries no valid album context.');
             const url = this.buildUrl('getAlbumUrl', { artistId, albumId }, { libraryId });
             const data = await this.fetchJsonAsync(url, signal, 'the album details');
             if (signal && signal.aborted)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The request for the album details was aborted.');
-            if (data === LuminaAudioPlayer.REDIRECTED)
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The request for the album details was aborted.');
+            if (data === NemeraAudioPlayer.REDIRECTED)
                 throwSessionExpired();
             if (data === undefined || data === null || typeof data !== 'object')
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The album details could not be loaded.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The album details could not be loaded.');
             return data;
         }
 
@@ -1464,10 +1464,10 @@
         createTrackDescriptors(tracks, album) {
             const descriptors = [];
             for (const track of Array.isArray(tracks) ? tracks : []) {
-                const trackId = LuminaAudioPlayer.toIdString(track && track.id);
-                if (!LuminaAudioPlayer.isGuid(trackId))
+                const trackId = NemeraAudioPlayer.toIdString(track && track.id);
+                if (!NemeraAudioPlayer.isGuid(trackId))
                     continue;
-                const descriptor = LuminaAudioPlayer.createPlayDescriptor({
+                const descriptor = NemeraAudioPlayer.createPlayDescriptor({
                     trackId,
                     albumId: album.albumId,
                     artistId: album.artistId,
@@ -1491,31 +1491,31 @@
          * @param {Object} replacements - The route values, keyed by placeholder name.
          * @param {Object} query - The query parameters.
          * @returns {string} The root relative endpoint path.
-         * @throws {LuminaAudioPlayer.PlayerError} When the template is missing, off this origin, or a route value is not a Guid.
+         * @throws {NemeraAudioPlayer.PlayerError} When the template is missing, off this origin, or a route value is not a Guid.
          */
         buildUrl(templateKey, replacements, query) {
             const configuration = typeof this.getConfiguration === 'function' ? this.getConfiguration() : null;
             const template = configuration ? configuration[templateKey] : null;
             if (typeof template !== 'string' || template.length === 0)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, `The endpoint '${templateKey}' is not configured.`);
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, `The endpoint '${templateKey}' is not configured.`);
             let path = template;
             for (const name of Object.keys(replacements || {})) {
                 const value = replacements[name];
-                if (!LuminaAudioPlayer.isGuid(value))
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, `The play context carries no valid ${name}.`, { field: name });
+                if (!NemeraAudioPlayer.isGuid(value))
+                    throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, `The play context carries no valid ${name}.`, { field: name });
                 path = path.split(`{${name}}`).join(encodeURIComponent(value));
             }
             let base;
             try {
                 base = new URL(path, getBaseOrigin());
             } catch (error) {
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The endpoint is not a valid URL.', { cause: error });
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The endpoint is not a valid URL.', { cause: error });
             }
             if ((base.protocol !== 'http:' && base.protocol !== 'https:')
                 || base.origin !== new URL(getBaseOrigin()).origin
                 || base.username !== ''
                 || base.password !== '')
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The endpoint is not on this origin.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The endpoint is not on this origin.');
             for (const name of Object.keys(query || {})) {
                 const value = query[name];
                 if (value !== undefined && value !== null && value !== '')
@@ -1551,18 +1551,18 @@
          * @param {string} label - The description of the request in a failure log.
          * @param {AbortSignal} [signal] - The signal that cancels the request when the player supersedes or stops it.
          * @returns {Promise<Object>} The paginated payload.
-         * @throws {LuminaAudioPlayer.PlayerError} When the session expired, the endpoint failed, or the request was aborted.
+         * @throws {NemeraAudioPlayer.PlayerError} When the session expired, the endpoint failed, or the request was aborted.
          */
         async fetchPageAsync(url, label, signal) {
             const data = await this.fetchJsonAsync(url, signal, label);
             // The JSON transport maps an abort to the same undefined result as a failed request, so the signal is checked
             // explicitly to keep an abort from being reported as an endpoint failure by the caller's error handling.
             if (signal && signal.aborted)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, `The request for ${label} was aborted.`);
-            if (data === LuminaAudioPlayer.REDIRECTED)
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, `The request for ${label} was aborted.`);
+            if (data === NemeraAudioPlayer.REDIRECTED)
                 throwSessionExpired();
             if (data === undefined || data === null || typeof data !== 'object')
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, `The request for ${label} failed.`);
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, `The request for ${label} failed.`);
             return data;
         }
     }
@@ -1597,7 +1597,7 @@
             if (this.isExhausted)
                 return [];
             if (typeof this.fetchBatchAsync !== 'function')
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The shuffle source has no endpoint.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The shuffle source has no endpoint.');
             const batch = await this.fetchBatchAsync(excludedTrackIds instanceof Set ? excludedTrackIds : new Set(), count, signal);
             const result = Array.isArray(batch) ? batch : [];
             // A short batch means the server ran out of tracks that are not already queued, so the scope is exhausted.
@@ -1607,9 +1607,9 @@
         }
     }
 
-    LuminaAudioPlayer.AudioQueue = AudioQueue;
-    LuminaAudioPlayer.QueueContextService = QueueContextService;
-    LuminaAudioPlayer.ShuffleSource = ShuffleSource;
-    LuminaAudioPlayer.SHUFFLE_BATCH_SIZE = SHUFFLE_BATCH_SIZE;
-    LuminaAudioPlayer.SHUFFLE_LOOKAHEAD = SHUFFLE_LOOKAHEAD;
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+    NemeraAudioPlayer.AudioQueue = AudioQueue;
+    NemeraAudioPlayer.QueueContextService = QueueContextService;
+    NemeraAudioPlayer.ShuffleSource = ShuffleSource;
+    NemeraAudioPlayer.SHUFFLE_BATCH_SIZE = SHUFFLE_BATCH_SIZE;
+    NemeraAudioPlayer.SHUFFLE_LOOKAHEAD = SHUFFLE_LOOKAHEAD;
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

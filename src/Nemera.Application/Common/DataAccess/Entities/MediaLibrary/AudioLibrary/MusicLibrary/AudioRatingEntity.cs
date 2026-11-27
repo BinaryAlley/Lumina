@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+namespace Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
 
 /// <summary>
 /// Repository entity for the rating of an audio media element.

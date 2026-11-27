@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Infrastructure.Core.Plugins;
-using Lumina.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Infrastructure.Core.Plugins;
+using Nemera.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.IntegrationTests.Core.Plugins;
+namespace Nemera.Infrastructure.IntegrationTests.Core.Plugins;
 
 /// <summary>
 /// Contains integration tests for the <see cref="PluginInstaller"/> class.
@@ -45,7 +45,7 @@ public class PluginInstallerTests : IDisposable
     public async Task InstallAsync_WhenUploadingSingleAssembly_ShouldCopyAssemblyToPluginsDirectory()
     {
         // Arrange
-        string assemblyName = "Lumina.TestPlugin.dll";
+        string assemblyName = "Nemera.TestPlugin.dll";
         await using FileStream stream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, assemblyName));
 
         // Act
@@ -61,7 +61,7 @@ public class PluginInstallerTests : IDisposable
     {
         // Arrange
         await using MemoryStream zipStream = new();
-        CreateZipArchive(zipStream, [("nested/plugin/Lumina.TestPlugin.dll", ReadTestAssembly()), ("readme.txt", Encoding.UTF8.GetBytes("not an assembly"))]);
+        CreateZipArchive(zipStream, [("nested/plugin/Nemera.TestPlugin.dll", ReadTestAssembly()), ("readme.txt", Encoding.UTF8.GetBytes("not an assembly"))]);
         zipStream.Position = 0;
 
         // Act
@@ -69,7 +69,7 @@ public class PluginInstallerTests : IDisposable
 
         // Assert
         Assert.False(result.IsFailure);
-        Assert.True(File.Exists(Path.Combine(_pluginsDirectory, "Lumina.TestPlugin.dll")));
+        Assert.True(File.Exists(Path.Combine(_pluginsDirectory, "Nemera.TestPlugin.dll")));
         Assert.False(File.Exists(Path.Combine(_pluginsDirectory, "readme.txt")));
     }
 
@@ -96,7 +96,7 @@ public class PluginInstallerTests : IDisposable
     {
         // Arrange
         const string TRAVERSAL_FILE_NAME = "traversal-test-plugin.dll";
-        await using FileStream stream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, "Lumina.TestPlugin.dll"));
+        await using FileStream stream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, "Nemera.TestPlugin.dll"));
 
         // Act
         Result<Success> result = await _sut.InstallAsync(stream, $@"..\{TRAVERSAL_FILE_NAME}", CancellationToken.None);
@@ -149,11 +149,11 @@ public class PluginInstallerTests : IDisposable
     }
 
     /// <summary>
-    /// Reads the bytes of the <c>Lumina.TestPlugin.dll</c> assembly from the test output directory.
+    /// Reads the bytes of the <c>Nemera.TestPlugin.dll</c> assembly from the test output directory.
     /// </summary>
     /// <returns>The assembly bytes.</returns>
     private static byte[] ReadTestAssembly()
     {
-        return File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "Lumina.TestPlugin.dll"));
+        return File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "Nemera.TestPlugin.dll"));
     }
 }

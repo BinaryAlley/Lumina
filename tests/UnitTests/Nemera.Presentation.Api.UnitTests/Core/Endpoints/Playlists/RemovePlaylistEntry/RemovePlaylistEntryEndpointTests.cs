@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Playlists.Commands.RemovePlaylistEntry;
-using Lumina.Contracts.Fixtures.Core.Responses.Playlists;
-using Lumina.Contracts.Responses.Playlists;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Playlists.RemovePlaylistEntry;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Playlists.Commands.RemovePlaylistEntry;
+using Nemera.Contracts.Fixtures.Core.Responses.Playlists;
+using Nemera.Contracts.Responses.Playlists;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Playlists.RemovePlaylistEntry;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +14,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Playlists.RemovePlaylistEntry;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Playlists.RemovePlaylistEntry;
 
 /// <summary>
 /// Contains unit tests for the <see cref="RemovePlaylistEntryEndpoint"/> class.

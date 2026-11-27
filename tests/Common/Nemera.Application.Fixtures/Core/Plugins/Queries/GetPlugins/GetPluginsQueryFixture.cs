@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Plugins.Queries.GetPlugins;
+using Nemera.Application.Core.Plugins.Queries.GetPlugins;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Plugins.Queries.GetPlugins;
+namespace Nemera.Application.Fixtures.Core.Plugins.Queries.GetPlugins;
 
 /// <summary>
 /// Fixture class for the <see cref="GetPluginsQuery"/> class.

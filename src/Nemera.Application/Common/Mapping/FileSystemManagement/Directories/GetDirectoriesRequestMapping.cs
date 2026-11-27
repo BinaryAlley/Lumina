@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
-using Lumina.Contracts.Requests.FileSystemManagement.Directories;
+using Nemera.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
+using Nemera.Contracts.Requests.FileSystemManagement.Directories;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.FileSystemManagement.Directories;
+namespace Nemera.Application.Common.Mapping.FileSystemManagement.Directories;
 
 /// <summary>
 /// Extension methods for converting <see cref="GetDirectoriesRequest"/>.

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Primitives;
 #endregion
 
-namespace Lumina.Domain.Common.Primitives;
+namespace Nemera.Domain.Common.Primitives;
 
 /// <summary>
 /// Error representing that authentication is required or has failed.

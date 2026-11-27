@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 #endregion
 
-namespace Lumina.Application.Core.Admin.Authorization.Permissions.Queries.GetPermissions;
+namespace Nemera.Application.Core.Admin.Authorization.Permissions.Queries.GetPermissions;
 
 /// <summary>
 /// Query for retrieving the list of authorization permissions.

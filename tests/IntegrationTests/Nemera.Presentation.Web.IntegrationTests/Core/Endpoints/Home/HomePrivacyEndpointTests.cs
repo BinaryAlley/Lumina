@@ -1,28 +1,28 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Home;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Home;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Home;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Home;
 
 /// <summary>
 /// Contains integration tests for the <see cref="HomePrivacyEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class HomePrivacyEndpointTests : IClassFixture<LuminaWebFactory>
+public class HomePrivacyEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HomePrivacyEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public HomePrivacyEndpointTests(LuminaWebFactory apiFactory)
+    public HomePrivacyEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

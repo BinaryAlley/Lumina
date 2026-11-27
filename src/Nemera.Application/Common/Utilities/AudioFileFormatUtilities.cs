@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using System;
 using System.IO;
 #endregion
 
-namespace Lumina.Application.Common.Utilities;
+namespace Nemera.Application.Common.Utilities;
 
 /// <summary>
 /// Provides helpers for the <see cref="AudioFileFormat"/> enumeration.

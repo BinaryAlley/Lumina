@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
-using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
-using Lumina.Contracts.DTO.Common;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
-using Lumina.Infrastructure.Common.Utilities;
-using Lumina.Infrastructure.Common.Networking;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Nemera.Infrastructure.Common.Utilities;
+using Nemera.Infrastructure.Common.Networking;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
+namespace Nemera.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
 
 /// <summary>
 /// Stores the artwork of a book into the internal media directory, under a per-book directory, and returns its relative path.
@@ -116,7 +116,7 @@ internal sealed class BookArtworkService : IBookArtworkService
             return Errors.FileSystemManagement.FileTooLarge;
 
         // Copy the uploaded artwork into a temporary file, so that the shared artwork storage can validate and copy it.
-        string temporaryPath = Path.Combine(Path.GetTempPath(), $"lumina-artwork-{Guid.NewGuid():N}{Path.GetExtension(fileName)}");
+        string temporaryPath = Path.Combine(Path.GetTempPath(), $"nemera-artwork-{Guid.NewGuid():N}{Path.GetExtension(fileName)}");
         bool isWritten = false;
         try
         {
@@ -269,7 +269,7 @@ internal sealed class BookArtworkService : IBookArtworkService
 
         // Download the remote artwork into a temporary file, aborting when it exceeds the maximum allowed size.
         using HttpClient httpClient = _httpClientFactory.CreateClient(NamedHttpClients.ARTWORK_DOWNLOAD);
-        string tempPath = Path.Combine(Path.GetTempPath(), $"lumina-artwork-{Guid.NewGuid():N}");
+        string tempPath = Path.Combine(Path.GetTempPath(), $"nemera-artwork-{Guid.NewGuid():N}");
         bool downloaded = false;
         try
         {

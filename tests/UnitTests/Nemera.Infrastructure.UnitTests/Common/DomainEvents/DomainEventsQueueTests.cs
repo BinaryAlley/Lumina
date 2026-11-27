@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Events;
-using Lumina.Infrastructure.Common.DomainEvents;
+using Nemera.Domain.Common.Events;
+using Nemera.Infrastructure.Common.DomainEvents;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Common.DomainEvents;
+namespace Nemera.Infrastructure.UnitTests.Common.DomainEvents;
 
 /// <summary>
 /// Contains unit tests for the <see cref="DomainEventsQueue"/> class.

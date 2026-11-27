@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Themes.Management.Queries.GetThemeSettings;
+using Nemera.Application.Core.Themes.Management.Queries.GetThemeSettings;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Themes.Management.Queries.GetThemeSettings;
+namespace Nemera.Application.Fixtures.Core.Themes.Management.Queries.GetThemeSettings;
 
 /// <summary>
 /// Fixture class for the <see cref="GetThemeSettingsQuery"/> class.

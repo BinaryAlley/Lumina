@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
-using Lumina.Plugins.ID3.Common.Models.DTO.Tags;
-using Lumina.Plugins.ID3.Core.Mapping;
-using Lumina.Plugins.ID3.Fixtures.Common.Models.DTO.Tags;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Plugins.ID3.Common.Models.DTO.Tags;
+using Nemera.Plugins.ID3.Core.Mapping;
+using Nemera.Plugins.ID3.Fixtures.Common.Models.DTO.Tags;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Plugins.ID3.UnitTests.Core.Mapping;
+namespace Nemera.Plugins.ID3.UnitTests.Core.Mapping;
 
 /// <summary>
 /// Contains unit tests for the <see cref="Id3TagMapper"/> class.

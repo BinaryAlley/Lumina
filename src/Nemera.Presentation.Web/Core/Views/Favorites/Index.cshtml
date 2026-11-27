@@ -10,7 +10,7 @@
     50 items, and the kind filter restricts the list to one kind. Every card links to the page of its item, and carries a
     favorite heart (a card-favorite-toggle button, always visible, in the place the actions trigger has on the library cards)
     that the global favorites script drives, so a favorite is removed from the card itself. The page listens to
-    the lumina:favorite-changed event the script dispatches and removes the card of an item that is no longer a favorite, so
+    the nemera:favorite-changed event the script dispatches and removes the card of an item that is no longer a favorite, so
     the counter and the empty state follow without another request. A favorite whose item was deleted, or whose library the
     user can no longer access, is kept as an unavailable card without a link, so the owner can still remove it.
 
@@ -24,7 +24,7 @@
     /favorites
 *@
 
-@using Lumina.Presentation.Web.Common.Services
+@using Nemera.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
 @using System
 @using System.Collections.Generic
@@ -501,7 +501,7 @@
             loadFavoritesAsync(false);
         }
 
-        document.addEventListener('lumina:favorite-changed', handleFavoriteChanged);
+        document.addEventListener('nemera:favorite-changed', handleFavoriteChanged);
         if (kindFilter)
             kindFilter.addEventListener('click', handleKindFilterClick);
         if (loadMoreButton)
@@ -520,7 +520,7 @@
 
         window.viewCleanups = window.viewCleanups || {};
         window.viewCleanups['@scriptId'] = () => {
-            document.removeEventListener('lumina:favorite-changed', handleFavoriteChanged);
+            document.removeEventListener('nemera:favorite-changed', handleFavoriteChanged);
             if (kindFilter)
                 kindFilter.removeEventListener('click', handleKindFilterClick);
             if (loadMoreButton)

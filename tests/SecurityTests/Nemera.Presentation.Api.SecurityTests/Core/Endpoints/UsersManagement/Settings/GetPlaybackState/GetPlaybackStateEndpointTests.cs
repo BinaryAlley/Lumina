@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Responses.UsersManagement.Settings;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Settings.GetPlaybackState;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Responses.UsersManagement.Settings;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Settings.GetPlaybackState;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -15,7 +15,7 @@ using System.Net;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Settings.GetPlaybackState;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Settings.GetPlaybackState;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetPlaybackStateEndpoint"/> class.
@@ -25,10 +25,10 @@ namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.S
 /// applicable to it. It also never issues a token, so token and claim correctness is not applicable either.
 /// </remarks>
 [ExcludeFromCodeCoverage]
-public class GetPlaybackStateEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class GetPlaybackStateEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
     private readonly HttpClient _client;
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -41,12 +41,12 @@ public class GetPlaybackStateEndpointTests : IClassFixture<LuminaApiFactory>, ID
     /// Initializes a new instance of the <see cref="GetPlaybackStateEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetPlaybackStateEndpointTests(LuminaApiFactory apiFactory)
+    public GetPlaybackStateEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
     }
 
     [Fact]
@@ -106,7 +106,7 @@ public class GetPlaybackStateEndpointTests : IClassFixture<LuminaApiFactory>, ID
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina.", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(" at Nemera.", content, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -118,7 +118,7 @@ public class GetPlaybackStateEndpointTests : IClassFixture<LuminaApiFactory>, ID
     private async Task SeedOtherUserWithPlaybackStateAsync(double volume, bool isMuted)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         string username = $"otheruser_{Guid.NewGuid()}";
         UserEntity otherUser = _userEntityFixture.Create(username: username, password: "TestPass123!");

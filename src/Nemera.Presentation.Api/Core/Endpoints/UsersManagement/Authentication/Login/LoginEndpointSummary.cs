@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.Authentication;
-using Lumina.Contracts.Responses.Authentication;
+using Nemera.Contracts.Requests.Authentication;
+using Nemera.Contracts.Responses.Authentication;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.Login;
+namespace Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.Login;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="LoginEndpoint"/> API endpoint, for OpenAPI.

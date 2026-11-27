@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Issues and resolves the opaque delivery handles of the playback manifest, which bind a normalized delivery to the user, the track and the inputs the delivery was declared with.

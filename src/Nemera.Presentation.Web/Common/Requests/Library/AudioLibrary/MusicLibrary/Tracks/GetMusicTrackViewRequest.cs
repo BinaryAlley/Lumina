@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
+namespace Nemera.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
 
 /// <summary>
 /// Represents a request for displaying the details of a track of an album of a music artist.

@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Core.Playlists.Queries.GetPlaylist;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Core.Playlists.Queries.GetPlaylist;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Playlists.Queries.GetPlaylist;
+namespace Nemera.Application.Fixtures.Core.Playlists.Queries.GetPlaylist;
 
 /// <summary>
 /// Fixture class for the <see cref="GetPlaylistQuery"/> record.

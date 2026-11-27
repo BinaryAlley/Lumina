@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Http;
-using Lumina.Presentation.Web.Common.Primitives;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Common.Services;
-using Lumina.Presentation.Web.Core.Endpoints.Favorites.Index;
-using Lumina.Presentation.Web.Core.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Http;
+using Nemera.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Common.Services;
+using Nemera.Presentation.Web.Core.Endpoints.Favorites.Index;
+using Nemera.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
@@ -22,7 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Favorites.Index;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Favorites.Index;
 
 /// <summary>
 /// Contains unit tests for the <see cref="FavoritesIndexViewEndpoint"/> class.

@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
+using Nemera.Presentation.Web;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+namespace Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 
 /// <summary>
 /// Represents an HTTP client that has been authenticated through the real login flow of the Web application.

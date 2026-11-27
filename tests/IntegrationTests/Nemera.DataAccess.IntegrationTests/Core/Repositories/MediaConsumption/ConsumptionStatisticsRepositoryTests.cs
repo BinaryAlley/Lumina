@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Core.Repositories.MediaConsumption;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Core.Repositories.MediaConsumption;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.MediaConsumption;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.MediaConsumption;
 
 /// <summary>
 /// Contains integration tests for the <see cref="ConsumptionStatisticsRepository"/> class, exercising it against a real SQLite database.
@@ -32,9 +32,9 @@ public class ConsumptionStatisticsRepositoryTests
     public async Task GetForUserAsync_WhenTheUserHasRecords_ShouldReturnOnlyTheirRecordsWithEveryPersistedValue()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-consumptionstats-get-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-consumptionstats-get-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         ConsumptionStatisticsRepository sut = new(context);
 
         Guid userId = Guid.NewGuid();
@@ -126,9 +126,9 @@ public class ConsumptionStatisticsRepositoryTests
     public async Task GetForUserAsync_WhenAnotherUserHasAMatchingRecord_ShouldNotReturnIt()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-consumptionstats-otheruser-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-consumptionstats-otheruser-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         ConsumptionStatisticsRepository sut = new(context);
 
         Guid userId = Guid.NewGuid();
@@ -160,9 +160,9 @@ public class ConsumptionStatisticsRepositoryTests
     public async Task GetForUserAsync_WhenTheRangeBoundariesMatchExactly_ShouldIncludeTheBoundaryRecords()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-consumptionstats-boundary-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-consumptionstats-boundary-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         ConsumptionStatisticsRepository sut = new(context);
 
         Guid userId = Guid.NewGuid();
@@ -201,9 +201,9 @@ public class ConsumptionStatisticsRepositoryTests
     public async Task GetForUserAsync_WhenAllFiltersAreProvided_ShouldApplyEveryFilter()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-consumptionstats-allfilters-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-consumptionstats-allfilters-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         ConsumptionStatisticsRepository sut = new(context);
 
         Guid userId = Guid.NewGuid();
@@ -237,9 +237,9 @@ public class ConsumptionStatisticsRepositoryTests
     public async Task GetForUserAsync_WhenNothingMatches_ShouldReturnAnEmptyList()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-consumptionstats-emptymatch-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-consumptionstats-emptymatch-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         ConsumptionStatisticsRepository sut = new(context);
 
         Guid userId = Guid.NewGuid();
@@ -264,9 +264,9 @@ public class ConsumptionStatisticsRepositoryTests
     public async Task GetForUserAsync_WhenCalled_ShouldReturnDetachedRecordsAndAllowRepeatedReads()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-consumptionstats-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-consumptionstats-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         ConsumptionStatisticsRepository sut = new(context);
 
         Guid userId = Guid.NewGuid();
@@ -297,9 +297,9 @@ public class ConsumptionStatisticsRepositoryTests
     public async Task GetForAllUsersAsync_WhenCalled_ShouldReturnTheRecordsOfEveryUser()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-consumptionstats-allusers-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-consumptionstats-allusers-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         ConsumptionStatisticsRepository sut = new(context);
 
         Guid firstUserId = Guid.NewGuid();
@@ -327,9 +327,9 @@ public class ConsumptionStatisticsRepositoryTests
     public async Task GetForAllUsersAsync_WhenAllFiltersAreProvided_ShouldApplyEveryFilterAcrossUsers()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-consumptionstats-allusers-filters-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-consumptionstats-allusers-filters-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         ConsumptionStatisticsRepository sut = new(context);
 
         Guid firstUserId = Guid.NewGuid();
@@ -369,9 +369,9 @@ public class ConsumptionStatisticsRepositoryTests
     public async Task GetForAllUsersAsync_WhenNothingMatches_ShouldReturnAnEmptyList()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-consumptionstats-allusers-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-consumptionstats-allusers-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         ConsumptionStatisticsRepository sut = new(context);
 
         Guid userId = Guid.NewGuid();
@@ -397,9 +397,9 @@ public class ConsumptionStatisticsRepositoryTests
     /// </summary>
     /// <param name="anchorConnection">The open in-memory SQLite connection that keeps the database alive for the duration of the test.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateContext(SqliteConnection anchorConnection)
+    private static NemeraDbContext CreateContext(SqliteConnection anchorConnection)
     {
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .Options);
         context.Database.EnsureCreated();

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Common.Models.DTO.Settings;
 using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Plugins.Contracts.Core.Plugins;
+namespace Nemera.Plugins.Contracts.Core.Plugins;
 
 /// <summary>
-/// Contract for a Lumina plugin.
+/// Contract for a Nemera plugin.
 /// </summary>
 public interface IPlugin
 {

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Contracts.DTO.Common;
-using Lumina.Domain.Common.ValueObjects.Metadata;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Common.Metadata;
+namespace Nemera.Application.Common.Mapping.Common.Metadata;
 
 /// <summary>
 /// Extension methods for converting <see cref="GenreDto"/>.

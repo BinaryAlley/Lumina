@@ -18,6 +18,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Lumina.Contracts\Lumina.Contracts.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Contracts\Nemera.Contracts.csproj" />
     </ItemGroup>
 </Project>

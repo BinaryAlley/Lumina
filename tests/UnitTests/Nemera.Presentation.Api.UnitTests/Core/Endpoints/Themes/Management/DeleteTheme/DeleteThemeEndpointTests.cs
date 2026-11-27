@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Core.Themes.Management.Commands.DeleteTheme;
-using Lumina.Contracts.Fixtures.Core.Requests.Themes;
-using Lumina.Contracts.Requests.Themes;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Themes.Management.DeleteTheme;
+using Nemera.Application.Core.Themes.Management.Commands.DeleteTheme;
+using Nemera.Contracts.Fixtures.Core.Requests.Themes;
+using Nemera.Contracts.Requests.Themes;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Themes.Management.DeleteTheme;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -12,11 +12,11 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Themes.Management.DeleteTheme;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Themes.Management.DeleteTheme;
 
 /// <summary>
 /// Contains unit tests for the <see cref="DeleteThemeEndpoint"/> class.

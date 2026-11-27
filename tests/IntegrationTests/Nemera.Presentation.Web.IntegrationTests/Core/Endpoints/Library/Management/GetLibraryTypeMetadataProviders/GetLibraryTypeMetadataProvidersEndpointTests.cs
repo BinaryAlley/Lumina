@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Plugins;
-using Lumina.Presentation.Web.Core.Endpoints.Library.Management.GetLibraryTypeMetadataProviders;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Plugins;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Plugins;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Management.GetLibraryTypeMetadataProviders;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Plugins;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -13,22 +13,22 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.GetLibraryTypeMetadataProviders;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.GetLibraryTypeMetadataProviders;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetLibraryTypeMetadataProvidersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetLibraryTypeMetadataProvidersEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetLibraryTypeMetadataProvidersEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly LibraryMetadataProviderDtoFixture _libraryMetadataProviderDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetLibraryTypeMetadataProvidersEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetLibraryTypeMetadataProvidersEndpointTests(LuminaWebFactory apiFactory)
+    public GetLibraryTypeMetadataProvidersEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

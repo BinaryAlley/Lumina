@@ -1,21 +1,21 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.Common.Metadata;
-using Lumina.Application.Common.Mapping.MediaContributors;
-using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
-using Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.Common;
-using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.AddBook;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
-using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
-using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Application.Common.Mapping.Common.Metadata;
+using Nemera.Application.Common.Mapping.MediaContributors;
+using Nemera.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Common;
+using Nemera.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.Common;
+using Nemera.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.AddBook;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate;
+using Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Entities;
+using Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.LibraryManagementBoundedContext.LibraryAggregate;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+namespace Nemera.Application.Common.Mapping.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 
 /// <summary>
 /// Extension methods for converting <see cref="AddBookCommand"/>.

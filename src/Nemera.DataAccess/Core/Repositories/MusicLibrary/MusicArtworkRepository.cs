@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.MusicLibrary;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,22 +13,22 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.MusicLibrary;
+namespace Nemera.DataAccess.Core.Repositories.MusicLibrary;
 
 /// <summary>
 /// Repository for the artwork of the music library items.
 /// </summary>
 internal sealed class MusicArtworkRepository : IMusicArtworkRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MusicArtworkRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public MusicArtworkRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public MusicArtworkRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -40,7 +40,7 @@ internal sealed class MusicArtworkRepository : IMusicArtworkRepository
     public Task<Result<Created>> InsertRangeAsync(IReadOnlyCollection<MusicArtworkEntity> artwork, CancellationToken cancellationToken)
     {
         if (artwork.Count > 0)
-            _luminaDbContext.MusicArtwork.AddRange(artwork);
+            _nemeraDbContext.MusicArtwork.AddRange(artwork);
         return Task.FromResult<Result<Created>>(Result.Created);
     }
 
@@ -53,7 +53,7 @@ internal sealed class MusicArtworkRepository : IMusicArtworkRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="MusicArtworkEntity"/>, or an error.</returns>
     public async Task<Result<IReadOnlyList<MusicArtworkEntity>>> GetByOwnerAsync(MusicArtworkOwnerType ownerType, Guid ownerId, CancellationToken cancellationToken)
     {
-        IReadOnlyList<MusicArtworkEntity> artwork = await _luminaDbContext.MusicArtwork
+        IReadOnlyList<MusicArtworkEntity> artwork = await _nemeraDbContext.MusicArtwork
             .AsNoTracking()
             .Where(musicArtwork => musicArtwork.OwnerType == ownerType && musicArtwork.OwnerId == ownerId)
             .OrderBy(musicArtwork => musicArtwork.ArtworkType)
@@ -76,7 +76,7 @@ internal sealed class MusicArtworkRepository : IMusicArtworkRepository
         const int LOOKUP_CHUNK_SIZE = 500;
         foreach (Guid[] chunk in ownerIds.Chunk(LOOKUP_CHUNK_SIZE))
         {
-            artwork.AddRange(await _luminaDbContext.MusicArtwork
+            artwork.AddRange(await _nemeraDbContext.MusicArtwork
                 .AsNoTracking()
                 .Where(musicArtwork => musicArtwork.OwnerType == ownerType && chunk.Contains(musicArtwork.OwnerId))
                 .OrderBy(musicArtwork => musicArtwork.ArtworkType)
@@ -95,7 +95,7 @@ internal sealed class MusicArtworkRepository : IMusicArtworkRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Deleted>> DeleteByOwnerAsync(MusicArtworkOwnerType ownerType, Guid ownerId, CancellationToken cancellationToken)
     {
-        await _luminaDbContext.MusicArtwork
+        await _nemeraDbContext.MusicArtwork
             .Where(musicArtwork => musicArtwork.OwnerType == ownerType && musicArtwork.OwnerId == ownerId)
             .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
         return Result.Deleted;
@@ -112,13 +112,13 @@ internal sealed class MusicArtworkRepository : IMusicArtworkRepository
         // The artwork table is shared by all the music library item types, so the owner of a piece of artwork is matched by its type against the
         // corresponding table, and the database resolves the membership of the owner in the library by a correlated subquery. Collecting the ids
         // of every artist, album and track of the library in memory first would make the cost of the operation grow with the size of the library.
-        await _luminaDbContext.MusicArtwork
+        await _nemeraDbContext.MusicArtwork
             .Where(musicArtwork => (musicArtwork.OwnerType == MusicArtworkOwnerType.Artist
-                    && _luminaDbContext.Artists.Any(artist => artist.Id == musicArtwork.OwnerId && artist.LibraryId == libraryId))
+                    && _nemeraDbContext.Artists.Any(artist => artist.Id == musicArtwork.OwnerId && artist.LibraryId == libraryId))
                 || (musicArtwork.OwnerType == MusicArtworkOwnerType.Album
-                    && _luminaDbContext.Albums.Any(album => album.Id == musicArtwork.OwnerId && album.LibraryId == libraryId))
+                    && _nemeraDbContext.Albums.Any(album => album.Id == musicArtwork.OwnerId && album.LibraryId == libraryId))
                 || (musicArtwork.OwnerType == MusicArtworkOwnerType.Track
-                    && _luminaDbContext.Tracks.Any(track => track.Id == musicArtwork.OwnerId && track.LibraryId == libraryId)))
+                    && _nemeraDbContext.Tracks.Any(track => track.Id == musicArtwork.OwnerId && track.LibraryId == libraryId)))
             .ExecuteUpdateAsync(setters => setters.SetProperty(musicArtwork => musicArtwork.Status, ArtworkStatus.Pending), cancellationToken).ConfigureAwait(false);
         return Result.Updated;
     }
@@ -134,13 +134,13 @@ internal sealed class MusicArtworkRepository : IMusicArtworkRepository
         // The artwork table is shared by all the music library item types, so the owner of a piece of artwork is matched by its type against the
         // corresponding table, and the database resolves the membership of the owner in the library by a correlated subquery. Collecting the ids
         // of every artist, album and track of the library in memory first would make the cost of the operation grow with the size of the library.
-        await _luminaDbContext.MusicArtwork
+        await _nemeraDbContext.MusicArtwork
             .Where(musicArtwork => (musicArtwork.OwnerType == MusicArtworkOwnerType.Artist
-                    && _luminaDbContext.Artists.Any(artist => artist.Id == musicArtwork.OwnerId && artist.LibraryId == libraryId))
+                    && _nemeraDbContext.Artists.Any(artist => artist.Id == musicArtwork.OwnerId && artist.LibraryId == libraryId))
                 || (musicArtwork.OwnerType == MusicArtworkOwnerType.Album
-                    && _luminaDbContext.Albums.Any(album => album.Id == musicArtwork.OwnerId && album.LibraryId == libraryId))
+                    && _nemeraDbContext.Albums.Any(album => album.Id == musicArtwork.OwnerId && album.LibraryId == libraryId))
                 || (musicArtwork.OwnerType == MusicArtworkOwnerType.Track
-                    && _luminaDbContext.Tracks.Any(track => track.Id == musicArtwork.OwnerId && track.LibraryId == libraryId)))
+                    && _nemeraDbContext.Tracks.Any(track => track.Id == musicArtwork.OwnerId && track.LibraryId == libraryId)))
             .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
         return Result.Deleted;
     }
@@ -157,7 +157,7 @@ internal sealed class MusicArtworkRepository : IMusicArtworkRepository
     {
         // The existing cover is matched the same way the callers that resolve it do, by owner and artwork type only, so that a cover stored
         // with an ordinal other than zero is replaced in place instead of a second cover row being inserted next to it.
-        MusicArtworkEntity? existingCover = await _luminaDbContext.MusicArtwork
+        MusicArtworkEntity? existingCover = await _nemeraDbContext.MusicArtwork
             .FirstOrDefaultAsync(musicArtwork => musicArtwork.OwnerType == ownerType
                 && musicArtwork.OwnerId == ownerId
                 && musicArtwork.ArtworkType == ArtworkType.Cover, cancellationToken).ConfigureAwait(false);
@@ -165,7 +165,7 @@ internal sealed class MusicArtworkRepository : IMusicArtworkRepository
         DateTime now = DateTime.UtcNow;
         if (existingCover is null)
         {
-            _luminaDbContext.MusicArtwork.Add(new MusicArtworkEntity
+            _nemeraDbContext.MusicArtwork.Add(new MusicArtworkEntity
             {
                 Id = Guid.CreateVersion7(),
                 OwnerType = ownerType,

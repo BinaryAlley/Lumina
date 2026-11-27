@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 using PDFtoImage;
 using SkiaSharp;
 using System;
@@ -15,7 +15,7 @@ using UglyToad.PdfPig.Content;
 using UglyToad.PdfPig.Outline;
 #endregion
 
-namespace Lumina.Plugins.Pdf.Core.Pdf;
+namespace Nemera.Plugins.Pdf.Core.Pdf;
 
 /// <summary>
 /// Parses a PDF into a normalized reading document, extracting the text of its pages into a working directory.
@@ -99,7 +99,7 @@ internal static class PdfDocumentParser
                 string resourceKey = $"page:{page.Number}";
                 string imageFileName = $"page-{page.Number}.png";
                 string fileName = $"{page.Number}.html";
-                string sectionHtml = $"<section><img data-lumina-resource=\"{resourceKey}\" alt=\"{WebUtility.HtmlEncode(locationRef)}\" /></section>";
+                string sectionHtml = $"<section><img data-nemera-resource=\"{resourceKey}\" alt=\"{WebUtility.HtmlEncode(locationRef)}\" /></section>";
                 File.WriteAllText(Path.Combine(sectionsDirectory, fileName), sectionHtml, Encoding.UTF8);
                 spine.Add(new ReadingSpineItemDto(locationRef, null, $"sections/{fileName}"));
                 // The resource is registered with its expected file path, but the image is rendered lazily, when the resource is
@@ -125,7 +125,7 @@ internal static class PdfDocumentParser
     /// <remarks>
     /// The PDFtoImage and SkiaSharp APIs used by this method are annotated with the supported platforms of the rendering engine, so this
     /// method must repeat that restriction or the CA1416 analyzer, which is a build error here, flags the call. The attributes must not
-    /// be removed, even though Windows, Linux and macOS are the only platforms Lumina runs on.
+    /// be removed, even though Windows, Linux and macOS are the only platforms Nemera runs on.
     /// </remarks>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]

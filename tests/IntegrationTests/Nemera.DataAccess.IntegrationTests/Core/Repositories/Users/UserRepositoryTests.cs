@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Core.Repositories.Users;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Core.Repositories.Users;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.Users;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.Users;
 
 /// <summary>
 /// Contains integration tests for the <see cref="UserRepository"/> class, exercising it against a real SQLite database.
@@ -30,9 +30,9 @@ public class UserRepositoryTests
     public async Task UpdateAsync_WhenAnEditableValueChanges_ShouldPreserveTheStoredAuditColumns()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-userrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-userrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         UserRepository sut = new(context);
 
@@ -71,9 +71,9 @@ public class UserRepositoryTests
     public async Task UpdateAsync_WhenNothingChanged_ShouldNotDuplicateThePermissions()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-userrepo-permissions-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-userrepo-permissions-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         UserRepository sut = new(context);
 

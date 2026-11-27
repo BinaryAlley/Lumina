@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.MediaConsumption;
-using Lumina.Contracts.Responses.MediaConsumption;
+using Nemera.Application.Common.DTO.MediaConsumption;
+using Nemera.Contracts.Responses.MediaConsumption;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.MediaConsumption;
+namespace Nemera.Application.Common.Mapping.MediaConsumption;
 
 /// <summary>
 /// Extension methods for converting <see cref="AllUsersConsumptionStatisticsDto"/>.

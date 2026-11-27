@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Requests.Library.Management;
-using Lumina.Presentation.Web.Core.Endpoints.Library.Management.CancelLibraryScan;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Requests.Library.Management;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Management.CancelLibraryScan;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -13,21 +13,21 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.CancelLibraryScan;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.CancelLibraryScan;
 
 /// <summary>
 /// Contains integration tests for the <see cref="CancelLibraryScanEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class CancelLibraryScanEndpointTests : IClassFixture<LuminaWebFactory>
+public class CancelLibraryScanEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CancelLibraryScanEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public CancelLibraryScanEndpointTests(LuminaWebFactory apiFactory)
+    public CancelLibraryScanEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

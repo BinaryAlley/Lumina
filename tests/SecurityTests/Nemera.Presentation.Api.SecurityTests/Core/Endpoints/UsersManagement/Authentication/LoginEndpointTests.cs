@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.Infrastructure.Security;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
-using Lumina.Contracts.Requests.Authentication;
-using Lumina.Contracts.Responses.Authentication;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Infrastructure.Core.Authentication;
-using Lumina.Infrastructure.Core.Security;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.Infrastructure.Security;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.Authentication;
+using Nemera.Contracts.Requests.Authentication;
+using Nemera.Contracts.Responses.Authentication;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Infrastructure.Core.Authentication;
+using Nemera.Infrastructure.Core.Security;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,20 +20,20 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authentication;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authentication;
 
 /// <summary>
 /// Contains security tests for the <see cref="LoginEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class LoginEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
     private readonly PasswordHashService _hashService = new();
     private readonly UserEntityFixture _userEntityFixture = new();
     private readonly LoginRequestFixture _loginRequestFixture = new();
     private readonly ICryptographyService _cryptographyService;
     private readonly TotpTokenGenerator _totpTokenGenerator = new();
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -46,7 +46,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     /// Initializes a new instance of the <see cref="LoginEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public LoginEndpointTests(LuminaApiFactory apiFactory)
+    public LoginEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
@@ -96,8 +96,8 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
         Assert.Contains(token.Claims, c => c.Type == "sub" && c.Value == user.Id.ToString());
         Assert.Contains(token.Claims, c => c.Type == "unique_name" && c.Value == user.Username);
         Assert.Contains(token.Claims, c => c.Type == "jti");
-        Assert.Contains(token.Claims, c => c.Type == "iss" && c.Value == "Lumina");
-        Assert.Contains(token.Claims, c => c.Type == "aud" && c.Value == "Lumina");
+        Assert.Contains(token.Claims, c => c.Type == "iss" && c.Value == "Nemera");
+        Assert.Contains(token.Claims, c => c.Type == "aud" && c.Value == "Nemera");
 
         Assert.DoesNotContain("password", content);
         Assert.DoesNotContain("hash", content);
@@ -204,7 +204,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
 
         // The injected statement must never be executed: the Users table and the seeded user must still be there.
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.NotNull(await dbContext.Users.FirstOrDefaultAsync(user => user.Id == legitimateUser.Id));
     }
 
@@ -270,7 +270,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     private async Task<UserEntity> CreateTestUser()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
         user.TotpSecret = null;
@@ -287,7 +287,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     private async Task<UserEntity> CreateTestUserWithTotp()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         byte[] totpSecret = _totpTokenGenerator.GenerateSecret();
         UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
@@ -301,7 +301,7 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     public void Dispose()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == _testUsername);
         if (user is not null)

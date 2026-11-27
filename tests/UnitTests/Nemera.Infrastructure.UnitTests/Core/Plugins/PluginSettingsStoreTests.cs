@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Infrastructure.Core.Plugins;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Repositories.Plugins;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Infrastructure.Core.Plugins;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Plugins;
+namespace Nemera.Infrastructure.UnitTests.Core.Plugins;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PluginSettingsStore"/> class.

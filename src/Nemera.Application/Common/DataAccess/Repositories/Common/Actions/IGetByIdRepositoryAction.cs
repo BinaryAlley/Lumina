@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Common;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
+namespace Nemera.Application.Common.DataAccess.Repositories.Common.Actions;
 
 /// <summary>
 /// Interface defining the "get by id" action for interacting with a generic persistence medium.

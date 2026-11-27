@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Reflection;
 #endregion
 
-namespace Lumina.Application.Common.Telemetry;
+namespace Nemera.Application.Common.Telemetry;
 
 /// <summary>
 /// Detects the outcome of an application handler result in a generic way, without coupling the telemetry decorators to any concrete result type.

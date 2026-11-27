@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Common.DTO.MediaConsumption;
-using Lumina.Application.Common.Mapping.MediaConsumption;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.MediaResumePointAggregate;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Common.DTO.MediaConsumption;
+using Nemera.Application.Common.Mapping.MediaConsumption;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.MediaResumePointAggregate;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.MediaConsumption;
+namespace Nemera.Application.UnitTests.Common.Mapping.MediaConsumption;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MediaResumePointEntityMapping"/> class.

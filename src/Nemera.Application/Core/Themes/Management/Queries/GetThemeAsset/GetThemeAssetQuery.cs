@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Themes.Management.Queries.GetThemeAsset;
+namespace Nemera.Application.Core.Themes.Management.Queries.GetThemeAsset;
 
 /// <summary>
 /// Query for retrieving an asset file of a theme.

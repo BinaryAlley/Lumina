@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Domain.Common.ValueObjects.Metadata;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Common.Metadata;
+namespace Nemera.Application.Common.Mapping.Common.Metadata;
 
 /// <summary>
 /// Extension methods for converting <see cref="Tag"/>.

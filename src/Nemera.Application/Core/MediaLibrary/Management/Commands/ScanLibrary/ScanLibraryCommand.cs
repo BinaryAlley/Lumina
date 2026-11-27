@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibrary;
+namespace Nemera.Application.Core.MediaLibrary.Management.Commands.ScanLibrary;
 
 /// <summary>
 /// Command for initiating the scan of a media library.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Metadata;
+namespace Nemera.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Metadata;
 
 /// <summary>
 /// Merges the book metadata returned by multiple metadata providers into a single book metadata, giving priority to the first provider that provides a value for each field.

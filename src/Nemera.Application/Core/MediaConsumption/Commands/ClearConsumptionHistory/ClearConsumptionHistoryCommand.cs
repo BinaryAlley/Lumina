@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.MediaConsumption.Commands.ClearConsumptionHistory;
+namespace Nemera.Application.Core.MediaConsumption.Commands.ClearConsumptionHistory;
 
 /// <summary>
 /// Command for deleting every consumption record of a user.

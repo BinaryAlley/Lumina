@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Services;
+namespace Nemera.Presentation.Web.Common.Services;
 
 /// <summary>
 /// Provides functionality to manage unique script identifiers across views.

@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Common;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.GetApiAccessToken;
+namespace Nemera.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.GetApiAccessToken;
 
 /// <summary>
 /// API endpoint for the <c>/{culture}/auth/api-access-token</c> route.

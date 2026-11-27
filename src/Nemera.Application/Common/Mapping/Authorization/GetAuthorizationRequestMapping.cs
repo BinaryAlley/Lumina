@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
-using Lumina.Contracts.Requests.Authorization;
+using Nemera.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
+using Nemera.Contracts.Requests.Authorization;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Authorization;
+namespace Nemera.Application.Common.Mapping.Authorization;
 
 /// <summary>
 /// Extension methods for converting <see cref="GetAuthorizationRequest"/>.

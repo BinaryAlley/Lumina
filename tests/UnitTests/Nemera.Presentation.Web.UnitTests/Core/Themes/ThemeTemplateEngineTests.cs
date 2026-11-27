@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Primitives;
-using Lumina.Presentation.Web.Core.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.Models;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Themes;
+namespace Nemera.Presentation.Web.UnitTests.Core.Themes;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ThemeTemplateEngine"/> class.
@@ -130,7 +130,7 @@ public class ThemeTemplateEngineTests
     {
         // Arrange
         ThemeNavMenuDto model = _themeNavMenuDtoFixture.Create(
-            siteName: "Lumina",
+            siteName: "Nemera",
             mobileSections: [],
             menubarSections:
             [

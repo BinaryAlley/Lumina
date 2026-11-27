@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
+namespace Nemera.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
 
 /// <summary>
 /// Query for getting the authorization permissions of a role identified by <paramref name="RoleId"/>.

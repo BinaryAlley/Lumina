@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DTO.Pagination;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Playlists.Queries.GetPlaylist;
+namespace Nemera.Application.Core.Playlists.Queries.GetPlaylist;
 
 /// <summary>
 /// Query for getting a playlist of the current user, together with a page of its ordered entries.

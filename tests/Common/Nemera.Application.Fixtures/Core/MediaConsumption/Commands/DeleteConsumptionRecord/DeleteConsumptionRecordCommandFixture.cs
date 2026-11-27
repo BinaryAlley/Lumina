@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.MediaConsumption.Commands.DeleteConsumptionRecord;
+using Nemera.Application.Core.MediaConsumption.Commands.DeleteConsumptionRecord;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.MediaConsumption.Commands.DeleteConsumptionRecord;
+namespace Nemera.Application.Fixtures.Core.MediaConsumption.Commands.DeleteConsumptionRecord;
 
 /// <summary>
 /// Fixture class for the <see cref="DeleteConsumptionRecordCommand"/> class.

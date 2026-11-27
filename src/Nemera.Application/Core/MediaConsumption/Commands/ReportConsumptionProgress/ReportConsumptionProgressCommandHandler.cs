@@ -1,30 +1,30 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DomainEvents;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Mapping.MediaConsumption;
-using Lumina.Application.Common.Mapping.MediaLibrary.Management;
-using Lumina.Contracts.Responses.MediaConsumption;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.Common.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.MediaConsumptionRecordAggregate;
-using Lumina.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.MediaResumePointAggregate;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DomainEvents;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Mapping.MediaConsumption;
+using Nemera.Application.Common.Mapping.MediaLibrary.Management;
+using Nemera.Contracts.Responses.MediaConsumption;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.Common.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.MediaConsumptionRecordAggregate;
+using Nemera.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.MediaResumePointAggregate;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.Core.MediaConsumption.Commands.ReportConsumptionProgress;
+namespace Nemera.Application.Core.MediaConsumption.Commands.ReportConsumptionProgress;
 
 /// <summary>
 /// Handler for the command to report the progress of a consumption session of the current user.

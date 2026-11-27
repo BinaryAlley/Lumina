@@ -18,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\plugins\Lumina.Plugins.MusicBrainz\Lumina.Plugins.MusicBrainz.csproj" />
-        <ProjectReference Include="..\..\..\src\Lumina.Plugins.Contracts\Lumina.Plugins.Contracts.csproj" />
+        <ProjectReference Include="..\..\..\plugins\Nemera.Plugins.MusicBrainz\Nemera.Plugins.MusicBrainz.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Plugins.Contracts\Nemera.Plugins.Contracts.csproj" />
     </ItemGroup>
 </Project>

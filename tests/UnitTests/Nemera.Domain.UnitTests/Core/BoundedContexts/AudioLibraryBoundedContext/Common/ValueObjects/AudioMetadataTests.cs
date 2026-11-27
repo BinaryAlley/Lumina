@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Common.ValueObjects.Metadata;
-using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
-using Lumina.Domain.Fixtures.Common.ValueObjects.Metadata;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.ValueObjects.Metadata;
+using Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
+using Nemera.Domain.Fixtures.Common.ValueObjects.Metadata;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Domain.UnitTests.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
+namespace Nemera.Domain.UnitTests.Core.BoundedContexts.AudioLibraryBoundedContext.Common.ValueObjects;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AudioMetadata"/> class.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Plugins.Queries.GetLibraryTypeMetadataProviders;
+using Nemera.Application.Core.Plugins.Queries.GetLibraryTypeMetadataProviders;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Plugins.Queries.GetLibraryTypeMetadataProviders;
+namespace Nemera.Application.Fixtures.Core.Plugins.Queries.GetLibraryTypeMetadataProviders;
 
 /// <summary>
 /// Fixture class for the <see cref="GetLibraryTypeMetadataProvidersQuery"/> record.

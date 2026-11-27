@@ -46,12 +46,12 @@
  *
  * A demuxer is a sub component, like the download engine and the decoder: it never moves the player state machine and
  * never emits on the event bus itself. A failure it cannot recover from is recorded on the instance for polling through
- * getError, is reported to the onError callback as a {@link LuminaAudioPlayer.PlayerError} with the DEMUX_FAILED code, and
+ * getError, is reported to the onError callback as a {@link NemeraAudioPlayer.PlayerError} with the DEMUX_FAILED code, and
  * makes the awaited calls (initializeAsync, readPacketAsync, seekToTimeAsync) reject with that same error. An engine must
  * forward onError to host.reportError, exactly as it forwards the download engine's and the decoder's, so the failure
  * reaches the player.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -82,7 +82,7 @@
      * @readonly
      * @enum {string}
      */
-    LuminaAudioPlayer.DemuxerContainer = Object.freeze({
+    NemeraAudioPlayer.DemuxerContainer = Object.freeze({
         MP3: 'MP3',
         AAC: 'AAC',
         OGG: 'OGG',
@@ -95,7 +95,7 @@
      * @readonly
      * @enum {string}
      */
-    LuminaAudioPlayer.DemuxerCodec = Object.freeze({
+    NemeraAudioPlayer.DemuxerCodec = Object.freeze({
         MP3: 'MP3',
         AAC: 'AAC',
         OPUS: 'OPUS',
@@ -152,8 +152,8 @@
         return normalized;
     }
 
-    LuminaAudioPlayer.canonicalizeDemuxerContainer = canonicalizeContainer;
-    LuminaAudioPlayer.canonicalizeDemuxerCodec = canonicalizeCodec;
+    NemeraAudioPlayer.canonicalizeDemuxerContainer = canonicalizeContainer;
+    NemeraAudioPlayer.canonicalizeDemuxerCodec = canonicalizeCodec;
 
     /**
      * Converts a count of samples to microseconds at a sample rate, the unit of every packet timestamp of the player.
@@ -167,7 +167,7 @@
         return Math.round((samples / sampleRate) * 1000000);
     }
 
-    LuminaAudioPlayer.samplesToMicroseconds = samplesToMicroseconds;
+    NemeraAudioPlayer.samplesToMicroseconds = samplesToMicroseconds;
 
     /**
      * Checks whether a run of bytes at an offset spells out an ASCII string. It is the check every magic number of a
@@ -236,10 +236,10 @@
         return value >= limit / 2 ? value - limit : value;
     }
 
-    LuminaAudioPlayer.demuxReadUintBE = readUintBE;
-    LuminaAudioPlayer.demuxReadUintLE = readUintLE;
-    LuminaAudioPlayer.demuxReadIntLE = readIntLE;
-    LuminaAudioPlayer.demuxBytesEqualAscii = bytesEqualAscii;
+    NemeraAudioPlayer.demuxReadUintBE = readUintBE;
+    NemeraAudioPlayer.demuxReadUintLE = readUintLE;
+    NemeraAudioPlayer.demuxReadIntLE = readIntLE;
+    NemeraAudioPlayer.demuxBytesEqualAscii = bytesEqualAscii;
 
     /**
      * Reads a little endian signed 64 bit integer from a run of bytes, used by the granule position of an OGG page. The
@@ -259,7 +259,7 @@
         return high * 4294967296 + low;
     }
 
-    LuminaAudioPlayer.demuxReadInt64LE = readInt64LE;
+    NemeraAudioPlayer.demuxReadInt64LE = readInt64LE;
 
     /**
      * Reads a big endian sync safe integer, the size encoding an ID3v2 tag uses, where the top bit of each of its four
@@ -277,7 +277,7 @@
             + (bytes[offset + 3] & 0x7F);
     }
 
-    LuminaAudioPlayer.demuxReadSyncSafe = readSyncSafe;
+    NemeraAudioPlayer.demuxReadSyncSafe = readSyncSafe;
 
     /**
      * Builds the byte-at-a-time lookup table of a non-reflected CRC, so that a checksum over a run of bytes costs one
@@ -300,7 +300,7 @@
         return table;
     }
 
-    LuminaAudioPlayer.demuxBuildCrcTable = buildCrcTable;
+    NemeraAudioPlayer.demuxBuildCrcTable = buildCrcTable;
 
     /**
      * A bit reader over a run of big endian bytes, for the bit packed headers of MPEG, FLAC and OGG.
@@ -344,7 +344,7 @@
         }
     }
 
-    LuminaAudioPlayer.DemuxerBitReader = DemuxerBitReader;
+    NemeraAudioPlayer.DemuxerBitReader = DemuxerBitReader;
 
     /**
      * A random access byte source that answers a read at an absolute offset and reports end of file as a short read
@@ -431,9 +431,9 @@
      */
     function isWindowUnavailableError(error) {
         return !!error
-            && error.code === LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED
+            && error.code === NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED
             && !!error.details
-            && error.details.reason === LuminaAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE;
+            && error.details.reason === NemeraAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE;
     }
 
     /**
@@ -445,13 +445,13 @@
     function isDownloadAbort(error) {
         if (!error)
             return false;
-        if (error.code === LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED)
+        if (error.code === NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED)
             return true;
         // A raw fetch abort is also an intentional stop, so a DOMException named AbortError is treated the same way.
-        return LuminaAudioPlayer.isAbortError(error);
+        return NemeraAudioPlayer.isAbortError(error);
     }
 
-    LuminaAudioPlayer.isDownloadAbort = isDownloadAbort;
+    NemeraAudioPlayer.isDownloadAbort = isDownloadAbort;
 
     /**
      * Adapts a byte source for a demuxer: a caller passes the TrackDownloader of the download engine, an object that
@@ -470,8 +470,8 @@
         };
     }
 
-    LuminaAudioPlayer.DemuxerByteSource = DemuxerByteSource;
-    LuminaAudioPlayer.createDemuxerByteSource = toByteSource;
+    NemeraAudioPlayer.DemuxerByteSource = DemuxerByteSource;
+    NemeraAudioPlayer.createDemuxerByteSource = toByteSource;
 
     /**
      * A windowing reader over a byte source. A parser walks the stream with absolute offsets, and the reader keeps the
@@ -481,7 +481,7 @@
     class DemuxerReader {
         /**
          * Creates an instance of DemuxerReader.
-         * @param {Object} source - The byte source, per {@link LuminaAudioPlayer.createDemuxerByteSource}.
+         * @param {Object} source - The byte source, per {@link NemeraAudioPlayer.createDemuxerByteSource}.
          * @param {Object} [options] - The reader options.
          * @param {number} [options.windowSize] - The number of bytes kept in the read ahead window. Defaults to 64 KiB.
          */
@@ -584,7 +584,7 @@
         }
     }
 
-    LuminaAudioPlayer.DemuxerReader = DemuxerReader;
+    NemeraAudioPlayer.DemuxerReader = DemuxerReader;
 
     /**
      * Coerces a value to a whole, non negative number of microseconds, so that a packet the decoder receives always
@@ -613,7 +613,7 @@
         });
     }
 
-    LuminaAudioPlayer.createDemuxerPacket = createPacket;
+    NemeraAudioPlayer.createDemuxerPacket = createPacket;
 
     /**
      * The number of candidate positions a single scan will validate before it gives up. A validator is an awaited read, so
@@ -636,7 +636,7 @@
      * is capped, so a crafted region cannot turn a scan into an unbounded number of awaited reads. A scan that reaches
      * that cap throws rather than returning the same -1 it uses for end of stream, so a refused region is reported as a
      * demux failure instead of ending playback silently.
-     * @param {LuminaAudioPlayer.DemuxerReader} reader - The reader to scan through.
+     * @param {NemeraAudioPlayer.DemuxerReader} reader - The reader to scan through.
      * @param {number} start - The offset to start the scan at.
      * @param {number|null} end - The exclusive end of the scan, or null to scan to the end of the stream.
      * @param {Array<number>} prefix - The bytes a candidate must start with.
@@ -644,7 +644,7 @@
      * @param {Object} [options] - The scan options.
      * @param {Array<number>} [options.prefixMask] - A mask per prefix byte; a candidate matches when each byte matches under its mask. Defaults to an exact comparison of every byte.
      * @returns {Promise<number>} The offset of the first accepted candidate, or -1 when the scan reaches the end of the stream without one.
-     * @throws {LuminaAudioPlayer.PlayerError} With {@link LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED} and <c>details.reason === 'scan-budget-exhausted'</c> when the scan evaluated its candidate budget without finding a frame, which is a corrupt or crafted region rather than an end of stream.
+     * @throws {NemeraAudioPlayer.PlayerError} With {@link NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED} and <c>details.reason === 'scan-budget-exhausted'</c> when the scan evaluated its candidate budget without finding a frame, which is a corrupt or crafted region rather than an end of stream.
      */
     async function scanForFrameAsync(reader, start, end, prefix, validateAsync, options = {}) {
         const settings = options || {};
@@ -680,7 +680,7 @@
                     continue;
                 // The prefix matched, so this offset is a full candidate: it costs one unit of the scan budget, and the validator, when there is one, decides whether it is a real frame header.
                 if (remaining <= 0)
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The scan evaluated its candidate budget without finding a frame.', { reason: 'scan-budget-exhausted' });
+                    throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The scan evaluated its candidate budget without finding a frame.', { reason: 'scan-budget-exhausted' });
                 remaining--;
                 const offset = position + index;
                 if (!validateAsync || await validateAsync(offset))
@@ -695,7 +695,7 @@
         return -1;
     }
 
-    LuminaAudioPlayer.scanForFrameAsync = scanForFrameAsync;
+    NemeraAudioPlayer.scanForFrameAsync = scanForFrameAsync;
 
     /**
      * Copies a run of bytes into a new array. It is used when a packet is assembled from more than one read, so that the
@@ -716,7 +716,7 @@
         return result;
     }
 
-    LuminaAudioPlayer.concatDemuxerBytes = concatBytes;
+    NemeraAudioPlayer.concatDemuxerBytes = concatBytes;
 
     /**
      * The base class of a demuxer. It owns the byte reader, the recorded failure and the error callback, and it defines the interface every per format demuxer implements.
@@ -725,16 +725,16 @@
         /**
          * Creates an instance of Demuxer.
          * @param {Object} options - The demuxer options.
-         * @param {*} options.source - The byte source, per {@link LuminaAudioPlayer.createDemuxerByteSource}.
-         * @param {LuminaAudioPlayer.DemuxerReader} [options.reader] - An existing reader to use instead of building one from the source.
-         * @param {Function} [options.onError] - Called with a {@link LuminaAudioPlayer.PlayerError} when the demuxer fails.
+         * @param {*} options.source - The byte source, per {@link NemeraAudioPlayer.createDemuxerByteSource}.
+         * @param {NemeraAudioPlayer.DemuxerReader} [options.reader] - An existing reader to use instead of building one from the source.
+         * @param {Function} [options.onError] - Called with a {@link NemeraAudioPlayer.PlayerError} when the demuxer fails.
          * @param {number} [options.windowSize] - The size of the read ahead window of the reader.
          */
         constructor(options = {}) {
             const settings = options || {};
             this.reader = settings.reader instanceof DemuxerReader ? settings.reader : new DemuxerReader(settings.source, settings);
             this.onError = typeof settings.onError === 'function' ? settings.onError : null;
-            /** @type {LuminaAudioPlayer.PlayerError|null} */
+            /** @type {NemeraAudioPlayer.PlayerError|null} */
             this.error = null;
             this.destroyed = false;
             this.initialized = false;
@@ -766,7 +766,7 @@
 
         /**
          * Gets the last failure the demuxer recorded, or null.
-         * @returns {LuminaAudioPlayer.PlayerError|null} The recorded failure.
+         * @returns {NemeraAudioPlayer.PlayerError|null} The recorded failure.
          */
         getError() {
             return this.error;
@@ -774,13 +774,13 @@
 
         /**
          * Builds a typed error without recording it.
-         * @param {string} code - One of the {@link LuminaAudioPlayer.PlayerErrorCode} values.
+         * @param {string} code - One of the {@link NemeraAudioPlayer.PlayerErrorCode} values.
          * @param {string} message - The developer facing description of the failure.
          * @param {Object} [details] - Optional structured details.
-         * @returns {LuminaAudioPlayer.PlayerError} The typed error.
+         * @returns {NemeraAudioPlayer.PlayerError} The typed error.
          */
         createError(code, message, details = null) {
-            return new LuminaAudioPlayer.PlayerError(code || LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, message, details || null);
+            return new NemeraAudioPlayer.PlayerError(code || NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, message, details || null);
         }
 
         /**
@@ -790,12 +790,12 @@
          * @param {*} error - The failure to record.
          * @param {string} [code] - The code to use when the failure is not already a player error.
          * @param {Object} [details] - Optional structured details.
-         * @returns {LuminaAudioPlayer.PlayerError} The recorded typed error.
+         * @returns {NemeraAudioPlayer.PlayerError} The recorded typed error.
          */
-        fail(error, code = LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, details = null) {
+        fail(error, code = NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, details = null) {
             if (this.error)
                 return this.error;
-            const typed = LuminaAudioPlayer.toOwnedPlayerError(error, code, details);
+            const typed = NemeraAudioPlayer.toOwnedPlayerError(error, code, details);
             this.error = typed;
             this.initialized = false;
             if (this.onError) {
@@ -816,54 +816,54 @@
          */
         async skipId3v2Async(offset) {
             const bytes = await this.reader.readAsync(offset, 10);
-            if (bytes.length < 10 || !LuminaAudioPlayer.demuxBytesEqualAscii(bytes, 0, 'ID3'))
+            if (bytes.length < 10 || !NemeraAudioPlayer.demuxBytesEqualAscii(bytes, 0, 'ID3'))
                 return offset;
             const flags = bytes[5];
-            const size = LuminaAudioPlayer.demuxReadSyncSafe(bytes, 6);
+            const size = NemeraAudioPlayer.demuxReadSyncSafe(bytes, 6);
             // A tag may carry a ten byte footer, which is not counted in the size.
             return offset + 10 + size + ((flags & 0x10) !== 0 ? 10 : 0);
         }
 
         /**
-         * Records a fatal failure through {@link LuminaAudioPlayer.Demuxer#fail}, with two exceptions: an intentional
+         * Records a fatal failure through {@link NemeraAudioPlayer.Demuxer#fail}, with two exceptions: an intentional
          * download stop, which is a normal teardown and not a failure of the track, is returned typed without being
          * recorded or reported; and a failure that another component already typed with a structured reason keeps its
          * own reason instead of the generic one of the caller.
          * @param {*} error - The failure to record.
          * @param {string} reason - The structured reason to attach when the failure carries none.
-         * @returns {LuminaAudioPlayer.PlayerError} The typed error, recorded unless it is an intentional stop.
+         * @returns {NemeraAudioPlayer.PlayerError} The typed error, recorded unless it is an intentional stop.
          */
         recordFailure(error, reason) {
             // A failure observed after the demuxer was destroyed belongs to the teardown of the operation, not to the track,
             // so it is returned typed as an abort and is neither recorded nor reported as a track failure.
             if (this.destroyed)
-                return LuminaAudioPlayer.PlayerError.from(error, LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED);
+                return NemeraAudioPlayer.PlayerError.from(error, NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED);
             // An intentional stop is returned typed but not recorded, and it is wrapped with the abort code rather than
             // the demux code, so that a caller which classifies the failure again, as the capability module does, still
             // sees it as an abort and not as a track that has to be normalized.
             if (isDownloadAbort(error))
-                return LuminaAudioPlayer.PlayerError.from(error, LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED);
-            if (error instanceof LuminaAudioPlayer.PlayerError && error.details && error.details.reason !== undefined)
-                return this.fail(error, LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED);
-            return this.fail(error, LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, { reason });
+                return NemeraAudioPlayer.PlayerError.from(error, NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED);
+            if (error instanceof NemeraAudioPlayer.PlayerError && error.details && error.details.reason !== undefined)
+                return this.fail(error, NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED);
+            return this.fail(error, NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, { reason });
         }
 
         /**
          * Reads the header(s) of the stream and prepares the configuration. It must be called before reading any packet.
          * @returns {Promise<void>} A promise resolving when the stream is ready to be read.
-         * @throws {LuminaAudioPlayer.PlayerError} When the bytes are not a stream of this format.
+         * @throws {NemeraAudioPlayer.PlayerError} When the bytes are not a stream of this format.
          */
         async initializeAsync() {
-            throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'This demuxer does not implement initializeAsync.');
+            throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'This demuxer does not implement initializeAsync.');
         }
 
         /**
          * Reads the next encoded packet of the stream.
          * @returns {Promise<Object|null>} The packet, or null once the stream ended.
-         * @throws {LuminaAudioPlayer.PlayerError} When the stream can no longer be parsed.
+         * @throws {NemeraAudioPlayer.PlayerError} When the stream can no longer be parsed.
          */
         async readPacketAsync() {
-            throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'This demuxer does not implement readPacketAsync.');
+            throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'This demuxer does not implement readPacketAsync.');
         }
 
         /**
@@ -886,7 +886,7 @@
          * Repositions the read cursor to a packet boundary at or before a time.
          * @param {number} seconds - The target time, in seconds.
          * @returns {Promise<number|null>} The byte offset it repositioned to, or null when the format cannot be repositioned by time.
-         * @throws {LuminaAudioPlayer.PlayerError} When the scan for a frame gives up on a corrupt or crafted region.
+         * @throws {NemeraAudioPlayer.PlayerError} When the scan for a frame gives up on a corrupt or crafted region.
          */
         async seekToTimeAsync(seconds) {
             return null;
@@ -912,19 +912,19 @@
         /**
          * Ensures the stream was initialized before it is read.
          * @returns {void}
-         * @throws {LuminaAudioPlayer.PlayerError} When the demuxer was destroyed, failed, or was not initialized.
+         * @throws {NemeraAudioPlayer.PlayerError} When the demuxer was destroyed, failed, or was not initialized.
          */
         ensureInitialized() {
             if (this.destroyed)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The demuxer was destroyed.');
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The demuxer was destroyed.');
             if (this.error)
                 throw this.error;
             if (!this.initialized)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The demuxer is not initialized.');
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The demuxer is not initialized.');
         }
     }
 
-    LuminaAudioPlayer.Demuxer = Demuxer;
+    NemeraAudioPlayer.Demuxer = Demuxer;
 
     /**
      * A registry of demuxer descriptors, keyed by the canonical container and codec pair a demuxer handles.
@@ -951,7 +951,7 @@
         /**
          * Registers a demuxer descriptor.
          * @param {Object} descriptor - The descriptor, with a container, a codec, a representative decoder probe and a create function that receives the demuxer options and returns a demuxer.
-         * @returns {LuminaAudioPlayer.DemuxerRegistry} This registry, for chaining.
+         * @returns {NemeraAudioPlayer.DemuxerRegistry} This registry, for chaining.
          * @throws {TypeError} When the descriptor is incomplete, including when it carries no representative probe. The probe is required so that the browser check of the demux capability module never has to guess from a name, which would silently report a supported codec as unsupported.
          */
         register(descriptor) {
@@ -996,21 +996,21 @@
         }
     }
 
-    LuminaAudioPlayer.DemuxerRegistry = DemuxerRegistry;
+    NemeraAudioPlayer.DemuxerRegistry = DemuxerRegistry;
 
     /**
      * The process wide registry the per format modules register their demuxers into. It exists as soon as this module
      * loads, so a format module loaded after it can always register, whatever the load order among the formats.
-     * @type {LuminaAudioPlayer.DemuxerRegistry}
+     * @type {NemeraAudioPlayer.DemuxerRegistry}
      */
-    LuminaAudioPlayer.demuxerRegistry = new DemuxerRegistry();
+    NemeraAudioPlayer.demuxerRegistry = new DemuxerRegistry();
 
     /**
      * Registers a demuxer descriptor into the process wide registry.
-     * @param {Object} descriptor - The descriptor, per {@link LuminaAudioPlayer.DemuxerRegistry#register}.
-     * @returns {LuminaAudioPlayer.DemuxerRegistry} The process wide registry, for chaining.
+     * @param {Object} descriptor - The descriptor, per {@link NemeraAudioPlayer.DemuxerRegistry#register}.
+     * @returns {NemeraAudioPlayer.DemuxerRegistry} The process wide registry, for chaining.
      */
-    LuminaAudioPlayer.registerDemuxer = function (descriptor) {
-        return LuminaAudioPlayer.demuxerRegistry.register(descriptor);
+    NemeraAudioPlayer.registerDemuxer = function (descriptor) {
+        return NemeraAudioPlayer.demuxerRegistry.register(descriptor);
     };
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

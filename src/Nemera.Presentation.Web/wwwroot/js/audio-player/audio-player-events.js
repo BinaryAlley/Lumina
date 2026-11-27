@@ -4,7 +4,7 @@
  * The player is decoupled from its consumers (the player bar, the transport UI, the queue panel, themes) through a single observable.
  * Every module of the player publishes to this bus, and every consumer subscribes to it, so that no module needs a direct reference to another one.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -12,7 +12,7 @@
      * @readonly
      * @enum {string}
      */
-    LuminaAudioPlayer.PlayerEvent = Object.freeze({
+    NemeraAudioPlayer.PlayerEvent = Object.freeze({
         // The state machine moved to another state. Payload: { previousState, state }.
         STATE_CHANGED: 'statechange',
         // The currently playing track changed. Payload: the play descriptor.
@@ -37,7 +37,7 @@
         BUFFERING_CHANGED: 'bufferingchange',
         // The current track reached its end.
         ENDED: 'ended',
-        // A {@link LuminaAudioPlayer.PlayerError} was raised. Payload: the player error.
+        // A {@link NemeraAudioPlayer.PlayerError} was raised. Payload: the player error.
         ERROR: 'error',
         // Capability detection completed. Payload: the capability report.
         CAPABILITIES_CHANGED: 'capabilitieschange',
@@ -45,7 +45,7 @@
         PREFERENCES_CHANGED: 'preferenceschange',
         // A track cannot be demuxed and decoded directly by the bundled player, so the server has to normalize it (remux or
         // transcode) before it can play. Payload: { container, codec, reason }, where reason is one of the
-        // {@link LuminaAudioPlayer.PlayerErrorReason} values NO_DEMUXER, CODEC_UNSUPPORTED or DEMUXER_FAILED, and, when the
+        // {@link NemeraAudioPlayer.PlayerErrorReason} values NO_DEMUXER, CODEC_UNSUPPORTED or DEMUXER_FAILED, and, when the
         // caller supplied one, isDirectPlay, the direct play flag of the manifest it asked about, so a consumer can tell a
         // client-side capability gap from a track the server already decided to normalize. The flag is absent, not false,
         // when the caller had no manifest.
@@ -69,7 +69,7 @@
 
         /**
          * Subscribes a handler to an event.
-         * @param {string} event - One of the {@link LuminaAudioPlayer.PlayerEvent} values.
+         * @param {string} event - One of the {@link NemeraAudioPlayer.PlayerEvent} values.
          * @param {Function} handler - The handler invoked with the event payload.
          * @returns {Function} A function that unsubscribes the handler.
          */
@@ -87,7 +87,7 @@
 
         /**
          * Checks whether an event currently has any subscriber, so a producer can skip an expensive payload nobody reads.
-         * @param {string} event - One of the {@link LuminaAudioPlayer.PlayerEvent} values.
+         * @param {string} event - One of the {@link NemeraAudioPlayer.PlayerEvent} values.
          * @returns {boolean} True when the event has at least one handler.
          */
         hasListeners(event) {
@@ -97,7 +97,7 @@
 
         /**
          * Subscribes a handler to an event, removing it after the first emission.
-         * @param {string} event - One of the {@link LuminaAudioPlayer.PlayerEvent} values.
+         * @param {string} event - One of the {@link NemeraAudioPlayer.PlayerEvent} values.
          * @param {Function} handler - The handler invoked once with the event payload.
          * @returns {Function} A function that unsubscribes the handler.
          */
@@ -111,7 +111,7 @@
 
         /**
          * Unsubscribes a handler from an event.
-         * @param {string} event - One of the {@link LuminaAudioPlayer.PlayerEvent} values.
+         * @param {string} event - One of the {@link NemeraAudioPlayer.PlayerEvent} values.
          * @param {Function} handler - The handler to remove.
          */
         off(event, handler) {
@@ -125,7 +125,7 @@
          *
          * A handler that throws does not prevent the remaining handlers from running: the failure is
          * logged and swallowed, because a misbehaving consumer must never break the player.
-         * @param {string} event - One of the {@link LuminaAudioPlayer.PlayerEvent} values.
+         * @param {string} event - One of the {@link NemeraAudioPlayer.PlayerEvent} values.
          * @param {*} [payload] - The payload passed to each handler.
          */
         emit(event, payload) {
@@ -144,7 +144,7 @@
 
         /**
          * Removes every handler of an event, or of every event when none is provided.
-         * @param {string} [event] - One of the {@link LuminaAudioPlayer.PlayerEvent} values, or nothing to clear all.
+         * @param {string} [event] - One of the {@link NemeraAudioPlayer.PlayerEvent} values, or nothing to clear all.
          */
         clear(event) {
             if (event === undefined)
@@ -154,5 +154,5 @@
         }
     }
 
-    LuminaAudioPlayer.PlayerEventBus = PlayerEventBus;
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+    NemeraAudioPlayer.PlayerEventBus = PlayerEventBus;
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

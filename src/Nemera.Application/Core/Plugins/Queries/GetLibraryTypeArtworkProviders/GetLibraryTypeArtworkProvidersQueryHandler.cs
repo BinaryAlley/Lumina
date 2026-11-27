@@ -1,24 +1,24 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Plugins;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Contracts.Responses.Plugins;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Plugins;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Contracts.Responses.Plugins;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.Core.Plugins.Queries.GetLibraryTypeArtworkProviders;
+namespace Nemera.Application.Core.Plugins.Queries.GetLibraryTypeArtworkProviders;
 
 /// <summary>
 /// Handler for the query to get the artwork providers available for a media library type.

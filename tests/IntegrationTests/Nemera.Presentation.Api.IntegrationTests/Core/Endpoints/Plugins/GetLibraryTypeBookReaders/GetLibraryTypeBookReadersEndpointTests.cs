@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.Plugins;
-using Lumina.Presentation.Api.Core.Endpoints.Plugins.GetLibraryTypeBookReaders;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Contracts.Responses.Plugins;
+using Nemera.Presentation.Api.Core.Endpoints.Plugins.GetLibraryTypeBookReaders;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -12,16 +12,16 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Plugins.GetLibraryTypeBookReaders;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Plugins.GetLibraryTypeBookReaders;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetLibraryTypeBookReadersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetLibraryTypeBookReadersEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetLibraryTypeBookReadersEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -32,7 +32,7 @@ public class GetLibraryTypeBookReadersEndpointTests : IClassFixture<Authenticate
     /// Initializes a new instance of the <see cref="GetLibraryTypeBookReadersEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetLibraryTypeBookReadersEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetLibraryTypeBookReadersEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;

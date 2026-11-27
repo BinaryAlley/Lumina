@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Api.Common.Routes.Playlists;
+namespace Nemera.Presentation.Api.Common.Routes.Playlists;
 
 /// <summary>
 /// Class for the collection of the playlist routes of the API.

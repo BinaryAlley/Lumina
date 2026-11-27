@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 #endregion
 
-namespace Lumina.Application.Core.Plugins.Queries.GetLibraryMetadataProviders;
+namespace Nemera.Application.Core.Plugins.Queries.GetLibraryMetadataProviders;
 
 /// <summary>
 /// Query for getting the metadata providers configured for a media library.

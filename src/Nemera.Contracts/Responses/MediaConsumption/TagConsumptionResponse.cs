@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.MediaConsumption;
+namespace Nemera.Contracts.Responses.MediaConsumption;
 
 /// <summary>
 /// Represents the consumption statistics of a tag, grouped across media kinds.

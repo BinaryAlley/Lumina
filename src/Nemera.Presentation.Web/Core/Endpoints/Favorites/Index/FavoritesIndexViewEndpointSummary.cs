@@ -3,7 +3,7 @@ using FastEndpoints;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Favorites.Index;
+namespace Nemera.Presentation.Web.Core.Endpoints.Favorites.Index;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="FavoritesIndexViewEndpoint"/> endpoint, for OpenAPI.

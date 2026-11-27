@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Net;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Services;
+namespace Nemera.Presentation.Web.Common.Services;
 
 /// <summary>
 /// Represents a cached HTTP response, including its content and status code.

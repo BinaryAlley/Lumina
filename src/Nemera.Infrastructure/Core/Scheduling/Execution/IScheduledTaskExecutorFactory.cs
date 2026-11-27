@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Scheduling.Execution;
+namespace Nemera.Infrastructure.Core.Scheduling.Execution;
 
 /// <summary>
 /// Interface for the factory that creates the executor of the task of a scheduled job, based on the type of its task.

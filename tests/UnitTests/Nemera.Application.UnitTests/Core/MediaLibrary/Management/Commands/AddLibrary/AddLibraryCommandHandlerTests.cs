@@ -1,27 +1,27 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DomainEvents;
-using Lumina.Application.Common.DTO.MediaLibrary.Management;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Infrastructure.Plugins;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DTO.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Core.MediaLibrary.Management.Commands.AddLibrary;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.PathTemplate;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DomainEvents;
+using Nemera.Application.Common.DTO.MediaLibrary.Management;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Plugins;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DTO.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Core.MediaLibrary.Management.Commands.AddLibrary;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.PathTemplate;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -29,11 +29,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.MediaLibrary.Management.Commands.AddLibrary;
+namespace Nemera.Application.UnitTests.Core.MediaLibrary.Management.Commands.AddLibrary;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AddLibraryCommandHandler"/> class.
@@ -314,7 +314,7 @@ public class AddLibraryCommandHandlerTests
         // Arrange
         AddLibraryCommand command = _addLibraryCommandFixture.Create();
         _mockAuthorizationService.IsInRoleAsync(_userId, "Admin", Arg.Any<CancellationToken>()).Returns(false);
-        _mockAuthorizationService.HasPermissionAsync(_userId, Arg.Any<Lumina.Domain.SharedKernel.Common.Enums.Authorization.AuthorizationPermission>(), Arg.Any<CancellationToken>())
+        _mockAuthorizationService.HasPermissionAsync(_userId, Arg.Any<Nemera.Domain.SharedKernel.Common.Enums.Authorization.AuthorizationPermission>(), Arg.Any<CancellationToken>())
             .Returns(false);
 
         // Act

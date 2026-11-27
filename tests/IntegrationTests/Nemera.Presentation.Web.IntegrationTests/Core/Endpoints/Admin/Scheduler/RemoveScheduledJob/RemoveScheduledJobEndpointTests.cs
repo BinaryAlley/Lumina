@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Requests.Scheduling;
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Scheduler.RemoveScheduledJob;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Scheduling;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Requests.Scheduling;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Scheduler.RemoveScheduledJob;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Scheduling;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -13,22 +13,22 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Scheduler.RemoveScheduledJob;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Scheduler.RemoveScheduledJob;
 
 /// <summary>
 /// Contains integration tests for the <see cref="RemoveScheduledJobEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RemoveScheduledJobEndpointTests : IClassFixture<LuminaWebFactory>
+public class RemoveScheduledJobEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly RemoveScheduledJobRequestFixture _removeScheduledJobRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RemoveScheduledJobEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public RemoveScheduledJobEndpointTests(LuminaWebFactory apiFactory)
+    public RemoveScheduledJobEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

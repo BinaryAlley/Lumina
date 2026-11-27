@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 #endregion
 
-namespace Lumina.Infrastructure.IntegrationTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Infrastructure.IntegrationTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Contains integration tests for the <see cref="TranscodingOutputSizeTracker"/> class.
@@ -25,7 +25,7 @@ public class TranscodingOutputSizeTrackerTests : IDisposable
     /// </summary>
     public TranscodingOutputSizeTrackerTests()
     {
-        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"lumina-transcoding-output-size-{Guid.NewGuid():N}");
+        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"nemera-transcoding-output-size-{Guid.NewGuid():N}");
         Directory.CreateDirectory(_temporaryDirectory);
         _sut = new TranscodingOutputSizeTracker(_temporaryDirectory, SEGMENT_FILE_PREFIX, SEGMENT_FILE_EXTENSION, SEGMENT_LIST_FILE_NAME);
     }

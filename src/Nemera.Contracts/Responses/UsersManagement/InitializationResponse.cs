@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.UsersManagement;
+namespace Nemera.Contracts.Responses.UsersManagement;
 
 /// <summary>
 /// Represents a response for verifying the initialization status of the application.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Repositories.Plugins;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,22 +15,22 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Plugins;
+namespace Nemera.DataAccess.Core.Repositories.Plugins;
 
 /// <summary>
 /// Repository for plugins.
 /// </summary>
 internal sealed class PluginRepository : IPluginRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public PluginRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public PluginRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ internal sealed class PluginRepository : IPluginRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="PluginEntity"/>, or an error.</returns>
     public async Task<Result<PluginEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
-        IQueryable<PluginEntity> query = _luminaDbContext.Plugins;
+        IQueryable<PluginEntity> query = _nemeraDbContext.Plugins;
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         return await query.FirstOrDefaultAsync(plugin => plugin.Id == id, cancellationToken).ConfigureAwait(false);
@@ -63,7 +63,7 @@ internal sealed class PluginRepository : IPluginRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a paginated result of <see cref="PluginEntity"/>, or an error.</returns>
     public async Task<Result<PaginatedResultDto<PluginEntity>>> GetAllAsync<TFilter>(PaginationDataDto? paginationData = null, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
     {
-        IQueryable<PluginEntity> query = _luminaDbContext.Plugins;
+        IQueryable<PluginEntity> query = _nemeraDbContext.Plugins;
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
 
@@ -108,10 +108,10 @@ internal sealed class PluginRepository : IPluginRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpsertAsync(PluginEntity plugin, CancellationToken cancellationToken)
     {
-        PluginEntity? existingPlugin = await _luminaDbContext.Plugins
+        PluginEntity? existingPlugin = await _nemeraDbContext.Plugins
             .FirstOrDefaultAsync(repositoryPlugin => repositoryPlugin.Id == plugin.Id, cancellationToken).ConfigureAwait(false);
         if (existingPlugin is null)
-            _luminaDbContext.Plugins.Add(plugin);
+            _nemeraDbContext.Plugins.Add(plugin);
         else
         {
             // Update only the detection fields, preserving the stored settings and creation date.
@@ -133,11 +133,11 @@ internal sealed class PluginRepository : IPluginRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        PluginEntity? plugin = await _luminaDbContext.Plugins
+        PluginEntity? plugin = await _nemeraDbContext.Plugins
             .FirstOrDefaultAsync(repositoryPlugin => repositoryPlugin.Id == id, cancellationToken).ConfigureAwait(false);
         if (plugin is null)
             return Errors.Plugins.PluginNotFound;
-        _luminaDbContext.Plugins.Remove(plugin);
+        _nemeraDbContext.Plugins.Remove(plugin);
         return Result.Deleted;
     }
 
@@ -150,7 +150,7 @@ internal sealed class PluginRepository : IPluginRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpdateSettingsAsync(Guid pluginId, string? settingsJson, CancellationToken cancellationToken)
     {
-        PluginEntity? existingPlugin = await _luminaDbContext.Plugins
+        PluginEntity? existingPlugin = await _nemeraDbContext.Plugins
             .FirstOrDefaultAsync(repositoryPlugin => repositoryPlugin.Id == pluginId, cancellationToken).ConfigureAwait(false);
         if (existingPlugin is null)
             return Errors.Plugins.PluginNotFound;

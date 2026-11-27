@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.FileSystemManagement.Path;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.FileSystemManagement.Path;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetPathRootEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetPathRootEndpointTests : IClassFixture<LuminaApiFactory>
+public class GetPathRootEndpointTests : IClassFixture<NemeraApiFactory>
 {
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -24,7 +24,7 @@ public class GetPathRootEndpointTests : IClassFixture<LuminaApiFactory>
     /// Initializes a new instance of the <see cref="GetPathRootEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetPathRootEndpointTests(LuminaApiFactory apiFactory)
+    public GetPathRootEndpointTests(NemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
     }

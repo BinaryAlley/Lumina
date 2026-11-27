@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
 #endregion
 
-namespace Lumina.Infrastructure.Fixtures.Core.Authorization;
+namespace Nemera.Infrastructure.Fixtures.Core.Authorization;
 
 /// <summary>
 /// Test policy interface for unregistered policy scenarios.

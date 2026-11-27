@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Responses.UsersManagement.Settings;
+using Nemera.Contracts.Responses.UsersManagement.Settings;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Settings.GetPlaybackState;
+namespace Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Settings.GetPlaybackState;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetPlaybackStateEndpoint"/> API endpoint, for OpenAPI.

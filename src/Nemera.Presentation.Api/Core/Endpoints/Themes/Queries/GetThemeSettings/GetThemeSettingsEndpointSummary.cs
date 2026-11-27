@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Responses.Themes;
+using Nemera.Contracts.Responses.Themes;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemeSettings;
+namespace Nemera.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemeSettings;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetThemeSettingsEndpoint"/> API endpoint, for OpenAPI.
@@ -24,7 +24,7 @@ public class GetThemeSettingsEndpointSummary : Summary<GetThemeSettingsEndpoint,
         Response(200, "The theme engine settings are returned.",
             example: new ThemeSettingsResponse(
                 MaxArchiveBytes: 8388608,
-                DefaultThemeId: "lumina-default"
+                DefaultThemeId: "nemera-default"
             ));
     }
 }

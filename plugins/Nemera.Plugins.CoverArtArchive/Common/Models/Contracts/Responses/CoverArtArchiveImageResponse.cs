@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.Common.Models.Contracts.Responses;
+namespace Nemera.Plugins.CoverArtArchive.Common.Models.Contracts.Responses;
 
 /// <summary>
 /// Represents a response for a single image of the artwork of a release or a release group from the Cover Art Archive API.

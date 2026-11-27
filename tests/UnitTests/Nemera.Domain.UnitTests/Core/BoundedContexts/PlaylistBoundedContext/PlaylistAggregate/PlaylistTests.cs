@@ -1,24 +1,24 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.PlaylistBoundedContext.ExternalIdentifiers.UserManagementBoundedContext.UserAggregate;
-using Lumina.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate;
-using Lumina.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.Entities;
-using Lumina.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.Events;
-using Lumina.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.PlaylistBoundedContext.ExternalIdentifiers.UserManagementBoundedContext.UserAggregate;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.Entities;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.PlaylistBoundedContext.ExternalIdentifiers.UserManagementBoundedContext.UserAggregate;
+using Nemera.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate;
+using Nemera.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.Entities;
+using Nemera.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.Events;
+using Nemera.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.PlaylistBoundedContext.ExternalIdentifiers.UserManagementBoundedContext.UserAggregate;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.Entities;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Domain.UnitTests.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate;
+namespace Nemera.Domain.UnitTests.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate;
 
 /// <summary>
 /// Contains unit tests for the <see cref="Playlist"/> class.

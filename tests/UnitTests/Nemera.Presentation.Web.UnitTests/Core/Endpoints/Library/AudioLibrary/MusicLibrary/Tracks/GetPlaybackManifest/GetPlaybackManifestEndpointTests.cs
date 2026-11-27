@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetPlaybackManifest;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetPlaybackManifest;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System;
@@ -19,7 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetPlaybackManifest;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetPlaybackManifest;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetPlaybackManifestEndpoint"/> class.
@@ -211,7 +211,7 @@ public class GetPlaybackManifestEndpointTests
     }
 
     [Theory]
-    [InlineData("/lumina", "/lumina")] // A plain absolute path base is prefixed.
+    [InlineData("/nemera", "/nemera")] // A plain absolute path base is prefixed.
     [InlineData("//evil", "")] // A protocol relative path base would point the stream at another origin.
     [InlineData("/a?b", "")] // A path base with a query would truncate the built path.
     public async Task ExecuteAsync_WhenPathBaseIsPresent_ShouldUseItOnlyWhenItIsSafe(string pathBase, string expectedPrefix)

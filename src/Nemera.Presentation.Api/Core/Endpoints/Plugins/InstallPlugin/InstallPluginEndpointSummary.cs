@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Plugins.InstallPlugin;
+namespace Nemera.Presentation.Api.Core.Endpoints.Plugins.InstallPlugin;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="InstallPluginEndpoint"/> API endpoint, for OpenAPI.

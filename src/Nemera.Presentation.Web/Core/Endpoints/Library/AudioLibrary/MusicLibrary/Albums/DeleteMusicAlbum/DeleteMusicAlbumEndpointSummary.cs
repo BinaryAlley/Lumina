@@ -3,7 +3,7 @@ using FastEndpoints;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.DeleteMusicAlbum;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.DeleteMusicAlbum;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="DeleteMusicAlbumEndpoint"/> endpoint, for OpenAPI.

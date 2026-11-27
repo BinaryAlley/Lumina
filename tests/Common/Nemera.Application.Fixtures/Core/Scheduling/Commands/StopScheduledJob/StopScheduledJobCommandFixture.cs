@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Scheduling.Commands.StopScheduledJob;
+using Nemera.Application.Core.Scheduling.Commands.StopScheduledJob;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Scheduling.Commands.StopScheduledJob;
+namespace Nemera.Application.Fixtures.Core.Scheduling.Commands.StopScheduledJob;
 
 /// <summary>
 /// Fixture class for the <see cref="StopScheduledJobCommand"/> class.

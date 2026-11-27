@@ -1,17 +1,17 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.Scheduling;
-using Lumina.Application.Core.Scheduling.Commands.RemoveScheduledJob;
-using Lumina.Contracts.Requests.Scheduling;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.Scheduling;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.Scheduling;
+using Nemera.Application.Core.Scheduling.Commands.RemoveScheduledJob;
+using Nemera.Contracts.Requests.Scheduling;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.Scheduling;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Scheduling.RemoveScheduledJob;
+namespace Nemera.Presentation.Api.Core.Endpoints.Scheduling.RemoveScheduledJob;
 
 /// <summary>
 /// API endpoint for the <c>/scheduled-jobs/{scheduledJobId}</c> route.

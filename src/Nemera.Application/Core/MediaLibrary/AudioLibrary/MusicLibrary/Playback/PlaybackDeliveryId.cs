@@ -1,4 +1,4 @@
-namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Defines the format of the opaque delivery handle of a playback manifest.

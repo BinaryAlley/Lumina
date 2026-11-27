@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Common.DTO.Libraries;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
+namespace Nemera.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
 
 /// <summary>
 /// Data transfer object carrying the data needed by the deleted items page of a book library.

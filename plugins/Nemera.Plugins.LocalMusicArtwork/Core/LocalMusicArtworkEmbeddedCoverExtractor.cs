@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.IO;
 using System.Linq;
 #endregion
 
-namespace Lumina.Plugins.LocalMusicArtwork.Core;
+namespace Nemera.Plugins.LocalMusicArtwork.Core;
 
 /// <summary>
 /// Extracts the cover image embedded in the metadata of an audio file into a temporary file, so that it can be stored as the artwork of an album.
@@ -41,7 +41,7 @@ internal static class LocalMusicArtworkEmbeddedCoverExtractor
                 if (imageBytes is null || imageBytes.Length == 0 || imageBytes.Length > MAX_EMBEDDED_COVER_SIZE_BYTES)
                     return null;
 
-                string temporaryPath = Path.Combine(Path.GetTempPath(), $"lumina-local-music-artwork-{Guid.NewGuid():N}{ResolveImageExtension(cover.MimeType)}");
+                string temporaryPath = Path.Combine(Path.GetTempPath(), $"nemera-local-music-artwork-{Guid.NewGuid():N}{ResolveImageExtension(cover.MimeType)}");
                 File.WriteAllBytes(temporaryPath, imageBytes);
                 return new ArtworkDto(ArtworkType.Cover, 0, LocalPath: temporaryPath, RemoteUrl: null, IsTemporary: true);
             }

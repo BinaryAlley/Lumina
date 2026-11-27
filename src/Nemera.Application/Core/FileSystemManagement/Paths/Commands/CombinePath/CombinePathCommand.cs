@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePath;
+namespace Nemera.Application.Core.FileSystemManagement.Paths.Commands.CombinePath;
 
 /// <summary>
 /// Command for combining two file system path.

@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using System;
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
+namespace Nemera.Infrastructure.Core.Authorization.Policies.Common.Factory;
 
 /// <summary>
 /// Interface for the authorization policies factory.

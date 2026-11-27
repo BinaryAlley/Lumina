@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Lumina.Plugins.LocalMusicArtwork.UnitTests")]
-[assembly: InternalsVisibleTo("Lumina.Plugins.LocalMusicArtwork.SecurityTests")]
-[assembly: InternalsVisibleTo("Lumina.Plugins.LocalMusicArtwork.IntegrationTests")]
-[assembly: InternalsVisibleTo("Lumina.Plugins.LocalMusicArtwork.Fixtures")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.LocalMusicArtwork.UnitTests")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.LocalMusicArtwork.SecurityTests")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.LocalMusicArtwork.IntegrationTests")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.LocalMusicArtwork.Fixtures")]

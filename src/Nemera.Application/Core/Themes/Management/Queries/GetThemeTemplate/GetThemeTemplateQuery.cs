@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Themes.Management.Queries.GetThemeTemplate;
+namespace Nemera.Application.Core.Themes.Management.Queries.GetThemeTemplate;
 
 /// <summary>
 /// Query for retrieving the template of a theme selected by a page key.

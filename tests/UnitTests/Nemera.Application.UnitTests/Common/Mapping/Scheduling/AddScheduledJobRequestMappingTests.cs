@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.Scheduling;
-using Lumina.Application.Core.Scheduling.Commands.AddScheduledJob;
-using Lumina.Contracts.Fixtures.Core.Requests.Scheduling;
-using Lumina.Contracts.Requests.Scheduling;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Application.Common.Mapping.Scheduling;
+using Nemera.Application.Core.Scheduling.Commands.AddScheduledJob;
+using Nemera.Contracts.Fixtures.Core.Requests.Scheduling;
+using Nemera.Contracts.Requests.Scheduling;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.Scheduling;
+namespace Nemera.Application.UnitTests.Common.Mapping.Scheduling;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AddScheduledJobRequestMapping"/> class.

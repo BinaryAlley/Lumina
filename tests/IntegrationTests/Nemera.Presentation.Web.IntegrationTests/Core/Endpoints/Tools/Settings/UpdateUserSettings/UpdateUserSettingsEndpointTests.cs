@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.UsersManagement;
-using Lumina.Presentation.Web.Common.Enums.AudioLibrary;
-using Lumina.Presentation.Web.Core.Endpoints.Tools.Settings.UpdateUserSettings;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.UsersManagement;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.UsersManagement;
+using Nemera.Presentation.Web.Common.Enums.AudioLibrary;
+using Nemera.Presentation.Web.Core.Endpoints.Tools.Settings.UpdateUserSettings;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.UsersManagement;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -14,22 +14,22 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Tools.Settings.UpdateUserSettings;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Tools.Settings.UpdateUserSettings;
 
 /// <summary>
 /// Contains integration tests for the <see cref="UpdateUserSettingsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaWebFactory>
+public class UpdateUserSettingsEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly UserSettingsDtoFixture _userSettingsDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateUserSettingsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public UpdateUserSettingsEndpointTests(LuminaWebFactory apiFactory)
+    public UpdateUserSettingsEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

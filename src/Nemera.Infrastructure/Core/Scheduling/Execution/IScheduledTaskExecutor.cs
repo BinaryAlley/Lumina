@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Scheduling.Execution;
+namespace Nemera.Infrastructure.Core.Scheduling.Execution;
 
 /// <summary>
 /// Interface for the executor of the task of a scheduled job.

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Favorites.Queries.GetFavoriteStatus;
-using Lumina.Contracts.Fixtures.Core.Requests.Favorites;
-using Lumina.Contracts.Fixtures.Core.Responses.Favorites;
-using Lumina.Contracts.Requests.Favorites;
-using Lumina.Contracts.Responses.Favorites;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
-using Lumina.Presentation.Api.Core.Endpoints.Favorites.GetFavoriteStatus;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Favorites.Queries.GetFavoriteStatus;
+using Nemera.Contracts.Fixtures.Core.Requests.Favorites;
+using Nemera.Contracts.Fixtures.Core.Responses.Favorites;
+using Nemera.Contracts.Requests.Favorites;
+using Nemera.Contracts.Responses.Favorites;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Presentation.Api.Core.Endpoints.Favorites.GetFavoriteStatus;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -17,11 +17,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Favorites.GetFavoriteStatus;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Favorites.GetFavoriteStatus;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetFavoriteStatusEndpoint"/> class.

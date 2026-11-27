@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Contracts.Responses.FileSystemManagement.Directories;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Application.Common.Mapping.FileSystemManagement.FileSystem;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Contracts.Responses.FileSystemManagement.Directories;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.FileSystemManagement.Directories;
+namespace Nemera.Application.Common.Mapping.FileSystemManagement.Directories;
 
 /// <summary>
 /// Extension methods for converting <see cref="Directory"/>.

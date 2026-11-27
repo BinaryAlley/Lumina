@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
-using Lumina.Contracts.Requests.Authorization;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.Authorization;
+using Nemera.Contracts.Requests.Authorization;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,16 +24,16 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagement.Authorization;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagement.Authorization;
 
 /// <summary>
 /// Contains integration tests for the <see cref="UpdateUserRoleAndPermissionsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly RoleEntityFixture _roleEntityFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
     private readonly UpdateUserRoleAndPermissionsRequestFixture _updateUserRoleAndPermissionsRequestFixture = new();
@@ -47,7 +47,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
     /// Initializes a new instance of the <see cref="UpdateUserRoleAndPermissionsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public UpdateUserRoleAndPermissionsEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public UpdateUserRoleAndPermissionsEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -66,7 +66,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
     {
         // Arrange
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         // Create a non-admin role first.
         RoleEntity editorRole = _roleEntityFixture.Create(roleName: "Editor");
@@ -138,7 +138,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
     {
         // Arrange
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         // Create Editor role.
         RoleEntity editorRole = _roleEntityFixture.Create(roleName: "Editor");
@@ -227,7 +227,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<Authentic
     public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         // Clear junction tables first.
         await dbContext.Set<RolePermissionEntity>().ExecuteDeleteAsync();

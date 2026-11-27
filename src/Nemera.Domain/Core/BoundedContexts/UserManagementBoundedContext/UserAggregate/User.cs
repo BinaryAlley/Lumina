@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Common.Models.Core;
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.Models.Core;
+using Nemera.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate;
+namespace Nemera.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate;
 
 /// <summary>
 /// Aggregate root for a user aggregate.

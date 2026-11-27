@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Text.Json.Serialization;
 #endregion
 
-namespace Lumina.Contracts.Requests.FileSystemManagement.Directories;
+namespace Nemera.Contracts.Requests.FileSystemManagement.Directories;
 
 /// <summary>
 /// Represents a request to get the directories of a file system path.

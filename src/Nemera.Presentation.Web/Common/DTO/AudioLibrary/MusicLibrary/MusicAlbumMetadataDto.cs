@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.Enums.AudioLibrary;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.Enums.AudioLibrary;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+namespace Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
 
 /// <summary>
 /// Data transfer object for the metadata of an album.

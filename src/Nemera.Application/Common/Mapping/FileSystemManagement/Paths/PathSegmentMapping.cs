@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Contracts.Responses.FileSystemManagement.Path;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
+namespace Nemera.Application.Common.Mapping.FileSystemManagement.Paths;
 
 /// <summary>
 /// Extension methods for converting <see cref="PathSegment"/>.

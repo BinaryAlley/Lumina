@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Presentation.Web.Common.DTO.Plugins;
-using Lumina.Presentation.Web.Common.Enums.Plugins;
+using Nemera.Presentation.Web.Common.DTO.Plugins;
+using Nemera.Presentation.Web.Common.Enums.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Plugins;
+namespace Nemera.Presentation.Web.Fixtures.Common.DTO.Plugins;
 
 /// <summary>
 /// Fixture class for the <see cref="PluginDto"/> class.

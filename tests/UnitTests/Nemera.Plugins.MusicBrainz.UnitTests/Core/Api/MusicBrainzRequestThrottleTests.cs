@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.MusicBrainz.Core.Api;
+using Nemera.Plugins.MusicBrainz.Core.Api;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.UnitTests.Core.Api;
+namespace Nemera.Plugins.MusicBrainz.UnitTests.Core.Api;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MusicBrainzRequestThrottle"/> class.

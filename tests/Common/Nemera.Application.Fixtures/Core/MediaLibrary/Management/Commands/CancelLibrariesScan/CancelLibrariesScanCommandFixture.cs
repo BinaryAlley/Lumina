@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
+using Nemera.Application.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
+namespace Nemera.Application.Fixtures.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
 
 /// <summary>
 /// Fixture class for the <see cref="CancelLibrariesScanCommand"/> class.

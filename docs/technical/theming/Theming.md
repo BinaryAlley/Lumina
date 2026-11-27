@@ -1,8 +1,8 @@
-# Lumina Theming
+# Nemera Theming
 
-The web client of Lumina is a themed shell: every page is rendered inside the templates of an active theme. A theme is a self contained ZIP archive with a manifest, HTML templates and static assets. This document explains how themes are structured, how the template engine works, and how to create, install and manage a theme.
+The web client of Nemera is a themed shell: every page is rendered inside the templates of an active theme. A theme is a self contained ZIP archive with a manifest, HTML templates and static assets. This document explains how themes are structured, how the template engine works, and how to create, install and manage a theme.
 
-- [Lumina Theming](#lumina-theming)
+- [Nemera Theming](#nemera-theming)
   - [Overview](#overview)
   - [Theme Pack Structure](#theme-pack-structure)
   - [The Manifest (theme.json)](#the-manifest-themejson)
@@ -85,7 +85,7 @@ The manifest is a JSON object describing the theme. The example below is the man
   "id": "editorial-paper",
   "name": "Editorial Paper",
   "description": "A clean, readable proof of concept theme.",
-  "author": "Lumina",
+  "author": "Nemera",
   "version": "1.6.0",
   "preview": "assets/preview.svg",
   "templates": {
@@ -215,7 +215,7 @@ The layout template of the bundled theme shows the intended shape:
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{title}} - Lumina</title>
+    <title>{{title}} - Nemera</title>
     {{&appHead}}
     <link rel="stylesheet" href="{{assetBase}}/site.css">
 </head>
@@ -703,9 +703,9 @@ The playlist rows are reordered by dragging the handle with the `playlist-entry-
 
 #### The Shared Add to Playlist Action
 
-The music library card on the home page, the artist cards, the album cards and the actions menu of an album track row share one add-to-playlist action. The action is a menu item with the `card-action-add-to-playlist` class in both cases. Their click handler calls `window.LuminaPlaylists.showAddScopeDialogAsync(scope)`, where `scope` carries `libraryId`, the optional `artistId`, `albumId` and `trackId`, the `title` shown in the dialog, the page-local `addToPlaylistLabel`, and the optional `returnFocus` element that gets the focus back when the dialog closes. The helper is provided by `wwwroot/js/playlists.js`, which every layout loads. The page passes its own localized label from its page resource as `addToPlaylistLabel`.
+The music library card on the home page, the artist cards, the album cards and the actions menu of an album track row share one add-to-playlist action. The action is a menu item with the `card-action-add-to-playlist` class in both cases. Their click handler calls `window.NemeraPlaylists.showAddScopeDialogAsync(scope)`, where `scope` carries `libraryId`, the optional `artistId`, `albumId` and `trackId`, the `title` shown in the dialog, the page-local `addToPlaylistLabel`, and the optional `returnFocus` element that gets the focus back when the dialog closes. The helper is provided by `wwwroot/js/playlists.js`, which every layout loads. The page passes its own localized label from its page resource as `addToPlaylistLabel`.
 
-The dialog is rendered by the application, not by the theme: it is a standard application dialog surface with a standard `enlightenment-combobox` of the playlists of the current user. When the scope carries a `trackId`, the dialog appends that single track through the single entry route. Otherwise, the server resolves the ordered track Ids of the scope and appends them to the selected playlist in one batch request. In both cases it shows the result notification and dispatches the `lumina:playlist-updated` event so an open playlist page refreshes. A theme that renders the dialog itself does not get this behavior; it must keep the action wired to the shared helper or reimplement the whole flow.
+The dialog is rendered by the application, not by the theme: it is a standard application dialog surface with a standard `enlightenment-combobox` of the playlists of the current user. When the scope carries a `trackId`, the dialog appends that single track through the single entry route. Otherwise, the server resolves the ordered track Ids of the scope and appends them to the selected playlist in one batch request. In both cases it shows the result notification and dispatches the `nemera:playlist-updated` event so an open playlist page refreshes. A theme that renders the dialog itself does not get this behavior; it must keep the action wired to the shared helper or reimplement the whole flow.
 
 A page or a theme template can also render a declarative action that needs no script of its own. The global playlist script binds one click listener on the document, so the action works anywhere in the swapped page content, inside the player bar, and on controls that a page renders later. The action is any focusable element, normally a `button`, that carries these attributes:
 
@@ -734,7 +734,7 @@ The player queue action does not use the declarative attributes. Its label comes
 
 #### The Album Track Actions Menu
 
-Every rendered track row of the album details page carries the same `card-actions-trigger` button with the vertical dots as the card menus, plus the `track-actions-trigger` class that places it inline in the row. The page script creates the same `card-actions-menu` markup on demand. The menu has three application actions: `card-action-add-to-playlist` opens the shared add-to-playlist dialog for that track, `card-action-add-to-queue` calls `window.LuminaAudioPlayer.instance.appendToQueueAsync(descriptor)`, and `card-action-play-all-from-here` calls `playAsync` with an explicit queue built from the clicked track and every track that follows it in the album order. The player starts the clicked track for the last action, and replaces the queue. A theme that renders the album page must keep the track row markup and the script behavior, or provide its own equivalent.
+Every rendered track row of the album details page carries the same `card-actions-trigger` button with the vertical dots as the card menus, plus the `track-actions-trigger` class that places it inline in the row. The page script creates the same `card-actions-menu` markup on demand. The menu has three application actions: `card-action-add-to-playlist` opens the shared add-to-playlist dialog for that track, `card-action-add-to-queue` calls `window.NemeraAudioPlayer.instance.appendToQueueAsync(descriptor)`, and `card-action-play-all-from-here` calls `playAsync` with an explicit queue built from the clicked track and every track that follows it in the album order. The player starts the clicked track for the last action, and replaces the queue. A theme that renders the album page must keep the track row markup and the script behavior, or provide its own equivalent.
 
 #### The Favorites Page
 
@@ -757,7 +757,7 @@ The pages of the media items read the library of the item from the `libraryId` q
 
 The fallback view keeps these element hooks, which the application script drives: `favorites-container`, `no-favorites`, `favorite-count`, `favorites-kind-filter`, `load-more-favorites-button` and `retry-favorites-button`. The bundled themes ship no template for `favorites/index`, so the fallback view is what a healthy site shows, and a theme that wants its own page provides `templates/favorites/index.html` and must keep the hooks the page script needs.
 
-The fallback view renders one card per favorite, from the most recently favorited, in pages of 50 that `load-more-favorites-button` extends. Each card carries a favorite heart (a `card-favorite-toggle` button, described below), already in the favorited state, and a favorite is removed from the page by unfavoriting its card: the page script does not call the remove route itself, the global favorites script does, and the page listens to the `lumina:favorite-changed` event described below, removes the card of an item that is no longer a favorite, and updates the counter and the empty state without another request. A failed first page or reload clears the rendered cards and shows the localized failure message with `retry-favorites-button`, so the user can load the current filter again instead of being left with a truncated list. A theme template that renders the page itself gets the same behavior by rendering hearts on its cards and handling that event.
+The fallback view renders one card per favorite, from the most recently favorited, in pages of 50 that `load-more-favorites-button` extends. Each card carries a favorite heart (a `card-favorite-toggle` button, described below), already in the favorited state, and a favorite is removed from the page by unfavoriting its card: the page script does not call the remove route itself, the global favorites script does, and the page listens to the `nemera:favorite-changed` event described below, removes the card of an item that is no longer a favorite, and updates the counter and the empty state without another request. A failed first page or reload clears the rendered cards and shows the localized failure message with `retry-favorites-button`, so the user can load the current filter again instead of being left with a truncated list. A theme template that renders the page itself gets the same behavior by rendering hearts on its cards and handling that event.
 
 #### The Statistics Page
 
@@ -819,7 +819,7 @@ A theme restyles a toggle from the `is-favorite` class or from the `aria-pressed
 
 A click on a toggle adds the favorite when the item is not one, and removes it otherwise, through the add and remove routes of the configuration. A click is ignored while a request for the same item is in flight, whichever toggle of the item it comes from, and a click on a toggle whose state is unknown reads the state again instead of guessing. The script keeps every toggle of the same item on the page in sync. When a change fails, every toggle returns to the state it had, and the global API helper shows the failure as a notification. When a state read fails, the global API helper shows the failure as a notification. The click handler prevents the default action, so a toggle inside a link or a card does not also navigate.
 
-After every successful change the script dispatches the `lumina:favorite-changed` event on `document`, with `detail` carrying `mediaKind` (the canonical kind name), `mediaItemId` (the lowercase Id) and `isFavorite` (the new state), so a page that lists favorites can react while it stays decoupled from the toggle that caused the change.
+After every successful change the script dispatches the `nemera:favorite-changed` event on `document`, with `detail` carrying `mediaKind` (the canonical kind name), `mediaItemId` (the lowercase Id) and `isFavorite` (the new state), so a page that lists favorites can react while it stays decoupled from the toggle that caused the change.
 
 The layout provides the shared configuration as `window.favoritesConfiguration`:
 
@@ -830,7 +830,7 @@ The layout provides the shared configuration as `window.favoritesConfiguration`:
 | `removeFavoriteUrlTemplate` | The route template that removes a favorite. Its named `{mediaKind}` and `{mediaItemId}` placeholders are replaced by the media kind name and the Id of the media item. |
 | `strings` | The localized labels: `add` and `remove`. |
 
-The script also exposes `window.LuminaFavorites` for page scripts that need more than the markup contract:
+The script also exposes `window.NemeraFavorites` for page scripts that need more than the markup contract:
 
 | Member | Behavior |
 | --- | --- |
@@ -876,7 +876,7 @@ The theme engine is configured through the `ThemeEngine` section of the API conf
 | --- | --- | --- |
 | `StoragePath` | `themes` | Directory where installed theme packs are stored, relative to the API base directory when not rooted. |
 | `BundledThemesPath` | `themes/bundled` | Directory where the theme archives shipped with the application are located. |
-| `DefaultThemeId` | `lumina-default` | Identifier of the theme selected when no valid current theme is persisted. |
+| `DefaultThemeId` | `nemera-default` | Identifier of the theme selected when no valid current theme is persisted. |
 | `MaxArchiveBytes` | `8388608` | Maximum size of an uploaded theme archive, in bytes (8 MB). |
 | `MaxExpandedBytes` | `25165824` | Maximum total size of an extracted theme pack, in bytes (24 MB). |
 | `MaxSingleFileBytes` | `6291456` | Maximum size of a single file within a theme pack, in bytes (6 MB). |

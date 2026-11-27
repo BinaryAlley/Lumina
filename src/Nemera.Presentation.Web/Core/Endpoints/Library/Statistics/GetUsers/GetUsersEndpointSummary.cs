@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.DTO.UsersManagement;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.UsersManagement;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.Statistics.GetUsers;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.Statistics.GetUsers;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetUsersEndpoint"/> endpoint, for OpenAPI.

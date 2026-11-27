@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Themes;
+namespace Nemera.Presentation.Web.Core.Themes;
 
 /// <summary>
 /// Renders a Razor partial to a string, so that the application chrome can be reused by the themed layout renderer.

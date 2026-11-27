@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Playlists;
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Requests.Playlists;
-using Lumina.Presentation.Web.Core.Endpoints.Playlists.AddPlaylistEntries;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Playlists;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Playlists;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Playlists;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Requests.Playlists;
+using Nemera.Presentation.Web.Core.Endpoints.Playlists.AddPlaylistEntries;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Playlists;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Playlists;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -21,7 +21,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Playlists.AddPlaylistEntries;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Playlists.AddPlaylistEntries;
 
 /// <summary>
 /// Contains security tests for the <see cref="AddPlaylistEntriesEndpoint"/> class.
@@ -31,11 +31,11 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Playlists.AddPlay
 /// performs no credential comparison, and token or claim correctness does not apply because the Web layer issues no token for this route.
 /// </remarks>
 [ExcludeFromCodeCoverage]
-public class AddPlaylistEntriesEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class AddPlaylistEntriesEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string ZERO_GUID = "00000000-0000-0000-0000-000000000000";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly AddPlaylistEntriesRequestFixture _addPlaylistEntriesRequestFixture = new();
     private readonly PlaylistEntriesAddedDtoFixture _playlistEntriesAddedDtoFixture = new();
     private readonly ProblemDetailsDtoFixture _problemDetailsDtoFixture = new();
@@ -45,7 +45,7 @@ public class AddPlaylistEntriesEndpointTests : IClassFixture<LuminaWebFactory>, 
     /// Initializes a new instance of the <see cref="AddPlaylistEntriesEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public AddPlaylistEntriesEndpointTests(LuminaWebFactory apiFactory)
+    public AddPlaylistEntriesEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _clientIp = $"10.{Random.Shared.Next(0, 256)}.{Random.Shared.Next(0, 256)}.{Random.Shared.Next(1, 254)}";
@@ -133,7 +133,7 @@ public class AddPlaylistEntriesEndpointTests : IClassFixture<LuminaWebFactory>, 
         Assert.DoesNotContain(payload, string.Join(",", endpointCalls), StringComparison.Ordinal);
         Assert.DoesNotContain(payload, content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     [Theory]
@@ -163,7 +163,7 @@ public class AddPlaylistEntriesEndpointTests : IClassFixture<LuminaWebFactory>, 
         Assert.DoesNotContain(payload, content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -218,7 +218,7 @@ public class AddPlaylistEntriesEndpointTests : IClassFixture<LuminaWebFactory>, 
         Assert.False(json.RootElement.TryGetProperty("data", out _));
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     /// <summary>

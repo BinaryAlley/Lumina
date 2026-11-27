@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibraryScanProgress;
+using Nemera.Application.Core.MediaLibrary.Management.Queries.GetLibraryScanProgress;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.MediaLibrary.Management.Queries.GetLibraryScanProgress;
+namespace Nemera.Application.Fixtures.Core.MediaLibrary.Management.Queries.GetLibraryScanProgress;
 
 /// <summary>
 /// Fixture class for the <see cref="GetLibraryScanProgressQuery"/> class.

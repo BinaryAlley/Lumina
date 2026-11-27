@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Paths;
+using Nemera.Contracts.Responses.FileSystemManagement.Path;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Paths;
+namespace Nemera.Application.UnitTests.Common.Mapping.FileSystemManagement.Paths;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PathSegmentMapping"/> class.

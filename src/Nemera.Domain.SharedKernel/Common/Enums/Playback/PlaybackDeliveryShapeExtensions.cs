@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.Playback;
+namespace Nemera.Domain.SharedKernel.Common.Enums.Playback;
 
 /// <summary>
 /// Extension methods for <see cref="PlaybackDeliveryShape"/>.

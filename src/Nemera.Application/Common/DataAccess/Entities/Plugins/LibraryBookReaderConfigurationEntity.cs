@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.Common;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.Plugins;
+namespace Nemera.Application.Common.DataAccess.Entities.Plugins;
 
 /// <summary>
 /// Repository entity for the configuration of a book reader of a media library.

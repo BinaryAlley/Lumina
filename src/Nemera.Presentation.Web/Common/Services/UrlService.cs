@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Common.Routes;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Services;
+namespace Nemera.Presentation.Web.Common.Services;
 
 /// <summary>
 /// Service for generating absolute URLs for the application routes, with URL localization.

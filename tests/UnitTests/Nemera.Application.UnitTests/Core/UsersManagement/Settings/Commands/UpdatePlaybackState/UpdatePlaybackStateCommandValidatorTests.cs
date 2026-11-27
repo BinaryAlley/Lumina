@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
-using Lumina.Application.Fixtures.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
+using Nemera.Application.Fixtures.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
+namespace Nemera.Application.UnitTests.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdatePlaybackStateCommandValidator"/> class.

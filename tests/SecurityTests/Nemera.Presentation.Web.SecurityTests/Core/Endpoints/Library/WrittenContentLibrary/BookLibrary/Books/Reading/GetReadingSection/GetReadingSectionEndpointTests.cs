@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Reading;
-using Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingSection;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Reading;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Reading;
+using Nemera.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingSection;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Reading;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -12,22 +12,22 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingSection;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingSection;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetReadingSectionEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetReadingSectionEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetReadingSectionEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly ReadingSectionDtoFixture _readingSectionDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetReadingSectionEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetReadingSectionEndpointTests(LuminaWebFactory apiFactory)
+    public GetReadingSectionEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

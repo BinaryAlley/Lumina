@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Contracts.Responses.Plugins;
+namespace Nemera.Contracts.Responses.Plugins;
 
 /// <summary>
 /// Represents an artwork provider, either as configured for a media library, or as available for a library type, the way a new library of that type starts.

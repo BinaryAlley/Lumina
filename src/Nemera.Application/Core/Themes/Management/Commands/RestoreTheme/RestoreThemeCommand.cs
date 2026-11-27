@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Themes.Management.Commands.RestoreTheme;
+namespace Nemera.Application.Core.Themes.Management.Commands.RestoreTheme;
 
 /// <summary>
 /// Command for restoring a soft deleted bundled theme.

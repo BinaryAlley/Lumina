@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Playlists;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.DTO.Playlists;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Playlists;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Application.Common.DataAccess.Entities.Playlists;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.DTO.Playlists;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Playlists;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.DTO.Playlists;
+namespace Nemera.Application.Fixtures.Common.DTO.Playlists;
 
 /// <summary>
 /// Fixture class for the <see cref="PlaylistDetailsDto"/> record.

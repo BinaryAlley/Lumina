@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.UsersManagement.Authentication;
+namespace Nemera.Presentation.Web.Common.Requests.UsersManagement.Authentication;
 
 /// <summary>
 /// Represents a request for displaying the account login view.

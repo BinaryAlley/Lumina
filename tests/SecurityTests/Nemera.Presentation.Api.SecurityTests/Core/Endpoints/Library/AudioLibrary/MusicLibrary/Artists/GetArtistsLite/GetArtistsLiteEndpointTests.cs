@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.GetArtistsLite;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.GetArtistsLite;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,15 +17,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.GetArtistsLite;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.GetArtistsLite;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetArtistsLiteEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetArtistsLiteEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class GetArtistsLiteEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -39,12 +39,12 @@ public class GetArtistsLiteEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     /// Initializes a new instance of the <see cref="GetArtistsLiteEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetArtistsLiteEndpointTests(LuminaApiFactory apiFactory)
+    public GetArtistsLiteEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class GetArtistsLiteEndpointTests : IClassFixture<LuminaApiFactory>, IDis
 
         // The injected statement must never be executed: the Artists table and the seeded rows must still be there.
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.Equal(1, await dbContext.Artists.CountAsync(artist => artist.LibraryId == libraryId));
 
     }
@@ -160,7 +160,7 @@ public class GetArtistsLiteEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     private async Task<Guid> SeedLibraryAsync(Guid userId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.NewGuid();
         dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Queen Reissues", libraryType: LibraryType.Music, contentLocations: []));
         await dbContext.SaveChangesAsync();
@@ -176,7 +176,7 @@ public class GetArtistsLiteEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     private async Task SeedArtistAsync(Guid libraryId, string name)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         dbContext.Artists.Add(_artistEntityFixture.Create(libraryId: libraryId, name: name, includeAlbums: false, includeContributors: false));
         await dbContext.SaveChangesAsync();
     }

@@ -1,28 +1,28 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
-using Lumina.Presentation.Web.Core.Endpoints.FileSystemManagement.Files.GetFiles;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.FileSystemManagement;
+using Nemera.Presentation.Web.Core.Endpoints.FileSystemManagement.Files.GetFiles;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.FileSystemManagement.Files.GetFiles;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.FileSystemManagement.Files.GetFiles;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetFilesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetFilesEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetFilesEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetFilesEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetFilesEndpointTests(LuminaWebFactory apiFactory)
+    public GetFilesEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

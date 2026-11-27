@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -9,7 +9,7 @@ using System.IO;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+namespace Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 
 /// <summary>
 /// Fixture class for the <see cref="TrackStreamDataDto"/> record.

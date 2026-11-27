@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Reading;
-using Lumina.Plugins.Pdf.Core;
+using Nemera.Plugins.Contracts.Core.Reading;
+using Nemera.Plugins.Pdf.Core;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 #endregion
 
-namespace Lumina.Plugins.Pdf.Common.DependencyInjection;
+namespace Nemera.Plugins.Pdf.Common.DependencyInjection;
 
 /// <summary>
 /// Utility class for registering the services of the PDF format reader into the Dependency Injection container.

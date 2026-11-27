@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.FileSystemManagement.Common;
-using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Common;
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Common;
+using Nemera.Contracts.Fixtures.Core.Responses.FileSystemManagement.Common;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Common;
+namespace Nemera.Application.UnitTests.Common.Mapping.FileSystemManagement.Common;
 
 /// <summary>
 /// Contains unit tests for the <see cref="FileSystemTreeNodeResponseMapping"/> class.

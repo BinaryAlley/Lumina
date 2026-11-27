@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Events;
+using Nemera.Domain.Common.Events;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Domain.Common.Models.Core;
+namespace Nemera.Domain.Common.Models.Core;
 
 /// <summary>
 /// Base class for all domain Aggregate Roots.

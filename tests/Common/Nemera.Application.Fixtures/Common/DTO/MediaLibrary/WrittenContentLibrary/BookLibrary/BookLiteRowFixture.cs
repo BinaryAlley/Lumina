@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Common.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+namespace Nemera.Application.Fixtures.Common.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 
 /// <summary>
 /// Fixture class for the <see cref="BookLiteRow"/> class.

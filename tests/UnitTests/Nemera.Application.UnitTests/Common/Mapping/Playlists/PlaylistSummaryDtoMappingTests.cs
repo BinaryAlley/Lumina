@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.Playlists;
-using Lumina.Application.Common.Mapping.Playlists;
-using Lumina.Application.Fixtures.Common.DTO.Playlists;
-using Lumina.Contracts.Responses.Playlists;
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Application.Common.DTO.Playlists;
+using Nemera.Application.Common.Mapping.Playlists;
+using Nemera.Application.Fixtures.Common.DTO.Playlists;
+using Nemera.Contracts.Responses.Playlists;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.Playlists;
+namespace Nemera.Application.UnitTests.Common.Mapping.Playlists;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PlaylistSummaryDtoMapping"/> class.

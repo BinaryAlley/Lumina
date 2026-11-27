@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Authorization;
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Lumina.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Common.Authorization;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Common;
+using Nemera.Presentation.Web.Core.Themes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Admin.Themes;
+namespace Nemera.Presentation.Web.Core.Endpoints.Admin.Themes;
 
 /// <summary>
 /// API endpoint for the <c>/{culture}/admin/manage-themes</c> route.

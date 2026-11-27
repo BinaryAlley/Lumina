@@ -4,7 +4,7 @@
  * The module owns one modal playlist picker. A page opens it with the scope or the single track it wants to add. A scope
  * is resolved by the server into its ordered track Ids and appended in one request; a single track is appended through
  * the single entry route. The actual card and track menu items are small wrappers that give the menu item its scope and
- * call <c>LuminaPlaylists.showAddScopeDialogAsync</c>. A theme template or a page script can also render a declarative
+ * call <c>NemeraPlaylists.showAddScopeDialogAsync</c>. A theme template or a page script can also render a declarative
  * action, which needs no script of its own: an element with the `data-playlist-add` marker and the scope attributes
  * documented in the theming guide opens the same picker through the delegated click listener of this module.
  *
@@ -12,14 +12,14 @@
  * tracks to the playlist atomically. A single track is already identified, so it uses the cheaper single-entry route
  * instead. The picker is built here, not rendered by each page, so the cards, the album and artist pages and the player
  * all share one dialog, one focus behavior and one error path. After a successful add the module dispatches the
- * `lumina:playlist-updated` DOM event: an open playlist page can refresh itself, while the callers stay decoupled from it.
+ * `nemera:playlist-updated` DOM event: an open playlist page can refresh itself, while the callers stay decoupled from it.
  */
 (function () {
     'use strict';
 
     // The layout may render this script on a page that already ran it, and the in-place navigation can evaluate scripts
     // again. A second set of listeners would send every request twice, so the first load owns the document.
-    if (window.LuminaPlaylists)
+    if (window.NemeraPlaylists)
         return;
 
     // The declarative add action: an element that carries the marker and the scope attributes documented in the theming
@@ -427,7 +427,7 @@
                 }
                 showNotification(strings.tracksAdded, false);
                 // Let an open playlist page refresh its window without coupling this module to that page.
-                document.dispatchEvent(new CustomEvent('lumina:playlist-updated', { detail: result }));
+                document.dispatchEvent(new CustomEvent('nemera:playlist-updated', { detail: result }));
                 close();
             } catch (error) {
                 // callApiPostAsync normally resolves to null on failure; this catch is for unexpected errors, such as a
@@ -511,7 +511,7 @@
 
     document.addEventListener('click', handleAddTriggerClick);
 
-    window.LuminaPlaylists = {
+    window.NemeraPlaylists = {
         showAddScopeDialogAsync
     };
 })();

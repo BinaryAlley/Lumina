@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Enums.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -12,22 +12,22 @@ using System.Text;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Scheduler.RemoveScheduledJob;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Scheduler.RemoveScheduledJob;
 
 /// <summary>
 /// Contains security tests for the <see cref="RemoveScheduledJobEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RemoveScheduledJobEndpointTests : IClassFixture<LuminaWebFactory>
+public class RemoveScheduledJobEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RemoveScheduledJobEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public RemoveScheduledJobEndpointTests(LuminaWebFactory apiFactory)
+    public RemoveScheduledJobEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

@@ -2,15 +2,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
-using Lumina.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Authorization;
 using System;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationAuthorizationService = Lumina.Application.Common.Infrastructure.Authorization.IAuthorizationService;
+using ApplicationAuthorizationService = Nemera.Application.Common.Infrastructure.Authorization.IAuthorizationService;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Scheduling.Notifications;
+namespace Nemera.Infrastructure.Core.Scheduling.Notifications;
 
 /// <summary>
 /// SignalR hub for broadcasting the state of the scheduled jobs to the connected administrator clients.

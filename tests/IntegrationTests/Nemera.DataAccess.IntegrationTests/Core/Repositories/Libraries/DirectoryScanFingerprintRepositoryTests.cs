@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Common.Dapper;
-using Lumina.DataAccess.Core.Repositories.Libraries;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Common.Dapper;
+using Nemera.DataAccess.Core.Repositories.Libraries;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.Libraries;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.Libraries;
 
 /// <summary>
 /// Contains integration tests for the <see cref="DirectoryScanFingerprintRepository"/> class.
@@ -31,7 +31,7 @@ public class DirectoryScanFingerprintRepositoryTests : IDisposable
 {
     private readonly string _connectionString;
     private readonly SqliteConnection _anchorConnection;
-    private readonly LuminaDbContext _context;
+    private readonly NemeraDbContext _context;
     private readonly DirectoryScanFingerprintRepository _sut;
     private readonly DirectoryScanFingerprintEntityFixture _directoryScanFingerprintEntityFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
@@ -43,10 +43,10 @@ public class DirectoryScanFingerprintRepositoryTests : IDisposable
     public DirectoryScanFingerprintRepositoryTests()
     {
         DapperTypeHandlers.Register();
-        _connectionString = $"Data Source=luminadataccess-fingerprint-tests-{Guid.NewGuid()};Mode=Memory;Cache=Shared";
+        _connectionString = $"Data Source=nemeradataccess-fingerprint-tests-{Guid.NewGuid()};Mode=Memory;Cache=Shared";
         _anchorConnection = new SqliteConnection(_connectionString);
         _anchorConnection.Open();
-        _context = new LuminaDbContext(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(_connectionString).Options);
+        _context = new NemeraDbContext(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(_connectionString).Options);
         _context.Database.EnsureCreated();
         _sut = new DirectoryScanFingerprintRepository(_context);
     }

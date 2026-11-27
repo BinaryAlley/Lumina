@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
-using Lumina.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -16,7 +16,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.Core.Mapping;
+namespace Nemera.Plugins.OpenLibrary.Core.Mapping;
 
 /// <summary>
 /// Maps Open Library API responses into the application's book request DTOs.

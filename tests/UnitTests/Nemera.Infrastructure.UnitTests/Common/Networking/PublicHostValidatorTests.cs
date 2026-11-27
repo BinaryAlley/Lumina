@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Networking;
-using Lumina.Infrastructure.Common.Networking;
+using Nemera.Domain.SharedKernel.Common.Enums.Networking;
+using Nemera.Infrastructure.Common.Networking;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Common.Networking;
+namespace Nemera.Infrastructure.UnitTests.Common.Networking;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PublicHostValidator"/> class.

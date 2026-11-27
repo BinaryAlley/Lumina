@@ -13,11 +13,11 @@ Repositories in the DataAccess layer persist aggregate graphs: they load a track
 
 3. **Scalar copy on edit**: `EditableValuesCopier` applies editable scalar values while leaving the audit columns to the auditing interceptor. Seven auditable repositories (`Role`, `LibraryScan`, `ScheduledJob`, `ScheduledJobExecution`, `Theme`, `User`, `UserSettings`) still copied scalars with `CurrentValues.SetValues`, which writes every scalar property, including the primary key and the audit columns. Writing the primary key is destructive whenever the tracked row was located by a key other than its primary key: `UserRepository` locates the row by username, so an incoming entity whose Id differs from, or is unset relative to, the stored one would retarget the tracked row's identity, leaving the guarantee "the stored identity is never overwritten by an edit" to caller convention instead of to the code.
 
-`Lumina.DataAccess\Common\Persistence` already held `CollectionReconciler` and `EditableValuesCopier`, but there was no shared reference primitive and no explicit boundary defining what may live there, so the shared reference concern was expressed per type and per repository.
+`Nemera.DataAccess\Common\Persistence` already held `CollectionReconciler` and `EditableValuesCopier`, but there was no shared reference primitive and no explicit boundary defining what may live there, so the shared reference concern was expressed per type and per repository.
 
 ## Decision
 
-Treat `Lumina.DataAccess\Common\Persistence` as a closed set of generic, entity-agnostic primitives that express the whole of aggregate graph persistence. Per-entity logic stays in the repository, and cross-cutting logic is generalized rather than specialized.
+Treat `Nemera.DataAccess\Common\Persistence` as a closed set of generic, entity-agnostic primitives that express the whole of aggregate graph persistence. Per-entity logic stays in the repository, and cross-cutting logic is generalized rather than specialized.
 
 ### The closed set
 
@@ -99,6 +99,6 @@ Details edits still go through `EditableValuesCopier`, but the copier now compar
 
 The one-time application initialization is the only save whose audit identity is provided explicitly instead of being stamped by the auditing interceptor. The setup handler creates the original administrator account before any user exists, and the seed service creates the default permissions, roles, role-permission grants, user-role link and scheduled jobs in the same anonymous flow. Those rows therefore cannot derive an actor from `ICurrentUserService`.
 
-The bootstrap code sets `CreatedBy` to the fixed SYSTEM audit identifier `11111111-1111-1111-1111-111111111111` and sets `CreatedOnUtc` from `IDateTimeProvider`, then saves through `SaveChangesAsInitializationAsync`. That method marks the save on the `LuminaDbContext` for its duration, and the interceptor skips its stamping only for that save. No other save path is affected.
+The bootstrap code sets `CreatedBy` to the fixed SYSTEM audit identifier `11111111-1111-1111-1111-111111111111` and sets `CreatedOnUtc` from `IDateTimeProvider`, then saves through `SaveChangesAsInitializationAsync`. That method marks the save on the `NemeraDbContext` for its duration, and the interceptor skips its stamping only for that save. No other save path is affected.
 
 The SYSTEM identity is never inferred from a missing authenticated user. Ordinary anonymous creation and modification remain unattributed with `Guid.Empty`, and the interceptor is still the sole writer for every ordinary save. The initialization exception exists because the app has no user account to attribute the bootstrap rows to, and it is confined to the setup and seed code paths.

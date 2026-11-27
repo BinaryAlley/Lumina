@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
-using Lumina.Infrastructure.Core.Scheduling.Execution.TaskExecutors;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
+using Nemera.Infrastructure.Core.Scheduling.Execution.TaskExecutors;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Scheduling.Execution.TaskExecutors;
+namespace Nemera.Infrastructure.UnitTests.Core.Scheduling.Execution.TaskExecutors;
 
 /// <summary>
 /// Contains unit tests for the <see cref="TemporaryFilesCleanupTaskExecutor"/> class.

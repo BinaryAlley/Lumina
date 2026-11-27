@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
-using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.CoverArtArchive.Core;
-using Lumina.Plugins.CoverArtArchive.Core.Settings;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Plugins.Contracts.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.CoverArtArchive.Core;
+using Nemera.Plugins.CoverArtArchive.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.UnitTests.Core;
+namespace Nemera.Plugins.CoverArtArchive.UnitTests.Core;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CoverArtArchivePlugin"/> class.
@@ -49,7 +49,7 @@ public class CoverArtArchivePluginTests
         string result = _sut.Author;
 
         // Assert
-        Assert.Equal("Lumina", result);
+        Assert.Equal("Nemera", result);
     }
 
     [Fact]

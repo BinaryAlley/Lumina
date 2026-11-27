@@ -3,7 +3,7 @@ using FastEndpoints;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Admin.ManageRoles;
+namespace Nemera.Presentation.Web.Core.Endpoints.Admin.ManageRoles;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="ManageRolesViewEndpoint"/> endpoint, for OpenAPI.

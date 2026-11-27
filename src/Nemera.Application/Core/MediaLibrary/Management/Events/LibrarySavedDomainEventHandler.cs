@@ -1,26 +1,26 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Mapping.MediaLibrary.Management;
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Common.Exceptions;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Mapping.MediaLibrary.Management;
+using Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Exceptions;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Configuration;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Events;
+namespace Nemera.Application.Core.MediaLibrary.Management.Events;
 
 /// <summary>
 /// Handler for the domain event raised when a media library is created or updated.

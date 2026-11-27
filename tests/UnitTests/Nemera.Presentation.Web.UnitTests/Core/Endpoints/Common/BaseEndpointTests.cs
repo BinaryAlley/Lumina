@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Http;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.Fixtures.Core.Endpoints.Common;
+using Nemera.Presentation.Web.Common.Http;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Fixtures.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
@@ -10,10 +10,10 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Common;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Common;
 
 /// <summary>
-/// Contains unit tests for the <see cref="Lumina.Presentation.Web.Core.Endpoints.Common.BaseEndpoint"/> class.
+/// Contains unit tests for the <see cref="Nemera.Presentation.Web.Core.Endpoints.Common.BaseEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
 public class BaseEndpointTests

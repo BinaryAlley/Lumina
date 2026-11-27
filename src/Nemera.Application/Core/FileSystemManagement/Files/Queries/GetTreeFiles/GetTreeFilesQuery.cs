@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
+namespace Nemera.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
 
 /// <summary>
 /// Query for retrieving the list of files at a path.

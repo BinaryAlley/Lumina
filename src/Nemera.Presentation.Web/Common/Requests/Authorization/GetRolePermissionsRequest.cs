@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.Authorization;
+namespace Nemera.Presentation.Web.Common.Requests.Authorization;
 
 /// <summary>
 /// Represents a request to get the authorization permissions of a role identified by <paramref name="RoleId"/>.

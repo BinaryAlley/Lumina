@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Scheduling.Queries.GetSchedulerDisplayPreferences;
-using Lumina.Contracts.Responses.Scheduling;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.Scheduling;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Scheduling.Queries.GetSchedulerDisplayPreferences;
+using Nemera.Contracts.Responses.Scheduling;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.Scheduling;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Scheduling.GetSchedulerDisplayPreferences;
+namespace Nemera.Presentation.Api.Core.Endpoints.Scheduling.GetSchedulerDisplayPreferences;
 
 /// <summary>
 /// API endpoint for the <c>/scheduled-jobs/display-preferences</c> route.

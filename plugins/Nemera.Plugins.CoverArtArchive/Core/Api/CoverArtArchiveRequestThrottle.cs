@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.Core.Api;
+namespace Nemera.Plugins.CoverArtArchive.Core.Api;
 
 /// <summary>
 /// Class for spacing out the requests sent to the Cover Art Archive API, so the configured minimum request interval is respected across every caller in the process.

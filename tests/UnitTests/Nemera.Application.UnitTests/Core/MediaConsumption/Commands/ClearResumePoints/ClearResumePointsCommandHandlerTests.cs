@@ -1,24 +1,24 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Repositories.MediaConsumption;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.ConsumptionActivity;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.MediaConsumption.Commands.ClearResumePoints;
-using Lumina.Application.Fixtures.Core.MediaConsumption.Commands.ClearResumePoints;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.MediaConsumption;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.ConsumptionActivity;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.MediaConsumption.Commands.ClearResumePoints;
+using Nemera.Application.Fixtures.Core.MediaConsumption.Commands.ClearResumePoints;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.MediaConsumption.Commands.ClearResumePoints;
+namespace Nemera.Application.UnitTests.Core.MediaConsumption.Commands.ClearResumePoints;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ClearResumePointsCommandHandler"/> class.

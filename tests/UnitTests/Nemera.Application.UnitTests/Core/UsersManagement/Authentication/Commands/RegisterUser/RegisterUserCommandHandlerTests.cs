@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Security;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Core.UsersManagement.Authentication.Commands.RegisterUser;
-using Lumina.Contracts.Responses.Authentication;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Repositories.Users;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Security;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Core.UsersManagement.Authentication.Commands.RegisterUser;
+using Nemera.Contracts.Responses.Authentication;
+using Nemera.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Commands.RegisterUser;
+namespace Nemera.Application.UnitTests.Core.UsersManagement.Authentication.Commands.RegisterUser;
 
 /// <summary>
 /// Contains unit tests for the <see cref="RegisterUserCommandHandler"/> class.

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Common.Http;
-using Lumina.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
-using Lumina.Plugins.MusicBrainz.Common.Models.DTO.Settings;
-using Lumina.Plugins.MusicBrainz.Core.Settings;
+using Nemera.Plugins.Contracts.Common.Http;
+using Nemera.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
+using Nemera.Plugins.MusicBrainz.Common.Models.DTO.Settings;
+using Nemera.Plugins.MusicBrainz.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.Core.Api;
+namespace Nemera.Plugins.MusicBrainz.Core.Api;
 
 /// <summary>
 /// HTTP client that calls the MusicBrainz web service and deserializes its JSON responses into typed response models.

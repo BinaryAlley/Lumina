@@ -1,25 +1,25 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Mapping.MediaLibrary.Management;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Mapping.MediaLibrary.Management;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibrary;
+namespace Nemera.Application.Core.MediaLibrary.Management.Queries.GetLibrary;
 
 /// <summary>
 /// Handler for the query to get a library by its Id.

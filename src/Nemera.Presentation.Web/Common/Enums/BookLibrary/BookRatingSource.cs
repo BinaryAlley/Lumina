@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.Enums.BookLibrary;
+namespace Nemera.Presentation.Web.Common.Enums.BookLibrary;
 
 /// <summary>
 /// Enumeration for the various sources of book ratings.
@@ -6,7 +6,7 @@ namespace Lumina.Presentation.Web.Common.Enums.BookLibrary;
 public enum BookRatingSource
 {
     /// <summary>
-    /// Ratings provided by users of the Lumina system.
+    /// Ratings provided by users of the Nemera system.
     /// </summary>
     User,
 

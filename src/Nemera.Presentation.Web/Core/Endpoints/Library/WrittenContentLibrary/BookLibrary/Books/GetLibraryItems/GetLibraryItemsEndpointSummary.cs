@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.DTO.Libraries;
-using Lumina.Presentation.Web.Common.Enums.Common;
-using Lumina.Presentation.Web.Common.Requests.Libraries;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Common.Enums.Common;
+using Nemera.Presentation.Web.Common.Requests.Libraries;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetLibraryItems;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetLibraryItems;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetLibraryItemsEndpoint"/> endpoint, for OpenAPI.

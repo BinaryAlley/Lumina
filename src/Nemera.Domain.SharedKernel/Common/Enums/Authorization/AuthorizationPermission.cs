@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+namespace Nemera.Domain.SharedKernel.Common.Enums.Authorization;
 
 /// <summary>
 /// Enumeration for authorization permissions.

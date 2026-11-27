@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.Playlists;
+namespace Nemera.Contracts.Responses.Playlists;
 
 /// <summary>
 /// Represents a response for the result of appending several tracks to a playlist, without returning the whole playlist.

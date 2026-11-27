@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.UsersManagement;
+using Nemera.Presentation.Web.Common.DTO.UsersManagement;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Tools.Settings.UpdatePlaybackState;
+namespace Nemera.Presentation.Web.Core.Endpoints.Tools.Settings.UpdatePlaybackState;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="UpdatePlaybackStateEndpoint"/> endpoint, for OpenAPI.

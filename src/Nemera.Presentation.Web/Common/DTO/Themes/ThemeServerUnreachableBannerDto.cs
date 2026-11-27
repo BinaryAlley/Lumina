@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Themes;
+namespace Nemera.Presentation.Web.Common.DTO.Themes;
 
 /// <summary>
 /// Data transfer object for the model available to the themed server unreachable banner template.

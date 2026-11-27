@@ -7,7 +7,7 @@ using System.IO.Compression;
 using System.Text;
 #endregion
 
-namespace Lumina.Plugins.Epub.Fixtures.Core.Epub;
+namespace Nemera.Plugins.Epub.Fixtures.Core.Epub;
 
 /// <summary>
 /// Builds minimal, structurally valid EPUB files used as test input for the EPUB parsing tests.

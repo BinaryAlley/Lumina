@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Fixtures.Core.Requests.MediaConsumption;
-using Lumina.Contracts.Requests.MediaConsumption;
-using Lumina.Contracts.Responses.MediaConsumption;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.MediaConsumption.StopConsumption;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaConsumption;
+using Nemera.Contracts.Requests.MediaConsumption;
+using Nemera.Contracts.Responses.MediaConsumption;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.MediaConsumption.StopConsumption;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -25,19 +25,19 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.MediaConsumption.StopConsumption;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.MediaConsumption.StopConsumption;
 
 /// <summary>
 /// Contains integration tests for the <see cref="StopConsumptionEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class StopConsumptionEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class StopConsumptionEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private static readonly DateTime s_startedOnUtc = new(2026, 3, 1, 10, 0, 0, DateTimeKind.Utc);
     private static readonly DateTime s_lastActivityOnUtc = new(2026, 3, 1, 10, 5, 0, DateTimeKind.Utc);
 
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -54,7 +54,7 @@ public class StopConsumptionEndpointTests : IClassFixture<AuthenticatedLuminaApi
     /// Initializes a new instance of the <see cref="StopConsumptionEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public StopConsumptionEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public StopConsumptionEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -103,7 +103,7 @@ public class StopConsumptionEndpointTests : IClassFixture<AuthenticatedLuminaApi
         Assert.Equal(30.0, record.LastPosition.TimeOffsetSeconds);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         MediaConsumptionRecordEntity? storedRecord = dbContext.MediaConsumptionRecords.FirstOrDefault(stored => stored.Id == recordId);
         Assert.NotNull(storedRecord);
         Assert.Equal(ConsumptionStatus.Stopped, storedRecord!.Status);
@@ -145,7 +145,7 @@ public class StopConsumptionEndpointTests : IClassFixture<AuthenticatedLuminaApi
         Assert.Equal(0.9, record.LastProgressFraction);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         MediaConsumptionRecordEntity? storedRecord = dbContext.MediaConsumptionRecords.FirstOrDefault(stored => stored.Id == recordId);
         Assert.NotNull(storedRecord);
         Assert.Equal(ConsumptionStatus.Completed, storedRecord!.Status);
@@ -180,7 +180,7 @@ public class StopConsumptionEndpointTests : IClassFixture<AuthenticatedLuminaApi
         Assert.Equal(1.0, record.LastProgressFraction);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.Null(dbContext.MediaResumePoints.FirstOrDefault(candidate => candidate.UserId == userId && candidate.MediaKind == MediaKind.MusicTrack && candidate.MediaItemId == mediaItemId));
     }
 
@@ -233,7 +233,7 @@ public class StopConsumptionEndpointTests : IClassFixture<AuthenticatedLuminaApi
         await AssertProblemDetails(response, HttpStatusCode.NotFound, "General.NotFound", "ConsumptionRecordNotFound", url, "https://tools.ietf.org/html/rfc9110#section-15.5.5");
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         MediaConsumptionRecordEntity? storedRecord = dbContext.MediaConsumptionRecords.FirstOrDefault(stored => stored.Id == recordId);
         Assert.NotNull(storedRecord);
         Assert.Equal(ConsumptionStatus.InProgress, storedRecord!.Status);
@@ -299,7 +299,7 @@ public class StopConsumptionEndpointTests : IClassFixture<AuthenticatedLuminaApi
     private async Task<Guid> SeedLibraryAsync(Guid userId, bool shouldTrackConsumptionProgress, int? completionThresholdPercentage)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.NewGuid();
         dbContext.Libraries.Add(_libraryEntityFixture.Create(
             id: libraryId,
@@ -327,7 +327,7 @@ public class StopConsumptionEndpointTests : IClassFixture<AuthenticatedLuminaApi
     private async Task<Guid> SeedRecordAsync(Guid userId, Guid libraryId, Guid mediaItemId, ConsumptionStatus status, long consumedDurationMilliseconds, double lastProgressFraction, bool includePosition)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid recordId = Guid.NewGuid();
         dbContext.MediaConsumptionRecords.Add(_mediaConsumptionRecordEntityFixture.Create(
             id: recordId,
@@ -362,7 +362,7 @@ public class StopConsumptionEndpointTests : IClassFixture<AuthenticatedLuminaApi
     private async Task<Guid> SeedResumePointAsync(Guid userId, Guid libraryId, Guid mediaItemId, long lastPositionTimeOffsetMilliseconds, double lastProgressFraction)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid resumePointId = Guid.NewGuid();
         dbContext.MediaResumePoints.Add(_mediaResumePointEntityFixture.Create(
             id: resumePointId,
@@ -384,7 +384,7 @@ public class StopConsumptionEndpointTests : IClassFixture<AuthenticatedLuminaApi
     private async Task<Guid> SeedOtherUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: $"otheruser_{Guid.NewGuid()}", password: "TestPass123!"));
         await dbContext.SaveChangesAsync();
@@ -398,7 +398,7 @@ public class StopConsumptionEndpointTests : IClassFixture<AuthenticatedLuminaApi
     private Guid GetCurrentUserId()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         UserEntity user = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername);
         return user.Id;
     }

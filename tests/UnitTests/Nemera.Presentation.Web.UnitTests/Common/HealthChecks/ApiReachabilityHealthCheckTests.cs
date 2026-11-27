@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Configuration;
-using Lumina.Presentation.Web.Common.HealthChecks;
-using Lumina.Presentation.Web.Fixtures.Common.Api;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Configuration;
+using Nemera.Presentation.Web.Common.DTO.Configuration;
+using Nemera.Presentation.Web.Common.HealthChecks;
+using Nemera.Presentation.Web.Fixtures.Common.Api;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.HealthChecks;
+namespace Nemera.Presentation.Web.UnitTests.Common.HealthChecks;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ApiReachabilityHealthCheck"/> class.

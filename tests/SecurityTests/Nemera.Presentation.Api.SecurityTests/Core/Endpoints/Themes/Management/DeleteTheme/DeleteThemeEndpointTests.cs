@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -8,15 +8,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Themes.Management.DeleteTheme;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Themes.Management.DeleteTheme;
 
 /// <summary>
 /// Contains security tests for the <see cref="DeleteThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class DeleteThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class DeleteThemeEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -27,12 +27,12 @@ public class DeleteThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispos
     /// Initializes a new instance of the <see cref="DeleteThemeEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public DeleteThemeEndpointTests(LuminaApiFactory apiFactory)
+    public DeleteThemeEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
     }
 
     [Fact]

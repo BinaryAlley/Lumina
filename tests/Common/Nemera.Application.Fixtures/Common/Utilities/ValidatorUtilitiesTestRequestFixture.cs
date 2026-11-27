@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.Utilities;
+namespace Nemera.Application.Fixtures.Common.Utilities;
 
 /// <summary>
 /// Fixture class for the <see cref="ValidatorUtilitiesTestRequest"/> record.

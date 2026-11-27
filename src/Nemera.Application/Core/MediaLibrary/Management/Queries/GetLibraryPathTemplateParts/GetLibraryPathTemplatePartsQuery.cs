@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibraryPathTemplateParts;
+namespace Nemera.Application.Core.MediaLibrary.Management.Queries.GetLibraryPathTemplateParts;
 
 /// <summary>
 /// Query for getting the path parts available for a media library type.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
-using Lumina.Application.Common.Utilities;
-using Lumina.Infrastructure.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Application.Common.Utilities;
+using Nemera.Infrastructure.Common.Errors;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Validators;
+namespace Nemera.Infrastructure.Common.Validators;
 
 /// <summary>
 /// Validates the needed validation rules for the PluginsSettings application configuration settings section.

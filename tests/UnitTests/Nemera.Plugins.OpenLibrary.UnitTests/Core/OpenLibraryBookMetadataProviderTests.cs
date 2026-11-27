@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.OpenLibrary.Common.Models.DTO.Settings;
-using Lumina.Plugins.OpenLibrary.Core;
-using Lumina.Plugins.OpenLibrary.Core.Api;
-using Lumina.Plugins.OpenLibrary.Core.Settings;
-using Lumina.Plugins.OpenLibrary.Fixtures.Common.Models.DTO.Settings;
-using Lumina.Plugins.OpenLibrary.Fixtures.Common.Setup;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.OpenLibrary.Common.Models.DTO.Settings;
+using Nemera.Plugins.OpenLibrary.Core;
+using Nemera.Plugins.OpenLibrary.Core.Api;
+using Nemera.Plugins.OpenLibrary.Core.Settings;
+using Nemera.Plugins.OpenLibrary.Fixtures.Common.Models.DTO.Settings;
+using Nemera.Plugins.OpenLibrary.Fixtures.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.UnitTests.Core;
+namespace Nemera.Plugins.OpenLibrary.UnitTests.Core;
 
 /// <summary>
 /// Contains unit tests for the <see cref="OpenLibraryBookMetadataProvider"/> class.

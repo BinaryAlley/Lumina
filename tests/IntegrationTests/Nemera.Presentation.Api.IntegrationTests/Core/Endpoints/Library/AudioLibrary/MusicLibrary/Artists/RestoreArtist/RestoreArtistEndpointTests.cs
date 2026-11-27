@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.RestoreArtist;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.RestoreArtist;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -18,16 +18,16 @@ using System.Net.Http;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.RestoreArtist;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.RestoreArtist;
 
 /// <summary>
 /// Contains integration tests for the <see cref="RestoreArtistEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RestoreArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class RestoreArtistEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
@@ -36,7 +36,7 @@ public class RestoreArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     /// Initializes a new instance of the <see cref="RestoreArtistEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public RestoreArtistEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public RestoreArtistEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -63,7 +63,7 @@ public class RestoreArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         ArtistEntity? artist = await dbContext.Artists.FirstOrDefaultAsync(artist => artist.Id == artistId);
         Assert.NotNull(artist);
         Assert.False(artist!.IsDeleted);
@@ -157,7 +157,7 @@ public class RestoreArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     private async Task<Guid> SeedLibraryAsync(Guid userId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.NewGuid();
         dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Queen Library", libraryType: LibraryType.Music, contentLocations: []));
         await dbContext.SaveChangesAsync();
@@ -173,7 +173,7 @@ public class RestoreArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     private async Task<(Guid libraryId, Guid artistId)> SeedLibraryAndArtistAsync(Guid userId, bool isDeleted)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = _artistEntityFixture.Create(libraryId: libraryId, name: "Queen", includeAlbums: false, includeContributors: false);
         artist.IsDeleted = isDeleted;
@@ -191,7 +191,7 @@ public class RestoreArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     private async Task<Guid> SeedOtherUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: $"otheruser_{Guid.NewGuid()}", password: "TestPass123!"));
         await dbContext.SaveChangesAsync();
@@ -205,7 +205,7 @@ public class RestoreArtistEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     private Guid GetCurrentUserId()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         UserEntity user = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername);
         return user.Id;
     }

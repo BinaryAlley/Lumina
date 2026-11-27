@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaConsumption.Queries.GetMostConsumed;
-using Lumina.Application.Fixtures.Core.MediaConsumption.Queries.GetMostConsumed;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Core.MediaConsumption.Queries.GetMostConsumed;
+using Nemera.Application.Fixtures.Core.MediaConsumption.Queries.GetMostConsumed;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.MediaConsumption.Queries.GetMostConsumed;
+namespace Nemera.Application.UnitTests.Core.MediaConsumption.Queries.GetMostConsumed;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetMostConsumedQueryValidator"/> class.

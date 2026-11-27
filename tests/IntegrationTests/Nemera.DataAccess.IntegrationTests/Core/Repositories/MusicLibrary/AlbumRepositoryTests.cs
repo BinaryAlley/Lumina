@@ -1,21 +1,21 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.DataAccess.Common.Interceptors;
-using Lumina.DataAccess.Core.Repositories.MusicLibrary;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Common;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.DataAccess.Common.Interceptors;
+using Nemera.DataAccess.Core.Repositories.MusicLibrary;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -27,7 +27,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.MusicLibrary;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.MusicLibrary;
 
 /// <summary>
 /// Contains integration tests for the <see cref="AlbumRepository"/> class, exercising it against a real SQLite database.
@@ -62,9 +62,9 @@ public class AlbumRepositoryTests
     public async Task InsertAsync_WhenCalledWithAValidAlbum_ShouldPersistTheAlbumAndItsAggregate()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-insert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-insert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -106,9 +106,9 @@ public class AlbumRepositoryTests
     public async Task InsertAsync_WhenAlbumWithTheSameIdAlreadyExists_ShouldReturnAlbumAlreadyExists()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-insert-id-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-insert-id-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -132,9 +132,9 @@ public class AlbumRepositoryTests
     public async Task InsertAsync_WhenTwoTracksOfTheSameRequestShareAPath_ShouldReturnTrackAlreadyExists()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-insert-duprequest-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-insert-duprequest-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -157,9 +157,9 @@ public class AlbumRepositoryTests
     public async Task InsertAsync_WhenATrackPathIsAlreadyStoredInTheLibrary_ShouldReturnTrackAlreadyExists()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-insert-storedpath-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-insert-storedpath-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -185,9 +185,9 @@ public class AlbumRepositoryTests
     public async Task InsertAsync_WhenAnotherLibraryHasATrackWithTheSamePath_ShouldPersistTheAlbum()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-insert-otherlibrary-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-insert-otherlibrary-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -219,9 +219,9 @@ public class AlbumRepositoryTests
     public async Task InsertAsync_WhenTagsAndGenresAlreadyExistByName_ShouldReuseTheStoredRows()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-insert-reuse-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-insert-reuse-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -254,9 +254,9 @@ public class AlbumRepositoryTests
     public async Task InsertAsync_WhenANewTagAndGenreNameIsSharedBetweenTheAlbumAndItsTracks_ShouldPersistItOnce()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-insert-shared-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-insert-shared-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -286,11 +286,11 @@ public class AlbumRepositoryTests
     public async Task UpdateAsync_WhenNothingChanged_ShouldNotChangeAnyAuditColumn()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-update-noop-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-update-noop-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         AlbumRepository sut = CreateAlbumRepository(context);
 
         Guid libraryId = Guid.NewGuid();
@@ -322,11 +322,11 @@ public class AlbumRepositoryTests
     public async Task UpdateAsync_WhenOnlyTheScalarValuesChanged_ShouldStampTheAlbumAndPreserveArtistAndLibrary()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-update-scalars-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-update-scalars-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         AlbumRepository sut = CreateAlbumRepository(context);
 
         Guid libraryId = Guid.NewGuid();
@@ -357,9 +357,9 @@ public class AlbumRepositoryTests
     public async Task UpdateAsync_WhenRatingsAndContributorsChange_ShouldReconcileThem()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-update-owned-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-update-owned-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -422,9 +422,9 @@ public class AlbumRepositoryTests
     public async Task GetByIdAsync_WhenAlbumExists_ShouldIncludeTheNavigationProperties()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-getbyid-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-getbyid-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -456,9 +456,9 @@ public class AlbumRepositoryTests
     public async Task GetByIdAsync_WhenEntitiesShouldNotBeTracked_ShouldReturnAnUntrackedAlbum()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-getbyid-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-getbyid-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -483,9 +483,9 @@ public class AlbumRepositoryTests
     public async Task GetAlbumsLiteByArtistIdAsync_WhenCalled_ShouldNotTrackTheEntities()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-lite-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-lite-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -509,9 +509,9 @@ public class AlbumRepositoryTests
     public async Task GetByArtistIdAsync_WhenCalled_ShouldReturnTheArtistAlbumsOrderedWithTheirCollections()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-getbyartist-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-getbyartist-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -545,9 +545,9 @@ public class AlbumRepositoryTests
     public async Task GetAlbumsLiteByArtistIdAsync_WhenPaginationDataIsNull_ShouldReturnAllArtistAlbumsOrdered()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-lite-null-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-lite-null-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -580,9 +580,9 @@ public class AlbumRepositoryTests
     public async Task GetAlbumsLiteByArtistIdAsync_WhenPaginationIsProvided_ShouldReturnTheRequestedPage(int requestedPage, int perPage, int expectedCurrentPage, int expectedRowCount)
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-lite-page-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-lite-page-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -617,9 +617,9 @@ public class AlbumRepositoryTests
     public async Task GetAlbumsLiteByArtistIdAsync_WhenReReleaseYearIsSet_ShouldProjectItAsReleaseYear()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-lite-releaseyear-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-lite-releaseyear-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -643,9 +643,9 @@ public class AlbumRepositoryTests
     public async Task GetAlbumsLiteByArtistIdAsync_WhenReReleaseYearIsNull_ShouldFallBackToOriginalReleaseYear()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-lite-originalyear-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-lite-originalyear-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -669,9 +669,9 @@ public class AlbumRepositoryTests
     public async Task GetAlbumsLiteByArtistIdAsync_WhenTheReleaseHasTypes_ShouldProjectThem()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-lite-releasetypes-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-lite-releasetypes-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -696,9 +696,9 @@ public class AlbumRepositoryTests
     public async Task GetAlbumsLiteByArtistIdAsync_WhenCoverArtworkExists_ShouldProjectTheCoverPath()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-lite-cover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-lite-cover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -723,9 +723,9 @@ public class AlbumRepositoryTests
     public async Task GetByIdAsync_WhenTheAlbumIsSoftDeleted_ShouldReturnNull()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-getbyid-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-getbyid-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -748,9 +748,9 @@ public class AlbumRepositoryTests
     public async Task GetByIdAsync_WhenItsArtistIsSoftDeleted_ShouldReturnNull()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-getbyid-deleted-artist-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-getbyid-deleted-artist-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -773,9 +773,9 @@ public class AlbumRepositoryTests
     public async Task GetByIdAsync_WhenATrackIsSoftDeleted_ShouldExcludeItFromTheGraph()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-getbyid-deleted-track-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-getbyid-deleted-track-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -803,9 +803,9 @@ public class AlbumRepositoryTests
     public async Task GetByArtistIdAsync_WhenAnAlbumIsSoftDeleted_ShouldExcludeIt()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-getbyartist-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-getbyartist-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -829,9 +829,9 @@ public class AlbumRepositoryTests
     public async Task GetByArtistIdIncludingDeletedAsync_WhenCalled_ShouldReturnEveryAlbumOfTheArtistOrdered()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-getbyartist-including-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-getbyartist-including-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -858,9 +858,9 @@ public class AlbumRepositoryTests
     public async Task GetIncludingDeletedByIdAsync_WhenTheAlbumIsSoftDeleted_ShouldReturnIt()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-get-including-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-get-including-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -884,9 +884,9 @@ public class AlbumRepositoryTests
     public async Task GetSoftDeletedByLibraryIdAsync_WhenCalled_ShouldReturnOnlyDeletedAlbumsOfVisibleArtistsOrdered()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-getdeleted-library-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-getdeleted-library-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -921,9 +921,9 @@ public class AlbumRepositoryTests
     public async Task SoftDeleteByIdAsync_WhenAnotherVisibleAlbumOfTheArtistRemains_ShouldPersistTheDeletionStateAndProviderTime()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-softdelete-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-softdelete-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -946,9 +946,9 @@ public class AlbumRepositoryTests
     public async Task SoftDeleteByIdAsync_WhenAlbumIsTheOnlyVisibleAlbumOfTheArtist_ShouldReturnArtistMustHaveAtLeastOneAlbumAndKeepItVisible()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-softdelete-last-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-softdelete-last-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -971,9 +971,9 @@ public class AlbumRepositoryTests
     public async Task SoftDeleteByIdAsync_WhenTheOtherAlbumsOfTheArtistAreDeleted_ShouldReturnArtistMustHaveAtLeastOneAlbum()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-softdelete-deleted-siblings-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-softdelete-deleted-siblings-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -999,9 +999,9 @@ public class AlbumRepositoryTests
     public async Task SoftDeleteByIdAsync_WhenAlbumIsAlreadyDeleted_ShouldReturnAlbumNotFound()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-softdelete-already-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-softdelete-already-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -1028,9 +1028,9 @@ public class AlbumRepositoryTests
     public async Task SoftDeleteByIdAsync_WhenAlbumDoesNotExist_ShouldReturnAlbumNotFound()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-softdelete-missing-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-softdelete-missing-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -1046,11 +1046,11 @@ public class AlbumRepositoryTests
     public async Task SoftDeleteByIdAsync_WhenAnotherWriterAlreadyDeletedTheOtherLastAlbum_ShouldReturnArtistMustHaveAtLeastOneAlbum()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-softdelete-race-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-softdelete-race-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext firstContext = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext firstContext = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         firstContext.Database.EnsureCreated();
-        using LuminaDbContext secondContext = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext secondContext = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         AlbumRepository firstRepository = CreateAlbumRepository(firstContext);
         AlbumRepository secondRepository = CreateAlbumRepository(secondContext);
 
@@ -1079,9 +1079,9 @@ public class AlbumRepositoryTests
     public async Task RestoreSoftDeletedByIdAsync_WhenCalled_ShouldPersistTheClearedDeletionState()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-restore-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-restore-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -1107,9 +1107,9 @@ public class AlbumRepositoryTests
     public async Task UpdateAsync_WhenTheAlbumIsSoftDeleted_ShouldReturnAlbumNotFound()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-update-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-update-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -1134,9 +1134,9 @@ public class AlbumRepositoryTests
     public async Task UpdateAsync_WhenItsArtistIsSoftDeleted_ShouldReturnAlbumNotFound()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-update-deleted-artist-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-update-deleted-artist-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -1161,9 +1161,9 @@ public class AlbumRepositoryTests
     public async Task UpdateAsync_WhenIncomingDataIsMarkedDeleted_ShouldPreserveTheActiveRowsDeletionState()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-albumrepo-update-preserve-deletion-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-albumrepo-update-preserve-deletion-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         AlbumRepository sut = CreateAlbumRepository(context);
 
@@ -1192,7 +1192,7 @@ public class AlbumRepositoryTests
     /// </summary>
     /// <param name="context">The context the repository operates on.</param>
     /// <returns>The created repository.</returns>
-    private AlbumRepository CreateAlbumRepository(LuminaDbContext context)
+    private AlbumRepository CreateAlbumRepository(NemeraDbContext context)
     {
         return new AlbumRepository(context, new TrackRepository(context, _mockDateTimeProvider), _mockDateTimeProvider);
     }
@@ -1203,7 +1203,7 @@ public class AlbumRepositoryTests
     /// <param name="context">The context the artist is persisted through.</param>
     /// <param name="libraryId">The Id of the library that owns the artist.</param>
     /// <returns>The persisted artist.</returns>
-    private async Task<ArtistEntity> SeedArtistAsync(LuminaDbContext context, Guid libraryId)
+    private async Task<ArtistEntity> SeedArtistAsync(NemeraDbContext context, Guid libraryId)
     {
         ArtistEntity artist = _artistEntityFixture.Create(libraryId: libraryId, includeAlbums: false, includeContributors: false);
         context.Artists.Add(artist);
@@ -1219,7 +1219,7 @@ public class AlbumRepositoryTests
     /// <param name="artistId">The Id of the artist that owns the album.</param>
     /// <param name="title">The title of the album.</param>
     /// <returns>The persisted album.</returns>
-    private async Task<AlbumEntity> SeedAlbumAsync(LuminaDbContext context, Guid libraryId, Guid artistId, string title)
+    private async Task<AlbumEntity> SeedAlbumAsync(NemeraDbContext context, Guid libraryId, Guid artistId, string title)
     {
         AlbumEntity album = _albumEntityFixture.Create(artistId: artistId, libraryId: libraryId, title: title, includeTracks: false, includeMetadata: false);
         context.Albums.Add(album);
@@ -1235,7 +1235,7 @@ public class AlbumRepositoryTests
     /// <param name="artistId">The Id of the artist that owns the album.</param>
     /// <param name="title">The title of the album.</param>
     /// <returns>The persisted album.</returns>
-    private async Task<AlbumEntity> SeedFullAlbumAsync(LuminaDbContext context, Guid libraryId, Guid artistId, string title)
+    private async Task<AlbumEntity> SeedFullAlbumAsync(NemeraDbContext context, Guid libraryId, Guid artistId, string title)
     {
         AlbumEntity album = BuildFullAlbum(artistId, libraryId, title);
         context.Albums.Add(album);
@@ -1274,7 +1274,7 @@ public class AlbumRepositoryTests
     /// <param name="context">The context that tracks the stored album.</param>
     /// <param name="albumId">The Id of the album to load.</param>
     /// <returns>The detached copy of the album.</returns>
-    private static async Task<AlbumEntity> LoadDetachedAlbumAsync(LuminaDbContext context, Guid albumId)
+    private static async Task<AlbumEntity> LoadDetachedAlbumAsync(NemeraDbContext context, Guid albumId)
     {
         return await context.Albums
             .AsNoTracking()
@@ -1305,13 +1305,13 @@ public class AlbumRepositoryTests
     /// <param name="userId">The Id of the user reported as the current user.</param>
     /// <param name="utcNow">The current UTC time reported by the time provider.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
+    private static NemeraDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
     {
         ICurrentUserService currentUserService = Substitute.For<ICurrentUserService>();
         currentUserService.UserId.Returns(userId);
         IDateTimeProvider dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(utcNow);
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .AddInterceptors(new UpdateAuditableEntitiesInterceptor(currentUserService, dateTimeProvider))
             .Options);

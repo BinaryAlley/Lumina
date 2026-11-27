@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Domain.Common.Primitives;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Interface for the service that decides whether the audio of a track can be played as stored by a player, or has to be

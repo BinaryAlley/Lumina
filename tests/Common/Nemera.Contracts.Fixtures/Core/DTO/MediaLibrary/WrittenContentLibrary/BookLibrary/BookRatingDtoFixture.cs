@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+namespace Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 
 /// <summary>
 /// Fixture class for the <see cref="BookRatingDto"/>.

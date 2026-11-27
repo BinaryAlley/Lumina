@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 #endregion
 
-namespace Lumina.Application.Core.Plugins.Queries.GetLibraryArtworkProviders;
+namespace Nemera.Application.Core.Plugins.Queries.GetLibraryArtworkProviders;
 
 /// <summary>
 /// Query for getting the artwork providers configured for a media library.

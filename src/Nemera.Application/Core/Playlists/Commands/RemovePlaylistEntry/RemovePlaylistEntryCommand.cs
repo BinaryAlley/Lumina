@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Playlists.Commands.RemovePlaylistEntry;
+namespace Nemera.Application.Core.Playlists.Commands.RemovePlaylistEntry;
 
 /// <summary>
 /// Command for removing an entry from a playlist of the current user.

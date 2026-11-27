@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Services;
-using Lumina.Presentation.Web.Fixtures.Common.Api;
+using Nemera.Presentation.Web.Common.Services;
+using Nemera.Presentation.Web.Fixtures.Common.Api;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.Services;
+namespace Nemera.Presentation.Web.UnitTests.Common.Services;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CachedThemeHandler"/> class.
@@ -76,7 +76,7 @@ public class CachedThemeHandlerTests
 
         // Act
         await client.GetAsync("http://localhost:5214/api/v1/themes/current", CancellationToken.None);
-        await client.PutAsync("http://localhost:5214/api/v1/themes/current", new StringContent("""{"themeId":"lumina-default"}""", Encoding.UTF8, "application/json"), CancellationToken.None);
+        await client.PutAsync("http://localhost:5214/api/v1/themes/current", new StringContent("""{"themeId":"nemera-default"}""", Encoding.UTF8, "application/json"), CancellationToken.None);
         await client.GetAsync("http://localhost:5214/api/v1/themes/current", CancellationToken.None);
 
         // Assert

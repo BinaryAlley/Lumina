@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Playlists;
-using Lumina.Application.Common.Mapping.Playlists;
-using Lumina.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate;
-using Lumina.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.Entities;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.Entities;
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Application.Common.DataAccess.Entities.Playlists;
+using Nemera.Application.Common.Mapping.Playlists;
+using Nemera.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate;
+using Nemera.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.Entities;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.Entities;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.Playlists;
+namespace Nemera.Application.UnitTests.Common.Mapping.Playlists;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PlaylistMapping"/> class.

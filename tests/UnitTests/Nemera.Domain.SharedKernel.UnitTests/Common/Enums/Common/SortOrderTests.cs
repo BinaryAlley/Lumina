@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.UnitTests.Common.Enums.Common;
+namespace Nemera.Domain.SharedKernel.UnitTests.Common.Enums.Common;
 
 /// <summary>
 /// Contains unit tests for the <see cref="SortOrder"/> enumeration.

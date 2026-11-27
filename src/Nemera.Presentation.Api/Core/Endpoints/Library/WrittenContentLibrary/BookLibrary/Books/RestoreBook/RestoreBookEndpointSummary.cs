@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.RestoreBook;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.RestoreBook;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="RestoreBookEndpoint"/> API endpoint, for OpenAPI.

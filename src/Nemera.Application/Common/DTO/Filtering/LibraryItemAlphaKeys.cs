@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 #endregion
 
-namespace Lumina.Application.Common.DTO.Filtering;
+namespace Nemera.Application.Common.DTO.Filtering;
 
 /// <summary>
 /// Collection of the special alpha keys that can be used for alpha filtering, in addition to the single letters.

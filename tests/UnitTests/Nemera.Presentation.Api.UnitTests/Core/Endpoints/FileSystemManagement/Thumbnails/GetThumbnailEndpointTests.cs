@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
-using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Thumbnails;
-using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Thumbnails;
-using Lumina.Contracts.Requests.FileSystemManagement.Thumbnails;
-using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.MimeTypes;
-using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Thumbnails.GetThumbnail;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
+using Nemera.Contracts.Fixtures.Core.Requests.FileSystemManagement.Thumbnails;
+using Nemera.Contracts.Fixtures.Core.Responses.FileSystemManagement.Thumbnails;
+using Nemera.Contracts.Requests.FileSystemManagement.Thumbnails;
+using Nemera.Contracts.Responses.FileSystemManagement.Thumbnails;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.MimeTypes;
+using Nemera.Presentation.Api.Core.Endpoints.FileSystemManagement.Thumbnails.GetThumbnail;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Thumbnails;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Thumbnails;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetThumbnailEndpoint"/> class.

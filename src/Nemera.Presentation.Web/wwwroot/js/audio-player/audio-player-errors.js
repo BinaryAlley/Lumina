@@ -2,19 +2,19 @@
  * Typed errors of the audio player.
  *
  * The player never throws raw strings: every failure is reported through the event bus as a
- * {@link LuminaAudioPlayer.PlayerError}, so that a consumer can branch on a stable code instead of
+ * {@link NemeraAudioPlayer.PlayerError}, so that a consumer can branch on a stable code instead of
  * matching a message, and so that a UI can present the failure without the player leaking
  * implementation details, file paths, or secrets.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
-     * Enum-like object for the stable codes carried by a {@link LuminaAudioPlayer.PlayerError}.
+     * Enum-like object for the stable codes carried by a {@link NemeraAudioPlayer.PlayerError}.
      * @readonly
      * @enum {string}
      */
-    LuminaAudioPlayer.PlayerErrorCode = Object.freeze({
+    NemeraAudioPlayer.PlayerErrorCode = Object.freeze({
         // The browser is missing a capability the player requires (WebCodecs, AudioDecoder or AudioContext).
         CAPABILITY_MISSING: 'capability-missing',
         // The play descriptor handed to the player is missing a required value, or carries an invalid one.
@@ -45,14 +45,14 @@
     /**
      * Enum-like object for the stable <c>details.reason</c> values that cross a module boundary of the player.
      *
-     * A reason is a structured detail of a {@link LuminaAudioPlayer.PlayerError} that a consumer branches on, so its value
+     * A reason is a structured detail of a {@link NemeraAudioPlayer.PlayerError} that a consumer branches on, so its value
      * is defined once here and shared, never written as a literal by the producer and the consumer separately: two copies
      * of a literal drift apart silently, and a consumer that keys on a stale one reclassifies a recoverable condition as
      * a fatal failure without anything failing to compile.
      * @readonly
      * @enum {string}
      */
-    LuminaAudioPlayer.PlayerErrorReason = Object.freeze({
+    NemeraAudioPlayer.PlayerErrorReason = Object.freeze({
         // A scheduler refused a decoded frame because its own scheduled ahead ceiling is tighter than the caller's, so the
         // frame is backpressure rather than a failure. Published by the renderer's schedule and recognized by the decode
         // pipeline, which pauses feeding instead of stopping.
@@ -110,7 +110,7 @@
     class PlayerError extends Error {
         /**
          * Creates an instance of PlayerError.
-         * @param {string} code - One of the {@link LuminaAudioPlayer.PlayerErrorCode} values.
+         * @param {string} code - One of the {@link NemeraAudioPlayer.PlayerErrorCode} values.
          * @param {string} message - A developer facing description of the failure. It must never contain a file path, a token, or any other value that must not reach a log.
          * @param {Object} [details] - Optional structured details about the failure, for example the missing capabilities.
          */
@@ -122,12 +122,12 @@
         }
 
         /**
-         * Wraps any value into a {@link LuminaAudioPlayer.PlayerError}, so that reported failures are always typed.
+         * Wraps any value into a {@link NemeraAudioPlayer.PlayerError}, so that reported failures are always typed.
          * @param {*} error - The value to wrap, typically an Error, a rejection reason, or a string.
          * @param {string} [fallbackCode] - The code to use when the value is not already a player error.
-         * @returns {LuminaAudioPlayer.PlayerError} The typed player error.
+         * @returns {NemeraAudioPlayer.PlayerError} The typed player error.
          */
-        static from(error, fallbackCode = LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR) {
+        static from(error, fallbackCode = NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR) {
             if (error instanceof PlayerError)
                 return error;
             if (error instanceof Error)
@@ -136,5 +136,5 @@
         }
     }
 
-    LuminaAudioPlayer.PlayerError = PlayerError;
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+    NemeraAudioPlayer.PlayerError = PlayerError;
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

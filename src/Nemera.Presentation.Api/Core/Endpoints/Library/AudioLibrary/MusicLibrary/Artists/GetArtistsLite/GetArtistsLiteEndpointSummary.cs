@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
-using Lumina.Contracts.Responses.Common;
-using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+using Nemera.Contracts.Responses.Common;
+using Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.GetArtistsLite;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.GetArtistsLite;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetArtistsLiteEndpoint"/> API endpoint, for OpenAPI.

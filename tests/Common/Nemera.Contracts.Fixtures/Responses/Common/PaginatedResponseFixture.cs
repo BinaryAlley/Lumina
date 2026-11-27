@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Responses.Common;
+using Nemera.Contracts.Responses.Common;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Responses.Common;
+namespace Nemera.Contracts.Fixtures.Responses.Common;
 
 /// <summary>
 /// Fixture class for the <see cref="PaginatedResponse{TData}"/> record.

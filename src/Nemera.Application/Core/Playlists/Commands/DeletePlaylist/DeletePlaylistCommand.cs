@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Playlists.Commands.DeletePlaylist;
+namespace Nemera.Application.Core.Playlists.Commands.DeletePlaylist;
 
 /// <summary>
 /// Command for deleting a playlist of the current user.

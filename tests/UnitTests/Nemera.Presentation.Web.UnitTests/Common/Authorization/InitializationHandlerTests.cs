@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.Authorization;
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Http;
-using Lumina.Presentation.Web.Common.Responses.UsersManagement;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.Authorization;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Http;
+using Nemera.Presentation.Web.Common.Responses.UsersManagement;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.Authorization;
+namespace Nemera.Presentation.Web.UnitTests.Common.Authorization;
 
 /// <summary>
 /// Contains unit tests for the <see cref="InitializationHandler"/> class.

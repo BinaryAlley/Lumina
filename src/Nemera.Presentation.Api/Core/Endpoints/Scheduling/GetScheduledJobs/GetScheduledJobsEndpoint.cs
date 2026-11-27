@@ -1,17 +1,17 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Scheduling.Queries.GetScheduledJobs;
-using Lumina.Contracts.Responses.Scheduling;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.Scheduling;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Scheduling.Queries.GetScheduledJobs;
+using Nemera.Contracts.Responses.Scheduling;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.Scheduling;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Scheduling.GetScheduledJobs;
+namespace Nemera.Presentation.Api.Core.Endpoints.Scheduling.GetScheduledJobs;
 
 /// <summary>
 /// API endpoint for the <c>/scheduled-jobs</c> route.

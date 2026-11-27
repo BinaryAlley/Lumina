@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Common.Middlewares;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Common.Middlewares;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -18,7 +18,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Common.Middlewares;
+namespace Nemera.Presentation.Api.IntegrationTests.Common.Middlewares;
 
 /// <summary>
 /// Contains integration tests for the <see cref="EventualConsistencyMiddleware"/> class through the real HTTP pipeline.
@@ -96,7 +96,7 @@ public class EventualConsistencyMiddlewareTests : IClassFixture<EventualConsiste
         Assert.Equal(1, _apiFactory.QueueProbe.DequeueCount);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.True(await dbContext.Favorites.AnyAsync(favorite => favorite.UserId == userId && favorite.MediaItemId == bookId));
     }
 
@@ -123,7 +123,7 @@ public class EventualConsistencyMiddlewareTests : IClassFixture<EventualConsiste
             Assert.Equal(0, _apiFactory.PublicationProbe.PublicationCount);
 
             using IServiceScope scope = _apiFactory.Services.CreateScope();
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             Assert.False(await dbContext.Favorites.AnyAsync(favorite => favorite.UserId == userId && favorite.MediaItemId == bookId));
         }
         finally
@@ -153,7 +153,7 @@ public class EventualConsistencyMiddlewareTests : IClassFixture<EventualConsiste
     private async Task<Guid> SeedBookAsync(Guid userId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.CreateVersion7();
         dbContext.Libraries.Add(_libraryEntityFixture.Create(
             id: libraryId,
@@ -179,7 +179,7 @@ public class EventualConsistencyMiddlewareTests : IClassFixture<EventualConsiste
     private Guid GetCurrentUserId()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         UserEntity user = dbContext.Users.First(candidate => candidate.Username == _apiFactory.TestUsername);
         return user.Id;
     }
@@ -191,7 +191,7 @@ public class EventualConsistencyMiddlewareTests : IClassFixture<EventualConsiste
     {
         using (IServiceScope scope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             List<Guid> libraryIds = [.. _seededLibraryIds];
             List<Guid> bookIds = await dbContext.Books.Where(book => libraryIds.Contains(book.LibraryId)).Select(book => book.Id).ToListAsync();
             Guid? userId = await dbContext.Users

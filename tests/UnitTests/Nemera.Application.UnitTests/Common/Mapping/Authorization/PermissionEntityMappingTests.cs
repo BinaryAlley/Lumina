@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.Mapping.Authorization;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
-using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.Mapping.Authorization;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.Contracts.Responses.Authorization;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.Authorization;
+namespace Nemera.Application.UnitTests.Common.Mapping.Authorization;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PermissionEntityMapping"/> class.

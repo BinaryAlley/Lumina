@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DependencyInjection;
-using Lumina.Presentation.Web.Common.HealthChecks;
-using Lumina.Presentation.Web.Common.Utilities;
+using Nemera.Presentation.Web.Common.DependencyInjection;
+using Nemera.Presentation.Web.Common.HealthChecks;
+using Nemera.Presentation.Web.Common.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -20,7 +20,7 @@ using System.Linq;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web;
+namespace Nemera.Presentation.Web;
 
 /// <summary>
 /// Application entry point, contains the composition root module, wires up all dependencies of the application.
@@ -126,7 +126,7 @@ public class Program
         app.UseOpenApi(openApiDocumentMiddlewareSettings => openApiDocumentMiddlewareSettings.Path = "/openapi/{documentName}.json");
         app.MapScalarApiReference(scalarOptions =>
         {
-            scalarOptions.WithTitle("Lumina Web")
+            scalarOptions.WithTitle("Nemera Web")
                 .WithTheme(ScalarTheme.BluePlanet)
                 .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
                 .WithDotNetFlag(true);

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Favorites.Queries.GetFavorites;
+namespace Nemera.Application.Core.Favorites.Queries.GetFavorites;
 
 /// <summary>
 /// Query for getting the favorites of the current user, from the most recently favorited.

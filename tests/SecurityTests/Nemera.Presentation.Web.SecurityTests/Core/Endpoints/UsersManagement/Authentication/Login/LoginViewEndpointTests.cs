@@ -1,26 +1,26 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Login;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Login;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.Login;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.Login;
 
 /// <summary>
 /// Contains security tests for the <see cref="LoginViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class LoginViewEndpointTests : IClassFixture<LuminaWebFactory>
+public class LoginViewEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LoginViewEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public LoginViewEndpointTests(LuminaWebFactory apiFactory)
+    public LoginViewEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

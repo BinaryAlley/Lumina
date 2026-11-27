@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Common.Models.Core;
-using Lumina.Domain.Common.ValueObjects.Metadata;
-using Lumina.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.VideoLibraryBoundedContext.MovieLibraryAggregate.ValueObjects;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.Models.Core;
+using Nemera.Domain.Common.ValueObjects.Metadata;
+using Nemera.Domain.Core.BoundedContexts.MediaContributorBoundedContext.MediaContributorAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.VideoLibraryBoundedContext.MovieLibraryAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Domain.Core.BoundedContexts.VideoLibraryBoundedContext.MovieLibraryAggregate;
+namespace Nemera.Domain.Core.BoundedContexts.VideoLibraryBoundedContext.MovieLibraryAggregate;
 
 /// <summary>
 /// Entity for a movie.

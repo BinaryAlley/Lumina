@@ -5,7 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+namespace Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 
 /// <summary>
 /// Helper for executing <see cref="IResult"/> instances and reading the JSON response body they produce.

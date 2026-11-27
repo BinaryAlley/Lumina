@@ -6,7 +6,7 @@
  * validating the stream path before a request that sends the session cookie is made. The playback engine and the later
  * normalized delivery pipeline both consume it, so the route, capability and same-origin rules are defined once.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -44,15 +44,15 @@
      * this origin by construction, so a base element can never redirect the fetch to another origin.
      * @param {*} value - The path to validate.
      * @returns {{ href: string, url: URL }} The validated resolved path and its parsed URL.
-     * @throws {LuminaAudioPlayer.PlayerError} When the path is not a safe same-origin root relative path.
+     * @throws {NemeraAudioPlayer.PlayerError} When the path is not a safe same-origin root relative path.
      */
     function resolveSameOriginUrl(value) {
         if (typeof value !== 'string' || value.length === 0)
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The request carries no path.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The request carries no path.');
         if (!value.startsWith('/') || value.startsWith('//'))
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The path is not a root relative path.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The path is not a root relative path.');
         if (/[\u0000-\u001f\u007f\\#]/.test(value))
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The path carries a forbidden character.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The path carries a forbidden character.');
         const queryIndex = value.indexOf('?');
         const path = queryIndex >= 0 ? value.slice(0, queryIndex) : value;
         // Decode every segment before judging it. The browser normalizes %2e%2e, %2f and %5c after the string is accepted,
@@ -64,11 +64,11 @@
             try {
                 decoded = decodeURIComponent(segment);
             } catch (error) {
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The path carries an invalid escape.', { cause: error });
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The path carries an invalid escape.', { cause: error });
             }
             if (decoded === '.' || decoded === '..' || decoded.includes('/') || decoded.includes('\\')
                 || /[\u0000-\u001f\u007f]/.test(decoded))
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The path carries a traversal segment.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The path carries a traversal segment.');
         }
         // Resolve last, so the returned href is absolute and a base element cannot change where the fetch goes. A host
         // without a DOM uses the synthetic base only for parsing and keeps the raw path.
@@ -76,7 +76,7 @@
         try {
             resolved = new URL(value, getBaseOrigin());
         } catch (error) {
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The path is not a valid URL.', { cause: error });
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The path is not a valid URL.', { cause: error });
         }
         // A request with credentials or a non-http scheme is not one this player is allowed to make, and an origin other
         // than the page origin would send the session cookie somewhere it must never go.
@@ -84,7 +84,7 @@
             || (hasWindowOrigin() && resolved.origin !== window.location.origin)
             || resolved.username !== ''
             || resolved.password !== '')
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The path is not on this origin.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The path is not on this origin.');
         return { href: hasWindowOrigin() ? resolved.href : value, url: resolved };
     }
 
@@ -97,24 +97,24 @@
      * @param {URL} url - The resolved stream URL.
      * @param {Object} descriptor - The play descriptor the manifest belongs to.
      * @param {Object} configuration - The endpoints configuration of the player.
-     * @throws {LuminaAudioPlayer.PlayerError} When the route template is missing, is on another origin, or the path does not match the route or the expected track and library Ids.
+     * @throws {NemeraAudioPlayer.PlayerError} When the route template is missing, is on another origin, or the path does not match the route or the expected track and library Ids.
      */
     function validateStreamRoute(url, descriptor, configuration) {
         const templateValue = configuration && configuration.streamTrackRouteTemplate;
         if (typeof templateValue !== 'string' || templateValue.length === 0)
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream route template is not configured.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream route template is not configured.');
         let template;
         try {
             template = new URL(templateValue, getBaseOrigin());
         } catch (error) {
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream route template is not a valid URL.', { cause: error });
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream route template is not a valid URL.', { cause: error });
         }
         if ((template.protocol !== 'http:' && template.protocol !== 'https:')
             || (hasWindowOrigin() && template.origin !== window.location.origin)
             || template.origin !== url.origin
             || template.username !== ''
             || template.password !== '')
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream route template is not on this origin.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream route template is not on this origin.');
         const expectedIds = {
             artistId: descriptor && descriptor.artistId,
             albumId: descriptor && descriptor.albumId,
@@ -123,27 +123,27 @@
         const templateSegments = template.pathname.split('/');
         const streamSegments = url.pathname.split('/');
         if (templateSegments.length !== streamSegments.length)
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream path does not match the stream route.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream path does not match the stream route.');
         for (let index = 0; index < templateSegments.length; index++) {
             let templateSegment;
             try {
                 // The URL parser percent-encodes braces, so a template segment has to be decoded before it can be recognized as a placeholder.
                 templateSegment = decodeURIComponent(templateSegments[index]);
             } catch (error) {
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream route template carries an invalid escape.', { cause: error });
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream route template carries an invalid escape.', { cause: error });
             }
             const placeholder = /^\{([A-Za-z0-9_]+)\}$/.exec(templateSegment);
             if (placeholder) {
                 const name = placeholder[1];
                 if (!Object.prototype.hasOwnProperty.call(expectedIds, name))
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream route template carries an unknown placeholder.');
+                    throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream route template carries an unknown placeholder.');
                 const expected = expectedIds[name];
-                if (!LuminaAudioPlayer.isGuid(expected))
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, `The play descriptor carries no valid ${name}.`, { field: name });
+                if (!NemeraAudioPlayer.isGuid(expected))
+                    throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, `The play descriptor carries no valid ${name}.`, { field: name });
                 const actual = streamSegments[index];
                 // The path must describe the track of this descriptor, not merely another track of the same library.
-                if (!LuminaAudioPlayer.isGuid(actual) || actual.toLowerCase() !== expected.toLowerCase())
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream path does not belong to the expected track.');
+                if (!NemeraAudioPlayer.isGuid(actual) || actual.toLowerCase() !== expected.toLowerCase())
+                    throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream path does not belong to the expected track.');
                 continue;
             }
             let actualSegment;
@@ -151,17 +151,17 @@
                 // Decode the actual segment too, so a path base or a static segment that contains an encoded character still compares equal to the template it came from.
                 actualSegment = decodeURIComponent(streamSegments[index]);
             } catch (error) {
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream path carries an invalid escape.', { cause: error });
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream path carries an invalid escape.', { cause: error });
             }
             if (templateSegment !== actualSegment)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream path does not match the stream route.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream path does not match the stream route.');
         }
         const libraryId = descriptor && descriptor.libraryId;
-        if (!LuminaAudioPlayer.isGuid(libraryId))
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor carries no valid library Id.', { field: 'libraryId' });
+        if (!NemeraAudioPlayer.isGuid(libraryId))
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor carries no valid library Id.', { field: 'libraryId' });
         const requestedLibraryIds = url.searchParams.getAll('libraryId');
         if (requestedLibraryIds.length !== 1 || requestedLibraryIds[0].toLowerCase() !== libraryId.toLowerCase())
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream path does not belong to the expected library.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The stream path does not belong to the expected library.');
     }
 
     /**
@@ -171,7 +171,7 @@
      * @param {Object} descriptor - The play descriptor the manifest belongs to.
      * @param {Object} configuration - The endpoints configuration of the player.
      * @returns {string} The validated resolved stream URL.
-     * @throws {LuminaAudioPlayer.PlayerError} When the manifest carries no safe stream path or the path is not the
+     * @throws {NemeraAudioPlayer.PlayerError} When the manifest carries no safe stream path or the path is not the
      * stream route of the expected track and library.
      */
     function resolveStreamUrl(manifest, descriptor, configuration) {
@@ -187,25 +187,25 @@
      * @param {Object} configuration - The endpoints configuration of the player.
      * @param {number} segmentIndex - The zero based index of the segment.
      * @param {string} deliveryId - The opaque delivery handle the manifest reported.
-     * @throws {LuminaAudioPlayer.PlayerError} When the route template is missing, is on another origin, or the path does not
+     * @throws {NemeraAudioPlayer.PlayerError} When the route template is missing, is on another origin, or the path does not
      * match the route, the expected track and library, the expected segment index, or the expected delivery handle.
      */
     function validateSegmentStreamRoute(url, descriptor, configuration, segmentIndex, deliveryId) {
         const templateValue = configuration && configuration.streamTrackSegmentRouteTemplate;
         if (typeof templateValue !== 'string' || templateValue.length === 0)
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment stream route template is not configured.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment stream route template is not configured.');
         let template;
         try {
             template = new URL(templateValue, getBaseOrigin());
         } catch (error) {
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment stream route template is not a valid URL.', { cause: error });
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment stream route template is not a valid URL.', { cause: error });
         }
         if ((template.protocol !== 'http:' && template.protocol !== 'https:')
             || (hasWindowOrigin() && template.origin !== window.location.origin)
             || template.origin !== url.origin
             || template.username !== ''
             || template.password !== '')
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment stream route template is not on this origin.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment stream route template is not on this origin.');
         const expectedIds = {
             artistId: descriptor && descriptor.artistId,
             albumId: descriptor && descriptor.albumId,
@@ -214,13 +214,13 @@
         const templateSegments = template.pathname.split('/');
         const streamSegments = url.pathname.split('/');
         if (templateSegments.length !== streamSegments.length)
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not match the segment route.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not match the segment route.');
         for (let index = 0; index < templateSegments.length; index++) {
             let templateSegment;
             try {
                 templateSegment = decodeURIComponent(templateSegments[index]);
             } catch (error) {
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment route template carries an invalid escape.', { cause: error });
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment route template carries an invalid escape.', { cause: error });
             }
             const placeholder = /^\{([A-Za-z0-9_]+)\}$/.exec(templateSegment);
             let actualSegment;
@@ -228,40 +228,40 @@
                 // Decode the actual segment too, so a path base or a static segment that contains an encoded character still compares equal to the template it came from.
                 actualSegment = decodeURIComponent(streamSegments[index]);
             } catch (error) {
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path carries an invalid escape.', { cause: error });
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path carries an invalid escape.', { cause: error });
             }
             if (placeholder) {
                 const name = placeholder[1];
                 if (name === 'segmentIndex') {
                     if (!Number.isInteger(segmentIndex) || segmentIndex < 0 || actualSegment !== String(segmentIndex))
-                        throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not belong to the expected segment index.');
+                        throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not belong to the expected segment index.');
                     continue;
                 }
                 if (name === 'deliveryId') {
                     // The path must name the delivery handle the manifest reported, not another delivery of the same track.
                     if (typeof deliveryId !== 'string' || actualSegment !== deliveryId)
-                        throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not belong to the expected delivery.');
+                        throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not belong to the expected delivery.');
                     continue;
                 }
                 if (!Object.prototype.hasOwnProperty.call(expectedIds, name))
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment route template carries an unknown placeholder.');
+                    throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment route template carries an unknown placeholder.');
                 const expected = expectedIds[name];
-                if (!LuminaAudioPlayer.isGuid(expected))
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, `The play descriptor carries no valid ${name}.`, { field: name });
+                if (!NemeraAudioPlayer.isGuid(expected))
+                    throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, `The play descriptor carries no valid ${name}.`, { field: name });
                 // The path must describe the track of this descriptor, not merely another track of the same library.
-                if (!LuminaAudioPlayer.isGuid(actualSegment) || actualSegment.toLowerCase() !== expected.toLowerCase())
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not belong to the expected track.');
+                if (!NemeraAudioPlayer.isGuid(actualSegment) || actualSegment.toLowerCase() !== expected.toLowerCase())
+                    throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not belong to the expected track.');
                 continue;
             }
             if (templateSegment !== actualSegment)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not match the segment route.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not match the segment route.');
         }
         const libraryId = descriptor && descriptor.libraryId;
-        if (!LuminaAudioPlayer.isGuid(libraryId))
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor carries no valid library Id.', { field: 'libraryId' });
+        if (!NemeraAudioPlayer.isGuid(libraryId))
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor carries no valid library Id.', { field: 'libraryId' });
         const requestedLibraryIds = url.searchParams.getAll('libraryId');
         if (requestedLibraryIds.length !== 1 || requestedLibraryIds[0].toLowerCase() !== libraryId.toLowerCase())
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not belong to the expected library.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment path does not belong to the expected library.');
     }
 
     /**
@@ -271,20 +271,20 @@
      * @param {Object} configuration - The endpoints configuration of the player.
      * @param {number} segmentIndex - The zero based index of the segment to fetch.
      * @returns {string} The validated resolved segment URL.
-     * @throws {LuminaAudioPlayer.PlayerError} When the manifest carries no safe segment path, the index is invalid, or the
+     * @throws {NemeraAudioPlayer.PlayerError} When the manifest carries no safe segment path, the index is invalid, or the
      * path is not the segment route of the expected track, library and index.
      */
     function resolveSegmentStreamUrl(manifest, descriptor, configuration, segmentIndex) {
         if (!Number.isInteger(segmentIndex) || segmentIndex < 0)
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment index is not valid.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The segment index is not valid.');
         const deliveryId = manifest && manifest.deliveryId;
         // The delivery handle is an opaque server issued token, so it is confined to the characters a path segment can carry and never contains a
         // separator, a query, a fragment or a control character that could change the route it is substituted into.
         if (typeof deliveryId !== 'string' || !/^[0-9a-f]{32}$/.test(deliveryId))
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The manifest carries no valid delivery handle.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The manifest carries no valid delivery handle.');
         const template = manifest && manifest.segmentStreamPathTemplate;
         if (typeof template !== 'string' || !template.includes('{deliveryId}') || !template.includes('{segmentIndex}'))
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The manifest carries no segment stream path template.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The manifest carries no segment stream path template.');
         const value = template
             .split('{deliveryId}').join(deliveryId)
             .split('{segmentIndex}').join(String(segmentIndex));
@@ -299,12 +299,12 @@
      * @param {Object} descriptor - The play descriptor of the track.
      * @param {string} capabilities - The comma separated container and codec capability list, or an empty string.
      * @returns {string} The absolute manifest URL, pinned to this origin.
-     * @throws {LuminaAudioPlayer.PlayerError} When the descriptor or the configuration is incomplete, or the endpoint is not on this origin.
+     * @throws {NemeraAudioPlayer.PlayerError} When the descriptor or the configuration is incomplete, or the endpoint is not on this origin.
      */
     function buildManifestUrl(configuration, descriptor, capabilities) {
         const template = configuration && configuration.getPlaybackManifestUrl;
         if (!template)
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The playback manifest endpoint is not configured.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The playback manifest endpoint is not configured.');
         const ids = {
             artistId: descriptor.artistId,
             albumId: descriptor.albumId,
@@ -313,10 +313,10 @@
         };
         for (const name of Object.keys(ids)) {
             if (!ids[name])
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, `The play descriptor carries no ${name}.`, { field: name });
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, `The play descriptor carries no ${name}.`, { field: name });
             // The manifest route only accepts Guids, and a value that is not a Guid must never be interpolated into a path the browser resolves against this origin.
-            if (!LuminaAudioPlayer.isGuid(ids[name]))
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, `The play descriptor carries an invalid ${name}.`, { field: name });
+            if (!NemeraAudioPlayer.isGuid(ids[name]))
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, `The play descriptor carries an invalid ${name}.`, { field: name });
         }
         let url = String(template)
             .split('{artistId}').join(encodeURIComponent(ids.artistId))
@@ -332,13 +332,13 @@
         try {
             resolved = new URL(url, getBaseOrigin());
         } catch (error) {
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The playback manifest endpoint is not a valid URL.', { cause: error });
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The playback manifest endpoint is not a valid URL.', { cause: error });
         }
         if ((resolved.protocol !== 'http:' && resolved.protocol !== 'https:')
             || (hasWindowOrigin() && resolved.origin !== window.location.origin)
             || resolved.username !== ''
             || resolved.password !== '')
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The playback manifest endpoint is not on this origin.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The playback manifest endpoint is not on this origin.');
         return resolved.href;
     }
 
@@ -391,13 +391,13 @@
      * URL, an optional signal, a label and a request options object with <c>redirect: 'manual'</c>, so a redirect target is validated before the browser follows it.
      * @param {AbortSignal} [options.signal] - An optional signal that cancels the request, used by a cancelled prefetch.
      * @returns {Promise<Object>} The playback manifest.
-     * @throws {LuminaAudioPlayer.PlayerError} When the descriptor is incomplete, the session expired, or the manifest could not be read.
+     * @throws {NemeraAudioPlayer.PlayerError} When the descriptor is incomplete, the session expired, or the manifest could not be read.
      */
     async function fetchPlaybackManifestAsync(options) {
         const settings = options || {};
         const transport = settings.transport;
         if (typeof transport !== 'function')
-            throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The playback manifest transport is not configured.');
+            throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The playback manifest transport is not configured.');
         const url = buildManifestUrl(settings.configuration, settings.descriptor, settings.capabilities || '');
         const request = createTimedRequestSignal(settings.signal);
         try {
@@ -405,21 +405,21 @@
             try {
                 data = await transport(url, request.signal, 'a playback manifest request', { redirect: 'manual' });
             } catch (error) {
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The playback manifest of the track could not be requested.', { cause: error });
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The playback manifest of the track could not be requested.', { cause: error });
             }
-            if (data === LuminaAudioPlayer.REDIRECTED)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The session expired while the playback manifest was requested.', { reason: LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED });
+            if (data === NemeraAudioPlayer.REDIRECTED)
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The session expired while the playback manifest was requested.', { reason: NemeraAudioPlayer.PlayerErrorReason.SESSION_EXPIRED });
             if (data === undefined)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The playback manifest of the track could not be requested.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The playback manifest of the track could not be requested.');
             if (!data || typeof data !== 'object')
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The playback manifest of the track carried no data.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The playback manifest of the track carried no data.');
             return data;
         } finally {
             request.dispose();
         }
     }
 
-    LuminaAudioPlayer.resolveStreamUrl = resolveStreamUrl;
-    LuminaAudioPlayer.resolveSegmentStreamUrl = resolveSegmentStreamUrl;
-    LuminaAudioPlayer.fetchPlaybackManifestAsync = fetchPlaybackManifestAsync;
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+    NemeraAudioPlayer.resolveStreamUrl = resolveStreamUrl;
+    NemeraAudioPlayer.resolveSegmentStreamUrl = resolveSegmentStreamUrl;
+    NemeraAudioPlayer.fetchPlaybackManifestAsync = fetchPlaybackManifestAsync;
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

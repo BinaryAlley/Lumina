@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.Playlists;
+namespace Nemera.Contracts.Responses.Playlists;
 
 /// <summary>
 /// Represents a response for the entry that was appended to a playlist, together with its playlist and the new activity time of the playlist.

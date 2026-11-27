@@ -1,11 +1,11 @@
-- [Lumina Domain](#lumina-domain)
+- [Nemera Domain](#nemera-domain)
   - [Music Library Aggregate](#music-library-aggregate)
     - [Artist](#artist)
     - [Album](#album)
     - [Track](#track)
     - [Audio Rating](#audio-rating)
 
-# [Lumina Domain](#lumina-domain)
+# [Nemera Domain](#nemera-domain)
 
 ## [Music Library Aggregate](#music-library-aggregate)
 

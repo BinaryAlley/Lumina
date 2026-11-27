@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
+namespace Nemera.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
 
 /// <summary>
 /// Data transfer object for a book that the user deleted and can restore.

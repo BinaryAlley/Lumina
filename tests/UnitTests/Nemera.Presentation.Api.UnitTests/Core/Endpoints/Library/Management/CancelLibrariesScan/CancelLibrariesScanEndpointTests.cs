@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Library.Management.CancelLibrariesScan;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Library.Management.CancelLibrariesScan;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Library.Management.CancelLibrariesScan;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Library.Management.CancelLibrariesScan;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CancelLibrariesScanEndpoint"/> class.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
-using Lumina.Presentation.Web.Common.Enums.Authorization;
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Responses.Authorization;
-using Lumina.Presentation.Web.Common.Responses.UsersManagement;
-using Lumina.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.FileSystemManagement;
+using Nemera.Presentation.Web.Common.Enums.Authorization;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Common.Responses.UsersManagement;
+using Nemera.Presentation.Web.Common.Routes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Api;
+namespace Nemera.Presentation.Web.Fixtures.Common.Api;
 
 /// <summary>
 /// Test double for the <see cref="IApiHttpClient"/> interface, allowing integration and security tests to stub the

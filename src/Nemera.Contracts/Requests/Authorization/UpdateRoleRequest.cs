@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.Authorization;
+namespace Nemera.Contracts.Requests.Authorization;
 
 /// <summary>
 /// Represents a request for updating an existing authorization role.

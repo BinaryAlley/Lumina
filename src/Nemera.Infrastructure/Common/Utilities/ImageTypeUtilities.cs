@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Utilities;
+namespace Nemera.Infrastructure.Common.Utilities;
 
 /// <summary>
 /// Provides helpers for the <see cref="ImageType"/> enumeration.

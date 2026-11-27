@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.UpdateBook;
-using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Contracts.Fixtures.Core.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBook;
+using Nemera.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Commands.UpdateBook;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Contracts.Fixtures.Core.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBook;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBook;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBook;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdateBookEndpoint"/> class.
@@ -25,7 +25,7 @@ namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Library.WrittenConten
 [ExcludeFromCodeCoverage]
 public class UpdateBookEndpointTests
 {
-    private readonly Lumina.Application.Common.CQRS.ICommandHandler<UpdateBookCommand, Result<BookResponse>> _mockHandler;
+    private readonly Nemera.Application.Common.CQRS.ICommandHandler<UpdateBookCommand, Result<BookResponse>> _mockHandler;
     private readonly UpdateBookEndpoint _sut;
     private readonly UpdateBookRequestFixture _updateBookRequestFixture = new();
     private readonly BookResponseFixture _bookResponseFixture = new();
@@ -35,7 +35,7 @@ public class UpdateBookEndpointTests
     /// </summary>
     public UpdateBookEndpointTests()
     {
-        _mockHandler = Substitute.For<Lumina.Application.Common.CQRS.ICommandHandler<UpdateBookCommand, Result<BookResponse>>>();
+        _mockHandler = Substitute.For<Nemera.Application.Common.CQRS.ICommandHandler<UpdateBookCommand, Result<BookResponse>>>();
         _sut = Factory.Create<UpdateBookEndpoint>(_mockHandler);
     }
 

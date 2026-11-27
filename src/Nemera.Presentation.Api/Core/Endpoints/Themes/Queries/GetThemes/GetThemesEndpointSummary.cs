@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Responses.Themes;
-using Lumina.Domain.SharedKernel.Common.Enums.Themes;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.Domain.SharedKernel.Common.Enums.Themes;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemes;
+namespace Nemera.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemes;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetThemesEndpoint"/> API endpoint, for OpenAPI.
@@ -26,10 +26,10 @@ public class GetThemesEndpointSummary : Summary<GetThemesEndpoint, EmptyRequest>
             example: new ThemeResponse[] {
             new (
                 Id: Guid.NewGuid(),
-                ThemeId: "lumina-default",
-                Name: "Lumina Default",
+                ThemeId: "nemera-default",
+                Name: "Nemera Default",
                 Description: "A clean, readable theme.",
-                Author: "Lumina Team",
+                Author: "Nemera Team",
                 Version: "1.2.0",
                 PreviewPath: "preview.png",
                 InstallSource: ThemeInstallSource.Bundled,
@@ -42,7 +42,7 @@ public class GetThemesEndpointSummary : Summary<GetThemesEndpoint, EmptyRequest>
                 ThemeId: "neon-grid",
                 Name: "Neon Grid",
                 Description: "A dark theme with a neon grid background.",
-                Author: "Lumina Team",
+                Author: "Nemera Team",
                 Version: "0.9.3",
                 PreviewPath: "preview.jpg",
                 InstallSource: ThemeInstallSource.Uploaded,

@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+namespace Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 
 /// <summary>
 /// Represents a lightweight track response, containing only the fields needed by the client to display the tracks of an album.

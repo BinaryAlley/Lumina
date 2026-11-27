@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.Authorization;
-using Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
-using Lumina.Contracts.Requests.Authorization;
-using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.UsersManagement;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.Authorization;
+using Nemera.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+using Nemera.Contracts.Requests.Authorization;
+using Nemera.Contracts.Responses.Authorization;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.UsersManagement;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.UpdateUserRoleAndPermissions;
+namespace Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.UpdateUserRoleAndPermissions;
 
 /// <summary>
 /// API endpoint for the <c>/auth/users/{userId}/role-and-permissions</c> route.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+namespace Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 
 /// <summary>
 /// Repository entity for the participation of a media contributor in a book, carrying the role the contributor played in that book. 

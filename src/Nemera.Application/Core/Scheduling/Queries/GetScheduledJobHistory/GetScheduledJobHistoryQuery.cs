@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Scheduling.Queries.GetScheduledJobHistory;
+namespace Nemera.Application.Core.Scheduling.Queries.GetScheduledJobHistory;
 
 /// <summary>
 /// Query for getting the history of the executions of the tasks of scheduled jobs.

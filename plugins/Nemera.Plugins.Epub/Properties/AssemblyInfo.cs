@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Lumina.Plugins.Epub.UnitTests")]
-[assembly: InternalsVisibleTo("Lumina.Plugins.Epub.IntegrationTests")]
-[assembly: InternalsVisibleTo("Lumina.Plugins.Epub.Fixtures")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.Epub.UnitTests")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.Epub.IntegrationTests")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.Epub.Fixtures")]

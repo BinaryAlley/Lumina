@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.FileSystemManagement.Thumbnails;
-using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
-using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Thumbnails;
-using Lumina.Contracts.Requests.FileSystemManagement.Thumbnails;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Thumbnails;
+using Nemera.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
+using Nemera.Contracts.Fixtures.Core.Requests.FileSystemManagement.Thumbnails;
+using Nemera.Contracts.Requests.FileSystemManagement.Thumbnails;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Thumbnails;
+namespace Nemera.Application.UnitTests.Common.Mapping.FileSystemManagement.Thumbnails;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetThumbnailRequestMapping"/> class.

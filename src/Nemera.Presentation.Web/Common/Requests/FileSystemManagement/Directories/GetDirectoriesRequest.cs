@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.FileSystemManagement.Directories;
+namespace Nemera.Presentation.Web.Common.Requests.FileSystemManagement.Directories;
 
 /// <summary>
 /// Represents a request to get the directories of a file system path.

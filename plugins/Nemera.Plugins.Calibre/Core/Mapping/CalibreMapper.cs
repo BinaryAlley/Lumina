@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
-using Lumina.Plugins.Calibre.Common.Models.DTO.Opf;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Plugins.Calibre.Common.Models.DTO.Opf;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,7 +13,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 #endregion
 
-namespace Lumina.Plugins.Calibre.Core.Mapping;
+namespace Nemera.Plugins.Calibre.Core.Mapping;
 
 /// <summary>
 /// Maps the metadata read from a Calibre OPF file into the application's book metadata DTO.

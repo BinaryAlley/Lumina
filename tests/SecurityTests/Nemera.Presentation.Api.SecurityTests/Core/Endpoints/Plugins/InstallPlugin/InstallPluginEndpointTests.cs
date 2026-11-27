@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -13,15 +13,15 @@ using System.Text;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.InstallPlugin;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.InstallPlugin;
 
 /// <summary>
 /// Contains security tests for the <see cref="InstallPluginEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class InstallPluginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class InstallPluginEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly List<string> _installedPluginFileNames = [];
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -33,12 +33,12 @@ public class InstallPluginEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
     /// Initializes a new instance of the <see cref="InstallPluginEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public InstallPluginEndpointTests(LuminaApiFactory apiFactory)
+    public InstallPluginEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
     }
 
     [Fact]

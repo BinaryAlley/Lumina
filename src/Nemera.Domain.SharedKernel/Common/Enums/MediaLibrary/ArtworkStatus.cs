@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+namespace Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 
 /// <summary>
 /// Enumeration for the status of the artwork enrichment of a media library item.

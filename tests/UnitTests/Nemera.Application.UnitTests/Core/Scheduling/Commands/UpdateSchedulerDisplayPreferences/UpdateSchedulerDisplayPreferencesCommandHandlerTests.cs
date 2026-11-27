@@ -1,23 +1,23 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
-using Lumina.Application.Fixtures.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.DataAccess.Repositories.Scheduling;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
+using Nemera.Application.Fixtures.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
+namespace Nemera.Application.UnitTests.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdateSchedulerDisplayPreferencesCommandHandler"/> class.

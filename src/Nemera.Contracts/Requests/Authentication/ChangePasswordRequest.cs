@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.Authentication;
+namespace Nemera.Contracts.Requests.Authentication;
 
 /// <summary>
 /// Represents the request model for account password change.

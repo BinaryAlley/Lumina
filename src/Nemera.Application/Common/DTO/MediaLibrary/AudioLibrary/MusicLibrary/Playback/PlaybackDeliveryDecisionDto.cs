@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Data transfer object for the decision of how the audio of a track is delivered to a player: as the original file, as the same codec repackaged, or re-encoded.

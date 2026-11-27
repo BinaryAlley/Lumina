@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.CoverArtArchive.Common.Models.Contracts.Responses;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.CoverArtArchive.Common.Models.Contracts.Responses;
 using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.Core.Mapping;
+namespace Nemera.Plugins.CoverArtArchive.Core.Mapping;
 
 /// <summary>
 /// Maps the responses of the Cover Art Archive API into artwork DTOs.

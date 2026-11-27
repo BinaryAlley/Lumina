@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
 using System.Collections.Generic;
 using System.Linq;
-using AudioMediaContributorId = Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.ExternalIdentifiers.MediaContributorBoundedContext.MediaContributorAggregate.MediaContributorId;
-using BookMediaContributorId = Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.MediaContributorBoundedContext.MediaContributorAggregate.MediaContributorId;
+using AudioMediaContributorId = Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.ExternalIdentifiers.MediaContributorBoundedContext.MediaContributorAggregate.MediaContributorId;
+using BookMediaContributorId = Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.ExternalIdentifiers.MediaContributorBoundedContext.MediaContributorAggregate.MediaContributorId;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.MediaContributors;
+namespace Nemera.Application.Common.Mapping.MediaContributors;
 
 /// <summary>
 /// Extension methods for converting <see cref="MediaContributorReferenceDto"/>.

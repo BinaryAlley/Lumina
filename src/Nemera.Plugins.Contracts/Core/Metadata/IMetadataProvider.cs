@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.Contracts.Core.Metadata;
+namespace Nemera.Plugins.Contracts.Core.Metadata;
 
 /// <summary>
 /// Contract for a plugin that provides metadata for media items.

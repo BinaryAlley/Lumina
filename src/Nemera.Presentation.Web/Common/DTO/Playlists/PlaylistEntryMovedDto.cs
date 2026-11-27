@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Playlists;
+namespace Nemera.Presentation.Web.Common.DTO.Playlists;
 
 /// <summary>
 /// Data transfer object for the result of moving one entry of a playlist to a new position.

@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.Favorites;
-using Lumina.Application.Core.Favorites.Queries.GetFavoriteStatus;
-using Lumina.Contracts.Requests.Favorites;
-using Lumina.Contracts.Responses.Favorites;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.Favorites;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.Favorites;
+using Nemera.Application.Core.Favorites.Queries.GetFavoriteStatus;
+using Nemera.Contracts.Requests.Favorites;
+using Nemera.Contracts.Responses.Favorites;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.Favorites;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Favorites.GetFavoriteStatus;
+namespace Nemera.Presentation.Api.Core.Endpoints.Favorites.GetFavoriteStatus;
 
 /// <summary>
 /// API endpoint for the <c>/users/me/favorites/status</c> route.

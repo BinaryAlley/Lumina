@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Plugins;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.Contracts.Core.Reading;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Repositories.Plugins;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Plugins;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.Contracts.Core.Reading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -21,7 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+namespace Nemera.Infrastructure.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 
 /// <summary>
 /// Contains unit tests for the <see cref="BookReadingService"/> class.
@@ -72,7 +72,7 @@ public class BookReadingServiceTests
         IServiceScopeFactory serviceScopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
         // The resolution and enablement guards under test stop before the book file is probed, so no real file is needed.
-        _bookPath = $"lumina-test-book-{Guid.NewGuid():N}.epub";
+        _bookPath = $"nemera-test-book-{Guid.NewGuid():N}.epub";
 
         _sut = new BookReadingService(_serviceProvider, _mockPluginManager, _enablementCache, serviceScopeFactory, Substitute.For<ILogger<BookReadingService>>());
     }

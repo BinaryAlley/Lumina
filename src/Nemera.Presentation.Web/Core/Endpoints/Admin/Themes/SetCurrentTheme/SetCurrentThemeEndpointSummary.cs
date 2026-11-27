@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.Requests.Themes;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.Requests.Themes;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.SetCurrentTheme;
+namespace Nemera.Presentation.Web.Core.Endpoints.Admin.Themes.SetCurrentTheme;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="SetCurrentThemeEndpoint"/> endpoint, for OpenAPI.
@@ -25,7 +25,7 @@ public class SetCurrentThemeEndpointSummary : Summary<SetCurrentThemeEndpoint, S
         RequestParam(r => r.ThemeId, "The manifest id of the theme to activate. Required.");
 
         ExampleRequest = new SetCurrentThemeRequest(
-            ThemeId: "lumina-default"
+            ThemeId: "nemera-default"
         );
 
         Response(200, "The theme was successfully activated.", example: new SuccessResponse(true));

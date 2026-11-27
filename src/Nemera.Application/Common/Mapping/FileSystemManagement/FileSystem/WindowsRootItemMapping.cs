@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
+namespace Nemera.Application.Common.Mapping.FileSystemManagement.FileSystem;
 
 /// <summary>
 /// Extension methods for converting <see cref="WindowsRootItem"/>.

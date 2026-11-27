@@ -56,8 +56,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(lumina_application_handler_duration_bucket[5m])) by (le, lumina_handler_type))",
-          "legendFormat": "p95 {{lumina_handler_type}}",
+          "expr": "histogram_quantile(0.95, sum(rate(nemera_application_handler_duration_bucket[5m])) by (le, nemera_handler_type))",
+          "legendFormat": "p95 {{nemera_handler_type}}",
           "refId": "A"
         },
         {
@@ -65,8 +65,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "histogram_quantile(0.50, sum(rate(lumina_application_handler_duration_bucket[5m])) by (le, lumina_handler_type))",
-          "legendFormat": "p50 {{lumina_handler_type}}",
+          "expr": "histogram_quantile(0.50, sum(rate(nemera_application_handler_duration_bucket[5m])) by (le, nemera_handler_type))",
+          "legendFormat": "p50 {{nemera_handler_type}}",
           "refId": "B"
         }
       ],
@@ -108,8 +108,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(rate(lumina_application_handler_invocations_total[5m])) by (lumina_handler_type, lumina_outcome)",
-          "legendFormat": "{{lumina_handler_type}} {{lumina_outcome}}",
+          "expr": "sum(rate(nemera_application_handler_invocations_total[5m])) by (nemera_handler_type, nemera_outcome)",
+          "legendFormat": "{{nemera_handler_type}} {{nemera_outcome}}",
           "refId": "A"
         }
       ],
@@ -120,7 +120,7 @@
   "refresh": "10s",
   "schemaVersion": 40,
   "tags": [
-    "lumina",
+    "nemera",
     "telemetry"
   ],
   "templating": {
@@ -132,7 +132,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Lumina",
-  "uid": "lumina-overview",
+  "title": "Nemera",
+  "uid": "nemera-overview",
   "version": 1
 }

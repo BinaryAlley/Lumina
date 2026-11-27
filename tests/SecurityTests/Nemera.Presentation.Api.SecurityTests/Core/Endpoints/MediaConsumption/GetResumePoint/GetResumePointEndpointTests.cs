@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Responses.MediaConsumption;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.MediaConsumption.GetResumePoint;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Responses.MediaConsumption;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.MediaConsumption.GetResumePoint;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -19,20 +19,20 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.MediaConsumption.GetResumePoint;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.MediaConsumption.GetResumePoint;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetResumePointEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetResumePointEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class GetResumePointEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
     private const string JWT_SECRET = "test-key-thats-at-least-32-chars-long-for-jwt";
     private const long SEEDED_VERSION = 7;
 
     private static readonly DateTime s_lastConsumedOnUtc = new(2026, 2, 28, 18, 30, 0, DateTimeKind.Utc);
 
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -51,12 +51,12 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     /// Initializes a new instance of the <see cref="GetResumePointEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetResumePointEndpointTests(LuminaApiFactory apiFactory)
+    public GetResumePointEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
     }
 
     [Fact]
@@ -154,7 +154,7 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         Assert.Equal(missingProblem["type"].GetString(), foreignProblem["type"].GetString());
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         MediaResumePointEntity? storedResumePoint = dbContext.MediaResumePoints.FirstOrDefault(candidate => candidate.Id == otherResumePointId);
         Assert.NotNull(storedResumePoint);
         Assert.Equal(otherUserId, storedResumePoint!.UserId);
@@ -188,7 +188,7 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         Assert.NotEqual(otherResumePointId, resumePoint.Id);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         MediaResumePointEntity? storedResumePoint = dbContext.MediaResumePoints.FirstOrDefault(candidate => candidate.Id == otherResumePointId);
         Assert.NotNull(storedResumePoint);
         Assert.Equal(otherUserId, storedResumePoint!.UserId);
@@ -215,7 +215,7 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         Assert.DoesNotContain(resumePointId.ToString(), content, StringComparison.OrdinalIgnoreCase);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.True(dbContext.MediaResumePoints.Any(candidate => candidate.Id == resumePointId));
     }
 
@@ -276,7 +276,7 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     private async Task<(Guid UserId, string Username)> SeedOtherUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         string username = $"otheruser_{Guid.NewGuid()}";
         UserEntity user = _userEntityFixture.Create(id: userId, username: username, password: "TestPass123!");
@@ -295,7 +295,7 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     private async Task<(Guid LibraryId, Guid TrackId)> SeedLibraryArtistAlbumAndTrackAsync(Guid userId, bool shouldTrackConsumptionProgress)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.NewGuid();
         Guid artistId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
@@ -336,7 +336,7 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         double lastProgressFraction)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid resumePointId = Guid.NewGuid();
         dbContext.MediaResumePoints.Add(_mediaResumePointEntityFixture.Create(
             id: resumePointId,
@@ -511,7 +511,7 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina.", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera.", content, StringComparison.Ordinal);
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(JWT_SECRET, content, StringComparison.Ordinal);
         Assert.DoesNotContain("Data Source", content, StringComparison.OrdinalIgnoreCase);

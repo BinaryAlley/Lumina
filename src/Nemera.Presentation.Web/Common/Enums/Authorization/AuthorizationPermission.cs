@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.Enums.Authorization;
+namespace Nemera.Presentation.Web.Common.Enums.Authorization;
 
 /// <summary>
 /// Enumeration for authorization permissions.

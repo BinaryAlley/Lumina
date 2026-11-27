@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Http;
-using Lumina.Presentation.Web.Common.Middlewares;
+using Nemera.Presentation.Web.Common.Http;
+using Nemera.Presentation.Web.Common.Middlewares;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using System;
@@ -10,7 +10,7 @@ using System.IO;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.Middlewares;
+namespace Nemera.Presentation.Web.UnitTests.Common.Middlewares;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CacheControlHeaderMiddleware"/> class.

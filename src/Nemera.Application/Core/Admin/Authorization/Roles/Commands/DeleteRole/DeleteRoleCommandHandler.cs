@@ -1,19 +1,19 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
+namespace Nemera.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
 
 /// <summary>
 /// Handler for the command to delete an authorization role.

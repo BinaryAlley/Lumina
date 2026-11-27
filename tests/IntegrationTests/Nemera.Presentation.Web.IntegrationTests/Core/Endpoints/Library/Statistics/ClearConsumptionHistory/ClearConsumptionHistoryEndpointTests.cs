@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Requests.Library.Statistics;
-using Lumina.Presentation.Web.Core.Endpoints.Library.Statistics.ClearConsumptionHistory;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.Statistics;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Statistics.ClearConsumptionHistory;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -14,24 +14,24 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Statistics.ClearConsumptionHistory;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Statistics.ClearConsumptionHistory;
 
 /// <summary>
 /// Contains integration tests for the <see cref="ClearConsumptionHistoryEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class ClearConsumptionHistoryEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class ClearConsumptionHistoryEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private static readonly string s_userId = Guid.NewGuid().ToString();
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly ClearConsumptionHistoryRequestFixture _clearConsumptionHistoryRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ClearConsumptionHistoryEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public ClearConsumptionHistoryEndpointTests(LuminaWebFactory apiFactory)
+    public ClearConsumptionHistoryEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

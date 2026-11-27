@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Exceptions;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Domain.Common.Exceptions;
+using Nemera.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Domain.UnitTests.Common.Exceptions;
+namespace Nemera.Domain.UnitTests.Common.Exceptions;
 
 /// <summary>
 /// Contains unit tests for the <see cref="EventualConsistencyException"/> class.

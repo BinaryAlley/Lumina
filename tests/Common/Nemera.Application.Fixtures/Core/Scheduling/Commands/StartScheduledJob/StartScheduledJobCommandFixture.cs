@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Scheduling.Commands.StartScheduledJob;
+using Nemera.Application.Core.Scheduling.Commands.StartScheduledJob;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Scheduling.Commands.StartScheduledJob;
+namespace Nemera.Application.Fixtures.Core.Scheduling.Commands.StartScheduledJob;
 
 /// <summary>
 /// Fixture class for the <see cref="StartScheduledJobCommand"/> class.

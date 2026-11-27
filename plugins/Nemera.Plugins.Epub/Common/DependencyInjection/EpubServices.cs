@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Reading;
-using Lumina.Plugins.Epub.Core;
+using Nemera.Plugins.Contracts.Core.Reading;
+using Nemera.Plugins.Epub.Core;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 #endregion
 
-namespace Lumina.Plugins.Epub.Common.DependencyInjection;
+namespace Nemera.Plugins.Epub.Common.DependencyInjection;
 
 /// <summary>
 /// Utility class for registering the services of the EPUB format reader into the Dependency Injection container.

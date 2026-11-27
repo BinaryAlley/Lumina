@@ -1,21 +1,21 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
-using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.DataAccess.Core.Repositories.MusicLibrary;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.MusicLibrary;
+using Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Common;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.DataAccess.Core.Repositories.MusicLibrary;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NSubstitute;
@@ -27,7 +27,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.MusicLibrary;
+namespace Nemera.DataAccess.UnitTests.Core.Repositories.MusicLibrary;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AlbumRepository"/> class.
@@ -35,7 +35,7 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.MusicLibrary;
 [ExcludeFromCodeCoverage]
 public class AlbumRepositoryTests
 {
-    private readonly LuminaDbContext _mockContext;
+    private readonly NemeraDbContext _mockContext;
     private readonly ITrackRepository _mockTrackRepository;
     private readonly IDateTimeProvider _mockDateTimeProvider;
     private readonly AlbumRepository _sut;
@@ -57,7 +57,7 @@ public class AlbumRepositoryTests
     /// </summary>
     public AlbumRepositoryTests()
     {
-        _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
+        _mockContext = Create.MockedDbContextFor<NemeraDbContext>();
         _mockTrackRepository = Substitute.For<ITrackRepository>();
         _mockTrackRepository.InsertAsync(Arg.Any<TrackEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Created);
         _mockTrackRepository.UpdateAsync(Arg.Any<TrackEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Updated);

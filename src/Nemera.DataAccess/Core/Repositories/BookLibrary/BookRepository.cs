@@ -1,22 +1,22 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Common.Specifications;
-using Lumina.DataAccess.Common.Persistence;
-using Lumina.DataAccess.Core.Repositories.BookLibrary.Specifications;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.BookLibrary;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Common.Specifications;
+using Nemera.DataAccess.Common.Persistence;
+using Nemera.DataAccess.Core.Repositories.BookLibrary.Specifications;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -27,7 +27,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.BookLibrary;
+namespace Nemera.DataAccess.Core.Repositories.BookLibrary;
 
 /// <summary>
 /// Repository for books.
@@ -38,17 +38,17 @@ internal sealed class BookRepository : IBookRepository
     private static readonly MethodInfo s_startsWithMethod = typeof(string).GetMethod(nameof(string.StartsWith), [typeof(string)])!;
     private static readonly MethodInfo s_substringMethod = typeof(string).GetMethod(nameof(string.Substring), [typeof(int)])!;
 
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BookRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
     /// <param name="dateTimeProvider">Injected provider for the current UTC time, used to stamp deletions deterministically.</param>
-    public BookRepository(LuminaDbContext luminaDbContext, IDateTimeProvider dateTimeProvider)
+    public BookRepository(NemeraDbContext nemeraDbContext, IDateTimeProvider dateTimeProvider)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
         _dateTimeProvider = dateTimeProvider;
     }
 
@@ -60,27 +60,27 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(BookEntity book, CancellationToken cancellationToken)
     {
-        bool doesBookExist = await _luminaDbContext.Books.AnyAsync(repositoryBook => repositoryBook.Id == book.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
+        bool doesBookExist = await _nemeraDbContext.Books.AnyAsync(repositoryBook => repositoryBook.Id == book.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (doesBookExist)
             return Errors.WrittenContent.BookAlreadyExists;
 
         // A book is unique within its library by its file system path, so the same file can never be registered twice in the same library.
-        bool doesBookPathExist = await _luminaDbContext.Books.AnyAsync(repositoryBook => repositoryBook.LibraryId == book.LibraryId && repositoryBook.Path == book.Path, cancellationToken: cancellationToken).ConfigureAwait(false);
+        bool doesBookPathExist = await _nemeraDbContext.Books.AnyAsync(repositoryBook => repositoryBook.LibraryId == book.LibraryId && repositoryBook.Path == book.Path, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (doesBookPathExist)
             return Errors.WrittenContent.BookAlreadyExists;
 
         // Resolve the tags and genres of the book to a single instance per name, replacing the stored ones where they exist, so that the shared tables are not duplicated.
-        Result<IReadOnlyDictionary<string, TagEntity>> resolveTagsResult = await SharedReferenceResolver.ResolveAsync(_luminaDbContext, book.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        Result<IReadOnlyDictionary<string, TagEntity>> resolveTagsResult = await SharedReferenceResolver.ResolveAsync(_nemeraDbContext, book.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
         if (resolveTagsResult.IsFailure)
             return resolveTagsResult.Errors;
-        Result<IReadOnlyDictionary<string, GenreEntity>> resolveGenresResult = await SharedReferenceResolver.ResolveAsync(_luminaDbContext, book.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        Result<IReadOnlyDictionary<string, GenreEntity>> resolveGenresResult = await SharedReferenceResolver.ResolveAsync(_nemeraDbContext, book.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
         if (resolveGenresResult.IsFailure)
             return resolveGenresResult.Errors;
 
         book.Tags = [.. SharedReferenceResolver.Normalize(book.Tags, resolveTagsResult.Value)];
         book.Genres = [.. SharedReferenceResolver.Normalize(book.Genres, resolveGenresResult.Value)];
 
-        _luminaDbContext.Books.Add(book);
+        _nemeraDbContext.Books.Add(book);
         return Result.Created;
     }
 
@@ -94,7 +94,7 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="BookEntity"/>, or an error.</returns>
     public async Task<Result<BookEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
-        IQueryable<BookEntity> query = _luminaDbContext.Books.Where(book => !book.IsDeleted);
+        IQueryable<BookEntity> query = _nemeraDbContext.Books.Where(book => !book.IsDeleted);
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         if (shouldIncludeNavigationProperties)
@@ -125,7 +125,7 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="PaginatedResultDto{BookEntity}"/>, or an error.</returns>
     public async Task<Result<PaginatedResultDto<BookEntity>>> GetAllAsync<TFilter>(PaginationDataDto? paginationData = null, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
     {
-        IQueryable<BookEntity> booksQuery = _luminaDbContext.Books.Where(book => !book.IsDeleted);
+        IQueryable<BookEntity> booksQuery = _nemeraDbContext.Books.Where(book => !book.IsDeleted);
         if (!shouldTrackEntities)
             booksQuery = booksQuery.AsNoTracking();
         if (shouldIncludeNavigationProperties)
@@ -208,7 +208,7 @@ internal sealed class BookRepository : IBookRepository
             return Errors.Library.FilterMustIncludeLibraryId;
 
         // The lightweight read models are retrieved without tracking by default, because they are never modified by the caller.
-        IQueryable<BookEntity> booksQuery = _luminaDbContext.Books.Where(book => !book.IsDeleted);
+        IQueryable<BookEntity> booksQuery = _nemeraDbContext.Books.Where(book => !book.IsDeleted);
         if (!shouldTrackEntities)
             booksQuery = booksQuery.AsNoTracking();
         if (shouldIncludeNavigationProperties)
@@ -288,7 +288,7 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="BookEntity"/> stored at the provided path, or an error.</returns>
     public async Task<Result<BookEntity?>> GetByPathAsync(Guid libraryId, string path, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Books
+        return await _nemeraDbContext.Books
             .Include(book => book.Tags)
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
@@ -305,7 +305,7 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted <see cref="BookEntity"/>, <see langword="null"/> when the book does not exist or is not soft deleted, or an error.</returns>
     public async Task<Result<BookEntity?>> GetSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Books
+        return await _nemeraDbContext.Books
             .Include(book => book.Artwork)
             .AsSplitQuery()
             .FirstOrDefaultAsync(book => book.Id == id && book.IsDeleted, cancellationToken).ConfigureAwait(false);
@@ -319,7 +319,7 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted books, or an error.</returns>
     public async Task<Result<IReadOnlyList<BookEntity>>> GetSoftDeletedByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Books
+        return await _nemeraDbContext.Books
             .AsNoTracking()
             .Include(book => book.Artwork)
             .AsSplitQuery()
@@ -341,7 +341,7 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> SoftDeleteByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        BookEntity? book = await _luminaDbContext.Books.FirstOrDefaultAsync(repositoryBook => repositoryBook.Id == id, cancellationToken).ConfigureAwait(false);
+        BookEntity? book = await _nemeraDbContext.Books.FirstOrDefaultAsync(repositoryBook => repositoryBook.Id == id, cancellationToken).ConfigureAwait(false);
         if (book is null || book.IsDeleted)
             return Errors.WrittenContent.BookNotFound;
 
@@ -358,7 +358,7 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> RestoreSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        BookEntity? book = await _luminaDbContext.Books.FirstOrDefaultAsync(repositoryBook => repositoryBook.Id == id, cancellationToken).ConfigureAwait(false);
+        BookEntity? book = await _nemeraDbContext.Books.FirstOrDefaultAsync(repositoryBook => repositoryBook.Id == id, cancellationToken).ConfigureAwait(false);
         if (book is null || !book.IsDeleted)
             return Errors.WrittenContent.BookNotFound;
 
@@ -390,7 +390,7 @@ internal sealed class BookRepository : IBookRepository
         const int LOOKUP_CHUNK_SIZE = 20_000;
         List<string> existingPaths = [];
         foreach (string[] chunk in distinctPaths.Chunk(LOOKUP_CHUNK_SIZE))
-            existingPaths.AddRange(await _luminaDbContext.Books
+            existingPaths.AddRange(await _nemeraDbContext.Books
                 .Where(repositoryBook => repositoryBook.LibraryId == libraryId && chunk.Contains(repositoryBook.Path))
                 .Select(repositoryBook => repositoryBook.Path)
                 .ToListAsync(cancellationToken).ConfigureAwait(false));
@@ -408,7 +408,7 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a page of books needing their metadata enriched, or an error.</returns>
     public async Task<Result<IReadOnlyList<BookEntity>>> GetBooksNeedingMetadataAsync(Guid libraryId, string? lastPath, int pageSize, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Books
+        return await _nemeraDbContext.Books
             .Include(book => book.Tags)
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
@@ -431,7 +431,7 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the number of books needing their metadata enriched, or an error.</returns>
     public async Task<Result<int>> GetBooksNeedingMetadataCountAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Books
+        return await _nemeraDbContext.Books
             .CountAsync(book => book.LibraryId == libraryId && !book.IsDeleted && book.MetadataStatus != MetadataStatus.Enriched, cancellationToken).ConfigureAwait(false);
     }
 
@@ -446,7 +446,7 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a page of books needing their artwork resolved, or an error.</returns>
     public async Task<Result<IReadOnlyList<BookEntity>>> GetBooksNeedingArtworkAsync(Guid libraryId, string? lastPath, int pageSize, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Books
+        return await _nemeraDbContext.Books
             .Include(book => book.Tags)
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
@@ -469,7 +469,7 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the number of books needing their artwork resolved, or an error.</returns>
     public async Task<Result<int>> GetBooksNeedingArtworkCountAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Books
+        return await _nemeraDbContext.Books
             .CountAsync(book => book.LibraryId == libraryId
                              && !book.IsDeleted
                              && !book.Artwork.Any(artwork => artwork.ArtworkType == ArtworkType.Cover && artwork.Status == ArtworkStatus.Enriched), cancellationToken)
@@ -498,13 +498,13 @@ internal sealed class BookRepository : IBookRepository
         const int LOOKUP_CHUNK_SIZE = 20_000;
         foreach (string[] chunk in pathList.Chunk(LOOKUP_CHUNK_SIZE))
         {
-            await _luminaDbContext.Books
+            await _nemeraDbContext.Books
                 .Where(book => book.LibraryId == libraryId && chunk.Contains(book.Path))
                 .ExecuteUpdateAsync(setters => setters.SetProperty(book => book.MetadataStatus, MetadataStatus.Pending), cancellationToken)
                 .ConfigureAwait(false);
 
-            await _luminaDbContext.Set<BookArtworkEntity>()
-                .Where(artwork => _luminaDbContext.Books.Any(book => book.Id == artwork.BookId && book.LibraryId == libraryId && chunk.Contains(book.Path)))
+            await _nemeraDbContext.Set<BookArtworkEntity>()
+                .Where(artwork => _nemeraDbContext.Books.Any(book => book.Id == artwork.BookId && book.LibraryId == libraryId && chunk.Contains(book.Path)))
                 .ExecuteUpdateAsync(setters => setters.SetProperty(artwork => artwork.Status, ArtworkStatus.Pending), cancellationToken)
                 .ConfigureAwait(false);
         }
@@ -524,7 +524,7 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> ResetMetadataStatusForLibraryAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        await _luminaDbContext.Books
+        await _nemeraDbContext.Books
             .Where(book => book.LibraryId == libraryId)
             .ExecuteUpdateAsync(setters => setters.SetProperty(book => book.MetadataStatus, MetadataStatus.Pending), cancellationToken)
             .ConfigureAwait(false);
@@ -544,8 +544,8 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> ResetArtworkStatusForLibraryAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        await _luminaDbContext.Set<BookArtworkEntity>()
-            .Where(artwork => _luminaDbContext.Books.Any(book => book.Id == artwork.BookId && book.LibraryId == libraryId))
+        await _nemeraDbContext.Set<BookArtworkEntity>()
+            .Where(artwork => _nemeraDbContext.Books.Any(book => book.Id == artwork.BookId && book.LibraryId == libraryId))
             .ExecuteUpdateAsync(setters => setters.SetProperty(artwork => artwork.Status, ArtworkStatus.Pending), cancellationToken)
             .ConfigureAwait(false);
 
@@ -561,7 +561,7 @@ internal sealed class BookRepository : IBookRepository
     public async Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
     {
         // The artwork and the related data of the books are removed by the database, through the cascading foreign keys.
-        await _luminaDbContext.Books
+        await _nemeraDbContext.Books
             .Where(book => book.LibraryId == libraryId)
             .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
         return Result.Deleted;
@@ -581,9 +581,9 @@ internal sealed class BookRepository : IBookRepository
         const int LOOKUP_CHUNK_SIZE = 500;
         foreach (Guid[] chunk in bookIds.Chunk(LOOKUP_CHUNK_SIZE))
         {
-            authorRows.AddRange(await _luminaDbContext.BookContributors
+            authorRows.AddRange(await _nemeraDbContext.BookContributors
                 .Where(bookContributor => chunk.Contains(bookContributor.BookId) && bookContributor.Role == MediaContributorRole.Author)
-                .Join(_luminaDbContext.MediaContributors,
+                .Join(_nemeraDbContext.MediaContributors,
                     bookContributor => bookContributor.MediaContributorId,
                     contributor => contributor.Id,
                     (bookContributor, contributor) => new AuthorRow(bookContributor.BookId, contributor.DisplayName))
@@ -610,7 +610,7 @@ internal sealed class BookRepository : IBookRepository
         const int LOOKUP_CHUNK_SIZE = 500;
         foreach (Guid[] chunk in bookIds.Chunk(LOOKUP_CHUNK_SIZE))
         {
-            IQueryable<BookEntity> query = _luminaDbContext.Books.AsNoTracking().Where(book => !book.IsDeleted);
+            IQueryable<BookEntity> query = _nemeraDbContext.Books.AsNoTracking().Where(book => !book.IsDeleted);
             if (shouldIncludeNavigationProperties)
             {
                 query = query
@@ -642,12 +642,12 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        BookEntity? book = await _luminaDbContext.Books
+        BookEntity? book = await _nemeraDbContext.Books
             .FirstOrDefaultAsync(repositoryBook => repositoryBook.Id == id, cancellationToken).ConfigureAwait(false);
         if (book is null)
             return Errors.WrittenContent.BookNotFound;
 
-        _luminaDbContext.Books.Remove(book);
+        _nemeraDbContext.Books.Remove(book);
         return Result.Deleted;
     }
 
@@ -659,7 +659,7 @@ internal sealed class BookRepository : IBookRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpdateAsync(BookEntity data, CancellationToken cancellationToken)
     {
-        BookEntity? foundBook = await _luminaDbContext.Books
+        BookEntity? foundBook = await _nemeraDbContext.Books
             .Include(book => book.Tags)
             .Include(book => book.Genres)
             .Include(book => book.ISBNs)
@@ -680,24 +680,24 @@ internal sealed class BookRepository : IBookRepository
         MetadataStatus metadataStatus = foundBook.MetadataStatus;
         DateTime? lastMetadataUpdateUtc = foundBook.LastMetadataUpdateUtc;
         string? metadataProvider = foundBook.MetadataProvider;
-        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundBook, data);
+        EditableValuesCopier.CopyEditableValues(_nemeraDbContext, foundBook, data);
         foundBook.LibraryId = libraryId;
         foundBook.Path = path;
         foundBook.IsDeleted = isDeleted;
         foundBook.DeletedOnUtc = deletedOnUtc;
         // The deletion state is owned by the explicit delete and restore operations. Clearing the modified flags keeps it out of the UPDATE statement,
         // so an edit that raced with a delete can never write the deletion state back and resurrect the book.
-        _luminaDbContext.Entry(foundBook).Property(book => book.IsDeleted).IsModified = false;
-        _luminaDbContext.Entry(foundBook).Property(book => book.DeletedOnUtc).IsModified = false;
+        _nemeraDbContext.Entry(foundBook).Property(book => book.IsDeleted).IsModified = false;
+        _nemeraDbContext.Entry(foundBook).Property(book => book.DeletedOnUtc).IsModified = false;
         foundBook.MetadataStatus = metadataStatus;
         foundBook.LastMetadataUpdateUtc = lastMetadataUpdateUtc;
         foundBook.MetadataProvider = metadataProvider;
 
         // Tags and genres are shared across the whole database, so the stored rows whose names already exist are reused, and only the missing names are inserted.
-        Result<Updated> reconcileTagsResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundBook.Tags, data.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        Result<Updated> reconcileTagsResult = await SharedReferenceResolver.ReconcileAsync(_nemeraDbContext, foundBook.Tags, data.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
         if (reconcileTagsResult.IsFailure)
             return reconcileTagsResult.Errors;
-        Result<Updated> reconcileGenresResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundBook.Genres, data.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        Result<Updated> reconcileGenresResult = await SharedReferenceResolver.ReconcileAsync(_nemeraDbContext, foundBook.Genres, data.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
         if (reconcileGenresResult.IsFailure)
             return reconcileGenresResult.Errors;
 

@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBookCover;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBookCover;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,21 +16,21 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBookCover;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBookCover;
 
 /// <summary>
 /// Contains security tests for the <see cref="UpdateBookCoverEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class UpdateBookCoverEndpointTests : IClassFixture<LuminaApiFactory>
+public class UpdateBookCoverEndpointTests : IClassFixture<NemeraApiFactory>
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateBookCoverEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public UpdateBookCoverEndpointTests(LuminaApiFactory apiFactory)
+    public UpdateBookCoverEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -71,7 +71,7 @@ public class UpdateBookCoverEndpointTests : IClassFixture<LuminaApiFactory>
         Guid bookId;
         using (IServiceScope scope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             bookId = dbContext.Books.Single(book => book.LibraryId == libraryId).Id;
         }
 

@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.ID3.Common.Models.DTO.Tags;
-using Lumina.Plugins.ID3.Core.Mapping;
-using Lumina.Plugins.ID3.Core.Tags;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.ID3.Common.Models.DTO.Tags;
+using Nemera.Plugins.ID3.Core.Mapping;
+using Nemera.Plugins.ID3.Core.Tags;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.ID3.Core;
+namespace Nemera.Plugins.ID3.Core;
 
 /// <summary>
 /// Provides album metadata from the embedded tags of one of its audio files, by resolving lookups into album metadata DTOs.

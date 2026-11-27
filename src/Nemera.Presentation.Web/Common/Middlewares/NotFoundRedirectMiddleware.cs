@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Middlewares;
+namespace Nemera.Presentation.Web.Common.Middlewares;
 
 /// <summary>
 /// Middleware to handle requests towards resources that do not exist.

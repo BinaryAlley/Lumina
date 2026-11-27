@@ -12,51 +12,51 @@ There are three parallel test trees, each with its own top-level directory and i
 ```
 tests/
 ├── Common/
-│   ├── Lumina.Domain.Fixtures/
-│   ├── Lumina.Application.Fixtures/
-│   ├── Lumina.DataAccess.Fixtures/
-│   ├── Lumina.Contracts.Fixtures/
-│   └── Lumina.Presentation.Api.Fixtures/    
+│   ├── Nemera.Domain.Fixtures/
+│   ├── Nemera.Application.Fixtures/
+│   ├── Nemera.DataAccess.Fixtures/
+│   ├── Nemera.Contracts.Fixtures/
+│   └── Nemera.Presentation.Api.Fixtures/    
 │   └── ... (created on demand, one per source project that has fixture-needing types)
 ├── UnitTests/
-│   ├── Lumina.Domain.UnitTests/
-│   ├── Lumina.Application.UnitTests/
-│   ├── Lumina.Presentation.Api.UnitTests/
+│   ├── Nemera.Domain.UnitTests/
+│   ├── Nemera.Application.UnitTests/
+│   ├── Nemera.Presentation.Api.UnitTests/
 │   └── ... (one per source project that has unit tests)
 ├── IntegrationTests/
-│   ├── Lumina.Presentation.Api.IntegrationTests/
+│   ├── Nemera.Presentation.Api.IntegrationTests/
 │   └── ... (one per source project that has integration tests)
 └── SecurityTests/
-    ├── Lumina.Presentation.Api.SecurityTests/
+    ├── Nemera.Presentation.Api.SecurityTests/
     └── ... (one per source project exposed at an HTTP boundary)
 ```
 
 Rules:
 
-- Each test project's internal directory structure **mirrors the corresponding source project's directory structure exactly**. A class at `Lumina.Application/Core/Authentication/Login/LoginUserQueryValidator.cs` gets its unit test at `tests/UnitTests/Lumina.Application.UnitTests/Core/Authentication/Login/LoginUserQueryValidatorTests.cs` - same relative path, different project root.
-- Test project naming is always `<SourceProjectName>.<Category>Tests` (e.g. `Lumina.Domain.UnitTests`, `Lumina.Presentation.Api.IntegrationTests`, `Lumina.Presentation.Api.SecurityTests`). Fixture project naming is always `<SourceProjectName>.Fixtures` (no category suffix - a fixtures project is not owned by any one test category, it's referenced by all of them as needed).
-- The test class name is always `<TestedClassName>Tests`, identical across all three trees when the same source class is tested from multiple angles - e.g. `LoginEndpointTests` legitimately exists in both `Lumina.Presentation.Api.UnitTests` (mocked handler) and `Lumina.Presentation.Api.IntegrationTests` (real pipeline) and `Lumina.Presentation.Api.SecurityTests` (security-focused HTTP tests), because they live in different projects/namespaces. This is not duplication, it is three different concerns about the same endpoint.
+- Each test project's internal directory structure **mirrors the corresponding source project's directory structure exactly**. A class at `Nemera.Application/Core/Authentication/Login/LoginUserQueryValidator.cs` gets its unit test at `tests/UnitTests/Nemera.Application.UnitTests/Core/Authentication/Login/LoginUserQueryValidatorTests.cs` - same relative path, different project root.
+- Test project naming is always `<SourceProjectName>.<Category>Tests` (e.g. `Nemera.Domain.UnitTests`, `Nemera.Presentation.Api.IntegrationTests`, `Nemera.Presentation.Api.SecurityTests`). Fixture project naming is always `<SourceProjectName>.Fixtures` (no category suffix - a fixtures project is not owned by any one test category, it's referenced by all of them as needed).
+- The test class name is always `<TestedClassName>Tests`, identical across all three trees when the same source class is tested from multiple angles - e.g. `LoginEndpointTests` legitimately exists in both `Nemera.Presentation.Api.UnitTests` (mocked handler) and `Nemera.Presentation.Api.IntegrationTests` (real pipeline) and `Nemera.Presentation.Api.SecurityTests` (security-focused HTTP tests), because they live in different projects/namespaces. This is not duplication, it is three different concerns about the same endpoint.
 - Only source projects with an HTTP-facing boundary (Presentation.Api today) need a `SecurityTests` project. Domain/Application/DataAccess projects generally only need `UnitTests`, since there's no external attack surface to test at that layer directly. Confirm with the developer before creating a `SecurityTests` project for a project type not already established.
 
 # Fixture location: always centralized, no exceptions
 
 There is exactly one rule, with no decision to make and no branching: **every fixture lives in `tests/Common/<SourceProjectName>.Fixtures/`, mirroring that type's own path inside its source project, with no extra `Fixtures` subdirectory inserted at each level** (the project itself is already dedicated to fixtures, so repeating that folder name would be redundant). This applies uniformly whether the type is:
 
-- consumed by a single test project (e.g. a Domain aggregate only ever tested by `Lumina.Domain.UnitTests`),
+- consumed by a single test project (e.g. a Domain aggregate only ever tested by `Nemera.Domain.UnitTests`),
 - consumed by many test projects across trees (e.g. a Contract DTO used by `UnitTests`, `IntegrationTests`, and `SecurityTests`),
-- or consumed by projects in a different source layer entirely (e.g. an EF entity defined in `Lumina.Application` but used by `Lumina.DataAccess.UnitTests` too).
+- or consumed by projects in a different source layer entirely (e.g. an EF entity defined in `Nemera.Application` but used by `Nemera.DataAccess.UnitTests` too).
 
 There is no "local vs shared" distinction anymore. Never create a `Fixtures` folder inside a `*Tests` project. If you ever see one from before this rule existed, treat it as tech debt: the fixtures inside it should be moved to the matching `tests/Common/<SourceProject>.Fixtures/` project, and the consuming test project should take a project reference to it instead - flag this in your report rather than doing a large migration unprompted, but do not add anything new to a local `Fixtures` folder going forward.
 
 ```
-Source:  Lumina.Domain/Core/BoundedContexts/WrittenContentLibraryBoundedContext/BookLibraryAggregate/Book.cs
-Fixture: tests/Common/Lumina.Domain.Fixtures/Core/BoundedContexts/WrittenContentLibraryBoundedContext/BookLibraryAggregate/BookFixture.cs
+Source:  Nemera.Domain/Core/BoundedContexts/WrittenContentLibraryBoundedContext/BookLibraryAggregate/Book.cs
+Fixture: tests/Common/Nemera.Domain.Fixtures/Core/BoundedContexts/WrittenContentLibraryBoundedContext/BookLibraryAggregate/BookFixture.cs
 
-Source:  Lumina.Application/Common/DataAccess/Entities/Authorization/PermissionEntity.cs
-Fixture: tests/Common/Lumina.Application.Fixtures/Common/DataAccess/Entities/Authorization/PermissionEntityFixture.cs
+Source:  Nemera.Application/Common/DataAccess/Entities/Authorization/PermissionEntity.cs
+Fixture: tests/Common/Nemera.Application.Fixtures/Common/DataAccess/Entities/Authorization/PermissionEntityFixture.cs
 
-Source:  Lumina.Contracts/Common/Models/Contracts/Requests/LoginRequest.cs
-Fixture: tests/Common/Lumina.Contracts.Fixtures/Common/Models/Contracts/Requests/LoginRequestFixture.cs
+Source:  Nemera.Contracts/Common/Models/Contracts/Requests/LoginRequest.cs
+Fixture: tests/Common/Nemera.Contracts.Fixtures/Common/Models/Contracts/Requests/LoginRequestFixture.cs
 ```
 
 Any test project, in any tree (Unit/Integration/Security), takes a normal project reference to whichever `<SourceProject>.Fixtures` project(s) it needs - never a reference to another `*Tests` project. Before creating any new fixture, grep the whole `tests/Common/` tree for `<TypeName>Fixture` to check whether it already exists. If a fixtures project for a given source project doesn't exist yet, create it (matching naming/structure above) rather than defaulting to placing the fixture somewhere else - ask the developer only if it's genuinely unclear which source project a type belongs to.
@@ -66,8 +66,8 @@ Any test project, in any tree (Unit/Integration/Security), takes a normal projec
 These are non-negotiable structural rules, checked before writing a single line of test code.
 
 - **Test classes mirror tested classes exactly.** Same name with `Tests` appended, same namespace, same hierarchical directory path. Example:
-  - Source: `Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Book.cs`
-  - Test: `Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.BookTests.cs`
+  - Source: `Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.Book.cs`
+  - Test: `Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.BookTests.cs`
 - **Fixtures always mirror their source project's own path exactly**, inside `tests/Common/<SourceProject>.Fixtures/`, per the section above.
 - One test class per tested class, one fixture per model/DTO/entity/query/command that needs one. Do not combine multiple types' tests or fixtures into one file.
 
@@ -90,8 +90,8 @@ If you encounter an existing fixture in the codebase that's called statically, t
 - **EF Core repository tests**: mocked `DbContext` via `Create.MockedDbContextFor<TContext>()`, asserting through `ChangeTracker.Entries<T>()` or by re-querying the mocked context, not by mocking `DbSet` methods directly.
 - **Validator tests**: use the `ValidatorTestExtensions` extension, combined with this project's custom `ShouldHaveValidationError` / `ShouldNotHaveValidationError` assertion extensions.
 - **Endpoint tests**: FastEndpoints via this project's `Factory.Create<TEndpoint>(...)` helper, asserting on the returned `IResult` type (`Ok<T>`, `ProblemHttpResult`, etc.) via `Assert.IsType<T>`.
-- **Integration tests**: real HTTP pipeline via a `WebApplicationFactory`-based fixture (`AuthenticatedLuminaApiFactory` for pre-authenticated scenarios), real `HttpClient`, real DB access through a `IServiceScope` for setup/teardown, asserting on actual `HttpResponseMessage` and deserialized `ProblemDetails`.
-- **Security tests**: same HTTP pipeline via `LuminaApiFactory` (not pre-authenticated), asserting on security-specific properties: response headers, rate limiting, timing, token structure, injection resistance, and information leakage.
+- **Integration tests**: real HTTP pipeline via a `WebApplicationFactory`-based fixture (`AuthenticatedNemeraApiFactory` for pre-authenticated scenarios), real `HttpClient`, real DB access through a `IServiceScope` for setup/teardown, asserting on actual `HttpResponseMessage` and deserialized `ProblemDetails`.
+- **Security tests**: same HTTP pipeline via `NemeraApiFactory` (not pre-authenticated), asserting on security-specific properties: response headers, rate limiting, timing, token structure, injection resistance, and information leakage.
 
 # Test method naming - depends on how the test invokes the code
 
@@ -324,7 +324,7 @@ Beyond that, each test sets up the specific mock return values needed for its sc
 
 ## DataAccess layer: repository tests
 
-Reference exemplar - a `UserRepositoryTests` class. Constructor creates `_mockContext = Create.MockedDbContextFor<LuminaDbContext>()` and `_sut = new Repository(_mockContext)`, plus instantiated fixtures (`private readonly UserEntityFixture _userEntityFixture = new();`). Tests interact with the real (mocked) `DbContext` behavior: seed data directly via `_mockContext.Entities.Add(...)` + `SaveChangesAsync()` when a pre-existing-state scenario is needed, then call the repository method under test and assert both the `Result` outcome AND the actual `ChangeTracker` state (e.g. `EntityState.Added`, entry count) to confirm the repository did what it claims.
+Reference exemplar - a `UserRepositoryTests` class. Constructor creates `_mockContext = Create.MockedDbContextFor<NemeraDbContext>()` and `_sut = new Repository(_mockContext)`, plus instantiated fixtures (`private readonly UserEntityFixture _userEntityFixture = new();`). Tests interact with the real (mocked) `DbContext` behavior: seed data directly via `_mockContext.Entities.Add(...)` + `SaveChangesAsync()` when a pre-existing-state scenario is needed, then call the repository method under test and assert both the `Result` outcome AND the actual `ChangeTracker` state (e.g. `EntityState.Added`, entry count) to confirm the repository did what it claims.
 
 # Integration test template
 
@@ -332,10 +332,10 @@ Live under `tests/IntegrationTests/<SourceProject>.IntegrationTests/`. Test the 
 
 ```csharp
 [ExcludeFromCodeCoverage]
-public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class LoginEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -343,7 +343,7 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     };
     private readonly string _testUsername;
 
-    public LoginEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public LoginEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -370,14 +370,14 @@ public class LoginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, 
     public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == _testUsername);
         if (user is not null) { dbContext.Users.Remove(user); await dbContext.SaveChangesAsync(); }
     }
 }
 ```
 
-Key characteristics: `IClassFixture<AuthenticatedLuminaApiFactory>` + `IAsyncLifetime` (not plain `IDisposable`), a fresh uniquely-named test user created and torn down per test, real HTTP calls, action-based naming (`Login_...`, never `ExecuteAsync_...`), and assertions on the deserialized `ProblemDetails` shape (`status`, `type`, `title`, `detail`, `instance`, `traceId`) for every non-success response, matching the exact RFC section URLs used by this project's error mapping. Cover: full happy path per distinct valid credential type (password, password+TOTP, temp password), and every distinct failure mode with its exact expected `ProblemDetails` shape (expired temp password, invalid credentials, invalid TOTP).
+Key characteristics: `IClassFixture<AuthenticatedNemeraApiFactory>` + `IAsyncLifetime` (not plain `IDisposable`), a fresh uniquely-named test user created and torn down per test, real HTTP calls, action-based naming (`Login_...`, never `ExecuteAsync_...`), and assertions on the deserialized `ProblemDetails` shape (`status`, `type`, `title`, `detail`, `instance`, `traceId`) for every non-success response, matching the exact RFC section URLs used by this project's error mapping. Cover: full happy path per distinct valid credential type (password, password+TOTP, temp password), and every distinct failure mode with its exact expected `ProblemDetails` shape (expired temp password, invalid credentials, invalid TOTP).
 
 # Security test template
 
@@ -385,13 +385,13 @@ Live under `tests/SecurityTests/<SourceProject>.SecurityTests/`. Test the securi
 
 ```csharp
 [ExcludeFromCodeCoverage]
-public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class LoginEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly string _testUsername;
 
-    public LoginEndpointTests(LuminaApiFactory apiFactory)
+    public LoginEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
@@ -420,14 +420,14 @@ public class LoginEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
     public void Dispose()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == _testUsername);
         if (user is not null) { dbContext.Users.Remove(user); dbContext.SaveChanges(); }
     }
 }
 ```
 
-Key characteristics: `IClassFixture<LuminaApiFactory>` + plain `IDisposable` (sync, per-test cleanup since xUnit instantiates the class per `[Fact]`), a unique `X-Forwarded-For` IP per test to isolate rate-limiting/timing tests from each other, and action-based naming (`Login_WithX_ShouldY`), never `ExecuteAsync_WithX_ShouldY`.
+Key characteristics: `IClassFixture<NemeraApiFactory>` + plain `IDisposable` (sync, per-test cleanup since xUnit instantiates the class per `[Fact]`), a unique `X-Forwarded-For` IP per test to isolate rate-limiting/timing tests from each other, and action-based naming (`Login_WithX_ShouldY`), never `ExecuteAsync_WithX_ShouldY`.
 
 Categories to cover for any authenticated/sensitive endpoint, unless clearly not applicable:
 

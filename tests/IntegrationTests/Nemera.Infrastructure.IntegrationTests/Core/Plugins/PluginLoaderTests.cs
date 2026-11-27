@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Common.Models.DTO.Plugins;
-using Lumina.Infrastructure.Core.Plugins;
-using Lumina.Plugins.Contracts.Core.Plugins;
+using Nemera.Infrastructure.Common.Models.DTO.Plugins;
+using Nemera.Infrastructure.Core.Plugins;
+using Nemera.Plugins.Contracts.Core.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -9,7 +9,7 @@ using System.IO;
 using System.Linq;
 #endregion
 
-namespace Lumina.Infrastructure.IntegrationTests.Core.Plugins;
+namespace Nemera.Infrastructure.IntegrationTests.Core.Plugins;
 
 /// <summary>
 /// Contains integration tests for the <see cref="PluginLoader"/> class.
@@ -21,7 +21,7 @@ public class PluginLoaderTests
     public void LoadPlugins_WhenDirectoryDoesNotExist_ShouldReturnNoPluginsAndNoErrors()
     {
         // Arrange
-        string nonExistentDirectory = Path.Combine(Path.GetTempPath(), $"lumina-plugins-{Guid.NewGuid()}");
+        string nonExistentDirectory = Path.Combine(Path.GetTempPath(), $"nemera-plugins-{Guid.NewGuid()}");
         IServiceCollection services = new ServiceCollection();
 
         // Act
@@ -202,14 +202,14 @@ public class PluginLoaderTests
     }
 
     /// <summary>
-    /// Gets the path of the <c>Lumina.TestPlugin</c> assembly from the test output directory.
+    /// Gets the path of the <c>Nemera.TestPlugin</c> assembly from the test output directory.
     /// The assembly is referenced by the test project but no type from it is used, so it is not loaded
     /// into the default load context, which is what makes the plugin loading pipeline testable.
     /// </summary>
     /// <returns>The path of the test plugin assembly.</returns>
     private static string GetTestPluginAssemblyPath()
     {
-        return Path.Combine(AppContext.BaseDirectory, "Lumina.TestPlugin.dll");
+        return Path.Combine(AppContext.BaseDirectory, "Nemera.TestPlugin.dll");
     }
 
     /// <summary>
@@ -233,7 +233,7 @@ public class PluginLoaderTests
 
         public TemporaryPluginDirectory()
         {
-            Path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"lumina-plugin-loader-{Guid.NewGuid()}");
+            Path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"nemera-plugin-loader-{Guid.NewGuid()}");
             Directory.CreateDirectory(Path);
         }
 

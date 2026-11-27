@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Playlists.Commands.CreatePlaylist;
-using Lumina.Application.Fixtures.Core.Playlists.Commands.CreatePlaylist;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Application.Core.Playlists.Commands.CreatePlaylist;
+using Nemera.Application.Fixtures.Core.Playlists.Commands.CreatePlaylist;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Playlists.Commands.CreatePlaylist;
+namespace Nemera.Application.UnitTests.Core.Playlists.Commands.CreatePlaylist;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CreatePlaylistCommandValidator"/> class.

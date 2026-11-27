@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
+using Nemera.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.UsersManagement.Authentication.Queries.LoginUser;
+namespace Nemera.Application.Fixtures.Core.UsersManagement.Authentication.Queries.LoginUser;
 
 /// <summary>
 /// Fixture class for the <see cref="LoginUserQuery"/> class.

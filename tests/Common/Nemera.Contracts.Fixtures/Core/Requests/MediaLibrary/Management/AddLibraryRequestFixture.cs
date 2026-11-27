@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Requests.MediaLibrary.Management;
+using Nemera.Contracts.Requests.MediaLibrary.Management;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
+namespace Nemera.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
 
 /// <summary>
 /// Fixture class for the <see cref="AddLibraryRequest"/> record.

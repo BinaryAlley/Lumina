@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
-using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.FileSystem;
-using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.FileSystem.GetType;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
+using Nemera.Contracts.Fixtures.Core.Responses.FileSystemManagement.FileSystem;
+using Nemera.Contracts.Responses.FileSystemManagement.FileSystem;
+using Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
+using Nemera.Presentation.Api.Core.Endpoints.FileSystemManagement.FileSystem.GetType;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.FileSystem;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.FileSystem;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetTypeEndpoint"/> class.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Utilities;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Application.Common.Utilities;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Utilities;
+namespace Nemera.Application.UnitTests.Common.Utilities;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AudioFileFormatUtilities"/> class.

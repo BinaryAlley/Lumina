@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
-using Lumina.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
-using Lumina.Plugins.OpenLibrary.Core.Mapping;
-using Lumina.Plugins.OpenLibrary.Fixtures.Common.Models.Contracts.Responses;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
+using Nemera.Plugins.OpenLibrary.Core.Mapping;
+using Nemera.Plugins.OpenLibrary.Fixtures.Common.Models.Contracts.Responses;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -18,7 +18,7 @@ using System.Linq;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.UnitTests.Core.Mapping;
+namespace Nemera.Plugins.OpenLibrary.UnitTests.Core.Mapping;
 
 /// <summary>
 /// Contains unit tests for the <see cref="OpenLibraryMapper"/> class.

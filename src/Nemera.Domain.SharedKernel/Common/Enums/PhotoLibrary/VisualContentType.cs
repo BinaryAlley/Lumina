@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+namespace Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 
 /// <summary>
 /// Enumeration for the types of visual content libraries.

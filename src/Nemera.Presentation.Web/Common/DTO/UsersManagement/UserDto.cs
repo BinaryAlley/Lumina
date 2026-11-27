@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.UsersManagement;
+namespace Nemera.Presentation.Web.Common.DTO.UsersManagement;
 
 /// <summary>
 /// Data transfer object for a user.

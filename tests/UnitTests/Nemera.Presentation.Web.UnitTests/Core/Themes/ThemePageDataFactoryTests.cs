@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Core.Themes;
 using Microsoft.Extensions.Localization;
 using NSubstitute;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Themes;
+namespace Nemera.Presentation.Web.UnitTests.Core.Themes;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ThemePageDataFactory"/> class.

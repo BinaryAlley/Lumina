@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DataAccess.Entities.Playlists;
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Application.Common.DataAccess.Entities.Playlists;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.Playlists;
+namespace Nemera.Application.Fixtures.Common.DataAccess.Entities.Playlists;
 
 /// <summary>
 /// Fixture class for the <see cref="PlaylistEntity"/> class.

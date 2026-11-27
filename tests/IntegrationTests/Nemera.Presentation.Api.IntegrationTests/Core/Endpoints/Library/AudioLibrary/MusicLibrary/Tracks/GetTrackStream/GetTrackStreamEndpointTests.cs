@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackStream;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackStream;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -23,17 +23,17 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackStream;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackStream;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetTrackStreamEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetTrackStreamEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetTrackStreamEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
-    private readonly string _contentRootPath = Path.Combine(Path.GetTempPath(), $"lumina-track-stream-tests-{Guid.NewGuid():N}");
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
+    private readonly string _contentRootPath = Path.Combine(Path.GetTempPath(), $"nemera-track-stream-tests-{Guid.NewGuid():N}");
     private readonly List<string> _temporaryFiles = [];
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -50,7 +50,7 @@ public class GetTrackStreamEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     /// Initializes a new instance of the <see cref="GetTrackStreamEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetTrackStreamEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetTrackStreamEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -161,7 +161,7 @@ public class GetTrackStreamEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         // Arrange
         Guid userId = GetCurrentUserId();
         byte[] audioBytes = CreateAudioBytes();
-        string outsideFilePath = Path.Combine(Path.GetTempPath(), $"lumina-track-stream-outside-{Guid.NewGuid():N}.mp3");
+        string outsideFilePath = Path.Combine(Path.GetTempPath(), $"nemera-track-stream-outside-{Guid.NewGuid():N}.mp3");
         await File.WriteAllBytesAsync(outsideFilePath, audioBytes);
         _temporaryFiles.Add(outsideFilePath);
         (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = await SeedLibraryArtistAlbumAndTrackAsync(userId, outsideFilePath);
@@ -220,7 +220,7 @@ public class GetTrackStreamEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     private async Task<(Guid libraryId, Guid artistId, Guid albumId, Guid trackId)> SeedLibraryArtistAlbumAndTrackAsync(Guid userId, string trackPath)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.NewGuid();
         Guid artistId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
@@ -240,7 +240,7 @@ public class GetTrackStreamEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     private async Task<(Guid userId, string username)> SeedOtherUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         string username = $"otheruser_{Guid.NewGuid()}";
         dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: username, password: "TestPass123!"));
@@ -288,7 +288,7 @@ public class GetTrackStreamEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     private Guid GetCurrentUserId()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         UserEntity user = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername);
         return user.Id;
     }

@@ -36,7 +36,7 @@
  * and drives the paused state from its own play and pause methods:
  *
  *   const preferences = host.getPreferences();
- *   const downloader = LuminaAudioPlayer.createTrackDownloader({
+ *   const downloader = NemeraAudioPlayer.createTrackDownloader({
  *       url: manifest.streamPath,
  *       durationInSeconds: manifest.durationInSeconds,
  *       shouldKeepDownloadingWhilePaused: preferences.shouldKeepDownloadingWhilePaused,
@@ -60,16 +60,16 @@
  * Reporting a failure
  * -------------------
  * The downloader is a sub component, so it never moves the player state machine and never emits on the event bus itself.
- * A stream or configuration failure is reported to the onError callback as a {@link LuminaAudioPlayer.PlayerError}
- * carrying {@link LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED}, and kept on the downloader for polling through
+ * A stream or configuration failure is reported to the onError callback as a {@link NemeraAudioPlayer.PlayerError}
+ * carrying {@link NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED}, and kept on the downloader for polling through
  * getError. The engine must forward that callback to <c>host.reportError(error)</c>, exactly as above, so the failure
  * reaches the player and the event bus; an engine that wires only onProgress leaves the failure unobserved.
  *
  * An intentional stop is not a failure: abort and destroyAsync never call onError and never set getError. They only reject
- * the reads that are waiting for a window, with {@link LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED}, so a seek
+ * the reads that are waiting for a window, with {@link NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED}, so a seek
  * teardown is never mistaken for a stream failure. A read therefore resolves once the buffer covers its window, and is
  * rejected when the window can no longer be filled: on a destroy or an abort (DOWNLOAD_ABORTED), with the recorded failure
- * when the loop stopped after a failure, or with DOWNLOAD_FAILED and <c>details.reason</c> {@link LuminaAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE} when
+ * when the loop stopped after a failure, or with DOWNLOAD_FAILED and <c>details.reason</c> {@link NemeraAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE} when
  * the file completed or the loop ended with no gap left to fill. A read that is waiting while the download is merely
  * paused, or before it has started, is left pending, because a resume or a start can still fill it. The loop callbacks and
  * getError only ever see DOWNLOAD_FAILED.
@@ -83,7 +83,7 @@
  * reject with a typed error when the window can never arrive. A caller awaits a read to get an error, and observes the
  * loop through its callbacks, never by catching its promise.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -113,16 +113,16 @@
      * @returns {number} The clamped value.
      */
     function clamp(value, minimum, maximum) {
-        return LuminaAudioPlayer.clamp(value, minimum, maximum);
+        return NemeraAudioPlayer.clamp(value, minimum, maximum);
     }
 
     /**
      * Builds the failure of a one shot range request that exceeded its timeout. It is a failed request, not an intentional
      * abort, so the seek recovery does not retry it with another full timeout.
-     * @returns {LuminaAudioPlayer.PlayerError} The timeout failure.
+     * @returns {NemeraAudioPlayer.PlayerError} The timeout failure.
      */
     function createRangeTimeoutError() {
-        return new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The range request timed out.', { reason: LuminaAudioPlayer.PlayerErrorReason.REQUEST_TIMEOUT });
+        return new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The range request timed out.', { reason: NemeraAudioPlayer.PlayerErrorReason.REQUEST_TIMEOUT });
     }
 
     /**
@@ -470,7 +470,7 @@
          * @param {boolean} [options.shouldKeepDownloadingWhilePaused] - The value of the 'keep downloading while paused' setting, seeded by the engine from host.getPreferences(). It is the initial value; later PREFERENCES_CHANGED events and setKeepDownloadingWhilePaused override it.
          * @param {Function} [options.onProgress] - Called with the downloaded fraction every time the buffer grows. The full snapshot is only produced once, by the completion callback.
          * @param {Function} [options.onComplete] - Called once when every byte of the file has been downloaded.
-         * @param {Function} [options.onError] - Called with a {@link LuminaAudioPlayer.PlayerError} when the download fails.
+         * @param {Function} [options.onError] - Called with a {@link NemeraAudioPlayer.PlayerError} when the download fails.
          */
         constructor(options = {}) {
             this.url = typeof options.url === 'string' ? options.url : '';
@@ -652,7 +652,7 @@
             this.abortAllRequests();
             // The download is stopping and no byte will append until it is started again, so a reader that is waiting for a
             // byte window is released with the aborted code instead of waiting forever.
-            this.rejectWaiters(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The track download was aborted.'));
+            this.rejectWaiters(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The track download was aborted.'));
         }
 
         /**
@@ -668,7 +668,7 @@
                 this.unsubscribePreferences();
                 this.unsubscribePreferences = null;
             }
-            this.rejectWaiters(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The track download was destroyed.'));
+            this.rejectWaiters(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The track download was destroyed.'));
             if (this.loopPromise) {
                 try {
                     await this.loopPromise;
@@ -870,7 +870,7 @@
 
         /**
          * Gets the last failure, or null when there was none.
-         * @returns {LuminaAudioPlayer.PlayerError|null} The last failure.
+         * @returns {NemeraAudioPlayer.PlayerError|null} The last failure.
          */
         getError() {
             return this.error;
@@ -896,7 +896,7 @@
          * @param {number} offset - The first byte of the window.
          * @param {number} length - The length of the window, in bytes.
          * @returns {Promise<Uint8Array>} A copy of the requested bytes.
-         * @throws {LuminaAudioPlayer.PlayerError} The rejection of {@link LuminaAudioPlayer.TrackDownloader#whenRangeAvailableAsync}, which a read propagates, or <c>DOWNLOAD_FAILED</c> with <c>details.reason</c> {@link LuminaAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE} if the window was released without ever arriving.
+         * @throws {NemeraAudioPlayer.PlayerError} The rejection of {@link NemeraAudioPlayer.TrackDownloader#whenRangeAvailableAsync}, which a read propagates, or <c>DOWNLOAD_FAILED</c> with <c>details.reason</c> {@link NemeraAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE} if the window was released without ever arriving.
          */
         async readBytesAsync(offset, length) {
             const direct = this.buffer.read(offset, length);
@@ -913,18 +913,18 @@
          * Resolves once a window of bytes has been downloaded.
          * @param {number} offset - The first byte of the window.
          * @param {number} length - The length of the window, in bytes.
-         * @returns {Promise<void>} A promise that resolves once the buffer covers the window. It is rejected when the window can no longer be filled: on a destroy or an abort, with the recorded failure when the loop stopped after a failure, or with the {@link LuminaAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE} error when the file completed or the loop ended with no gap left to fill. A read issued while the download is merely paused, or before it has started, stays pending, because a resume or a start can still fill it.
-         * @throws {LuminaAudioPlayer.PlayerError} With <c>DOWNLOAD_ABORTED</c> when the downloader is destroyed or was aborted, with the recorded failure when the loop stopped after a failure, or with <c>DOWNLOAD_FAILED</c> and <c>details.reason</c> {@link LuminaAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE} when the file completed or the loop ended with no gap left to fill.
+         * @returns {Promise<void>} A promise that resolves once the buffer covers the window. It is rejected when the window can no longer be filled: on a destroy or an abort, with the recorded failure when the loop stopped after a failure, or with the {@link NemeraAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE} error when the file completed or the loop ended with no gap left to fill. A read issued while the download is merely paused, or before it has started, stays pending, because a resume or a start can still fill it.
+         * @throws {NemeraAudioPlayer.PlayerError} With <c>DOWNLOAD_ABORTED</c> when the downloader is destroyed or was aborted, with the recorded failure when the loop stopped after a failure, or with <c>DOWNLOAD_FAILED</c> and <c>details.reason</c> {@link NemeraAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE} when the file completed or the loop ended with no gap left to fill.
          */
         whenRangeAvailableAsync(offset, length) {
             if (this.buffer.covers(offset, length))
                 return Promise.resolve();
             if (this.destroyed)
-                return Promise.reject(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The track download was destroyed.'));
+                return Promise.reject(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The track download was destroyed.'));
             // A window that is not buffered and a download that is intentionally stopped or has failed can never be filled,
             // so the read is rejected now instead of waiting forever.
             if (this.isAborted)
-                return Promise.reject(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The track download was aborted.'));
+                return Promise.reject(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The track download was aborted.'));
             if (this.error && !this.loopPromise)
                 return Promise.reject(this.error);
             // A completed file, or a loop that stopped with nothing left to fetch, can never fill an uncovered window, so the
@@ -946,7 +946,7 @@
          * whose outcome the caller inspects.
          * @param {number} start - The first byte of the range.
          * @param {number} end - The last byte of the range, inclusive, as HTTP defines the end of a Range header.
-         * @returns {Promise<Object>} The outcome, per {@link LuminaAudioPlayer.TrackDownloader#performFetchAsync}.
+         * @returns {Promise<Object>} The outcome, per {@link NemeraAudioPlayer.TrackDownloader#performFetchAsync}.
          */
         downloadRangeAsync(start, end) {
             return this.performFetchAsync({ start, end, isOneShot: true });
@@ -956,7 +956,7 @@
          * Downloads an open ended byte range, from a position to the end of the file, and stores it. It never throws: a
          * failure is returned as <c>{ isFailed: true, error }</c> and it never runs the complete or error callbacks.
          * @param {number} start - The first byte of the range.
-         * @returns {Promise<Object>} The outcome, per {@link LuminaAudioPlayer.TrackDownloader#performFetchAsync}.
+         * @returns {Promise<Object>} The outcome, per {@link NemeraAudioPlayer.TrackDownloader#performFetchAsync}.
          */
         downloadOpenEndedAsync(start) {
             return this.performFetchAsync({ start, openEnded: true, isOneShot: true });
@@ -966,7 +966,7 @@
          * Downloads a suffix byte range, the last bytes of the file, and stores it. It never throws: a failure is returned
          * as <c>{ isFailed: true, error }</c> and it never runs the complete or error callbacks.
          * @param {number} length - The number of trailing bytes to request.
-         * @returns {Promise<Object>} The outcome, per {@link LuminaAudioPlayer.TrackDownloader#performFetchAsync}.
+         * @returns {Promise<Object>} The outcome, per {@link NemeraAudioPlayer.TrackDownloader#performFetchAsync}.
          */
         downloadSuffixAsync(length) {
             return this.performFetchAsync({ suffix: length, isOneShot: true });
@@ -983,9 +983,9 @@
          * it through the constructor option.
          */
         subscribeToPreferences() {
-            if (!this.events || !LuminaAudioPlayer.PlayerEvent || typeof this.events.on !== 'function')
+            if (!this.events || !NemeraAudioPlayer.PlayerEvent || typeof this.events.on !== 'function')
                 return;
-            this.unsubscribePreferences = this.events.on(LuminaAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, (preferences) => {
+            this.unsubscribePreferences = this.events.on(NemeraAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, (preferences) => {
                 if (preferences && typeof preferences.shouldKeepDownloadingWhilePaused === 'boolean')
                     this.setKeepDownloadingWhilePaused(preferences.shouldKeepDownloadingWhilePaused);
             });
@@ -1068,12 +1068,12 @@
                 // A missing fetch implementation is a permanent configuration failure, so the downloader is marked unusable
                 // and later starts resolve without re-reporting it.
                 this.isUnusable = true;
-                this.fail(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'This environment provides no fetch implementation for the player download.'));
+                this.fail(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'This environment provides no fetch implementation for the player download.'));
                 return;
             }
             if (this.url === '') {
                 this.isUnusable = true;
-                this.fail(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The play descriptor carries no stream path.'));
+                this.fail(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The play descriptor carries no stream path.'));
                 return;
             }
             let hasDrained = false;
@@ -1111,7 +1111,7 @@
                     if (this.buffer.getByteCount() <= bytesBefore) {
                         if (this.isComplete())
                             break;
-                        this.fail(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The download made no progress.'));
+                        this.fail(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The download made no progress.'));
                         return;
                     }
                 }
@@ -1157,7 +1157,7 @@
                 return { isAborted: true, isFailed: false, isDestroyed: false };
             if (this.fetchImpl === null || this.url === '') {
                 this.isUnusable = true;
-                return { isFailed: true, error: new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The download request could not be built.') };
+                return { isFailed: true, error: new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The download request could not be built.') };
             }
             const controller = new AbortController();
             // An explicit range request is not cancelled by a pause or a pivot, because a seek scan must be able to read
@@ -1229,7 +1229,7 @@
                     this.discardResponseBody(response);
                     return { isFailed: true, isAborted: false, isDestroyed: this.destroyed, error: createRangeTimeoutError() };
                 }
-                if (LuminaAudioPlayer.isAbortError(error))
+                if (NemeraAudioPlayer.isAbortError(error))
                     return { isAborted: true, isFailed: false, isDestroyed: this.destroyed };
                 // The failure left the response body unread, so it is discarded and the request is aborted to release the
                 // connection instead of waiting for the browser to drop the stream.
@@ -1240,7 +1240,7 @@
                 } catch (abortError) {
                     console.debug('Audio player: the failed download request could not be aborted.', abortError);
                 }
-                return { isFailed: true, error: LuminaAudioPlayer.PlayerError.from(error, LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED) };
+                return { isFailed: true, error: NemeraAudioPlayer.PlayerError.from(error, NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED) };
             } finally {
                 if (timeoutTimer !== null)
                     clearTimeout(timeoutTimer);
@@ -1292,14 +1292,14 @@
          * response, and rejecting an unusable answer.
          * @param {Response} response - The response to inspect.
          * @returns {{ start: number, endInclusive: number|null, total: number|null }|null} The resolved range, or null when the request is already satisfied.
-         * @throws {LuminaAudioPlayer.PlayerError} When the response was a followed redirect, carries a content type that is not audio, or is an error that is not a 'range not satisfiable'.
+         * @throws {NemeraAudioPlayer.PlayerError} When the response was a followed redirect, carries a content type that is not audio, or is an error that is not a 'range not satisfiable'.
          */
         resolveResponseRange(response) {
             // An expired or cleared session makes the authenticated stream route answer with a redirect to the sign in
             // page, and fetch follows it by default, so the followed redirect is rejected before any byte is stored. The
             // request never asked for a redirect to a track, so a redirect is always a failure, never audio.
             if (response.redirected)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The stream request was redirected, which means the session expired.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The stream request was redirected, which means the session expired.');
             if (response.status === 416) {
                 // A range not satisfiable means the request started at or past the end of the file. It is only "already
                 // satisfied" when the buffer really covers the whole file, which is what isComplete measures, whether the
@@ -1308,18 +1308,18 @@
                 // still missing, and that must be a failure, not a silent end.
                 if (this.isComplete())
                     return null;
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The stream rejected the requested byte range.', { status: response.status });
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The stream rejected the requested byte range.', { status: response.status });
             }
             if (response.status !== 200 && response.status !== 206)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, `The stream answered with status ${response.status}.`, { status: response.status });
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, `The stream answered with status ${response.status}.`, { status: response.status });
             // A success that does not carry an audio type is not the track either, so the sign in page, or any other HTML
             // or JSON answer of the same status, is rejected before its body is read into the buffer.
             if (!isStreamContentType(response.headers.get('Content-Type')))
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The stream answered with a content type that is not audio.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The stream answered with a content type that is not audio.');
             if (response.status === 206) {
                 const parsed = parseContentRange(response.headers.get('Content-Range'));
                 if (parsed === null)
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The stream answered a partial response without a usable Content-Range.', { status: response.status });
+                    throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The stream answered a partial response without a usable Content-Range.', { status: response.status });
                 return { start: parsed.start, endInclusive: parsed.end, total: parsed.total };
             }
             // A 200 means the server ignored the range and sent the whole resource, so the buffer is filled from its start.
@@ -1336,11 +1336,11 @@
          * @param {{ start: number, length: number }|null} [readWindow] - The bounded window a one shot request asked for. When the server answered with a 200 instead of a range, the body is read up to the end of this window, only the bytes of the window are stored, and the rest of the body is discarded.
          * @param {boolean} [isLoopRequest=false] - True when this read belongs to the download loop. The received cursor of the loop is advanced per chunk so a seek aware source only waits for windows the loop is actually reaching.
          * @returns {Promise<Object>} The outcome of the read.
-         * @throws {LuminaAudioPlayer.PlayerError} When the response carries no readable body.
+         * @throws {NemeraAudioPlayer.PlayerError} When the response carries no readable body.
          */
         async readResponseIntoBufferAsync(response, range, controller, stopOnPause, openEnded, readWindow = null, isLoopRequest = false) {
             if (!response.body || typeof response.body.getReader !== 'function')
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The stream response carried no readable body.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The stream response carried no readable body.');
             const reader = response.body.getReader();
             let offset = range.start;
             if (isLoopRequest)
@@ -1365,7 +1365,7 @@
                     try {
                         result = await reader.read();
                     } catch (error) {
-                        if (LuminaAudioPlayer.isAbortError(error)) {
+                        if (NemeraAudioPlayer.isAbortError(error)) {
                             isStopped = true;
                             break;
                         }
@@ -1541,7 +1541,7 @@
          * @param {*} error - The failure to record.
          */
         fail(error) {
-            const typed = LuminaAudioPlayer.PlayerError.from(error, LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED);
+            const typed = NemeraAudioPlayer.PlayerError.from(error, NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED);
             this.error = typed;
             // The loop that failed has returned and no byte will append until a restart, so every reader waiting for a byte
             // window is released with the failure instead of hanging. The loop handle is cleared before the callback, so a
@@ -1577,7 +1577,7 @@
 
         /**
          * Rejects and clears every pending byte window waiter, so a reader never waits for a download that has stopped.
-         * @param {LuminaAudioPlayer.PlayerError} error - The reason to reject the waiters with.
+         * @param {NemeraAudioPlayer.PlayerError} error - The reason to reject the waiters with.
          */
         rejectWaiters(error) {
             if (this.waiters.length === 0)
@@ -1590,22 +1590,22 @@
          * Builds the single error used whenever a byte window can no longer be filled: a completed file, a loop that
          * drained with nothing left to fetch, or a window that was released without ever arriving. Every path that reports
          * this outcome uses it, so a consumer sees one consistent code and reason.
-         * @returns {LuminaAudioPlayer.PlayerError} The window unavailable error, with <c>details.reason === {@link LuminaAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE}</c>.
+         * @returns {NemeraAudioPlayer.PlayerError} The window unavailable error, with <c>details.reason === {@link NemeraAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE}</c>.
          */
         createWindowUnavailableError() {
-            return new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The requested byte window can no longer be filled.', { reason: LuminaAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE });
+            return new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The requested byte window can no longer be filled.', { reason: NemeraAudioPlayer.PlayerErrorReason.WINDOW_UNAVAILABLE });
         }
     }
 
-    LuminaAudioPlayer.ByteBufferStore = ByteBufferStore;
-    LuminaAudioPlayer.TrackDownloader = TrackDownloader;
+    NemeraAudioPlayer.ByteBufferStore = ByteBufferStore;
+    NemeraAudioPlayer.TrackDownloader = TrackDownloader;
 
     /**
-     * Creates a track downloader. See {@link LuminaAudioPlayer.TrackDownloader} for the options.
+     * Creates a track downloader. See {@link NemeraAudioPlayer.TrackDownloader} for the options.
      * @param {Object} options - The downloader options.
-     * @returns {LuminaAudioPlayer.TrackDownloader} The created downloader.
+     * @returns {NemeraAudioPlayer.TrackDownloader} The created downloader.
      */
-    LuminaAudioPlayer.createTrackDownloader = function (options) {
+    NemeraAudioPlayer.createTrackDownloader = function (options) {
         return new TrackDownloader(options);
     };
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

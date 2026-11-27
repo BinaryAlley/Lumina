@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+namespace Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
 
 /// <summary>
 /// Enumeration for the file formats of audio files.

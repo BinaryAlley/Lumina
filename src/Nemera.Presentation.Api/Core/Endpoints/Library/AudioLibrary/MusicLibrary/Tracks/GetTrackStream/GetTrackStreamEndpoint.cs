@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Queries.GetTrackStream;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.DependencyInjection;
-using Lumina.Presentation.Api.Common.Http;
-using Lumina.Presentation.Api.Common.MimeTypes;
-using Lumina.Presentation.Api.Common.Routes.Library.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Queries.GetTrackStream;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.DependencyInjection;
+using Nemera.Presentation.Api.Common.Http;
+using Nemera.Presentation.Api.Common.MimeTypes;
+using Nemera.Presentation.Api.Common.Routes.Library.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackStream;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackStream;
 
 /// <summary>
 /// API endpoint for the <c>/libraries/{libraryId}/artists/{artistId}/albums/{albumId}/tracks/{trackId}/stream</c> route.

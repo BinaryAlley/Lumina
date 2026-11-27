@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
+using Nemera.Domain.Common.Primitives;
 #endregion
 
-namespace Lumina.Application.Common.Errors;
+namespace Nemera.Application.Common.Errors;
 
 /// <summary>
 /// Application authentication related error types.

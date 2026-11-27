@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 #endregion
 
-namespace Lumina.Plugins.LocalMusicArtwork.Core;
+namespace Nemera.Plugins.LocalMusicArtwork.Core;
 
 /// <summary>
 /// Scans the folders of a local music library and classifies the images they contain into artwork DTOs, following the naming

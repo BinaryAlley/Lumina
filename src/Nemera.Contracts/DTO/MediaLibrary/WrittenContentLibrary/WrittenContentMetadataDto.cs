@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.Common;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
+namespace Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
 
 /// <summary>
 /// Data transfer object for written content metadata.

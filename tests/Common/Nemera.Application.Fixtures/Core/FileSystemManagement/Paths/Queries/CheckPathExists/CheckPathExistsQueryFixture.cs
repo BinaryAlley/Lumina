@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
+using Nemera.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
+namespace Nemera.Application.Fixtures.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
 
 /// <summary>
 /// Fixture class for the <see cref="CheckPathExistsQuery"/> class.

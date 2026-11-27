@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Plugins.Calibre.Core;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Plugins.Calibre.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.Calibre.IntegrationTests.Core;
+namespace Nemera.Plugins.Calibre.IntegrationTests.Core;
 
 /// <summary>
 /// Contains integration tests for the <see cref="CalibreArtworkProvider"/> class.
@@ -182,7 +182,7 @@ public class CalibreArtworkProviderTests
     /// <returns>The file system path of the created temporary directory.</returns>
     private static string CreateTempDirectory()
     {
-        string directoryPath = Path.Combine(Path.GetTempPath(), $"lumina-calibre-artwork-{Guid.NewGuid():N}");
+        string directoryPath = Path.Combine(Path.GetTempPath(), $"nemera-calibre-artwork-{Guid.NewGuid():N}");
         Directory.CreateDirectory(directoryPath);
         return directoryPath;
     }

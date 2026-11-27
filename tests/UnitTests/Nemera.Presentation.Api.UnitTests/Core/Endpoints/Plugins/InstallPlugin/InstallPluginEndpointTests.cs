@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Core.Plugins.Commands.InstallPlugin;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Plugins.InstallPlugin;
+using Nemera.Application.Core.Plugins.Commands.InstallPlugin;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Plugins.InstallPlugin;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -12,10 +12,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Plugins.InstallPlugin;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Plugins.InstallPlugin;
 
 /// <summary>
 /// Contains unit tests for the <see cref="InstallPluginEndpoint"/> class.

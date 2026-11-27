@@ -3,7 +3,7 @@ using System;
 
 #nullable disable
 
-namespace Lumina.DataAccess.Common.Migrations;
+namespace Nemera.DataAccess.Common.Migrations;
 
 /// <inheritdoc />
 public partial class InitialMigration : Migration

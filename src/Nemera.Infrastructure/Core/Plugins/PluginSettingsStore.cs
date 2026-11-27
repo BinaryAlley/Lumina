@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Mapping.Plugins;
-using Lumina.Plugins.Contracts.Core.Plugins;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Repositories.Plugins;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Mapping.Plugins;
+using Nemera.Plugins.Contracts.Core.Plugins;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Plugins;
+namespace Nemera.Infrastructure.Core.Plugins;
 
 /// <summary>
 /// Reads the settings persisted by the host for a plugin.

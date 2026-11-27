@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Nemera.Contracts.Responses.FileSystemManagement.FileSystem;
+using Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.FileSystem;
+namespace Nemera.Contracts.Fixtures.Core.Responses.FileSystemManagement.FileSystem;
 
 /// <summary>
 /// Fixture class for the <see cref="FileSystemTypeResponse"/> record.

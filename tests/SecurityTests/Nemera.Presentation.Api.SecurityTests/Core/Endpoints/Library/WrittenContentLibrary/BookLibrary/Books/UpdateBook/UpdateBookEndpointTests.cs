@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
-using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBook;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBook;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,15 +18,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBook;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.UpdateBook;
 
 /// <summary>
 /// Contains security tests for the <see cref="UpdateBookEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class UpdateBookEndpointTests : IClassFixture<LuminaApiFactory>
+public class UpdateBookEndpointTests : IClassFixture<NemeraApiFactory>
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly UpdateBookRequestFixture _updateBookRequestFixture = new();
     private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
 
@@ -34,7 +34,7 @@ public class UpdateBookEndpointTests : IClassFixture<LuminaApiFactory>
     /// Initializes a new instance of the <see cref="UpdateBookEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public UpdateBookEndpointTests(LuminaApiFactory apiFactory)
+    public UpdateBookEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -157,7 +157,7 @@ public class UpdateBookEndpointTests : IClassFixture<LuminaApiFactory>
         Guid bookId;
         using (IServiceScope scope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             bookId = dbContext.Books.Single(book => book.LibraryId == libraryId).Id;
         }
 

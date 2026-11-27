@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Api.Common.Routes.Library.WrittenContentLibrary.BookLibrary;
+namespace Nemera.Presentation.Api.Common.Routes.Library.WrittenContentLibrary.BookLibrary;
 
 /// <summary>
 /// Class for the collection of routes defined in this API.

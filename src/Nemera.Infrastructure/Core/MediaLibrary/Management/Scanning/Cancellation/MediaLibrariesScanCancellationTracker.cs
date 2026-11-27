@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Cancellation;
+namespace Nemera.Infrastructure.Core.MediaLibrary.Management.Scanning.Cancellation;
 
 /// <summary>
 /// Tracker used for canceling in-memory media library scans.

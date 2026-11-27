@@ -39,8 +39,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Lumina.Domain\Lumina.Domain.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Domain.Fixtures\Lumina.Domain.Fixtures.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Domain.SharedKernel.Fixtures\Lumina.Domain.SharedKernel.Fixtures.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Domain\Nemera.Domain.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Domain.Fixtures\Nemera.Domain.Fixtures.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Domain.SharedKernel.Fixtures\Nemera.Domain.SharedKernel.Fixtures.csproj" />
     </ItemGroup>
 </Project>

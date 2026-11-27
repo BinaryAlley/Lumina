@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Common.Documentation;
+namespace Nemera.Presentation.Web.IntegrationTests.Common.Documentation;
 
 /// <summary>
 /// Contains integration tests for the OpenAPI and Scalar documentation endpoints of the Web application.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class OpenApiEndpointTests : IClassFixture<LuminaWebFactory>
+public class OpenApiEndpointTests : IClassFixture<NemeraWebFactory>
 {
     private readonly HttpClient _client;
 
@@ -20,7 +20,7 @@ public class OpenApiEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="OpenApiEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public OpenApiEndpointTests(LuminaWebFactory apiFactory)
+    public OpenApiEndpointTests(NemeraWebFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
     }

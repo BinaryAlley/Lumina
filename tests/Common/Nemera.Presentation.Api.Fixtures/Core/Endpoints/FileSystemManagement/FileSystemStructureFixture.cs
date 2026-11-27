@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 #endregion
 
-namespace Lumina.Presentation.Api.Fixtures.Core.Endpoints.FileSystemManagement;
+namespace Nemera.Presentation.Api.Fixtures.Core.Endpoints.FileSystemManagement;
 
 /// <summary>
 /// Fixture class for creating and managing a file system structure for integration testing purposes.
@@ -73,7 +73,7 @@ public class FileSystemStructureFixture
         if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
             return true;
         // On Windows the fixture relies on the hidden file attribute, which some file systems (for example network drives) do not persist.
-        string probePath = Path.Combine(AppContext.BaseDirectory, "lumina_hidden_attribute_probe_" + Guid.NewGuid());
+        string probePath = Path.Combine(AppContext.BaseDirectory, "nemera_hidden_attribute_probe_" + Guid.NewGuid());
         try
         {
             File.WriteAllText(probePath, string.Empty);

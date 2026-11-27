@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+namespace Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
 
 /// <summary>
 /// Enumeration for the types of written content libraries.

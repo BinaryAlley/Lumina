@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.DTO.Themes;
+namespace Nemera.Presentation.Web.Common.DTO.Themes;
 
 /// <summary>
 /// Base type for all nodes of a parsed theme template.

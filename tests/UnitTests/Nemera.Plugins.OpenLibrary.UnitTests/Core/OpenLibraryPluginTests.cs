@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
-using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.OpenLibrary.Core;
-using Lumina.Plugins.OpenLibrary.Core.Api;
-using Lumina.Plugins.OpenLibrary.Core.Settings;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Plugins.Contracts.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.OpenLibrary.Core;
+using Nemera.Plugins.OpenLibrary.Core.Api;
+using Nemera.Plugins.OpenLibrary.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.UnitTests.Core;
+namespace Nemera.Plugins.OpenLibrary.UnitTests.Core;
 
 /// <summary>
 /// Contains unit tests for the <see cref="OpenLibraryPlugin"/> class.
@@ -49,7 +49,7 @@ public class OpenLibraryPluginTests
         string result = _sut.Author;
 
         // Assert
-        Assert.Equal("Lumina", result);
+        Assert.Equal("Nemera", result);
     }
 
     [Fact]

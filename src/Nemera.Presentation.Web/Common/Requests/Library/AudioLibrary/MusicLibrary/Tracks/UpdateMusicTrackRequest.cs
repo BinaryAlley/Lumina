@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.AudioLibrary;
-using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.DTO.MediaContributors;
-using Lumina.Presentation.Web.Common.Enums.AudioLibrary;
+using Nemera.Presentation.Web.Common.DTO.AudioLibrary;
+using Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.MediaContributors;
+using Nemera.Presentation.Web.Common.Enums.AudioLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
+namespace Nemera.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
 
 /// <summary>
 /// Represents a request to update an existing track of an album of a music artist.

@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
-using Lumina.DataAccess.Common.Persistence;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Common;
+using Nemera.DataAccess.Common.Persistence;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Common.Persistence;
+namespace Nemera.DataAccess.UnitTests.Common.Persistence;
 
 /// <summary>
 /// Contains unit tests for the <see cref="SharedReferenceResolver"/> class.
@@ -20,7 +20,7 @@ namespace Lumina.DataAccess.UnitTests.Common.Persistence;
 [ExcludeFromCodeCoverage]
 public class SharedReferenceResolverTests
 {
-    private readonly LuminaDbContext _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
+    private readonly NemeraDbContext _mockContext = Create.MockedDbContextFor<NemeraDbContext>();
     private readonly TagEntityFixture _tagEntityFixture = new();
     private readonly GenreEntityFixture _genreEntityFixture = new();
 

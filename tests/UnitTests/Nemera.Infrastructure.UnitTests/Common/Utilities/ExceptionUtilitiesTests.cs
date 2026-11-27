@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Common.Utilities;
+using Nemera.Infrastructure.Common.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Common.Utilities;
+namespace Nemera.Infrastructure.UnitTests.Common.Utilities;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ExceptionUtilities"/> class.

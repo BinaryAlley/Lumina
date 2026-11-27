@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.Calibre.Core;
-using Lumina.Plugins.Calibre.Fixtures.Core.Metadata;
-using Lumina.Plugins.Contracts.Core.Metadata;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.Calibre.Core;
+using Nemera.Plugins.Calibre.Fixtures.Core.Metadata;
+using Nemera.Plugins.Contracts.Core.Metadata;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.Calibre.UnitTests.Core;
+namespace Nemera.Plugins.Calibre.UnitTests.Core;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CalibreArtworkProvider"/> class.

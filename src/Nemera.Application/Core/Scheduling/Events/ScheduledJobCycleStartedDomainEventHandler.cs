@@ -1,23 +1,23 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Infrastructure.Scheduling;
-using Lumina.Application.Common.Mapping.Scheduling;
-using Lumina.Application.Core.Scheduling.Notifications;
-using Lumina.Contracts.Responses.Scheduling;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Common.Exceptions;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Scheduling;
+using Nemera.Application.Common.Mapping.Scheduling;
+using Nemera.Application.Core.Scheduling.Notifications;
+using Nemera.Contracts.Responses.Scheduling;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Exceptions;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.Scheduling.Events;
+namespace Nemera.Application.Core.Scheduling.Events;
 
 /// <summary>
 /// Handler for the domain event raised when the execution cycle of a scheduled job is started.

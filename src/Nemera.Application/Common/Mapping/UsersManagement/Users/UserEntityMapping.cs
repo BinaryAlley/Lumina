@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Responses.UsersManagement.Users;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Responses.UsersManagement.Users;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.UsersManagement.Users;
+namespace Nemera.Application.Common.Mapping.UsersManagement.Users;
 
 /// <summary>
 /// Extension methods for converting <see cref="UserEntity"/>.

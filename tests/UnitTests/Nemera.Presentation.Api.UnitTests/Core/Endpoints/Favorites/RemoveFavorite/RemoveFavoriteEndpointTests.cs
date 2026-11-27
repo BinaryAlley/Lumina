@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Favorites.Commands.RemoveFavorite;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Favorites.RemoveFavorite;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Favorites.Commands.RemoveFavorite;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Favorites.RemoveFavorite;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +12,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Favorites.RemoveFavorite;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Favorites.RemoveFavorite;
 
 /// <summary>
 /// Contains unit tests for the <see cref="RemoveFavoriteEndpoint"/> class.

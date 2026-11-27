@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.DataAccess.Common.Interceptors;
-using Lumina.DataAccess.Core.UoW;
+using Nemera.DataAccess.Common.Interceptors;
+using Nemera.DataAccess.Core.UoW;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -17,26 +17,26 @@ using System.Text;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+namespace Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 
 /// <summary>
 /// Factory for creating a web application for integration tests.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
+public class NemeraApiFactory : WebApplicationFactory<Program>, IDisposable
 {
     private readonly SqliteConnection _connection;
     private readonly string _sharedInMemoryConnectionString;
     private const string TEST_ENCRYPTION_KEY = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=";
-    private const string SHARED_IN_MEMORY_CONNECTION_STRING_PREFIX = "Data Source=lumina-tests-{0};Mode=Memory;Cache=Shared";
+    private const string SHARED_IN_MEMORY_CONNECTION_STRING_PREFIX = "Data Source=nemera-tests-{0};Mode=Memory;Cache=Shared";
     private static byte s_IpClass = 25;
 
     public static byte IpClass => s_IpClass++;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="LuminaApiFactory"/> class.
+    /// Initializes a new instance of the <see cref="NemeraApiFactory"/> class.
     /// </summary>
-    public LuminaApiFactory()
+    public NemeraApiFactory()
     {
         // Each factory gets its own uniquely named shared in-memory database, so that parallel test classes remain isolated from one another;
         // the shared cache allows each DbContext to open its own pooled connection to the same database, instead of sharing a single connection,
@@ -76,11 +76,11 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
         builder.ConfigureServices(services =>
         {
             // Remove existing DbContext configuration.
-            ServiceDescriptor? descriptor = services.SingleOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(DbContextOptions<LuminaDbContext>));
+            ServiceDescriptor? descriptor = services.SingleOrDefault(serviceDescriptor => serviceDescriptor.ServiceType == typeof(DbContextOptions<NemeraDbContext>));
             if (descriptor is not null)
                 services.Remove(descriptor);
             // Add SQLite DbContext configuration.
-            services.AddDbContext<LuminaDbContext>((serviceProvider, options) =>
+            services.AddDbContext<NemeraDbContext>((serviceProvider, options) =>
             {
                 options.UseSqlite(_sharedInMemoryConnectionString);
                 options.AddInterceptors(serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>());
@@ -105,7 +105,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
             using (IServiceScope scope = servicePreovider.CreateScope())
             {
                 IServiceProvider scopedServices = scope.ServiceProvider;
-                LuminaDbContext dbContext = scopedServices.GetRequiredService<LuminaDbContext>();
+                NemeraDbContext dbContext = scopedServices.GetRequiredService<NemeraDbContext>();
                 dbContext.Database.Migrate(); 
             }
         });
@@ -132,7 +132,7 @@ public class LuminaApiFactory : WebApplicationFactory<Program>, IDisposable
     public async Task ResetDatabaseAsync()
     {
         using IServiceScope scope = Services.CreateScope();
-        LuminaDbContext context = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext context = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         context.Books.RemoveRange(context.Books);
         context.Libraries.RemoveRange(context.Libraries);

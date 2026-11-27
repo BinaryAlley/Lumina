@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Playlists;
+using Nemera.Presentation.Web.Common.Enums.Playlists;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Playlists;
+namespace Nemera.Presentation.Web.Common.DTO.Playlists;
 
 /// <summary>
 /// Data transfer object for an ordered playlist entry together with the display details of the media item it references.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Fixtures.Core.Requests.UsersManagement.Settings;
-using Lumina.Contracts.Requests.UsersManagement.Settings;
-using Lumina.Contracts.Responses.UsersManagement.Settings;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Settings.UpdatePlaybackState;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.UsersManagement.Settings;
+using Nemera.Contracts.Requests.UsersManagement.Settings;
+using Nemera.Contracts.Responses.UsersManagement.Settings;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Settings.UpdatePlaybackState;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,16 +23,16 @@ using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagement.Settings.UpdatePlaybackState;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagement.Settings.UpdatePlaybackState;
 
 /// <summary>
 /// Contains integration tests for the <see cref="UpdatePlaybackStateEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class UpdatePlaybackStateEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class UpdatePlaybackStateEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly UpdatePlaybackStateRequestFixture _updatePlaybackStateRequestFixture = new();
     private readonly UserSettingsEntityFixture _userSettingsEntityFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -44,7 +44,7 @@ public class UpdatePlaybackStateEndpointTests : IClassFixture<AuthenticatedLumin
     /// Initializes a new instance of the <see cref="UpdatePlaybackStateEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public UpdatePlaybackStateEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public UpdatePlaybackStateEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -251,7 +251,7 @@ public class UpdatePlaybackStateEndpointTests : IClassFixture<AuthenticatedLumin
     private async Task<UserSettingsEntity> CreateTestUserSettingsAsync(double volume, bool isMuted, int itemsPerPage, bool isPaginationEnabled)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         Guid userId = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername).Id;
         UserSettingsEntity settings = _userSettingsEntityFixture.Create(
@@ -273,7 +273,7 @@ public class UpdatePlaybackStateEndpointTests : IClassFixture<AuthenticatedLumin
     private async Task<UserSettingsEntity?> GetCurrentUserSettingsAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         Guid userId = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername).Id;
         return await dbContext.UserSettings.FirstOrDefaultAsync(settings => settings.UserId == userId);
@@ -285,7 +285,7 @@ public class UpdatePlaybackStateEndpointTests : IClassFixture<AuthenticatedLumin
     public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         await dbContext.Set<UserSettingsEntity>().ExecuteDeleteAsync();
         await dbContext.Set<UserEntity>().ExecuteDeleteAsync();

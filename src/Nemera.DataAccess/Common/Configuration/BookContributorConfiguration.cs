@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 #endregion
 
-namespace Lumina.DataAccess.Common.Configuration;
+namespace Nemera.DataAccess.Common.Configuration;
 
 /// <summary>
 /// Configures the entity mapping for the <see cref="BookContributorEntity"/> entity.

@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Plugins;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.Plugins.Queries.GetPluginSettings;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Fixtures.Core.Plugins.Queries.GetPluginSettings;
-using Lumina.Contracts.Responses.Plugins;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.Contracts.Fixtures.Common.Models.DTO.Settings;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Repositories.Plugins;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Plugins;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.Plugins.Queries.GetPluginSettings;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Fixtures.Core.Plugins.Queries.GetPluginSettings;
+using Nemera.Contracts.Responses.Plugins;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.Contracts.Fixtures.Common.Models.DTO.Settings;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -19,10 +19,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Plugins.Queries.GetPluginSettings;
+namespace Nemera.Application.UnitTests.Core.Plugins.Queries.GetPluginSettings;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetPluginSettingsQueryHandler"/> class.

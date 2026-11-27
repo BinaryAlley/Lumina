@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
-using Lumina.Application.Fixtures.Core.UsersManagement.Authentication.Queries.LoginUser;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Core.UsersManagement.Authentication.Queries.LoginUser;
+using Nemera.Application.Fixtures.Core.UsersManagement.Authentication.Queries.LoginUser;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.UsersManagement.Authentication.Queries.LoginUser;
+namespace Nemera.Application.UnitTests.Core.UsersManagement.Authentication.Queries.LoginUser;
 
 /// <summary>
 /// Contains unit tests for the <see cref="LoginUserQueryValidator"/> class.

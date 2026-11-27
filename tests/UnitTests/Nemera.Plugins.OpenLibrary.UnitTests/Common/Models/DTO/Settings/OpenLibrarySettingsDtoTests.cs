@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.OpenLibrary.Common.Models.DTO.Settings;
-using Lumina.Plugins.OpenLibrary.Fixtures.Common.Models.DTO.Settings;
+using Nemera.Plugins.OpenLibrary.Common.Models.DTO.Settings;
+using Nemera.Plugins.OpenLibrary.Fixtures.Common.Models.DTO.Settings;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.UnitTests.Common.Models.DTO.Settings;
+namespace Nemera.Plugins.OpenLibrary.UnitTests.Common.Models.DTO.Settings;
 
 /// <summary>
 /// Contains unit tests for the <see cref="OpenLibrarySettingsDto"/> class.
@@ -24,7 +24,7 @@ public class OpenLibrarySettingsDtoTests
         // Act
 
         // Assert
-        Assert.Equal("Lumina-OpenLibrary/1.0", sut.UserAgent);
+        Assert.Equal("Nemera-OpenLibrary/1.0", sut.UserAgent);
         Assert.Null(sut.ContactEmail);
         Assert.Equal(10, sut.SearchResultLimit);
         Assert.Equal(50, sut.WorkEditionLimit);

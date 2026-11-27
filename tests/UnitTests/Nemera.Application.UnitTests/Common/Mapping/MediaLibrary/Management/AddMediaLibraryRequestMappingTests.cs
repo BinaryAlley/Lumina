@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.MediaLibrary.Management;
-using Lumina.Application.Common.Mapping.MediaLibrary.Management;
-using Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
-using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
-using Lumina.Contracts.Requests.MediaLibrary.Management;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DTO.MediaLibrary.Management;
+using Nemera.Application.Common.Mapping.MediaLibrary.Management;
+using Nemera.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
+using Nemera.Contracts.Requests.MediaLibrary.Management;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.Management;
+namespace Nemera.Application.UnitTests.Common.Mapping.MediaLibrary.Management;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AddMediaLibraryRequestMapping"/> class.

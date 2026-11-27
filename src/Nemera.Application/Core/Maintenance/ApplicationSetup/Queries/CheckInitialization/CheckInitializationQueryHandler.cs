@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Contracts.Responses.UsersManagement;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Contracts.Responses.UsersManagement;
+using Nemera.Domain.Common.Primitives;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
+namespace Nemera.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
 
 /// <summary>
 /// Handler for the query to check the initialization of the application.

@@ -32,7 +32,7 @@
  * reads the frame header itself. The configuration therefore carries only the codec string, the sample rate and the
  * channel count.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -157,10 +157,10 @@
     /**
      * Demuxes an MP3 (MPEG Layer III) stream.
      */
-    class Mp3Demuxer extends LuminaAudioPlayer.Demuxer {
+    class Mp3Demuxer extends NemeraAudioPlayer.Demuxer {
         /**
          * Creates an instance of Mp3Demuxer.
-         * @param {Object} options - The demuxer options, per {@link LuminaAudioPlayer.Demuxer}.
+         * @param {Object} options - The demuxer options, per {@link NemeraAudioPlayer.Demuxer}.
          */
         constructor(options = {}) {
             super(options);
@@ -183,24 +183,24 @@
          * Reads the ID3v2 tag, the first MPEG frame with its Xing or VBRI metadata, and the duration they state, and
          * positions the read cursor on the first real audio frame.
          * @returns {Promise<void>} A promise resolving when the stream is ready to be read.
-         * @throws {LuminaAudioPlayer.PlayerError} When the bytes are not an MP3 stream.
+         * @throws {NemeraAudioPlayer.PlayerError} When the bytes are not an MP3 stream.
          */
         async initializeAsync() {
             if (this.isInitialized())
                 return;
             if (this.destroyed)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The demuxer was destroyed.');
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The demuxer was destroyed.');
             try {
                 const dataStart = await this.skipId3v2Async(0);
                 const end = this.reader.getLength();
-                const firstFrame = await LuminaAudioPlayer.scanForFrameAsync(this.reader, dataStart, end, MP3_SYNC_PREFIX, (offset) => this.isValidFrameAtAsync(offset), { prefixMask: MP3_SYNC_MASK });
+                const firstFrame = await NemeraAudioPlayer.scanForFrameAsync(this.reader, dataStart, end, MP3_SYNC_PREFIX, (offset) => this.isValidFrameAtAsync(offset), { prefixMask: MP3_SYNC_MASK });
                 if (firstFrame < 0)
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The bytes do not contain an MPEG audio frame.', { reason: 'no-mpeg-frame' });
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The bytes do not contain an MPEG audio frame.', { reason: 'no-mpeg-frame' });
                 const header = await this.parseHeaderAtAsync(firstFrame);
                 if (!header)
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The MPEG frame header could not be parsed.', { reason: 'no-mpeg-frame' });
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The MPEG frame header could not be parsed.', { reason: 'no-mpeg-frame' });
                 if (header.layer !== 1)
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The MPEG stream uses a layer the player does not decode.', { reason: 'unsupported-layer' });
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The MPEG stream uses a layer the player does not decode.', { reason: 'unsupported-layer' });
                 const metadata = await this.readVariableRateMetadataAsync(firstFrame, header);
                 this.dataStart = metadata ? firstFrame + header.frameLength : firstFrame;
                 this.offset = this.dataStart;
@@ -246,7 +246,7 @@
          * Reads the next MPEG frame as an encoded packet. A byte that is not the start of a valid frame is skipped by
          * rescanning for the next frame sync, so a corrupted or partially downloaded region does not stop the stream.
          * @returns {Promise<Object|null>} The packet, or null once the stream ended.
-         * @throws {LuminaAudioPlayer.PlayerError} When the stream can no longer be parsed.
+         * @throws {NemeraAudioPlayer.PlayerError} When the stream can no longer be parsed.
          */
         async readPacketAsync() {
             this.ensureInitialized();
@@ -266,7 +266,7 @@
                 // The duration is kept unrounded while the timeline accumulates it, so that rounding it per packet does not
                 // make the timeline drift; only the packet the decoder receives carries a whole number of microseconds.
                 const duration = (header.samplesPerFrame / header.sampleRate) * 1000000;
-                const packet = LuminaAudioPlayer.createDemuxerPacket(data.slice(), this.timelineMicros, duration);
+                const packet = NemeraAudioPlayer.createDemuxerPacket(data.slice(), this.timelineMicros, duration);
                 this.timelineMicros += duration;
                 this.offset += header.frameLength;
                 return packet;
@@ -278,11 +278,11 @@
         /**
          * Rescans for the next valid frame after a byte that is not the start of one.
          * @returns {Promise<Object|null>} The next packet, or null when no further frame is found.
-         * @throws {LuminaAudioPlayer.PlayerError} When the stream can no longer be parsed.
+         * @throws {NemeraAudioPlayer.PlayerError} When the stream can no longer be parsed.
          */
         async resyncAsync() {
             const end = this.reader.getLength();
-            const next = await LuminaAudioPlayer.scanForFrameAsync(this.reader, this.offset + 1, end, MP3_SYNC_PREFIX, (offset) => this.isValidFrameAtAsync(offset), { prefixMask: MP3_SYNC_MASK });
+            const next = await NemeraAudioPlayer.scanForFrameAsync(this.reader, this.offset + 1, end, MP3_SYNC_PREFIX, (offset) => this.isValidFrameAtAsync(offset), { prefixMask: MP3_SYNC_MASK });
             if (next < 0) {
                 this.reachedEnd = true;
                 return null;
@@ -296,14 +296,14 @@
          * the constant bitrate estimate otherwise, and then scanning to the next real frame.
          * @param {number} seconds - The target time, in seconds.
          * @returns {Promise<number|null>} The byte offset it repositioned to, or null when the stream cannot be seeked.
-         * @throws {LuminaAudioPlayer.PlayerError} When the scan for a frame gives up on a corrupt or crafted region.
+         * @throws {NemeraAudioPlayer.PlayerError} When the scan for a frame gives up on a corrupt or crafted region.
          */
         async seekToTimeAsync(seconds) {
             this.ensureInitialized();
             const end = this.reader.getLength();
             if (end === null || !Number.isFinite(seconds) || this.durationSeconds === null || this.durationSeconds <= 0)
                 return null;
-            const fraction = LuminaAudioPlayer.clamp(seconds / this.durationSeconds, 0, 1);
+            const fraction = NemeraAudioPlayer.clamp(seconds / this.durationSeconds, 0, 1);
             let estimate;
             if (this.xingToc) {
                 const index = Math.min(99, Math.floor(fraction * 100));
@@ -314,7 +314,7 @@
                 estimate = this.dataStart + Math.floor((seconds * bitrate) / 8);
             }
             const start = Math.max(this.dataStart, Math.min(end - 1, estimate));
-            const frame = await LuminaAudioPlayer.scanForFrameAsync(this.reader, start, end, MP3_SYNC_PREFIX, (offset) => this.isValidFrameAtAsync(offset), { prefixMask: MP3_SYNC_MASK });
+            const frame = await NemeraAudioPlayer.scanForFrameAsync(this.reader, start, end, MP3_SYNC_PREFIX, (offset) => this.isValidFrameAtAsync(offset), { prefixMask: MP3_SYNC_MASK });
             if (frame < 0)
                 return null;
             this.offset = frame;
@@ -380,12 +380,12 @@
             if (window.length < MPEG_HEADER_BYTES)
                 return null;
             const xingOffset = MPEG_HEADER_BYTES + crcBytes + sideInfoBytes;
-            const isXing = LuminaAudioPlayer.demuxBytesEqualAscii(window, xingOffset, 'Xing')
-                || LuminaAudioPlayer.demuxBytesEqualAscii(window, xingOffset, 'Info');
+            const isXing = NemeraAudioPlayer.demuxBytesEqualAscii(window, xingOffset, 'Xing')
+                || NemeraAudioPlayer.demuxBytesEqualAscii(window, xingOffset, 'Info');
             let cursor = -1;
             if (isXing)
                 cursor = xingOffset + 4;
-            else if (LuminaAudioPlayer.demuxBytesEqualAscii(window, MPEG_HEADER_BYTES + 32, 'VBRI'))
+            else if (NemeraAudioPlayer.demuxBytesEqualAscii(window, MPEG_HEADER_BYTES + 32, 'VBRI'))
                 cursor = MPEG_HEADER_BYTES + 32 + 4 + 2 + 2 + 2;
             if (cursor < 0)
                 return null;
@@ -393,12 +393,12 @@
             let frameCount = null;
             let toc = null;
             if (isVbri)  // VBRI: bytes (4), frames (4), then a two entry-per-percent table this demuxer does not use.               
-                frameCount = LuminaAudioPlayer.demuxReadUintBE(window, cursor + 4, 4);
+                frameCount = NemeraAudioPlayer.demuxReadUintBE(window, cursor + 4, 4);
             else {
-                const flags = LuminaAudioPlayer.demuxReadUintBE(window, cursor, 4) || 0;
+                const flags = NemeraAudioPlayer.demuxReadUintBE(window, cursor, 4) || 0;
                 cursor += 4;
                 if ((flags & 0x01) !== 0) {
-                    frameCount = LuminaAudioPlayer.demuxReadUintBE(window, cursor, 4);
+                    frameCount = NemeraAudioPlayer.demuxReadUintBE(window, cursor, 4);
                     cursor += 4;
                 }
                 if ((flags & 0x02) !== 0) // The byte count the tag may carry is not needed, but its four bytes still shift the seek table.                   
@@ -432,12 +432,12 @@
         }
     }
 
-    LuminaAudioPlayer.Mp3Demuxer = Mp3Demuxer;
+    NemeraAudioPlayer.Mp3Demuxer = Mp3Demuxer;
 
-    LuminaAudioPlayer.registerDemuxer({
-        container: LuminaAudioPlayer.DemuxerContainer.MP3,
-        codec: LuminaAudioPlayer.DemuxerCodec.MP3,
-        probe: LuminaAudioPlayer.AUDIO_CODEC_PROBES.MP3,
+    NemeraAudioPlayer.registerDemuxer({
+        container: NemeraAudioPlayer.DemuxerContainer.MP3,
+        codec: NemeraAudioPlayer.DemuxerCodec.MP3,
+        probe: NemeraAudioPlayer.AUDIO_CODEC_PROBES.MP3,
         create: (options) => new Mp3Demuxer(options)
     });
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

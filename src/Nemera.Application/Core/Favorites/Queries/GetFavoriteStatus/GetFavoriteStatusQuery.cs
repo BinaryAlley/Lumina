@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Application.Common.CQRS;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Favorites.Queries.GetFavoriteStatus;
+namespace Nemera.Application.Core.Favorites.Queries.GetFavoriteStatus;
 
 /// <summary>
 /// Query for finding out which media items of one kind are favorites of the current user.

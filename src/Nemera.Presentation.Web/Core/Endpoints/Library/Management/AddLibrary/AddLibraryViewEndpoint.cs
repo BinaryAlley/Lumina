@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Authorization;
-using Lumina.Presentation.Web.Common.DTO.Libraries;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Common;
+using Nemera.Presentation.Web.Common.Authorization;
+using Nemera.Presentation.Web.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.Management.AddLibrary;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.Management.AddLibrary;
 
 /// <summary>
 /// API endpoint for the <c>/{culture}/libraries/manage/item</c> route.

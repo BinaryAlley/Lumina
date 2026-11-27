@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Infrastructure.Common.Models.DTO.Configuration;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Infrastructure.Common.Models.DTO.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,7 +9,7 @@ using System.Security.Claims;
 using System.Text;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Authentication;
+namespace Nemera.Infrastructure.Core.Authentication;
 
 /// <summary>
 /// Class for generating JWT tokens.

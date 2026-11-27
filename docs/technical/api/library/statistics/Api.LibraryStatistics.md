@@ -1,6 +1,6 @@
-# Lumina API
+# Nemera API
 
-- [Lumina API](#lumina-api)
+- [Nemera API](#nemera-api)
   - [Library Statistics](#library-statistics)
     - [When a Session Counts](#when-a-session-counts)
     - [Get Recently Consumed](#get-recently-consumed)

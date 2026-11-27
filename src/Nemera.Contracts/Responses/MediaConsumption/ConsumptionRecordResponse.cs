@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.MediaConsumption;
+namespace Nemera.Contracts.Responses.MediaConsumption;
 
 /// <summary>
 /// Represents a media consumption session.

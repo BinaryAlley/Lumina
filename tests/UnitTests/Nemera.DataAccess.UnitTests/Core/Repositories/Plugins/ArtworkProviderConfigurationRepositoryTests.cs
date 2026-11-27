@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
-using Lumina.DataAccess.Core.Repositories.Plugins;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Nemera.DataAccess.Core.Repositories.Plugins;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.Plugins;
+namespace Nemera.DataAccess.UnitTests.Core.Repositories.Plugins;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ArtworkProviderConfigurationRepository"/> class.
@@ -20,7 +20,7 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.Plugins;
 [ExcludeFromCodeCoverage]
 public class ArtworkProviderConfigurationRepositoryTests
 {
-    private readonly LuminaDbContext _mockContext;
+    private readonly NemeraDbContext _mockContext;
     private readonly ArtworkProviderConfigurationRepository _sut;
     private readonly LibraryArtworkProviderConfigurationEntityFixture _libraryArtworkProviderConfigurationEntityFixture = new();
 
@@ -29,7 +29,7 @@ public class ArtworkProviderConfigurationRepositoryTests
     /// </summary>
     public ArtworkProviderConfigurationRepositoryTests()
     {
-        _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
+        _mockContext = Create.MockedDbContextFor<NemeraDbContext>();
         _sut = new ArtworkProviderConfigurationRepository(_mockContext);
     }
 

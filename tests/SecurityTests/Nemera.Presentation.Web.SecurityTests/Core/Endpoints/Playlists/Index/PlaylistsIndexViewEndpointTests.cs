@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Playlists.Index;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Playlists.Index;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -9,7 +9,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Playlists.Index;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Playlists.Index;
 
 /// <summary>
 /// Contains security tests for the <see cref="PlaylistsIndexViewEndpoint"/> class.
@@ -20,18 +20,18 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Playlists.Index;
 /// cross-user isolation does not apply because the page accepts no user or resource identifier and shows only the signed-in user's own data.
 /// </remarks>
 [ExcludeFromCodeCoverage]
-public class PlaylistsIndexViewEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class PlaylistsIndexViewEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string WEB_ROUTE = "/en-us/playlists";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly string _clientIp;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PlaylistsIndexViewEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public PlaylistsIndexViewEndpointTests(LuminaWebFactory apiFactory)
+    public PlaylistsIndexViewEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _clientIp = $"10.{Random.Shared.Next(0, 256)}.{Random.Shared.Next(0, 256)}.{Random.Shared.Next(1, 254)}";
@@ -76,7 +76,7 @@ public class PlaylistsIndexViewEndpointTests : IClassFixture<LuminaWebFactory>, 
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
         Assert.DoesNotContain("TestPass123!", content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     [Fact]

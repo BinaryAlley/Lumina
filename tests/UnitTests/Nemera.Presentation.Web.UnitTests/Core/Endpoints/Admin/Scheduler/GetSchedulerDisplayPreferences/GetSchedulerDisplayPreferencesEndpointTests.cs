@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Scheduling;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Scheduler.GetSchedulerDisplayPreferences;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Scheduling;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Scheduling;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Scheduler.GetSchedulerDisplayPreferences;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Scheduling;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Admin.Scheduler.GetSchedulerDisplayPreferences;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Admin.Scheduler.GetSchedulerDisplayPreferences;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetSchedulerDisplayPreferencesEndpoint"/> class.
@@ -39,7 +39,7 @@ public class GetSchedulerDisplayPreferencesEndpointTests
     public async Task ExecuteAsync_WhenApiReturnsPreferences_ShouldReturnSuccessJsonWithDisplayPreferences()
     {
         // Arrange
-        SchedulerDisplayPreferencesDto expectedPreferences = _schedulerDisplayPreferencesDtoFixture.Create(displayTimeUnit: Lumina.Presentation.Web.Common.Enums.Scheduling.SchedulerDisplayTimeUnit.Minutes);
+        SchedulerDisplayPreferencesDto expectedPreferences = _schedulerDisplayPreferencesDtoFixture.Create(displayTimeUnit: Nemera.Presentation.Web.Common.Enums.Scheduling.SchedulerDisplayTimeUnit.Minutes);
         _mockApiHttpClient.GetAsync<SchedulerDisplayPreferencesDto>(ApiRoutes.ScheduledJobs.GET_DISPLAY_PREFERENCES, Arg.Any<CancellationToken>())
             .Returns(expectedPreferences);
 

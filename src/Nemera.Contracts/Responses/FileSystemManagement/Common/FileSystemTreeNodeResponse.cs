@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.FileSystemManagement.Common;
+namespace Nemera.Contracts.Responses.FileSystemManagement.Common;
 
 /// <summary>
 /// Generic file system node.

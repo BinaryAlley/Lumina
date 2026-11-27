@@ -33,7 +33,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Lumina.Domain.SharedKernel\Lumina.Domain.SharedKernel.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Domain.SharedKernel.Fixtures\Lumina.Domain.SharedKernel.Fixtures.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Domain.SharedKernel\Nemera.Domain.SharedKernel.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Domain.SharedKernel.Fixtures\Nemera.Domain.SharedKernel.Fixtures.csproj" />
     </ItemGroup>
 </Project>

@@ -1,19 +1,19 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.Common.HealthChecks;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Api.Common.HealthChecks;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Health;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Health;
 
 /// <summary>
 /// Factory whose database health check always reports an unhealthy state.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class FailingDatabaseApiFactory : LuminaApiFactory
+public class FailingDatabaseApiFactory : NemeraApiFactory
 {
     /// <summary>
     /// Configures the web host, replacing the database health check with one that always fails.

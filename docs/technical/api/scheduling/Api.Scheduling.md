@@ -1,6 +1,6 @@
-# Lumina API
+# Nemera API
 
-- [Lumina API](#lumina-api)
+- [Nemera API](#nemera-api)
   - [Scheduled Jobs](#scheduled-jobs)
     - [Add Scheduled Job](#add-scheduled-job)
       - [Add Scheduled Job Request](#add-scheduled-job-request)

@@ -1,21 +1,21 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Mapping.UsersManagement.Users;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Mapping.UsersManagement.Users;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
+namespace Nemera.Application.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
 
 /// <summary>
 /// Handler for the command to update the playback state the player reports for the current user automatically.

@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.Core;
+namespace Nemera.Plugins.CoverArtArchive.Core;
 
 /// <summary>
 /// Defines the hosts of the Cover Art Archive and the Internet Archive, which are the only hosts the plugin queries, the only hosts it may follow a

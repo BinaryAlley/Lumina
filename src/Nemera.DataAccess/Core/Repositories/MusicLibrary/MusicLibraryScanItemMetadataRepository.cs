@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.MusicLibrary;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,22 +11,22 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.MusicLibrary;
+namespace Nemera.DataAccess.Core.Repositories.MusicLibrary;
 
 /// <summary>
 /// Repository for the music metadata staged during a media library scan.
 /// </summary>
 internal sealed class MusicLibraryScanItemMetadataRepository : IMusicLibraryScanItemMetadataRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MusicLibraryScanItemMetadataRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public MusicLibraryScanItemMetadataRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public MusicLibraryScanItemMetadataRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -38,7 +38,7 @@ internal sealed class MusicLibraryScanItemMetadataRepository : IMusicLibraryScan
     public Task<Result<Created>> InsertRangeAsync(IReadOnlyCollection<MusicLibraryScanItemMetadataEntity> items, CancellationToken cancellationToken)
     {
         if (items.Count > 0)
-            _luminaDbContext.MusicLibraryScanItemMetadata.AddRange(items);
+            _nemeraDbContext.MusicLibraryScanItemMetadata.AddRange(items);
         return Task.FromResult<Result<Created>>(Result.Created);
     }
 
@@ -50,7 +50,7 @@ internal sealed class MusicLibraryScanItemMetadataRepository : IMusicLibraryScan
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="MusicLibraryScanItemMetadataEntity"/>, or an error.</returns>
     public async Task<Result<IReadOnlyList<MusicLibraryScanItemMetadataEntity>>> GetByScanIdAsync(Guid scanId, CancellationToken cancellationToken)
     {
-        IReadOnlyList<MusicLibraryScanItemMetadataEntity> items = await _luminaDbContext.MusicLibraryScanItemMetadata
+        IReadOnlyList<MusicLibraryScanItemMetadataEntity> items = await _nemeraDbContext.MusicLibraryScanItemMetadata
             .AsNoTracking()
             .Where(musicMetadata => musicMetadata.LibraryScanId == scanId)
             .OrderBy(musicMetadata => musicMetadata.Path)
@@ -66,7 +66,7 @@ internal sealed class MusicLibraryScanItemMetadataRepository : IMusicLibraryScan
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="MusicLibraryScanItemMetadataEntity"/>, or an error.</returns>
     public async Task<Result<IReadOnlyList<MusicLibraryScanItemMetadataEntity>>> GetByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        IReadOnlyList<MusicLibraryScanItemMetadataEntity> items = await _luminaDbContext.MusicLibraryScanItemMetadata
+        IReadOnlyList<MusicLibraryScanItemMetadataEntity> items = await _nemeraDbContext.MusicLibraryScanItemMetadata
             .AsNoTracking()
             .Where(musicMetadata => musicMetadata.LibraryId == libraryId)
             .OrderBy(musicMetadata => musicMetadata.Path)
@@ -82,7 +82,7 @@ internal sealed class MusicLibraryScanItemMetadataRepository : IMusicLibraryScan
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Deleted>> DeleteByScanIdAsync(Guid scanId, CancellationToken cancellationToken)
     {
-        await _luminaDbContext.MusicLibraryScanItemMetadata
+        await _nemeraDbContext.MusicLibraryScanItemMetadata
             .Where(musicMetadata => musicMetadata.LibraryScanId == scanId)
             .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
         return Result.Deleted;
@@ -96,7 +96,7 @@ internal sealed class MusicLibraryScanItemMetadataRepository : IMusicLibraryScan
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        await _luminaDbContext.MusicLibraryScanItemMetadata
+        await _nemeraDbContext.MusicLibraryScanItemMetadata
             .Where(musicMetadata => musicMetadata.LibraryId == libraryId)
             .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
         return Result.Deleted;

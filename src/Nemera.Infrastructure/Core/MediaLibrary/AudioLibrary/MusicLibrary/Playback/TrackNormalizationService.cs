@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
-using Lumina.Infrastructure.Common.Caching;
-using Lumina.Infrastructure.Common.Models.DTO.Configuration;
-using Lumina.Infrastructure.Common.Models.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Infrastructure.Common.Caching;
+using Nemera.Infrastructure.Common.Models.DTO.Configuration;
+using Nemera.Infrastructure.Common.Models.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -26,7 +26,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Service that produces the normalized audio of a track with ffmpeg, caches it as fixed duration segments and serves it from the cache.

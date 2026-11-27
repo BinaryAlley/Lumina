@@ -1,23 +1,23 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Common.DataAccess.Repositories.Favorites;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Favorites;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.Favorites.Queries.GetFavorites;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Fixtures.Common.DTO.Favorites;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.Application.Fixtures.Core.Favorites.Queries.GetFavorites;
-using Lumina.Contracts.Responses.Common;
-using Lumina.Contracts.Responses.Favorites;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Application.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Common.DataAccess.Repositories.Favorites;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Favorites;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.Favorites.Queries.GetFavorites;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Fixtures.Common.DTO.Favorites;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Application.Fixtures.Core.Favorites.Queries.GetFavorites;
+using Nemera.Contracts.Responses.Common;
+using Nemera.Contracts.Responses.Favorites;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -25,11 +25,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Favorites.Queries.GetFavorites;
+namespace Nemera.Application.UnitTests.Core.Favorites.Queries.GetFavorites;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetFavoritesQueryHandler"/> class.

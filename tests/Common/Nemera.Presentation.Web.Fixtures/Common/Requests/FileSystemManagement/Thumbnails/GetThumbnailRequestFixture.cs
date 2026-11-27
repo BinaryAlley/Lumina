@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Requests.FileSystemManagement.Thumbnails;
+using Nemera.Presentation.Web.Common.Requests.FileSystemManagement.Thumbnails;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Requests.FileSystemManagement.Thumbnails;
+namespace Nemera.Presentation.Web.Fixtures.Common.Requests.FileSystemManagement.Thumbnails;
 
 /// <summary>
 /// Fixture class for the <see cref="GetThumbnailRequest"/> record.

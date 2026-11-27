@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
-using Lumina.Presentation.Api.Core.Endpoints.Favorites.RemoveFavorite;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Presentation.Api.Core.Endpoints.Favorites.RemoveFavorite;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,18 +20,18 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Favorites.RemoveFavorite;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Favorites.RemoveFavorite;
 
 /// <summary>
 /// Contains security tests for the <see cref="RemoveFavoriteEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RemoveFavoriteEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class RemoveFavoriteEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
     private const string JWT_SECRET = "test-key-thats-at-least-32-chars-long-for-jwt";
     private const string PATH = "/api/v1/users/me/favorites";
 
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly FavoriteEntityFixture _favoriteEntityFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
@@ -41,12 +41,12 @@ public class RemoveFavoriteEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     /// Initializes a new instance of the <see cref="RemoveFavoriteEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public RemoveFavoriteEndpointTests(LuminaApiFactory apiFactory)
+    public RemoveFavoriteEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public class RemoveFavoriteEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         AssertNoSensitiveData(content);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.False(await dbContext.Favorites.AnyAsync(favorite => favorite.UserId == callerId));
         Assert.True(await dbContext.Favorites.AnyAsync(favorite => favorite.UserId == otherUserId && favorite.MediaItemId == mediaItemId));
     }
@@ -174,7 +174,7 @@ public class RemoveFavoriteEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     private async Task<(Guid UserId, string Username)> SeedOtherUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         string username = $"otheruser_{Guid.NewGuid()}";
         dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: username, password: "TestPass123!"));
@@ -192,7 +192,7 @@ public class RemoveFavoriteEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     private async Task SeedFavoriteAsync(Guid userId, FavoriteMediaKind mediaKind, Guid mediaItemId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         dbContext.Favorites.Add(_favoriteEntityFixture.Create(
             userId: userId,
             mediaKind: mediaKind,
@@ -211,7 +211,7 @@ public class RemoveFavoriteEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     private async Task AssertFavoriteExistsAsync(Guid userId, Guid mediaItemId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.True(await dbContext.Favorites.AnyAsync(favorite => favorite.UserId == userId && favorite.MediaItemId == mediaItemId));
     }
 
@@ -288,7 +288,7 @@ public class RemoveFavoriteEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina.", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera.", content, StringComparison.Ordinal);
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(JWT_SECRET, content, StringComparison.Ordinal);
         Assert.DoesNotContain("Data Source", content, StringComparison.OrdinalIgnoreCase);

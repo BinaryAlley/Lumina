@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Presentation.Web.Common.Enums.MediaConsumption;
-using Lumina.Presentation.Web.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Common.Enums.MediaConsumption;
+using Nemera.Presentation.Web.Common.Requests.Library.Statistics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Library.Statistics;
+namespace Nemera.Presentation.Web.Fixtures.Common.Requests.Library.Statistics;
 
 /// <summary>
 /// Fixture class for the <see cref="GetRecentlyConsumedRequest"/> record.

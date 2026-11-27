@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
 using System;
 #endregion
 
-namespace Lumina.Application.Core.MediaConsumption.Commands.CompleteConsumption;
+namespace Nemera.Application.Core.MediaConsumption.Commands.CompleteConsumption;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="CompleteConsumptionCommand"/>.

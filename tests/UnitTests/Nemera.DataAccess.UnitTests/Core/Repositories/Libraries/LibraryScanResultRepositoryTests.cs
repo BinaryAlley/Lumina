@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.DataAccess.Core.Repositories.Libraries;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.DataAccess.Core.Repositories.Libraries;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.Libraries;
+namespace Nemera.DataAccess.UnitTests.Core.Repositories.Libraries;
 
 /// <summary>
 /// Contains unit tests for the <see cref="LibraryScanResultRepository"/> class.
@@ -21,7 +21,7 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.Libraries;
 [ExcludeFromCodeCoverage]
 public class LibraryScanResultRepositoryTests
 {
-    private readonly LuminaDbContext _mockContext;
+    private readonly NemeraDbContext _mockContext;
     private readonly LibraryScanResultRepository _sut;
     private readonly LibraryScanResultEntityFixture _libraryScanResultEntityFixture = new();
 
@@ -30,7 +30,7 @@ public class LibraryScanResultRepositoryTests
     /// </summary>
     public LibraryScanResultRepositoryTests()
     {
-        _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
+        _mockContext = Create.MockedDbContextFor<NemeraDbContext>();
         _sut = new LibraryScanResultRepository(_mockContext);
     }
 

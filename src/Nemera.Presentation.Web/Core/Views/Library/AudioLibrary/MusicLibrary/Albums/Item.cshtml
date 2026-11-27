@@ -19,11 +19,11 @@
     /library/audio-library/music-library/artists/{artistId}/albums/{albumId}?libraryId=...
 *@
 
-@using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary
-@using Lumina.Presentation.Web.Common.Enums.AudioLibrary
-@using Lumina.Presentation.Web.Common.Enums.Common
-@using Lumina.Presentation.Web.Common.Enums.MediaContributors
-@using Lumina.Presentation.Web.Common.Services
+@using Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary
+@using Nemera.Presentation.Web.Common.Enums.AudioLibrary
+@using Nemera.Presentation.Web.Common.Enums.Common
+@using Nemera.Presentation.Web.Common.Enums.MediaContributors
+@using Nemera.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
 @using System
 @using System.Globalization
@@ -1044,8 +1044,8 @@
 
         // Gets the singleton audio player, or null when the layout did not render it.
         function getAudioPlayer() {
-            return window.LuminaAudioPlayer && window.LuminaAudioPlayer.instance
-                ? window.LuminaAudioPlayer.instance
+            return window.NemeraAudioPlayer && window.NemeraAudioPlayer.instance
+                ? window.NemeraAudioPlayer.instance
                 : null;
         }
 
@@ -1189,9 +1189,9 @@
 
         // Opens the shared add-to-playlist dialog for this single track.
         function addTrackToPlaylist(track, trigger) {
-            if (!window.LuminaPlaylists || typeof window.LuminaPlaylists.showAddScopeDialogAsync !== 'function')
+            if (!window.NemeraPlaylists || typeof window.NemeraPlaylists.showAddScopeDialogAsync !== 'function')
                 return;
-            window.LuminaPlaylists.showAddScopeDialogAsync({
+            window.NemeraPlaylists.showAddScopeDialogAsync({
                 libraryId: libraryId,
                 artistId: artistId,
                 albumId: albumId,

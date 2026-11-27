@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.ID3.Common.DependencyInjection;
-using Lumina.Plugins.ID3.Core.Tags;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.ID3.Common.DependencyInjection;
+using Nemera.Plugins.ID3.Core.Tags;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Plugins.ID3.UnitTests.Common.DependencyInjection;
+namespace Nemera.Plugins.ID3.UnitTests.Common.DependencyInjection;
 
 /// <summary>
 /// Contains unit tests for the <see cref="Id3Services"/> class.

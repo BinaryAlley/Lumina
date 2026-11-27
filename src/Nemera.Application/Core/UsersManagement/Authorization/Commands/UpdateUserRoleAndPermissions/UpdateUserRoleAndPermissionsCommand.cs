@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+namespace Nemera.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
 
 /// <summary>
 /// Command for updating the authorization role and permissions of a user.

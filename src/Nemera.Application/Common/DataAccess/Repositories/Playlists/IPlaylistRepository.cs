@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Playlists;
-using Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
-using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.DTO.Playlists;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Application.Common.DataAccess.Entities.Playlists;
+using Nemera.Application.Common.DataAccess.Repositories.Common.Actions;
+using Nemera.Application.Common.DataAccess.Repositories.Common.Base;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.DTO.Playlists;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Repositories.Playlists;
+namespace Nemera.Application.Common.DataAccess.Repositories.Playlists;
 
 /// <summary>
 /// Interface for the repository for playlists.

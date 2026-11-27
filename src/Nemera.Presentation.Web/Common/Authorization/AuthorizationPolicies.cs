@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.Authorization;
+namespace Nemera.Presentation.Web.Common.Authorization;
 
 /// <summary>
 /// Contains the names of the authorization policies defined in the Web application.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
+namespace Nemera.Contracts.DTO.MediaLibrary.AudioLibrary;
 
 /// <summary>
 /// Data transfer object for the rating of an audio media element.

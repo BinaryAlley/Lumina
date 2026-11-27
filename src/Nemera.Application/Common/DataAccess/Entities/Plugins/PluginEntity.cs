@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.Plugins;
+namespace Nemera.Application.Common.DataAccess.Entities.Plugins;
 
 /// <summary>
 /// Repository entity for a plugin.

@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Time;
+namespace Nemera.Application.Common.Infrastructure.Time;
 
 /// <summary>
 /// Interface for time related concerns.

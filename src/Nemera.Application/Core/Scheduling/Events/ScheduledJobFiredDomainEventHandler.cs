@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Scheduling;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
+using Nemera.Application.Common.Infrastructure.Scheduling;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.Scheduling.Events;
+namespace Nemera.Application.Core.Scheduling.Events;
 
 /// <summary>
 /// Handler for the domain event raised when the task of a scheduled job is fired once.

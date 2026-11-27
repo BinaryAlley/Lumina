@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.UsersManagement;
+namespace Nemera.Presentation.Web.Common.Requests.UsersManagement;
 
 /// <summary>
 /// Represents a request for user registration.

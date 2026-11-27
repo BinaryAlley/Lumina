@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.FileSystemManagement.FileSystem.GetType;
+namespace Nemera.Presentation.Web.Core.Endpoints.FileSystemManagement.FileSystem.GetType;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetTypeEndpoint"/> endpoint, for OpenAPI.

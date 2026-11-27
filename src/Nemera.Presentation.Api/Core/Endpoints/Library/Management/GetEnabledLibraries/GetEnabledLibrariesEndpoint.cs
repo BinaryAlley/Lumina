@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.MediaLibrary.Management.Queries.GetEnabledLibraries;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.Library.Management;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.MediaLibrary.Management.Queries.GetEnabledLibraries;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.Library.Management;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.GetEnabledLibraries;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.Management.GetEnabledLibraries;
 
 /// <summary>
 /// API endpoint for the <c>/libraries/enabled</c> route.

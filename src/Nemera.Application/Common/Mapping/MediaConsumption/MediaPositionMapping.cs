@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.MediaConsumption;
-using Lumina.Contracts.Responses.MediaConsumption;
-using Lumina.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.Common.ValueObjects;
+using Nemera.Application.Common.DTO.MediaConsumption;
+using Nemera.Contracts.Responses.MediaConsumption;
+using Nemera.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.Common.ValueObjects;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.MediaConsumption;
+namespace Nemera.Application.Common.Mapping.MediaConsumption;
 
 /// <summary>
 /// Extension methods for converting <see cref="MediaPosition"/>. The position is mapped directly to its DTO and to its response.

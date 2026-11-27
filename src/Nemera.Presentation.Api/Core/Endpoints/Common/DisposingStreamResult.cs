@@ -5,7 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Common;
+namespace Nemera.Presentation.Api.Core.Endpoints.Common;
 
 /// <summary>
 /// A response result that writes an owned stream to the response without buffering it and releases the stream once the response is complete.

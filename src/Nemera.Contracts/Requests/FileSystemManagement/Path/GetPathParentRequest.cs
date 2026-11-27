@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Text.Json.Serialization;
 #endregion
 
-namespace Lumina.Contracts.Requests.FileSystemManagement.Path;
+namespace Nemera.Contracts.Requests.FileSystemManagement.Path;
 
 /// <summary>
 /// Represents the request for retrieving the parent path of a file system path.

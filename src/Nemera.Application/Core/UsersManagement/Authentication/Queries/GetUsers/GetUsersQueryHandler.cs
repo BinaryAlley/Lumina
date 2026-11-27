@@ -1,23 +1,23 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Mapping.Authorization;
-using Lumina.Application.Common.Mapping.UsersManagement.Users;
-using Lumina.Contracts.Responses.UsersManagement.Users;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Mapping.Authorization;
+using Nemera.Application.Common.Mapping.UsersManagement.Users;
+using Nemera.Contracts.Responses.UsersManagement.Users;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.UsersManagement.Authentication.Queries.GetUsers;
+namespace Nemera.Application.Core.UsersManagement.Authentication.Queries.GetUsers;
 
 /// <summary>
 /// Handler for the query to retrieve the list of users.

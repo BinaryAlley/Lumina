@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Primitives;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Themes;
+namespace Nemera.Presentation.Web.Core.Themes;
 
 /// <summary>
 /// Renders the audio player bar with a theme, inlining the sub templates of its dynamic content so that the client script can render queue items and playlist items from theme markup.

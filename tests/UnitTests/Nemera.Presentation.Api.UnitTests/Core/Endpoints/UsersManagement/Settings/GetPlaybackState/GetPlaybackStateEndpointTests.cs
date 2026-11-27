@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.UsersManagement.Settings.Queries.GetPlaybackState;
-using Lumina.Contracts.Fixtures.Core.Responses.UsersManagement.Settings;
-using Lumina.Contracts.Responses.UsersManagement.Settings;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Settings.GetPlaybackState;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.UsersManagement.Settings.Queries.GetPlaybackState;
+using Nemera.Contracts.Fixtures.Core.Responses.UsersManagement.Settings;
+using Nemera.Contracts.Responses.UsersManagement.Settings;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Settings.GetPlaybackState;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -13,10 +13,10 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Settings.GetPlaybackState;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Settings.GetPlaybackState;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetPlaybackStateEndpoint"/> class.

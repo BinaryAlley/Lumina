@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DTO.Playlists;
+namespace Nemera.Application.Common.DTO.Playlists;
 
 /// <summary>
 /// Data transfer object for a playlist in a list, without its entries.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Requests.Authorization;
+using Nemera.Contracts.Requests.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Requests.Authorization;
+namespace Nemera.Contracts.Fixtures.Core.Requests.Authorization;
 
 /// <summary>
 /// Fixture class for the <see cref="GetUserPermissionsRequest"/> record.

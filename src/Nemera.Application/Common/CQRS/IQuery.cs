@@ -1,4 +1,4 @@
-namespace Lumina.Application.Common.CQRS;
+namespace Nemera.Application.Common.CQRS;
 
 /// <summary>
 /// Marker interface for query types handled by <see cref="IQueryHandler{TQuery, TResult}"/>. 

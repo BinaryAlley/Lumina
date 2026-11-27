@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,16 +18,16 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Scheduling.AddScheduledJob;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Scheduling.AddScheduledJob;
 
 /// <summary>
 /// Contains security tests for the <see cref="AddScheduledJobEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AddScheduledJobEndpointTests : IClassFixture<LuminaApiFactory>, IAsyncDisposable
+public class AddScheduledJobEndpointTests : IClassFixture<NemeraApiFactory>, IAsyncDisposable
 {
     private readonly HttpClient _client;
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -39,7 +39,7 @@ public class AddScheduledJobEndpointTests : IClassFixture<LuminaApiFactory>, IAs
     /// Initializes a new instance of the <see cref="AddScheduledJobEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public AddScheduledJobEndpointTests(LuminaApiFactory apiFactory)
+    public AddScheduledJobEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
@@ -125,7 +125,7 @@ public class AddScheduledJobEndpointTests : IClassFixture<LuminaApiFactory>, IAs
         if (response.StatusCode == HttpStatusCode.OK)
         {
             using IServiceScope scope = _apiFactory.Services.CreateScope();
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             Assert.NotNull(await dbContext.ScheduledJobs.FirstOrDefaultAsync(scheduledJob => scheduledJob.Name == maliciousName));
         }
     }
@@ -138,7 +138,7 @@ public class AddScheduledJobEndpointTests : IClassFixture<LuminaApiFactory>, IAs
         if (_adminUserId != Guid.Empty)
         {
             using IServiceScope scope = _apiFactory.Services.CreateScope();
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
             ScheduledJobEntity[] scheduledJobs = await dbContext.ScheduledJobs
                 .Where(scheduledJob => scheduledJob.OwnerUserId == _adminUserId)

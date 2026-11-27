@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.Scheduling;
+namespace Nemera.Contracts.Requests.Scheduling;
 
 /// <summary>
 /// Represents a request to start the execution cycle of a scheduled job.

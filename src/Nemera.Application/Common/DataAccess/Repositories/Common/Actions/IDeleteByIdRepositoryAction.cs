@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
+using Nemera.Domain.Common.Primitives;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
+namespace Nemera.Application.Common.DataAccess.Repositories.Common.Actions;
 
 /// <summary>
 /// Interface defining the "delete by id" action for interacting with a generic persistence medium.

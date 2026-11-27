@@ -1,22 +1,22 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Infrastructure.Plugins;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.Plugins.Commands.InstallPlugin;
-using Lumina.Application.Fixtures.Core.Plugins.Commands.InstallPlugin;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Plugins;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.Plugins.Commands.InstallPlugin;
+using Nemera.Application.Fixtures.Core.Plugins.Commands.InstallPlugin;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Plugins.Commands.InstallPlugin;
+namespace Nemera.Application.UnitTests.Core.Plugins.Commands.InstallPlugin;
 
 /// <summary>
 /// Contains unit tests for the <see cref="InstallPluginCommandHandler"/> class.

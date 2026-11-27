@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.CQRS;
+namespace Nemera.Application.Common.CQRS;
 
 /// <summary>
 /// Defines a contract for handling commands in the application layer.

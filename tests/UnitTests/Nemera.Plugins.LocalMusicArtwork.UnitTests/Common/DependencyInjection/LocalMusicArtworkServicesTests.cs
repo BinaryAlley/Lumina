@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.LocalMusicArtwork.Common.DependencyInjection;
-using Lumina.Plugins.LocalMusicArtwork.Core;
-using Lumina.Plugins.LocalMusicArtwork.Core.Settings;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.LocalMusicArtwork.Common.DependencyInjection;
+using Nemera.Plugins.LocalMusicArtwork.Core;
+using Nemera.Plugins.LocalMusicArtwork.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Plugins.LocalMusicArtwork.UnitTests.Common.DependencyInjection;
+namespace Nemera.Plugins.LocalMusicArtwork.UnitTests.Common.DependencyInjection;
 
 /// <summary>
 /// Contains unit tests for the <see cref="LocalMusicArtworkServices"/> class.

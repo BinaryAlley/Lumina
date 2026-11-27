@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -8,13 +8,13 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Health;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Health;
 
 /// <summary>
 /// Contains integration tests for the <c>/health/live</c> and <c>/health/ready</c> probe routes.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class HealthEndpointTests : IClassFixture<LuminaApiFactory>
+public class HealthEndpointTests : IClassFixture<NemeraApiFactory>
 {
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -26,7 +26,7 @@ public class HealthEndpointTests : IClassFixture<LuminaApiFactory>
     /// Initializes a new instance of the <see cref="HealthEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public HealthEndpointTests(LuminaApiFactory apiFactory)
+    public HealthEndpointTests(NemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
     }

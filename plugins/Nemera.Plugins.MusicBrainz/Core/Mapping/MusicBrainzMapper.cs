@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
-using Lumina.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,7 +14,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.Core.Mapping;
+namespace Nemera.Plugins.MusicBrainz.Core.Mapping;
 
 /// <summary>
 /// Maps MusicBrainz web service responses into the application's media metadata DTOs.

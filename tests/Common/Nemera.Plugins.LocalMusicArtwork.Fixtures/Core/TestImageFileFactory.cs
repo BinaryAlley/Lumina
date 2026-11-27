@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 #endregion
 
-namespace Lumina.Plugins.LocalMusicArtwork.Fixtures.Core;
+namespace Nemera.Plugins.LocalMusicArtwork.Fixtures.Core;
 
 /// <summary>
 /// Creates image files of the formats a local music library stores next to its tracks, so that artwork scanning can be exercised against real files.

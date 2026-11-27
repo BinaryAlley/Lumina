@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Requests.UsersManagement.Settings;
+using Nemera.Contracts.Requests.UsersManagement.Settings;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Requests.UsersManagement.Settings;
+namespace Nemera.Contracts.Fixtures.Core.Requests.UsersManagement.Settings;
 
 /// <summary>
 /// Fixture class for the <see cref="UpdatePlaybackStateRequest"/> record.

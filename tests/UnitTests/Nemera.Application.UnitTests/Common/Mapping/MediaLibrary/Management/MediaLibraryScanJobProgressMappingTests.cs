@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.MediaLibrary.Management;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Nemera.Application.Common.Mapping.MediaLibrary.Management;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.MediaLibrary.Management;
+namespace Nemera.Application.UnitTests.Common.Mapping.MediaLibrary.Management;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MediaLibraryScanJobProgressMapping"/> class.

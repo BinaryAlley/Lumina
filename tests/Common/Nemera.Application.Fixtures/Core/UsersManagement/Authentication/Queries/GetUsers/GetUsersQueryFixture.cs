@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.UsersManagement.Authentication.Queries.GetUsers;
+using Nemera.Application.Core.UsersManagement.Authentication.Queries.GetUsers;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.UsersManagement.Authentication.Queries.GetUsers;
+namespace Nemera.Application.Fixtures.Core.UsersManagement.Authentication.Queries.GetUsers;
 
 /// <summary>
 /// Fixture class for the <see cref="GetUsersQuery"/> class.

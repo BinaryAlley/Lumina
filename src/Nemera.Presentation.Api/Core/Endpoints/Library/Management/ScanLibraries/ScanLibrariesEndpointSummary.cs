@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.ScanLibraries;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.Management.ScanLibraries;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="ScanLibrariesEndpoint"/> API endpoint, for OpenAPI.

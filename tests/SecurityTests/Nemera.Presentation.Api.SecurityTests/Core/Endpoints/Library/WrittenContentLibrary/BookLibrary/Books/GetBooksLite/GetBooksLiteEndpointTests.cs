@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,16 +12,16 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBooksLite;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBooksLite;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetBooksLiteEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetBooksLiteEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class GetBooksLiteEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
     private readonly HttpClient _client;
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -31,7 +31,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
     /// Initializes a new instance of the <see cref="GetBooksLiteEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetBooksLiteEndpointTests(LuminaApiFactory apiFactory)
+    public GetBooksLiteEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
@@ -80,7 +80,7 @@ public class GetBooksLiteEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
 
         // The injected statement must never be executed: the Books table and the seeded rows must still be there.
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.Equal(1, await dbContext.Books.CountAsync(book => book.LibraryId == libraryId));
 
         await _apiFactory.RemoveTestUserAsync(username);

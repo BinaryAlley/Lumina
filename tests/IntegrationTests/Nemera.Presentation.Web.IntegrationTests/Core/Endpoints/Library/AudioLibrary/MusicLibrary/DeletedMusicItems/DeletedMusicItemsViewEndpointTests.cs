@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Web.Common.DTO.Libraries;
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.DeletedMusicItems;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Libraries;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.DeletedMusicItems;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -15,15 +15,15 @@ using System.Net.Http;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.DeletedMusicItems;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.DeletedMusicItems;
 
 /// <summary>
 /// Contains integration tests for the <see cref="DeletedMusicItemsViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class DeletedMusicItemsViewEndpointTests : IClassFixture<LuminaWebFactory>
+public class DeletedMusicItemsViewEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly LibraryDtoFixture _libraryDtoFixture = new();
     private readonly DeletedMusicArtistDtoFixture _deletedMusicArtistDtoFixture = new();
     private readonly DeletedMusicAlbumDtoFixture _deletedMusicAlbumDtoFixture = new();
@@ -34,7 +34,7 @@ public class DeletedMusicItemsViewEndpointTests : IClassFixture<LuminaWebFactory
     /// Initializes a new instance of the <see cref="DeletedMusicItemsViewEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public DeletedMusicItemsViewEndpointTests(LuminaWebFactory apiFactory)
+    public DeletedMusicItemsViewEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

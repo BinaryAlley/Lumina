@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Application.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -12,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Common.Configuration;
+namespace Nemera.DataAccess.UnitTests.Common.Configuration;
 
 /// <summary>
 /// Contains unit tests for the <see cref="FavoriteConfiguration"/> class.
@@ -20,14 +20,14 @@ namespace Lumina.DataAccess.UnitTests.Common.Configuration;
 [ExcludeFromCodeCoverage]
 public class FavoriteConfigurationTests
 {
-    private readonly LuminaDbContext _context;
+    private readonly NemeraDbContext _context;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FavoriteConfigurationTests"/> class.
     /// </summary>
     public FavoriteConfigurationTests()
     {
-        _context = new LuminaDbContext(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite("Data Source=:memory:").Options);
+        _context = new NemeraDbContext(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite("Data Source=:memory:").Options);
     }
 
     /// <summary>

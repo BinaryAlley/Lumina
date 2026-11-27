@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.FileSystemManagement.Thumbnails;
+namespace Nemera.Contracts.Requests.FileSystemManagement.Thumbnails;
 
 /// <summary>
 /// Represents a request to get the thumbnail of a file system file.

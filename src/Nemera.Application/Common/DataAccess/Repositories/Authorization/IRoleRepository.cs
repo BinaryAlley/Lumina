@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
-using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Repositories.Common.Actions;
+using Nemera.Application.Common.DataAccess.Repositories.Common.Base;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Repositories.Authorization;
+namespace Nemera.Application.Common.DataAccess.Repositories.Authorization;
 
 /// <summary>
 /// Interface for the repository for authorization roles.

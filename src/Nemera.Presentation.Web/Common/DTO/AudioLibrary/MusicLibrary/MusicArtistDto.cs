@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Web.Common.DTO.MediaContributors;
+using Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Common.DTO.MediaContributors;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+namespace Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
 
 /// <summary>
 /// Data transfer object carrying the full details of a music artist, as stored in the media library.

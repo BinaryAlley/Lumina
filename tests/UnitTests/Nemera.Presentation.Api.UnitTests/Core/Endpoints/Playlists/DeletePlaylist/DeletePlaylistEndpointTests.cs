@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Playlists.Commands.DeletePlaylist;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Playlists.DeletePlaylist;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Playlists.Commands.DeletePlaylist;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Playlists.DeletePlaylist;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +12,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Playlists.DeletePlaylist;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Playlists.DeletePlaylist;
 
 /// <summary>
 /// Contains unit tests for the <see cref="DeletePlaylistEndpoint"/> class.

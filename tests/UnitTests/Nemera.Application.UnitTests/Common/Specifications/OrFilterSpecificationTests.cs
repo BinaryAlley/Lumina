@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Specifications;
-using Lumina.Application.Fixtures.Common.Specifications;
+using Nemera.Application.Common.Specifications;
+using Nemera.Application.Fixtures.Common.Specifications;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Specifications;
+namespace Nemera.Application.UnitTests.Common.Specifications;
 
 /// <summary>
 /// Contains unit tests for the <see cref="OrFilterSpecification{T}"/> class.

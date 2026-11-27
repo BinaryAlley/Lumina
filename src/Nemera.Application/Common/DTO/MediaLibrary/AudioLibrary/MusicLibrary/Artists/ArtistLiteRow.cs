@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+namespace Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 
 /// <summary>
 /// Lightweight read model of an artist, containing only the fields needed to display the artist in a card-based grid or a list.

@@ -1,28 +1,28 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.DataAccess.Core.UoW;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Libraries;
+namespace Nemera.DataAccess.Core.Repositories.Libraries;
 
 /// <summary>
 /// Repository for media library scan results.
 /// </summary>
 internal sealed class LibraryScanResultRepository : ILibraryScanResultRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryScanResultRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public LibraryScanResultRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public LibraryScanResultRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -33,7 +33,7 @@ internal sealed class LibraryScanResultRepository : ILibraryScanResultRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public Task<Result<Created>> InsertAsync(LibraryScanResultEntity libraryScan, CancellationToken cancellationToken)
     {
-        _luminaDbContext.LibraryScanResults.Add(libraryScan);
+        _nemeraDbContext.LibraryScanResults.Add(libraryScan);
         return Task.FromResult(Result.From(Result.Created));
     }
 }

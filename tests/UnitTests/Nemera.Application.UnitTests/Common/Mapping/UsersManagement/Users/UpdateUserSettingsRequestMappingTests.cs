@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.UsersManagement.Users;
-using Lumina.Application.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
-using Lumina.Contracts.Fixtures.Core.Requests.UsersManagement.Settings;
-using Lumina.Contracts.Requests.UsersManagement.Settings;
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Application.Common.Mapping.UsersManagement.Users;
+using Nemera.Application.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
+using Nemera.Contracts.Fixtures.Core.Requests.UsersManagement.Settings;
+using Nemera.Contracts.Requests.UsersManagement.Settings;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.UsersManagement.Users;
+namespace Nemera.Application.UnitTests.Common.Mapping.UsersManagement.Users;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdateUserSettingsRequestMapping"/> class.

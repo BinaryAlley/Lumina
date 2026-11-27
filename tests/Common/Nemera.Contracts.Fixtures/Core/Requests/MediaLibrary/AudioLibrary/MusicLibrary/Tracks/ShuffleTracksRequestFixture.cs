@@ -1,12 +1,12 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+namespace Nemera.Contracts.Fixtures.Core.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 
 /// <summary>
 /// Fixture class for the <see cref="ShuffleTracksRequest"/> record.

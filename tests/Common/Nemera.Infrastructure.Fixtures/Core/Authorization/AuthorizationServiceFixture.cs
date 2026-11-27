@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
-using Lumina.Infrastructure.Core.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Infrastructure.Core.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.Fixtures.Core.Authorization;
+namespace Nemera.Infrastructure.Fixtures.Core.Authorization;
 
 /// <summary>
 /// Test-support class for the <see cref="AuthorizationService"/> tests.

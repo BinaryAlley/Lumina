@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Plugins.Queries.GetLibraryBookReaders;
+using Nemera.Application.Core.Plugins.Queries.GetLibraryBookReaders;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Plugins.Queries.GetLibraryBookReaders;
+namespace Nemera.Application.Fixtures.Core.Plugins.Queries.GetLibraryBookReaders;
 
 /// <summary>
 /// Fixture class for the <see cref="GetLibraryBookReadersQuery"/> class.

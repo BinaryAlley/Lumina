@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
-using Lumina.Application.Fixtures.Core.FileSystemManagement.Drives.Queries.GetDrives;
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Nemera.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
+using Nemera.Application.Fixtures.Core.FileSystemManagement.Drives.Queries.GetDrives;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Drives.Queries.GetDrives;
+namespace Nemera.Application.UnitTests.Core.FileSystemManagement.Drives.Queries.GetDrives;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetDrivesQueryHandler"/> class.

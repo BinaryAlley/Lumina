@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Common.Enums.MediaConsumption;
-using Lumina.Presentation.Web.Common.Requests.Library.Statistics;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Library.Statistics.GetTagConsumption;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.Statistics;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Common.Enums.MediaConsumption;
+using Nemera.Presentation.Web.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Statistics.GetTagConsumption;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System;
@@ -19,7 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Library.Statistics.GetTagConsumption;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Library.Statistics.GetTagConsumption;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetTagConsumptionEndpoint"/> class.

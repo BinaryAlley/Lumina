@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.DataAccess.Core.UoW;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Common.Interceptors;
+namespace Nemera.DataAccess.Common.Interceptors;
 
 /// <summary>
 /// Interceptor for updating audit fields automatically for entities implementing <see cref="IAuditableEntity"/>.
@@ -66,7 +66,7 @@ public sealed class UpdateAuditableEntitiesInterceptor : SaveChangesInterceptor
         if (context is null)
             return;
         // Initialization is the one save whose audit identity is provided explicitly, because no user account exists yet.
-        if (context is LuminaDbContext luminaDbContext && luminaDbContext.IsInitializationSave)
+        if (context is NemeraDbContext nemeraDbContext && nemeraDbContext.IsInitializationSave)
             return;
 
         Guid? userId = _currentUserService.UserId;

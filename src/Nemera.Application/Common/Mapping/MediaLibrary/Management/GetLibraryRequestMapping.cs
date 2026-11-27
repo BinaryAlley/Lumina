@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibrary;
-using Lumina.Contracts.Requests.MediaLibrary.Management;
+using Nemera.Application.Core.MediaLibrary.Management.Queries.GetLibrary;
+using Nemera.Contracts.Requests.MediaLibrary.Management;
 using System;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.MediaLibrary.Management;
+namespace Nemera.Application.Common.Mapping.MediaLibrary.Management;
 
 /// <summary>
 /// Extension methods for converting <see cref="GetLibraryRequest"/>.

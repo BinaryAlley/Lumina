@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Fixtures.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Fixtures.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
+namespace Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
 
 /// <summary>
 /// Fixture class for the <see cref="MediaContributorEntity"/> class.

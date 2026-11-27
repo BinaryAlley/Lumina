@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Lumina.Plugins.Pdf.UnitTests")]
-[assembly: InternalsVisibleTo("Lumina.Plugins.Pdf.IntegrationTests")]
-[assembly: InternalsVisibleTo("Lumina.Plugins.Pdf.Fixtures")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.Pdf.UnitTests")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.Pdf.IntegrationTests")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.Pdf.Fixtures")]

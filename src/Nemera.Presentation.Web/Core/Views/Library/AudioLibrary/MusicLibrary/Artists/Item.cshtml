@@ -19,11 +19,11 @@
     /library/audio-library/music-library/artists/{artistId}?libraryId=...
 *@
 
-@using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary
-@using Lumina.Presentation.Web.Common.Enums.AudioLibrary
-@using Lumina.Presentation.Web.Common.Enums.Common
-@using Lumina.Presentation.Web.Common.Enums.MediaContributors
-@using Lumina.Presentation.Web.Common.Services
+@using Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary
+@using Nemera.Presentation.Web.Common.Enums.AudioLibrary
+@using Nemera.Presentation.Web.Common.Enums.Common
+@using Nemera.Presentation.Web.Common.Enums.MediaContributors
+@using Nemera.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
 @using System
 @using System.Globalization
@@ -1133,8 +1133,8 @@
                 event.preventDefault();
                 event.stopImmediatePropagation();
                 closeCardMenus();
-                if (window.LuminaPlaylists)
-                    await window.LuminaPlaylists.showAddScopeDialogAsync({ libraryId: libraryId, artistId: artistId, albumId: album.id, title: album.title || '', addToPlaylistLabel: jsLocalizedStrings.addToPlaylist, returnFocus: trigger });
+                if (window.NemeraPlaylists)
+                    await window.NemeraPlaylists.showAddScopeDialogAsync({ libraryId: libraryId, artistId: artistId, albumId: album.id, title: album.title || '', addToPlaylistLabel: jsLocalizedStrings.addToPlaylist, returnFocus: trigger });
             });
 
             const deleteAction = createAlbumMenuAction(jsLocalizedStrings.remove, 'card-action-delete');

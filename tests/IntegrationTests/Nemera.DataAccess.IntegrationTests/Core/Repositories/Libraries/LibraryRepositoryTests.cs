@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Common.Interceptors;
-using Lumina.DataAccess.Core.Repositories.Libraries;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Common.Interceptors;
+using Nemera.DataAccess.Core.Repositories.Libraries;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -20,7 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.Libraries;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.Libraries;
 
 /// <summary>
 /// Contains integration tests for the <see cref="LibraryRepository"/> class, exercising it against a real SQLite database.
@@ -36,11 +36,11 @@ public class LibraryRepositoryTests
     public async Task UpdateAsync_WhenNothingChanged_ShouldNotChangeTheLibraryAudit()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryrepo-update-noop-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-libraryrepo-update-noop-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         LibraryRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         LibraryEntity library = _libraryEntityFixture.Create(userId: userId, contentLocations: ["/media/one", "/media/two"]);
@@ -64,11 +64,11 @@ public class LibraryRepositoryTests
     public async Task UpdateAsync_WhenContentLocationsChange_ShouldApplyOnlyTheDeltasAndKeepTheUnchangedOnes()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryrepo-update-locations-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-libraryrepo-update-locations-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         LibraryRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         LibraryEntity library = _libraryEntityFixture.Create(userId: userId, contentLocations: ["/media/one", "/media/two", "/media/keep"]);
@@ -100,11 +100,11 @@ public class LibraryRepositoryTests
     public async Task InsertAsync_WhenLibraryTracksConsumptionProgress_ShouldPersistTheTrackingAndThreshold()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryrepo-insert-consumption-tracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-libraryrepo-insert-consumption-tracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         LibraryRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         LibraryEntity library = _libraryEntityFixture.Create(userId: userId, shouldTrackConsumptionProgress: true, completionThresholdPercentage: 75, contentLocations: []);
@@ -126,11 +126,11 @@ public class LibraryRepositoryTests
     public async Task InsertAsync_WhenLibraryDoesNotTrackConsumptionProgress_ShouldPersistTrackingOffWithoutThreshold()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryrepo-insert-consumption-off-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-libraryrepo-insert-consumption-off-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         LibraryRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         LibraryEntity library = _libraryEntityFixture.Create(userId: userId, shouldTrackConsumptionProgress: false, completionThresholdPercentage: null, contentLocations: []);
@@ -152,11 +152,11 @@ public class LibraryRepositoryTests
     public async Task InsertAsync_WhenLibraryContentIsOnSsd_ShouldPersistTheSetting()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryrepo-insert-ssd-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-libraryrepo-insert-ssd-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         LibraryRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         LibraryEntity library = _libraryEntityFixture.Create(userId: userId, isContentOnSsd: true, contentLocations: []);
@@ -177,11 +177,11 @@ public class LibraryRepositoryTests
     public async Task UpdateAsync_WhenConsumptionSettingsAreEnabled_ShouldPersistTheTrackingAndThreshold()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryrepo-update-consumption-on-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-libraryrepo-update-consumption-on-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         LibraryRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         LibraryEntity library = _libraryEntityFixture.Create(userId: userId, shouldTrackConsumptionProgress: false, completionThresholdPercentage: null, contentLocations: []);
@@ -214,11 +214,11 @@ public class LibraryRepositoryTests
     public async Task UpdateAsync_WhenConsumptionSettingsAreDisabled_ShouldPersistTrackingOffWithoutThreshold()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryrepo-update-consumption-off-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-libraryrepo-update-consumption-off-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         LibraryRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         LibraryEntity library = _libraryEntityFixture.Create(userId: userId, shouldTrackConsumptionProgress: true, completionThresholdPercentage: 80, contentLocations: []);
@@ -251,11 +251,11 @@ public class LibraryRepositoryTests
     public async Task UpdateAsync_WhenOnlyConsumptionSettingsChange_ShouldStampTheUpdateAudit()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-libraryrepo-update-consumption-audit-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-libraryrepo-update-consumption-audit-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         LibraryRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         LibraryEntity library = _libraryEntityFixture.Create(userId: userId, shouldTrackConsumptionProgress: false, completionThresholdPercentage: null, contentLocations: []);
@@ -293,13 +293,13 @@ public class LibraryRepositoryTests
     /// <param name="userId">The Id of the user reported as the current user.</param>
     /// <param name="utcNow">The current UTC time reported by the time provider.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
+    private static NemeraDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
     {
         ICurrentUserService currentUserService = Substitute.For<ICurrentUserService>();
         currentUserService.UserId.Returns(userId);
         IDateTimeProvider dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(utcNow);
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .AddInterceptors(new UpdateAuditableEntitiesInterceptor(currentUserService, dateTimeProvider))
             .Options);
@@ -313,7 +313,7 @@ public class LibraryRepositoryTests
     /// <param name="context">The context that tracks the stored library.</param>
     /// <param name="libraryId">The Id of the library to load.</param>
     /// <returns>The detached copy of the library.</returns>
-    private static async Task<LibraryEntity> LoadDetachedLibraryAsync(LuminaDbContext context, Guid libraryId)
+    private static async Task<LibraryEntity> LoadDetachedLibraryAsync(NemeraDbContext context, Guid libraryId)
     {
         return await context.Libraries
             .AsNoTracking()

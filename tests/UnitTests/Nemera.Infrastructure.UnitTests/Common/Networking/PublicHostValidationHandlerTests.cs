@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Networking;
-using Lumina.Infrastructure.Common.Networking;
-using Lumina.Plugins.Contracts.Common.Http;
+using Nemera.Domain.SharedKernel.Common.Enums.Networking;
+using Nemera.Infrastructure.Common.Networking;
+using Nemera.Plugins.Contracts.Common.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Common.Networking;
+namespace Nemera.Infrastructure.UnitTests.Common.Networking;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PublicHostValidationHandler"/> class.

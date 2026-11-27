@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.CoverArtArchive.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.CoverArtArchive.Common.Models.DTO.Settings;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.Core.Settings;
+namespace Nemera.Plugins.CoverArtArchive.Core.Settings;
 
 /// <summary>
 /// Provides the runtime settings of the Cover Art Archive artwork plugin, overlaying the settings persisted by the host over the configured defaults.

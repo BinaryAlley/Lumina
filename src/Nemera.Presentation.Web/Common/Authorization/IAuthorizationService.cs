@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Authorization;
+using Nemera.Presentation.Web.Common.Enums.Authorization;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Authorization;
+namespace Nemera.Presentation.Web.Common.Authorization;
 
 /// <summary>
 /// Interface for the service for managing authorization.

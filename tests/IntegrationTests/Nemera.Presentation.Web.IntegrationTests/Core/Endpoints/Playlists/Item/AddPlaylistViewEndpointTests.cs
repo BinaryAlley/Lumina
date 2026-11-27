@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Playlists.Item;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Playlists.Item;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -9,23 +9,23 @@ using System.Net.Http;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Playlists.Item;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Playlists.Item;
 
 /// <summary>
 /// Contains integration tests for the <see cref="AddPlaylistViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AddPlaylistViewEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class AddPlaylistViewEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string WEB_ROUTE = "/en-us/playlists/item";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddPlaylistViewEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public AddPlaylistViewEndpointTests(LuminaWebFactory apiFactory)
+    public AddPlaylistViewEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

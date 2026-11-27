@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.MediaLibrary.Management;
-using Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
-using Lumina.Contracts.Requests.MediaLibrary.Management;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Presentation.Api.Common.Routes.Library.Management;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.MediaLibrary.Management;
+using Nemera.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
+using Nemera.Contracts.Requests.MediaLibrary.Management;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Presentation.Api.Common.Routes.Library.Management;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.AddLibrary;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.Management.AddLibrary;
 
 /// <summary>
 /// API endpoint for the <c>/libraries</c> route.

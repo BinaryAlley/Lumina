@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.Common;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Repositories.Common.Base;
+namespace Nemera.Application.Common.DataAccess.Repositories.Common.Base;
 
 /// <summary>
 /// Interface for interaction with a generic persistence medium.

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 #endregion
 
-namespace Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
+namespace Nemera.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
 
 /// <summary>
 /// Command for the initial application setup.

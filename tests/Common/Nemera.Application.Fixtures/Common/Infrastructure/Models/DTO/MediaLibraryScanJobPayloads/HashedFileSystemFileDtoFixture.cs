@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
+using Nemera.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
+namespace Nemera.Application.Fixtures.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
 
 /// <summary>
 /// Fixture class for the <see cref="HashedFileSystemFileDto"/> class.

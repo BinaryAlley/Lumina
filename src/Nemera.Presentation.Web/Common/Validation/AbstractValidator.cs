@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.Primitives;
 using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Validation;
+namespace Nemera.Presentation.Web.Common.Validation;
 
 /// <summary>
 /// Base class for creating validators for a specific type.

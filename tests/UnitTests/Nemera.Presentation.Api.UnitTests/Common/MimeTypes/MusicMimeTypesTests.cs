@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Presentation.Api.Common.MimeTypes;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Presentation.Api.Common.MimeTypes;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Common.MimeTypes;
+namespace Nemera.Presentation.Api.UnitTests.Common.MimeTypes;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MusicMimeTypes"/> class.

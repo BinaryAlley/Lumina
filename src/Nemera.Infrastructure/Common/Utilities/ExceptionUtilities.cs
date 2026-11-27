@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Utilities;
+namespace Nemera.Infrastructure.Common.Utilities;
 
 /// <summary>
 /// Exception extension methods.

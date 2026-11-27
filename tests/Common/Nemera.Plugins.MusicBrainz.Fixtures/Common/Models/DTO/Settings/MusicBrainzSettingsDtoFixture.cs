@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Plugins.MusicBrainz.Common.Models.DTO.Settings;
+using Nemera.Plugins.MusicBrainz.Common.Models.DTO.Settings;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.Fixtures.Common.Models.DTO.Settings;
+namespace Nemera.Plugins.MusicBrainz.Fixtures.Common.Models.DTO.Settings;
 
 /// <summary>
 /// Fixture class for the <see cref="MusicBrainzSettingsDto"/> class.
@@ -43,7 +43,7 @@ internal sealed class MusicBrainzSettingsDtoFixture
         {
             BaseUrl = baseUrl ?? _faker.Internet.Url(),
             DoesAllowPrivateBaseUrl = doesAllowPrivateBaseUrl ?? _faker.Random.Bool(),
-            UserAgent = userAgent ?? $"Lumina-MusicBrainz/{_faker.Random.Int(1, 9)}.{_faker.Random.Int(0, 9)}",
+            UserAgent = userAgent ?? $"Nemera-MusicBrainz/{_faker.Random.Int(1, 9)}.{_faker.Random.Int(0, 9)}",
             ContactEmail = includeContactEmail ? contactEmail ?? _faker.Internet.Email() : null,
             SearchResultLimit = searchResultLimit ?? _faker.Random.Int(1, 100),
             ReleaseLookupLimit = releaseLookupLimit ?? _faker.Random.Int(1, 100),

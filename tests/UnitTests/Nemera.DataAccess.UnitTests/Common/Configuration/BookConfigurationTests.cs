@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System;
@@ -11,7 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Common.Configuration;
+namespace Nemera.DataAccess.UnitTests.Common.Configuration;
 
 /// <summary>
 /// Contains unit tests for the <see cref="BookConfiguration"/> class.
@@ -19,14 +19,14 @@ namespace Lumina.DataAccess.UnitTests.Common.Configuration;
 [ExcludeFromCodeCoverage]
 public class BookConfigurationTests
 {
-    private readonly LuminaDbContext _context;
+    private readonly NemeraDbContext _context;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BookConfigurationTests"/> class.
     /// </summary>
     public BookConfigurationTests()
     {
-        _context = new LuminaDbContext(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite("Data Source=:memory:").Options);
+        _context = new NemeraDbContext(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite("Data Source=:memory:").Options);
     }
 
     [Fact]

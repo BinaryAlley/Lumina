@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Common.Requests.Library.Statistics;
-using Lumina.Presentation.Web.Core.Endpoints.Library.Statistics.GetAllUsersConsumptionStatistics;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.Statistics;
-using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Statistics.GetAllUsersConsumptionStatistics;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Fixtures.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -18,17 +18,17 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Statistics.GetAllUsersConsumptionStatistics;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Library.Statistics.GetAllUsersConsumptionStatistics;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetAllUsersConsumptionStatisticsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetAllUsersConsumptionStatisticsEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class GetAllUsersConsumptionStatisticsEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string WEB_ROUTE = "/en-us/library/statistics/api-get-all-users-statistics";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly GetAllUsersConsumptionStatisticsRequestFixture _getAllUsersConsumptionStatisticsRequestFixture = new();
     private readonly AllUsersConsumptionStatisticsDtoFixture _allUsersConsumptionStatisticsDtoFixture = new();
     private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
@@ -37,7 +37,7 @@ public class GetAllUsersConsumptionStatisticsEndpointTests : IClassFixture<Lumin
     /// Initializes a new instance of the <see cref="GetAllUsersConsumptionStatisticsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetAllUsersConsumptionStatisticsEndpointTests(LuminaWebFactory apiFactory)
+    public GetAllUsersConsumptionStatisticsEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -105,7 +105,7 @@ public class GetAllUsersConsumptionStatisticsEndpointTests : IClassFixture<Lumin
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     [Fact]

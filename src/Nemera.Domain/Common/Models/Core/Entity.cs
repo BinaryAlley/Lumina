@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
+using Nemera.Domain.Common.Primitives;
 using System;
 #endregion
 
-namespace Lumina.Domain.Common.Models.Core;
+namespace Nemera.Domain.Common.Models.Core;
 
 /// <summary>
 /// Base class for all domain Entities.

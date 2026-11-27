@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaConsumption.Commands.StopConsumption;
-using Lumina.Application.Fixtures.Core.MediaConsumption.Commands.StopConsumption;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Application.Core.MediaConsumption.Commands.StopConsumption;
+using Nemera.Application.Fixtures.Core.MediaConsumption.Commands.StopConsumption;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.MediaConsumption.Commands.StopConsumption;
+namespace Nemera.Application.UnitTests.Core.MediaConsumption.Commands.StopConsumption;
 
 /// <summary>
 /// Contains unit tests for the <see cref="StopConsumptionCommandValidator"/> class.

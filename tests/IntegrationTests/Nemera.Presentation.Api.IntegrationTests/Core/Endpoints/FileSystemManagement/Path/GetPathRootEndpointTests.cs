@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Contracts.Responses.FileSystemManagement.Path;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -13,16 +13,16 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemManagement.Path;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemManagement.Path;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetPathRootEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetPathRootEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetPathRootEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -33,7 +33,7 @@ public class GetPathRootEndpointTests : IClassFixture<AuthenticatedLuminaApiFact
     /// Initializes a new instance of the <see cref="GetPathRootEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetPathRootEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetPathRootEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;

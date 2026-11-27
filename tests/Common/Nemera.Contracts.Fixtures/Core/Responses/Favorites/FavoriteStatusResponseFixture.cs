@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Responses.Favorites;
+using Nemera.Contracts.Responses.Favorites;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Responses.Favorites;
+namespace Nemera.Contracts.Fixtures.Core.Responses.Favorites;
 
 /// <summary>
 /// Fixture class for the <see cref="FavoriteStatusResponse"/> record.

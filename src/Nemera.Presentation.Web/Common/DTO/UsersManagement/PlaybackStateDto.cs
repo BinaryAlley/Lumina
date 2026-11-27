@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.UsersManagement;
+namespace Nemera.Presentation.Web.Common.DTO.UsersManagement;
 
 /// <summary>
 /// Data transfer object for the playback state a user last reported to the player. The player writes these values automatically, and they are not part of the settings the user edits.

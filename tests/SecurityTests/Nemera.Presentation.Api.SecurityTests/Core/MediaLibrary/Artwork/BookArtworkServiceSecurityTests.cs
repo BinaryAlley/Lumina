@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
-using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
-using Lumina.Application.Fixtures.Common.Infrastructure.Models.DTO.Configuration;
-using Lumina.Contracts.Fixtures.Core.DTO.Common;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
-using Lumina.Infrastructure.Common.DependencyInjection;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
+using Nemera.Application.Fixtures.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Contracts.Fixtures.Core.DTO.Common;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Nemera.Infrastructure.Common.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -22,7 +22,7 @@ using System.Net;
 using System.Net.Sockets;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.MediaLibrary.Artwork;
+namespace Nemera.Presentation.Api.SecurityTests.Core.MediaLibrary.Artwork;
 
 /// <summary>
 /// Contains security tests for the <see cref="IBookArtworkService"/> contract, exercised through the real <see cref="BookArtworkService"/> implementation resolved from the dependency injection container.
@@ -120,9 +120,9 @@ public class BookArtworkServiceSecurityTests
     public async Task SaveBookArtworkAsync_WhenLocalArtworkIsAReparsePoint_ShouldRejectIt()
     {
         // Arrange
-        string targetDirectory = Path.Combine(Path.GetTempPath(), $"lumina-security-junction-target-{Guid.NewGuid():N}");
+        string targetDirectory = Path.Combine(Path.GetTempPath(), $"nemera-security-junction-target-{Guid.NewGuid():N}");
         Directory.CreateDirectory(targetDirectory);
-        string linkPath = Path.Combine(Path.GetTempPath(), $"lumina-security-junction-link-{Guid.NewGuid():N}");
+        string linkPath = Path.Combine(Path.GetTempPath(), $"nemera-security-junction-link-{Guid.NewGuid():N}");
         if (!TryCreateJunction(linkPath, targetDirectory))
         {
             Directory.Delete(targetDirectory, true);
@@ -156,7 +156,7 @@ public class BookArtworkServiceSecurityTests
     public async Task SaveBookArtworkAsync_WhenNameSegmentsContainPathTraversal_ShouldSanitizeThemIntoLiteralSegments()
     {
         // Arrange
-        string sourcePath = Path.Combine(Path.GetTempPath(), $"lumina-security-source-{Guid.NewGuid():N}.jpg");
+        string sourcePath = Path.Combine(Path.GetTempPath(), $"nemera-security-source-{Guid.NewGuid():N}.jpg");
         File.WriteAllBytes(sourcePath, new byte[1024]);
         try
         {
@@ -203,7 +203,7 @@ public class BookArtworkServiceSecurityTests
     public async Task SaveBookArtworkAsync_WhenLibraryNameIsADotDotSegment_ShouldReturnInvalidPath()
     {
         // Arrange
-        string sourcePath = Path.Combine(Path.GetTempPath(), $"lumina-security-source-{Guid.NewGuid():N}.jpg");
+        string sourcePath = Path.Combine(Path.GetTempPath(), $"nemera-security-source-{Guid.NewGuid():N}.jpg");
         File.WriteAllBytes(sourcePath, new byte[1024]);
         try
         {

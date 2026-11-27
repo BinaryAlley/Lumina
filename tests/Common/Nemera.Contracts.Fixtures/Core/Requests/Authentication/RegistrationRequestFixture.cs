@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Requests.Authentication;
+using Nemera.Contracts.Requests.Authentication;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Requests.Authentication;
+namespace Nemera.Contracts.Fixtures.Core.Requests.Authentication;
 
 /// <summary>
 /// Fixture class for the <see cref="RegistrationRequest"/> record.

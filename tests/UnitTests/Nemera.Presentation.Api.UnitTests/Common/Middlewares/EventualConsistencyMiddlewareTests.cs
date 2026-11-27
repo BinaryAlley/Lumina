@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DomainEvents;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Events;
-using Lumina.Presentation.Api.Common.Http;
-using Lumina.Presentation.Api.Common.Middlewares;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DomainEvents;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Events;
+using Nemera.Presentation.Api.Common.Http;
+using Nemera.Presentation.Api.Common.Middlewares;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Data.Sqlite;
@@ -22,7 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Common.Middlewares;
+namespace Nemera.Presentation.Api.UnitTests.Common.Middlewares;
 
 /// <summary>
 /// Contains unit tests for the <see cref="EventualConsistencyMiddleware"/> class.
@@ -71,9 +71,9 @@ public class EventualConsistencyMiddlewareTests
     public async Task InvokeAsync_WhenTheClientAbortsAfterASuccessfulOperation_ShouldStillCommitTheTransaction()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-eventual-consistency-abort-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-eventual-consistency-abort-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext dbContext = CreateContext(anchorConnection);
+        using NemeraDbContext dbContext = CreateContext(anchorConnection);
         using UnitOfWork unitOfWork = new(dbContext, Substitute.For<IDateTimeProvider>());
         await dbContext.Database.ExecuteSqlRawAsync("CREATE TABLE CommitProbe (Id INTEGER NOT NULL PRIMARY KEY);");
         CapturingHttpResponseFeature responseFeature = new();
@@ -100,7 +100,7 @@ public class EventualConsistencyMiddlewareTests
         await responseFeature.InvokeCompletedCallbacksAsync();
 
         // Assert
-        using LuminaDbContext verificationContext = CreateContext(anchorConnection);
+        using NemeraDbContext verificationContext = CreateContext(anchorConnection);
         int committedCount = await verificationContext.Database
             .SqlQueryRaw<int>("SELECT COUNT(*) AS \"Value\" FROM CommitProbe")
             .SingleAsync();
@@ -111,9 +111,9 @@ public class EventualConsistencyMiddlewareTests
     public async Task InvokeAsync_WhenTheResponseIsNotSuccessful_ShouldRollBackTheTransactionAndTheEvents()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-eventual-consistency-rollback-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-eventual-consistency-rollback-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext dbContext = CreateContext(anchorConnection);
+        using NemeraDbContext dbContext = CreateContext(anchorConnection);
         using UnitOfWork unitOfWork = new(dbContext, Substitute.For<IDateTimeProvider>());
         await dbContext.Database.ExecuteSqlRawAsync("CREATE TABLE CommitProbe (Id INTEGER NOT NULL PRIMARY KEY);");
         CapturingHttpResponseFeature responseFeature = new();
@@ -137,7 +137,7 @@ public class EventualConsistencyMiddlewareTests
         await responseFeature.InvokeCompletedCallbacksAsync();
 
         // Assert
-        using LuminaDbContext verificationContext = CreateContext(anchorConnection);
+        using NemeraDbContext verificationContext = CreateContext(anchorConnection);
         int committedCount = await verificationContext.Database
             .SqlQueryRaw<int>("SELECT COUNT(*) AS \"Value\" FROM CommitProbe")
             .SingleAsync();
@@ -185,9 +185,9 @@ public class EventualConsistencyMiddlewareTests
     /// </summary>
     /// <param name="anchorConnection">The open in-memory SQLite connection that keeps the database alive for the duration of the test.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateContext(SqliteConnection anchorConnection)
+    private static NemeraDbContext CreateContext(SqliteConnection anchorConnection)
     {
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .Options);
         context.Database.EnsureCreated();

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Common.DTO.MediaConsumption;
-using Lumina.Contracts.Responses.MediaConsumption;
-using Lumina.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.MediaResumePointAggregate;
+using Nemera.Application.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Common.DTO.MediaConsumption;
+using Nemera.Contracts.Responses.MediaConsumption;
+using Nemera.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.MediaResumePointAggregate;
 using System;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.MediaConsumption;
+namespace Nemera.Application.Common.Mapping.MediaConsumption;
 
 /// <summary>
 /// Extension methods for converting <see cref="MediaResumePoint"/>. The resume point is mapped directly to its repository entity and to its response.

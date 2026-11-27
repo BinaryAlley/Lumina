@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Themes.Management.Queries.GetThemes;
-using Lumina.Contracts.Fixtures.Core.Responses.Themes;
-using Lumina.Contracts.Responses.Themes;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemes;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Themes.Management.Queries.GetThemes;
+using Nemera.Contracts.Fixtures.Core.Responses.Themes;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -15,10 +15,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Themes.Queries.GetThemes;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Themes.Queries.GetThemes;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetThemesEndpoint"/> class.

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
+using Nemera.Domain.Common.Primitives;
 #endregion
 
-namespace Lumina.Domain.Common.Errors;
+namespace Nemera.Domain.Common.Errors;
 
 /// <summary>
 /// Plugin error types.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using DebounceThrottle;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.Mapping.MediaLibrary.Management;
-using Lumina.Application.Core.MediaLibrary.Management.Progress;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.Mapping.MediaLibrary.Management;
+using Nemera.Application.Core.MediaLibrary.Management.Progress;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Progress;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Concurrent;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
+namespace Nemera.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
 
 /// <summary>
 /// Class used to notify SignalR clients about changes in the progress of a media library scan.

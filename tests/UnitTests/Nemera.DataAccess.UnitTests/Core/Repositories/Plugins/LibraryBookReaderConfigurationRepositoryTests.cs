@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
-using Lumina.DataAccess.Core.Repositories.Plugins;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Nemera.DataAccess.Core.Repositories.Plugins;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.Plugins;
+namespace Nemera.DataAccess.UnitTests.Core.Repositories.Plugins;
 
 /// <summary>
 /// Contains unit tests for the <see cref="LibraryBookReaderConfigurationRepository"/> class.
@@ -21,7 +21,7 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.Plugins;
 [ExcludeFromCodeCoverage]
 public class LibraryBookReaderConfigurationRepositoryTests
 {
-    private readonly LuminaDbContext _mockContext;
+    private readonly NemeraDbContext _mockContext;
     private readonly LibraryBookReaderConfigurationRepository _sut;
     private readonly LibraryBookReaderConfigurationEntityFixture _libraryBookReaderConfigurationEntityFixture = new();
 
@@ -30,7 +30,7 @@ public class LibraryBookReaderConfigurationRepositoryTests
     /// </summary>
     public LibraryBookReaderConfigurationRepositoryTests()
     {
-        _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
+        _mockContext = Create.MockedDbContextFor<NemeraDbContext>();
         _sut = new LibraryBookReaderConfigurationRepository(_mockContext);
     }
 

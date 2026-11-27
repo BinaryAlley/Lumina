@@ -1,22 +1,22 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Repositories.Users;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
+using Nemera.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
+namespace Nemera.Application.UnitTests.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdatePlaybackStateCommandHandler"/> class.

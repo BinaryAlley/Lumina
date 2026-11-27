@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Common.DataAccess.Repositories.Themes;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.DataAccess.Common.Persistence;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Common.DataAccess.Repositories.Themes;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.DataAccess.Common.Persistence;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,22 +16,22 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Themes;
+namespace Nemera.DataAccess.Core.Repositories.Themes;
 
 /// <summary>
 /// Repository for themes.
 /// </summary>
 internal sealed class ThemeRepository : IThemeRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ThemeRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public ThemeRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public ThemeRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -42,11 +42,11 @@ internal sealed class ThemeRepository : IThemeRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(ThemeEntity theme, CancellationToken cancellationToken)
     {
-        bool doesThemeExist = await _luminaDbContext.Themes.AnyAsync(repositoryTheme => repositoryTheme.Id == theme.Id, cancellationToken).ConfigureAwait(false);
+        bool doesThemeExist = await _nemeraDbContext.Themes.AnyAsync(repositoryTheme => repositoryTheme.Id == theme.Id, cancellationToken).ConfigureAwait(false);
         if (doesThemeExist)
             return Errors.Themes.ThemeNotFound;
 
-        _luminaDbContext.Themes.Add(theme);
+        _nemeraDbContext.Themes.Add(theme);
         return Result.Created;
     }
 
@@ -58,13 +58,13 @@ internal sealed class ThemeRepository : IThemeRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpdateAsync(ThemeEntity data, CancellationToken cancellationToken)
     {
-        ThemeEntity? foundTheme = await _luminaDbContext.Themes
+        ThemeEntity? foundTheme = await _nemeraDbContext.Themes
             .FirstOrDefaultAsync(theme => theme.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundTheme is null)
             return Errors.Themes.ThemeNotFound;
 
         // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
-        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundTheme, data);
+        EditableValuesCopier.CopyEditableValues(_nemeraDbContext, foundTheme, data);
         return Result.Updated;
     }
 
@@ -82,7 +82,7 @@ internal sealed class ThemeRepository : IThemeRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a paginated result of <see cref="ThemeEntity"/>, or an error.</returns>
     public async Task<Result<PaginatedResultDto<ThemeEntity>>> GetAllAsync<TFilter>(PaginationDataDto? paginationData = null, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
     {
-        IQueryable<ThemeEntity> query = _luminaDbContext.Themes;
+        IQueryable<ThemeEntity> query = _nemeraDbContext.Themes;
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
 
@@ -127,7 +127,7 @@ internal sealed class ThemeRepository : IThemeRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="ThemeEntity"/> identified by <paramref name="themeId"/>, or an error.</returns>
     public async Task<Result<ThemeEntity?>> GetByThemeIdAsync(string themeId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Themes
+        return await _nemeraDbContext.Themes
             .FirstOrDefaultAsync(theme => theme.ThemeId == themeId, cancellationToken).ConfigureAwait(false);
     }
 
@@ -139,12 +139,12 @@ internal sealed class ThemeRepository : IThemeRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        ThemeEntity? foundTheme = await _luminaDbContext.Themes
+        ThemeEntity? foundTheme = await _nemeraDbContext.Themes
             .FirstOrDefaultAsync(theme => theme.Id == id, cancellationToken).ConfigureAwait(false);
         if (foundTheme is null)
             return Errors.Themes.ThemeNotFound;
 
-        _luminaDbContext.Themes.Remove(foundTheme);
+        _nemeraDbContext.Themes.Remove(foundTheme);
         return Result.Deleted;
     }
 
@@ -155,7 +155,7 @@ internal sealed class ThemeRepository : IThemeRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the active <see cref="ThemeEntity"/>, or an error.</returns>
     public async Task<Result<ThemeEntity?>> GetCurrentAsync(CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Themes
+        return await _nemeraDbContext.Themes
             .FirstOrDefaultAsync(theme => theme.IsCurrent == true, cancellationToken).ConfigureAwait(false);
     }
 }

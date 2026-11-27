@@ -12,8 +12,8 @@
 /library/audio-library/music-library/artists?libraryId=...
 *@
 
-@using Lumina.Presentation.Web.Common.DTO.Libraries
-@using Lumina.Presentation.Web.Common.Services
+@using Nemera.Presentation.Web.Common.DTO.Libraries
+@using Nemera.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
 
 @{
@@ -266,8 +266,8 @@
                 event.preventDefault();
                 event.stopImmediatePropagation();
                 closeCardMenus();
-                if (window.LuminaPlaylists)
-                    await window.LuminaPlaylists.showAddScopeDialogAsync({ libraryId: libraryId, artistId: artist.id, title: artist.name || '', addToPlaylistLabel: jsLocalizedStrings.addToPlaylist, returnFocus: trigger });
+                if (window.NemeraPlaylists)
+                    await window.NemeraPlaylists.showAddScopeDialogAsync({ libraryId: libraryId, artistId: artist.id, title: artist.name || '', addToPlaylistLabel: jsLocalizedStrings.addToPlaylist, returnFocus: trigger });
             });
 
             const deleteAction = document.createElement('a');

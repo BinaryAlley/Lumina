@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Fixtures.Core.Requests.Scheduling;
-using Lumina.Contracts.Requests.Scheduling;
-using Lumina.Contracts.Responses.Scheduling;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.Scheduling;
+using Nemera.Contracts.Requests.Scheduling;
+using Nemera.Contracts.Responses.Scheduling;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,15 +24,15 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Scheduling.GetScheduledJobs;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Scheduling.GetScheduledJobs;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetScheduledJobsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetScheduledJobsEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetScheduledJobsEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -46,7 +46,7 @@ public class GetScheduledJobsEndpointTests : IClassFixture<AuthenticatedLuminaAp
     /// Initializes a new instance of the <see cref="GetScheduledJobsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetScheduledJobsEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetScheduledJobsEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -111,7 +111,7 @@ public class GetScheduledJobsEndpointTests : IClassFixture<AuthenticatedLuminaAp
     public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         // Wipe the tables touched by the tests, because the in-memory database of the class factory is shared between the tests of the class.
         await dbContext.Set<RolePermissionEntity>().ExecuteDeleteAsync();

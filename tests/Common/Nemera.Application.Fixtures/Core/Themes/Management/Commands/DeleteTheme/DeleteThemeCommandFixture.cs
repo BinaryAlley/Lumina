@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Themes.Management.Commands.DeleteTheme;
+using Nemera.Application.Core.Themes.Management.Commands.DeleteTheme;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Themes.Management.Commands.DeleteTheme;
+namespace Nemera.Application.Fixtures.Core.Themes.Management.Commands.DeleteTheme;
 
 /// <summary>
 /// Fixture class for the <see cref="DeleteThemeCommand"/> class.

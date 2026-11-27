@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
 using Dapper;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Entities.Playlists;
-using Lumina.Application.Common.DataAccess.Repositories.Playlists;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.DTO.Playlists;
-using Lumina.DataAccess.Common.Persistence;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Entities.Playlists;
+using Nemera.Application.Common.DataAccess.Repositories.Playlists;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.DTO.Playlists;
+using Nemera.DataAccess.Common.Persistence;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -23,11 +23,11 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Playlists;
+namespace Nemera.DataAccess.Core.Repositories.Playlists;
 
 /// <summary>
 /// Repository for playlists.
@@ -43,15 +43,15 @@ internal sealed class PlaylistRepository : IPlaylistRepository
     // Leaves a wide numeric gap between adjacent entries, so a move or a removal normally writes one row instead of the whole range.
     private const long POSITION_STEP = 1_000_000_000L;
 
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PlaylistRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public PlaylistRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public PlaylistRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -63,12 +63,12 @@ internal sealed class PlaylistRepository : IPlaylistRepository
     public async Task<Result<Created>> InsertAsync(PlaylistEntity data, CancellationToken cancellationToken)
     {
         // The Id comes from the aggregate, so a row with this Id means the same playlist was already persisted, for example by a retried request.
-        bool doesPlaylistExist = await _luminaDbContext.Playlists
+        bool doesPlaylistExist = await _nemeraDbContext.Playlists
             .AnyAsync(playlist => playlist.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (doesPlaylistExist)
             return DomainErrors.Playlists.PlaylistAlreadyExists;
 
-        _luminaDbContext.Playlists.Add(data);
+        _nemeraDbContext.Playlists.Add(data);
         return Result.Created;
     }
 
@@ -83,9 +83,9 @@ internal sealed class PlaylistRepository : IPlaylistRepository
     {
         // The playlist details are a scalar edit. Entry mutations are set-based repository operations, so this update never loads or reconciles the entry collection.
         // A handler may already have loaded the same playlist in this unit of work, so the tracked instance is preferred over materializing a second copy.
-        PlaylistEntity? foundPlaylist = _luminaDbContext.Playlists.Local
+        PlaylistEntity? foundPlaylist = _nemeraDbContext.Playlists.Local
             .FirstOrDefault(playlist => playlist.Id == data.Id && playlist.UserId == data.UserId);
-        foundPlaylist ??= await _luminaDbContext.Playlists.FirstOrDefaultAsync(playlist => playlist.Id == data.Id && playlist.UserId == data.UserId, cancellationToken).ConfigureAwait(false);
+        foundPlaylist ??= await _nemeraDbContext.Playlists.FirstOrDefaultAsync(playlist => playlist.Id == data.Id && playlist.UserId == data.UserId, cancellationToken).ConfigureAwait(false);
         if (foundPlaylist is null)
             return DomainErrors.Playlists.PlaylistNotFound;
 
@@ -94,12 +94,12 @@ internal sealed class PlaylistRepository : IPlaylistRepository
         Guid storedUserId = foundPlaylist.UserId;
         long storedVersion = foundPlaylist.Version;
         int storedEntryCount = foundPlaylist.EntryCount;
-        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundPlaylist, data);
+        EditableValuesCopier.CopyEditableValues(_nemeraDbContext, foundPlaylist, data);
         foundPlaylist.UserId = storedUserId;
 
         // The version and the entry count are not editable values of the aggregate. The count is maintained by the set-based entry
         // operations, so a details edit can never overwrite it with the count of the mapped entity.
-        EntityEntry<PlaylistEntity> trackedEntry = _luminaDbContext.Entry(foundPlaylist);
+        EntityEntry<PlaylistEntity> trackedEntry = _nemeraDbContext.Entry(foundPlaylist);
         trackedEntry.Property(playlist => playlist.UserId).IsModified = false;
         trackedEntry.Property(playlist => playlist.Version).CurrentValue = storedVersion;
         trackedEntry.Property(playlist => playlist.EntryCount).CurrentValue = storedEntryCount;
@@ -135,7 +135,7 @@ internal sealed class PlaylistRepository : IPlaylistRepository
     public async Task<Result<PlaylistEntity?>> GetByIdForUserAsync(Guid id, Guid userId, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
         // The user is part of the filter rather than a check performed after the read, so the storage medium never returns a playlist that belongs to another user in the first place.
-        IQueryable<PlaylistEntity> query = _luminaDbContext.Playlists;
+        IQueryable<PlaylistEntity> query = _nemeraDbContext.Playlists;
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         if (shouldIncludeNavigationProperties)
@@ -151,7 +151,7 @@ internal sealed class PlaylistRepository : IPlaylistRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the playlists of the user, or an error.</returns>
     public async Task<Result<IReadOnlyList<PlaylistSummaryDto>>> GetAllForUserAsync(Guid userId, CancellationToken cancellationToken)
     {
-        IReadOnlyList<PlaylistSummaryDto> playlists = await _luminaDbContext.Playlists
+        IReadOnlyList<PlaylistSummaryDto> playlists = await _nemeraDbContext.Playlists
             .AsNoTracking()
             .Where(playlist => playlist.UserId == userId)
             .OrderByDescending(playlist => playlist.UpdatedOnUtc ?? playlist.CreatedOnUtc)
@@ -183,13 +183,13 @@ internal sealed class PlaylistRepository : IPlaylistRepository
     public async Task<Result<PlaylistDetailsDto?>> GetDetailsForUserAsync(Guid id, Guid userId, PaginationDataDto? paginationData = null, CancellationToken cancellationToken = default)
     {
         // The user is part of the filter rather than a check performed after the read, so the storage medium never returns a playlist that belongs to another user in the first place.
-        PlaylistEntity? playlist = await _luminaDbContext.Playlists
+        PlaylistEntity? playlist = await _nemeraDbContext.Playlists
             .AsNoTracking()
             .FirstOrDefaultAsync(foundPlaylist => foundPlaylist.Id == id && foundPlaylist.UserId == userId, cancellationToken).ConfigureAwait(false);
         if (playlist is null)
             return Result<PlaylistDetailsDto?>.Success(null);
 
-        IQueryable<PlaylistEntryEntity> entriesQuery = _luminaDbContext.PlaylistEntries
+        IQueryable<PlaylistEntryEntity> entriesQuery = _nemeraDbContext.PlaylistEntries
             .AsNoTracking()
             .Where(entry => entry.PlaylistId == id)
             .OrderBy(entry => entry.Position);
@@ -271,8 +271,8 @@ internal sealed class PlaylistRepository : IPlaylistRepository
     public async Task<Result<PlaylistEntryDto?>> GetAppendedEntryDetailsForUserAsync(Guid playlistId, Guid userId, Guid entryId, CancellationToken cancellationToken)
     {
         // The user is part of the join, so the read never returns an entry of a playlist that belongs to another user.
-        AppendedEntryState? state = await (from candidate in _luminaDbContext.PlaylistEntries.AsNoTracking()
-                                           join playlist in _luminaDbContext.Playlists on candidate.PlaylistId equals playlist.Id
+        AppendedEntryState? state = await (from candidate in _nemeraDbContext.PlaylistEntries.AsNoTracking()
+                                           join playlist in _nemeraDbContext.Playlists on candidate.PlaylistId equals playlist.Id
                                            where candidate.Id == entryId && candidate.PlaylistId == playlistId && playlist.UserId == userId
                                            select new AppendedEntryState
                                            {
@@ -394,10 +394,10 @@ internal sealed class PlaylistRepository : IPlaylistRepository
 
         // The raw inserts run on the connection and transaction of the request's unit of work, so they participate in the same
         // atomic operation as the rest of the command instead of opening a second connection that would fight for the SQLite write lock.
-        DbConnection connection = _luminaDbContext.Database.GetDbConnection();
+        DbConnection connection = _nemeraDbContext.Database.GetDbConnection();
         if (connection.State != ConnectionState.Open)
             await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-        DbTransaction? existingTransaction = _luminaDbContext.Database.CurrentTransaction?.GetDbTransaction();
+        DbTransaction? existingTransaction = _nemeraDbContext.Database.CurrentTransaction?.GetDbTransaction();
         DbTransaction transaction = existingTransaction ?? await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
         // The request middleware owns the transaction it opened and decides its fate. The repository only commits or rolls back a
         // transaction it opened itself, which happens when it runs without an ambient request transaction.
@@ -625,14 +625,14 @@ internal sealed class PlaylistRepository : IPlaylistRepository
             // The version, the entry count and the existence of the entry are read in one statement. The count comes from the playlist
             // row, so a drag on a very large playlist never scans the entry index to find out how many entries it holds. Keeping the
             // existence check in the same query also preserves the not-found result for a one-entry playlist, where no entry update runs.
-            PlaylistMoveState? playlistState = await _luminaDbContext.Playlists
+            PlaylistMoveState? playlistState = await _nemeraDbContext.Playlists
                 .AsNoTracking()
                 .Where(playlist => playlist.Id == playlistId && playlist.UserId == userId)
                 .Select(playlist => new PlaylistMoveState
                 {
                     Version = playlist.Version,
                     EntryCount = playlist.EntryCount,
-                    DoesEntryExist = _luminaDbContext.PlaylistEntries.Any(entry => entry.Id == entryId && entry.PlaylistId == playlistId)
+                    DoesEntryExist = _nemeraDbContext.PlaylistEntries.Any(entry => entry.Id == entryId && entry.PlaylistId == playlistId)
                 })
                 .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
             if (playlistState is null)
@@ -652,7 +652,7 @@ internal sealed class PlaylistRepository : IPlaylistRepository
                 if (targetPosition == 0)
                 {
                     // Moving to the front needs a sparse key before the current first entry.
-                    long? nextPosition = await _luminaDbContext.PlaylistEntries
+                    long? nextPosition = await _nemeraDbContext.PlaylistEntries
                         .AsNoTracking()
                         .Where(entry => entry.PlaylistId == playlistId && entry.Id != entryId)
                         .OrderBy(entry => entry.Position)
@@ -665,7 +665,7 @@ internal sealed class PlaylistRepository : IPlaylistRepository
                 else if (targetPosition == entryCount - 1)
                 {
                     // Moving to the end needs a sparse key after the current last entry.
-                    long? previousPosition = await _luminaDbContext.PlaylistEntries
+                    long? previousPosition = await _nemeraDbContext.PlaylistEntries
                         .AsNoTracking()
                         .Where(entry => entry.PlaylistId == playlistId && entry.Id != entryId)
                         .OrderByDescending(entry => entry.Position)
@@ -696,7 +696,7 @@ internal sealed class PlaylistRepository : IPlaylistRepository
                     newPosition = neighbors[0] + (gap / 2);
                 }
 
-                int updatedEntryCount = await _luminaDbContext.PlaylistEntries
+                int updatedEntryCount = await _nemeraDbContext.PlaylistEntries
                     .Where(entry => entry.Id == entryId && entry.PlaylistId == playlistId)
                     .ExecuteUpdateAsync(setters => setters
                         .SetProperty(entry => entry.Position, newPosition)
@@ -744,7 +744,7 @@ internal sealed class PlaylistRepository : IPlaylistRepository
         try
         {
             // The version is captured before the delete, so the following count update only applies if no other writer changed the playlist meanwhile.
-            long? playlistVersion = await _luminaDbContext.Playlists
+            long? playlistVersion = await _nemeraDbContext.Playlists
                 .AsNoTracking()
                 .Where(playlist => playlist.Id == playlistId && playlist.UserId == userId)
                 .Select(playlist => (long?)playlist.Version)
@@ -753,7 +753,7 @@ internal sealed class PlaylistRepository : IPlaylistRepository
                 return DomainErrors.Playlists.PlaylistNotFound;
 
             // The delete reports how many rows it removed, so a missing or already removed entry needs no separate existence query.
-            int deletedEntryCount = await _luminaDbContext.PlaylistEntries
+            int deletedEntryCount = await _nemeraDbContext.PlaylistEntries
                 .Where(entry => entry.Id == entryId && entry.PlaylistId == playlistId)
                 .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
             if (deletedEntryCount == 0)
@@ -795,7 +795,7 @@ internal sealed class PlaylistRepository : IPlaylistRepository
     private async Task<List<long>> GetMoveNeighborsAsync(Guid playlistId, Guid entryId, int targetPosition, CancellationToken cancellationToken)
     {
         // The moved entry is excluded from the ordering, so the dense target position maps to the two rows before and after it.
-        return await _luminaDbContext.PlaylistEntries
+        return await _nemeraDbContext.PlaylistEntries
             .AsNoTracking()
             .Where(entry => entry.PlaylistId == playlistId && entry.Id != entryId)
             .OrderBy(entry => entry.Position)
@@ -819,10 +819,10 @@ internal sealed class PlaylistRepository : IPlaylistRepository
     private async Task RebalancePositionsAsync(Guid playlistId, CancellationToken cancellationToken)
     {
         string playlistIdText = ToStorageId(playlistId);
-        DbConnection connection = _luminaDbContext.Database.GetDbConnection();
+        DbConnection connection = _nemeraDbContext.Database.GetDbConnection();
         if (connection.State != ConnectionState.Open)
             await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-        DbTransaction? existingTransaction = _luminaDbContext.Database.CurrentTransaction?.GetDbTransaction();
+        DbTransaction? existingTransaction = _nemeraDbContext.Database.CurrentTransaction?.GetDbTransaction();
         DbTransaction transaction = existingTransaction ?? await connection.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
         bool ownsTransaction = existingTransaction is null;
         try
@@ -899,12 +899,12 @@ internal sealed class PlaylistRepository : IPlaylistRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        PlaylistEntity? playlist = await _luminaDbContext.Playlists
+        PlaylistEntity? playlist = await _nemeraDbContext.Playlists
             .FirstOrDefaultAsync(foundPlaylist => foundPlaylist.Id == id, cancellationToken).ConfigureAwait(false);
         if (playlist is null)
             return DomainErrors.Playlists.PlaylistNotFound;
 
-        _luminaDbContext.Playlists.Remove(playlist);
+        _nemeraDbContext.Playlists.Remove(playlist);
         return Result.Deleted;
     }
 
@@ -922,7 +922,7 @@ internal sealed class PlaylistRepository : IPlaylistRepository
     {
         // ExecuteUpdate sends one UPDATE and never loads the entries or the playlist. The version predicate is the optimistic concurrency
         // check, and the returned row count tells the caller whether another writer won the race.
-        return await _luminaDbContext.Playlists
+        return await _nemeraDbContext.Playlists
             .Where(playlist => playlist.Id == playlistId && playlist.UserId == userId && playlist.Version == expectedVersion)
             .ExecuteUpdateAsync(setters => setters
                 .SetProperty(playlist => playlist.UpdatedOnUtc, updatedOnUtc)
@@ -967,9 +967,9 @@ internal sealed class PlaylistRepository : IPlaylistRepository
         List<PlaylistEntryDisplayDto> trackDetails = [];
         foreach (Guid[] chunk in trackIds.Chunk(LOOKUP_CHUNK_SIZE))
         {
-            List<PlaylistEntryDisplayDto> chunkDetails = await (from track in _luminaDbContext.Tracks.AsNoTracking()
-                                                                    join album in _luminaDbContext.Albums on track.AlbumId equals album.Id
-                                                                    join artist in _luminaDbContext.Artists on album.ArtistId equals artist.Id
+            List<PlaylistEntryDisplayDto> chunkDetails = await (from track in _nemeraDbContext.Tracks.AsNoTracking()
+                                                                    join album in _nemeraDbContext.Albums on track.AlbumId equals album.Id
+                                                                    join artist in _nemeraDbContext.Artists on album.ArtistId equals artist.Id
                                                                     where chunk.Contains(track.Id) && !track.IsDeleted && !album.IsDeleted && !artist.IsDeleted
                                                                     select new PlaylistEntryDisplayDto(
                                                                         track.Id,
@@ -980,7 +980,7 @@ internal sealed class PlaylistRepository : IPlaylistRepository
                                                                         album.Title,
                                                                         artist.Id,
                                                                         artist.Name,
-                                                                        _luminaDbContext.MusicArtwork
+                                                                        _nemeraDbContext.MusicArtwork
                                                                             .Where(artwork => artwork.OwnerType == MusicArtworkOwnerType.Album
                                                                                 && artwork.OwnerId == album.Id
                                                                                 && artwork.ArtworkType == ArtworkType.Cover)

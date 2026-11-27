@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
-using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.CoverArtArchive.Common.DependencyInjection;
-using Lumina.Plugins.CoverArtArchive.Core.Settings;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Plugins.Contracts.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.CoverArtArchive.Common.DependencyInjection;
+using Nemera.Plugins.CoverArtArchive.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.Core;
+namespace Nemera.Plugins.CoverArtArchive.Core;
 
 /// <summary>
 /// Plugin that provides music album artwork retrieval from the Cover Art Archive.
@@ -34,7 +34,7 @@ public sealed class CoverArtArchivePlugin : IPlugin, IPluginServiceRegistrator
     /// <summary>
     /// Gets the author of the plugin.
     /// </summary>
-    public string Author => "Lumina";
+    public string Author => "Nemera";
 
     /// <summary>
     /// Gets the version of the plugin.

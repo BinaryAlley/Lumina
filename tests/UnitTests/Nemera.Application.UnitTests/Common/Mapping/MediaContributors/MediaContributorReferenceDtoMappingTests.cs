@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.MediaContributors;
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
-using Lumina.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Application.Common.Mapping.MediaContributors;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaContributors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.AudioLibraryBoundedContext.MusicLibraryAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.WrittenContentLibraryBoundedContext.BookLibraryAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.MediaContributors;
+namespace Nemera.Application.UnitTests.Common.Mapping.MediaContributors;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MediaContributorReferenceDtoMapping"/> class.

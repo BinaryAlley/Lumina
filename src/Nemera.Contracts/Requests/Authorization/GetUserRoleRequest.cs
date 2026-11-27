@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.Authorization;
+namespace Nemera.Contracts.Requests.Authorization;
 
 /// <summary>
 /// Represents the request model for retrieving the authorization role of a user identified by <paramref name="UserId"/>.

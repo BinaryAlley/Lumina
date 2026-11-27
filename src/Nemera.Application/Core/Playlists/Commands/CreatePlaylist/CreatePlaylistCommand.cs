@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Application.Common.CQRS;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Playlists.Commands.CreatePlaylist;
+namespace Nemera.Application.Core.Playlists.Commands.CreatePlaylist;
 
 /// <summary>
 /// Command for creating a playlist of the current user.

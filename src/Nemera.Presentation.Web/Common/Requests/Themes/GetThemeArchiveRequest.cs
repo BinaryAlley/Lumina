@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.Themes;
+namespace Nemera.Presentation.Web.Common.Requests.Themes;
 
 /// <summary>
 /// Represents a request to download the archive of a theme.

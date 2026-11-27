@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.UnitTests.Common.Enums.Playlists;
+namespace Nemera.Domain.SharedKernel.UnitTests.Common.Enums.Playlists;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PlaylistMediaItemType"/> enumeration.

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Scheduling.Queries.GetScheduledJobHistory;
+using Nemera.Application.Core.Scheduling.Queries.GetScheduledJobHistory;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Scheduling.Queries.GetScheduledJobHistory;
+namespace Nemera.Application.Fixtures.Core.Scheduling.Queries.GetScheduledJobHistory;
 
 /// <summary>
 /// Fixture class for the <see cref="GetScheduledJobHistoryQuery"/> class.

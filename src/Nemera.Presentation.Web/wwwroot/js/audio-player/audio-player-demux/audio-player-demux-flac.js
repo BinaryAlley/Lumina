@@ -38,7 +38,7 @@
  * position of a time from its proportion of the total samples and then scans to the next frame header, whose coded frame
  * or sample number gives the position back exactly.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -135,14 +135,14 @@
      * @readonly
      * @type {Uint32Array}
      */
-    const CRC16_TABLE = LuminaAudioPlayer.demuxBuildCrcTable(0x8005, 16);
+    const CRC16_TABLE = NemeraAudioPlayer.demuxBuildCrcTable(0x8005, 16);
 
     /**
      * The lookup table of the FLAC frame header checksum, built once.
      * @readonly
      * @type {Uint32Array}
      */
-    const CRC8_TABLE = LuminaAudioPlayer.demuxBuildCrcTable(0x07, 8);
+    const CRC8_TABLE = NemeraAudioPlayer.demuxBuildCrcTable(0x07, 8);
 
     /**
      * Computes the CRC-16 of a run of bytes, with the polynomial 0x8005 and an initial value of zero, the checksum a
@@ -172,7 +172,7 @@
 
     /**
      * Reads the UTF-8 style coded number a FLAC frame header uses for the frame number or the sample number.
-     * @param {LuminaAudioPlayer.DemuxerBitReader} reader - The bit reader positioned on the first byte of the number.
+     * @param {NemeraAudioPlayer.DemuxerBitReader} reader - The bit reader positioned on the first byte of the number.
      * @returns {number} The decoded number.
      * @throws {RangeError} When the coded number is malformed.
      */
@@ -203,7 +203,7 @@
     /**
      * Resolves the block size a FLAC frame header names.
      * @param {number} code - The four bit block size code.
-     * @param {LuminaAudioPlayer.DemuxerBitReader} reader - The bit reader, positioned after the coded number, from which the variable codes read their extra bytes.
+     * @param {NemeraAudioPlayer.DemuxerBitReader} reader - The bit reader, positioned after the coded number, from which the variable codes read their extra bytes.
      * @returns {number|null} The block size in samples, or null when the code is invalid.
      */
     function resolveBlockSize(code, reader) {
@@ -227,7 +227,7 @@
      * from the reserved code, which a frame may never use: collapsing the two into null would accept a frame header that
      * names a reserved sample rate code, leaving only the header checksum to reject a false sync.
      * @param {number} code - The four bit sample rate code.
-     * @param {LuminaAudioPlayer.DemuxerBitReader} reader - The bit reader, positioned after the block size, from which the variable codes read their extra bytes.
+     * @param {NemeraAudioPlayer.DemuxerBitReader} reader - The bit reader, positioned after the block size, from which the variable codes read their extra bytes.
      * @returns {{ rate: number|null, isValid: boolean }} The sample rate in Hz, or null to mean 'from STREAMINFO', together with whether the code is one the format defines.
      */
     function resolveFrameSampleRate(code, reader) {
@@ -255,7 +255,7 @@
         if (!bytes || offset < 0 || offset + 4 > bytes.length)
             return null;
         try {
-            const reader = new LuminaAudioPlayer.DemuxerBitReader(bytes.subarray(offset));
+            const reader = new NemeraAudioPlayer.DemuxerBitReader(bytes.subarray(offset));
             // A frame header is bit packed: a fourteen bit sync (0x3FFE), a reserved bit that must be zero, a blocking
             // strategy bit, a four bit block size code, a four bit sample rate code, a four bit channel assignment, a
             // three bit sample size code, a second reserved bit, the coded frame or sample number, and finally the eight
@@ -328,7 +328,7 @@
     class FlacBitstreamReader {
         /**
          * Creates an instance of FlacBitstreamReader.
-         * @param {LuminaAudioPlayer.DemuxerReader} reader - The windowing reader over the track.
+         * @param {NemeraAudioPlayer.DemuxerReader} reader - The windowing reader over the track.
          * @param {Object} options - The options.
          * @param {number} options.startOffset - The absolute byte offset the bitstream starts at.
          * @param {number} options.maxBitOffset - The number of bits the walk may consume before the frame is refused.
@@ -580,10 +580,10 @@
     /**
      * Demuxes a FLAC stream.
      */
-    class FlacDemuxer extends LuminaAudioPlayer.Demuxer {
+    class FlacDemuxer extends NemeraAudioPlayer.Demuxer {
         /**
          * Creates an instance of FlacDemuxer.
-         * @param {Object} options - The demuxer options, per {@link LuminaAudioPlayer.Demuxer}.
+         * @param {Object} options - The demuxer options, per {@link NemeraAudioPlayer.Demuxer}.
          */
         constructor(options = {}) {
             super(options);
@@ -607,20 +607,20 @@
         /**
          * Reads the STREAMINFO block and the metadata blocks that follow it, builds the codec private data, and positions the read cursor on the first audio frame.
          * @returns {Promise<void>} A promise resolving when the stream is ready to be read.
-         * @throws {LuminaAudioPlayer.PlayerError} When the bytes are not a FLAC stream.
+         * @throws {NemeraAudioPlayer.PlayerError} When the bytes are not a FLAC stream.
          */
         async initializeAsync() {
             if (this.isInitialized())
                 return;
             if (this.destroyed)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The demuxer was destroyed.');
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The demuxer was destroyed.');
             try {
                 const magic = await this.reader.readAsync(0, 4);
-                if (!LuminaAudioPlayer.demuxBytesEqualAscii(magic, 0, FLAC_MAGIC))
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The bytes are not a native FLAC stream.', { reason: 'no-flac-magic' });
+                if (!NemeraAudioPlayer.demuxBytesEqualAscii(magic, 0, FLAC_MAGIC))
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The bytes are not a native FLAC stream.', { reason: 'no-flac-magic' });
                 const streamInfo = await this.readStreamInfoAsync();
                 if (!streamInfo)
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The FLAC stream carries no STREAMINFO block.', { reason: 'no-streaminfo' });
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The FLAC stream carries no STREAMINFO block.', { reason: 'no-streaminfo' });
                 this.streamInfo = streamInfo;
                 this.dataStart = streamInfo.dataStart;
                 this.description = streamInfo.description;
@@ -668,7 +668,7 @@
         /**
          * Reads the next FLAC frame as an encoded packet, by walking its bitstream to its exact end.
          * @returns {Promise<Object|null>} The packet, or null once the stream ended.
-         * @throws {LuminaAudioPlayer.PlayerError} When the stream can no longer be parsed.
+         * @throws {NemeraAudioPlayer.PlayerError} When the stream can no longer be parsed.
          */
         async readPacketAsync() {
             this.ensureInitialized();
@@ -700,7 +700,7 @@
                 // The duration is kept unrounded while the timeline accumulates it, so that rounding it per packet does not
                 // make the timeline drift; only the packet the decoder receives carries a whole number of microseconds.
                 const duration = (header.blockSize / header.sampleRate) * 1000000;
-                const packet = LuminaAudioPlayer.createDemuxerPacket(data, this.timelineMicros, duration);
+                const packet = NemeraAudioPlayer.createDemuxerPacket(data, this.timelineMicros, duration);
                 this.timelineMicros += duration;
                 this.offset = frameEnd;
                 return packet;
@@ -714,7 +714,7 @@
          * then scanning to the next frame header, whose coded number states the exact sample it starts at.
          * @param {number} seconds - The target time, in seconds.
          * @returns {Promise<number|null>} The byte offset it repositioned to, or null when the stream cannot be seeked.
-         * @throws {LuminaAudioPlayer.PlayerError} When the scan for a frame gives up on a corrupt or crafted region.
+         * @throws {NemeraAudioPlayer.PlayerError} When the scan for a frame gives up on a corrupt or crafted region.
          */
         async seekToTimeAsync(seconds) {
             this.ensureInitialized();
@@ -725,7 +725,7 @@
             const targetSample = Math.floor(seconds * streamInfo.sampleRate);
             let estimate;
             if (this.totalSamples > 0) {
-                const fraction = LuminaAudioPlayer.clamp(targetSample / this.totalSamples, 0, 1);
+                const fraction = NemeraAudioPlayer.clamp(targetSample / this.totalSamples, 0, 1);
                 estimate = this.dataStart + Math.floor(fraction * (end - this.dataStart));
             } else 
                 estimate = this.dataStart + Math.floor((seconds / (this.durationSeconds || 1)) * (end - this.dataStart));
@@ -777,7 +777,7 @@
 
         /**
          * Walks the subframes of a frame, one per channel, using the bit width each channel's subframe carries under the channel assignment of the frame.
-         * @param {LuminaAudioPlayer.FlacBitstreamReader} reader - The frame bitstream reader.
+         * @param {NemeraAudioPlayer.FlacBitstreamReader} reader - The frame bitstream reader.
          * @param {Object} header - The parsed header of the frame.
          * @returns {Promise<void>} A promise resolving when every subframe was walked.
          */
@@ -795,7 +795,7 @@
 
         /**
          * Walks one subframe to its end.
-         * @param {LuminaAudioPlayer.FlacBitstreamReader} reader - The frame bitstream reader.
+         * @param {NemeraAudioPlayer.FlacBitstreamReader} reader - The frame bitstream reader.
          * @param {number} blockSize - The number of samples of the frame.
          * @param {number} sampleBits - The bit width of the subframe, before its wasted bits.
          * @returns {Promise<void>} A promise resolving when the subframe was walked.
@@ -849,7 +849,7 @@
          * Walks the coded residual of a fixed or LPC subframe, partition by partition. Each partition is walked by the
          * synchronous fast path of the reader, so the per value awaits that a naive walk would pay are replaced by one
          * reload per window; only a value longer than a whole window falls back to the awaited readers.
-         * @param {LuminaAudioPlayer.FlacBitstreamReader} reader - The frame bitstream reader.
+         * @param {NemeraAudioPlayer.FlacBitstreamReader} reader - The frame bitstream reader.
          * @param {number} blockSize - The number of samples of the frame.
          * @param {number} predictorOrder - The order of the predictor that produced the residual.
          * @returns {Promise<void>} A promise resolving when the residual was walked.
@@ -916,16 +916,16 @@
          * Verifies the 16 bit frame CRC against the bytes that were walked.
          * @param {Uint8Array} frameBytes - The bytes of the whole frame, ending with the CRC.
          * @returns {void}
-         * @throws {LuminaAudioPlayer.PlayerError} When the checksum does not match.
+         * @throws {NemeraAudioPlayer.PlayerError} When the checksum does not match.
          */
         verifyFrameCrc16(frameBytes) {
             if (frameBytes.length < 3)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The FLAC frame is too short to carry a checksum.', { reason: 'frame-crc-mismatch' });
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The FLAC frame is too short to carry a checksum.', { reason: 'frame-crc-mismatch' });
             const length = frameBytes.length;
-            const expected = LuminaAudioPlayer.demuxReadUintBE(frameBytes, length - 2, 2);
+            const expected = NemeraAudioPlayer.demuxReadUintBE(frameBytes, length - 2, 2);
             const computed = computeCrc16(frameBytes.subarray(0, length - 2));
             if (expected !== computed)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The FLAC frame checksum does not match.', { reason: 'frame-crc-mismatch' });
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The FLAC frame checksum does not match.', { reason: 'frame-crc-mismatch' });
         }
 
         //+=======================================================================================+
@@ -944,13 +944,13 @@
             // below it; the next three bytes are the big endian length of the block body.
             const isLast = (blockHeader[0] & 0x80) !== 0;
             const blockType = blockHeader[0] & 0x7F;
-            const length = LuminaAudioPlayer.demuxReadUintBE(blockHeader, 1, 3);
+            const length = NemeraAudioPlayer.demuxReadUintBE(blockHeader, 1, 3);
             if (blockType !== 0 || length !== STREAMINFO_BODY_BYTES)
                 return null;
             const body = await this.reader.readAsync(8, STREAMINFO_BODY_BYTES);
             if (body.length < STREAMINFO_BODY_BYTES)
                 return null;
-            const reader = new LuminaAudioPlayer.DemuxerBitReader(body);
+            const reader = new NemeraAudioPlayer.DemuxerBitReader(body);
             const minBlockSize = reader.readBits(16);
             const maxBlockSize = reader.readBits(16);
             reader.readBits(24);
@@ -961,7 +961,7 @@
             const totalSamples = reader.readBits(36);
             if (sampleRate <= 0 || channels <= 0 || minBlockSize < 16 || maxBlockSize < minBlockSize)
                 return null;
-            const description = LuminaAudioPlayer.concatDemuxerBytes([
+            const description = NemeraAudioPlayer.concatDemuxerBytes([
                 await this.reader.copyAsync(0, 4),
                 blockHeader.slice(),
                 body.slice()
@@ -985,7 +985,7 @@
          * @param {boolean} isStreamInfoLast - True when STREAMINFO is the last metadata block.
          * @param {number} offset - The offset just past the STREAMINFO block.
          * @returns {Promise<number>} The offset of the first audio frame.
-         * @throws {LuminaAudioPlayer.PlayerError} When the stream has more metadata blocks than the player accepts.
+         * @throws {NemeraAudioPlayer.PlayerError} When the stream has more metadata blocks than the player accepts.
          */
         async walkMetadataBlocksAsync(isStreamInfoLast, offset) {
             let cursor = offset;
@@ -1000,12 +1000,12 @@
                     return cursor;
                 // The same metadata block header as STREAMINFO: the last-block flag is the top bit of the first byte, and the next three bytes are the big endian body length.
                 isLast = (header[0] & 0x80) !== 0;
-                const length = LuminaAudioPlayer.demuxReadUintBE(header, 1, 3);
+                const length = NemeraAudioPlayer.demuxReadUintBE(header, 1, 3);
                 cursor += 4 + length;
                 blocks++;
             }
             if (!isLast)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The FLAC stream has more metadata blocks than the player accepts.', { reason: 'metadata-too-many' });
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The FLAC stream has more metadata blocks than the player accepts.', { reason: 'metadata-too-many' });
             return cursor;
         }
 
@@ -1029,10 +1029,10 @@
          * @param {number} start - The offset to start the scan at.
          * @param {number|null} end - The exclusive end of the scan, or null to scan to the end of the stream.
          * @returns {Promise<number>} The offset of the next frame header, or -1 when there is none.
-         * @throws {LuminaAudioPlayer.PlayerError} When the scan gives up on a corrupt or crafted region.
+         * @throws {NemeraAudioPlayer.PlayerError} When the scan gives up on a corrupt or crafted region.
          */
         async findNextFrameAsync(start, end) {
-            return await LuminaAudioPlayer.scanForFrameAsync(this.reader, start, end, FLAC_SYNC_PREFIX, async (offset) => {
+            return await NemeraAudioPlayer.scanForFrameAsync(this.reader, start, end, FLAC_SYNC_PREFIX, async (offset) => {
                 const header = await this.parseHeaderAtAsync(offset);
                 return header !== null;
             }, { prefixMask: FLAC_SYNC_MASK });
@@ -1042,7 +1042,7 @@
          * Rescans for the next frame after the current offset deviated from a frame boundary, so that a corrupted or
          * partially downloaded region does not stop the stream.
          * @returns {Promise<number>} The offset of the next frame header, or -1 when there is none.
-         * @throws {LuminaAudioPlayer.PlayerError} When the scan gives up on a corrupt or crafted region.
+         * @throws {NemeraAudioPlayer.PlayerError} When the scan gives up on a corrupt or crafted region.
          */
         async resyncAsync() {
             const end = this.reader.getLength();
@@ -1053,12 +1053,12 @@
         }
     }
 
-    LuminaAudioPlayer.FlacDemuxer = FlacDemuxer;
+    NemeraAudioPlayer.FlacDemuxer = FlacDemuxer;
 
-    LuminaAudioPlayer.registerDemuxer({
-        container: LuminaAudioPlayer.DemuxerContainer.FLAC,
-        codec: LuminaAudioPlayer.DemuxerCodec.FLAC,
-        probe: LuminaAudioPlayer.AUDIO_CODEC_PROBES.FLAC,
+    NemeraAudioPlayer.registerDemuxer({
+        container: NemeraAudioPlayer.DemuxerContainer.FLAC,
+        codec: NemeraAudioPlayer.DemuxerCodec.FLAC,
+        probe: NemeraAudioPlayer.AUDIO_CODEC_PROBES.FLAC,
         create: (options) => new FlacDemuxer(options)
     });
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+namespace Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
 
 /// <summary>
 /// Enumeration for the musical key of a track, describing the pitch and the major or minor mode of the key.

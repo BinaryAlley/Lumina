@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.FileSystemManagement.Paths.Commands.CombinePath;
+using Nemera.Application.Core.FileSystemManagement.Paths.Commands.CombinePath;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.FileSystemManagement.Paths.Commands.CombinePath;
+namespace Nemera.Application.Fixtures.Core.FileSystemManagement.Paths.Commands.CombinePath;
 
 /// <summary>
 /// Fixture class for the <see cref="CombinePathCommand"/> class.

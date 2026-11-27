@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Responses.UsersManagement.Settings;
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Responses.UsersManagement.Settings;
+using Nemera.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.UsersManagement.Users;
+namespace Nemera.Application.Common.Mapping.UsersManagement.Users;
 
 /// <summary>
 /// Extension methods for converting <see cref="UserSettings"/>.

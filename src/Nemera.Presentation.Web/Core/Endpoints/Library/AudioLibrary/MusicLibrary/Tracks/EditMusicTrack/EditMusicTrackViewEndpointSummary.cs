@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.EditMusicTrack;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.EditMusicTrack;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="EditMusicTrackViewEndpoint"/> endpoint, for OpenAPI.

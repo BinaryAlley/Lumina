@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.Playback;
+namespace Nemera.Presentation.Web.Common.Playback;
 
 /// <summary>
 /// Defines the format of the opaque delivery handle of a playback manifest.

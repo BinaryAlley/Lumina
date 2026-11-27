@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.Common.Models.DTO.Settings;
+namespace Nemera.Plugins.OpenLibrary.Common.Models.DTO.Settings;
 
 /// <summary>
 /// Data transfer object for the settings that configure the Open Library metadata plugin.
@@ -12,7 +12,7 @@ internal sealed class OpenLibrarySettingsDto
     /// <summary>
     /// Gets or sets the user agent sent with every request to the Open Library API.
     /// </summary>
-    public string UserAgent { get; set; } = "Lumina-OpenLibrary/1.0";
+    public string UserAgent { get; set; } = "Nemera-OpenLibrary/1.0";
 
     /// <summary>
     /// Gets or sets the contact email sent with every request to the Open Library API.

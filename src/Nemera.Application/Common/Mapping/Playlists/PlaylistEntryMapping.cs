@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Playlists;
-using Lumina.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.Entities;
+using Nemera.Application.Common.DataAccess.Entities.Playlists;
+using Nemera.Domain.Core.BoundedContexts.PlaylistBoundedContext.PlaylistAggregate.Entities;
 using System;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Playlists;
+namespace Nemera.Application.Common.Mapping.Playlists;
 
 /// <summary>
 /// Extension methods for converting <see cref="PlaylistEntry"/>.

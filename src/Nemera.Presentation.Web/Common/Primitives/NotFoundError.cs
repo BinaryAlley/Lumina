@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Primitives;
+using Nemera.Presentation.Web.Common.Enums.Primitives;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Primitives;
+namespace Nemera.Presentation.Web.Common.Primitives;
 
 /// <summary>
 /// Error representing that the requested resource or entity was not found.

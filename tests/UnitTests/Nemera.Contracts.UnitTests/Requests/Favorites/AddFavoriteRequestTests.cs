@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Fixtures.Core.Requests.Favorites;
-using Lumina.Contracts.Requests.Favorites;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Contracts.Fixtures.Core.Requests.Favorites;
+using Nemera.Contracts.Requests.Favorites;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Contracts.UnitTests.Requests.Favorites;
+namespace Nemera.Contracts.UnitTests.Requests.Favorites;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AddFavoriteRequest"/> record.

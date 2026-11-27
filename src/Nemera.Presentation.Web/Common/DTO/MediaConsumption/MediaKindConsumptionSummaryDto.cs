@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.MediaConsumption;
+using Nemera.Presentation.Web.Common.Enums.MediaConsumption;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.MediaConsumption;
+namespace Nemera.Presentation.Web.Common.DTO.MediaConsumption;
 
 /// <summary>
 /// Data transfer object for the consumption statistics of one kind of media.

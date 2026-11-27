@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Core.Scheduling.Queries.GetScheduledJobs;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.Contracts.Responses.Scheduling;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.DataAccess.Repositories.Scheduling;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Core.Scheduling.Queries.GetScheduledJobs;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Contracts.Responses.Scheduling;
+using Nemera.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -18,10 +18,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Scheduling.Queries.GetScheduledJobs;
+namespace Nemera.Application.UnitTests.Core.Scheduling.Queries.GetScheduledJobs;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetScheduledJobsQueryHandler"/> class.

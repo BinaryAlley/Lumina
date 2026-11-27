@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+namespace Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 
 /// <summary>
 /// Repository entity for one part of the path template of a media library.

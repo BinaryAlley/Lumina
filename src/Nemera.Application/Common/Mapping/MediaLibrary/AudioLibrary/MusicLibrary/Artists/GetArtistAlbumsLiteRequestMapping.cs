@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Queries.GetArtistAlbumsLite;
-using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Queries.GetArtistAlbumsLite;
+using Nemera.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+namespace Nemera.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 
 /// <summary>
 /// Extension methods for converting <see cref="GetArtistAlbumsLiteRequest"/>.

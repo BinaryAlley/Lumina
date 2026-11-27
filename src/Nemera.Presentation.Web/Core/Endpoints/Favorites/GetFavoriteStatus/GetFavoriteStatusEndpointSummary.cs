@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.DTO.Favorites;
-using Lumina.Presentation.Web.Common.Enums.Favorites;
-using Lumina.Presentation.Web.Common.Requests.Favorites;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Favorites;
+using Nemera.Presentation.Web.Common.Enums.Favorites;
+using Nemera.Presentation.Web.Common.Requests.Favorites;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Favorites.GetFavoriteStatus;
+namespace Nemera.Presentation.Web.Core.Endpoints.Favorites.GetFavoriteStatus;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetFavoriteStatusEndpoint"/> endpoint, for OpenAPI.

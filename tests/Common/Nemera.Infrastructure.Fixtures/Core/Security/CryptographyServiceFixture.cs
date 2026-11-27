@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Infrastructure.Common.Models.DTO.Configuration;
-using Lumina.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
+using Nemera.Infrastructure.Common.Models.DTO.Configuration;
+using Nemera.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using System;
@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 #endregion
 
-namespace Lumina.Infrastructure.Fixtures.Core.Security;
+namespace Nemera.Infrastructure.Fixtures.Core.Security;
 
 /// <summary>
 /// Test-support class for cryptography service tests.

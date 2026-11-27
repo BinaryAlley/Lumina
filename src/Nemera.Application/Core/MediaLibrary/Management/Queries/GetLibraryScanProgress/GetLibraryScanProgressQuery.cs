@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibraryScanProgress;
+namespace Nemera.Application.Core.MediaLibrary.Management.Queries.GetLibraryScanProgress;
 
 /// <summary>
 /// Query for getting the progress of a media library scan.

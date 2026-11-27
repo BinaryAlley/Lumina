@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+using Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+namespace Nemera.Contracts.Fixtures.Core.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 
 /// <summary>
 /// Fixture class for the <see cref="UpdateArtistCoverResponse"/> record.

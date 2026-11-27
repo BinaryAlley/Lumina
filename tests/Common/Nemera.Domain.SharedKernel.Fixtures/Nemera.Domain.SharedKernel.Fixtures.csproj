@@ -16,6 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Lumina.Domain.SharedKernel\Lumina.Domain.SharedKernel.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Domain.SharedKernel\Nemera.Domain.SharedKernel.csproj" />
     </ItemGroup>
 </Project>

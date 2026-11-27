@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Api.Common.Routes.Library.AudioLibrary.MusicLibrary;
+namespace Nemera.Presentation.Api.Common.Routes.Library.AudioLibrary.MusicLibrary;
 
 /// <summary>
 /// Class for the collection of routes defined in this API.

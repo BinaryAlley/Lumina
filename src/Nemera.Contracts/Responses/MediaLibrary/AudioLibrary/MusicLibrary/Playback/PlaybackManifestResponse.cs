@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Represents a response for the playback manifest of a track, containing the format of its stored audio, the delivery the server decided on for the

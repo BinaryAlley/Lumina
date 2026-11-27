@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.Mapping.UsersManagement.Users;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Responses.UsersManagement.Settings;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.Mapping.UsersManagement.Users;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Responses.UsersManagement.Settings;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.UserManagementBoundedContext.UserSettingsAggregate;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.UsersManagement.Users;
+namespace Nemera.Application.UnitTests.Common.Mapping.UsersManagement.Users;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UserSettingsEntityMapping"/> class.

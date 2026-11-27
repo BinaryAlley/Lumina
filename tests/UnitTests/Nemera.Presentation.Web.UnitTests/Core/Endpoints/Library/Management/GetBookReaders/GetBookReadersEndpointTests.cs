@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Plugins;
-using Lumina.Presentation.Web.Common.Requests.Library.Management;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Library.Management.GetBookReaders;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Plugins;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.Management;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Plugins;
+using Nemera.Presentation.Web.Common.Requests.Library.Management;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Management.GetBookReaders;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Plugins;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Library.Management;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System;
@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Library.Management.GetBookReaders;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Library.Management.GetBookReaders;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetBookReadersEndpoint"/> class.

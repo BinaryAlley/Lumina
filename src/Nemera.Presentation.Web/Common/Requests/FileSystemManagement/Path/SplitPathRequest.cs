@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.FileSystemManagement.Path;
+namespace Nemera.Presentation.Web.Common.Requests.FileSystemManagement.Path;
 
 /// <summary>
 /// Represents a request to split a file system path.

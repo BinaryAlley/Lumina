@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
-using Lumina.DataAccess.Common.Persistence;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.DataAccess.Repositories.Scheduling;
+using Nemera.DataAccess.Common.Persistence;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,22 +13,22 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Scheduling;
+namespace Nemera.DataAccess.Core.Repositories.Scheduling;
 
 /// <summary>
 /// Repository for the executions of the tasks of scheduled jobs.
 /// </summary>
 internal sealed class ScheduledJobExecutionRepository : IScheduledJobExecutionRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScheduledJobExecutionRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public ScheduledJobExecutionRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public ScheduledJobExecutionRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ internal sealed class ScheduledJobExecutionRepository : IScheduledJobExecutionRe
     {
         // The execution is read with a query instead of FindAsync so that it can be retrieved without tracking when requested.
         // When the entity is tracked, the change tracker still returns the already loaded instance instead of a new one.
-        IQueryable<ScheduledJobExecutionEntity> query = _luminaDbContext.ScheduledJobExecutions;
+        IQueryable<ScheduledJobExecutionEntity> query = _nemeraDbContext.ScheduledJobExecutions;
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         return await query.FirstOrDefaultAsync(execution => execution.Id == id, cancellationToken).ConfigureAwait(false);
@@ -57,12 +57,12 @@ internal sealed class ScheduledJobExecutionRepository : IScheduledJobExecutionRe
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(ScheduledJobExecutionEntity execution, CancellationToken cancellationToken)
     {
-        bool doesExecutionExist = await _luminaDbContext.ScheduledJobExecutions.AnyAsync(
+        bool doesExecutionExist = await _nemeraDbContext.ScheduledJobExecutions.AnyAsync(
             existingExecution => existingExecution.Id == execution.Id, cancellationToken).ConfigureAwait(false);
         if (doesExecutionExist)
             return Errors.Scheduling.ScheduledJobExecutionAlreadyExists;
 
-        _luminaDbContext.ScheduledJobExecutions.Add(execution);
+        _nemeraDbContext.ScheduledJobExecutions.Add(execution);
         return Result.Created;
     }
 
@@ -74,12 +74,12 @@ internal sealed class ScheduledJobExecutionRepository : IScheduledJobExecutionRe
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpdateAsync(ScheduledJobExecutionEntity data, CancellationToken cancellationToken)
     {
-        ScheduledJobExecutionEntity? foundExecution = _luminaDbContext.ScheduledJobExecutions.Local.FirstOrDefault(execution => execution.Id == data.Id)
-            ?? await _luminaDbContext.ScheduledJobExecutions.FirstOrDefaultAsync(execution => execution.Id == data.Id, cancellationToken).ConfigureAwait(false);
+        ScheduledJobExecutionEntity? foundExecution = _nemeraDbContext.ScheduledJobExecutions.Local.FirstOrDefault(execution => execution.Id == data.Id)
+            ?? await _nemeraDbContext.ScheduledJobExecutions.FirstOrDefaultAsync(execution => execution.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundExecution is null)
             return Errors.Scheduling.ScheduledJobExecutionNotFound;
         // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
-        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundExecution, data);
+        EditableValuesCopier.CopyEditableValues(_nemeraDbContext, foundExecution, data);
         return Result.Updated;
     }
 
@@ -91,7 +91,7 @@ internal sealed class ScheduledJobExecutionRepository : IScheduledJobExecutionRe
     /// <returns>An <see cref="Result{TValue}"/> containing either the running execution of the scheduled job, or <see langword="null"/>.</returns>
     public async Task<Result<ScheduledJobExecutionEntity?>> GetOpenByScheduledJobIdAsync(Guid scheduledJobId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.ScheduledJobExecutions
+        return await _nemeraDbContext.ScheduledJobExecutions
             .Where(execution => execution.ScheduledJobId == scheduledJobId && execution.CompletedOnUtc == null)
             .OrderByDescending(execution => execution.StartedOnUtc)
             .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
@@ -106,7 +106,7 @@ internal sealed class ScheduledJobExecutionRepository : IScheduledJobExecutionRe
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="ScheduledJobExecutionEntity"/>, or an error.</returns>
     public async Task<Result<IEnumerable<ScheduledJobExecutionEntity>>> GetByTimeRangeAsync(DateTime fromUtc, DateTime toUtc, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.ScheduledJobExecutions
+        return await _nemeraDbContext.ScheduledJobExecutions
             .Where(execution => execution.StartedOnUtc >= fromUtc && execution.StartedOnUtc <= toUtc)
             .OrderBy(execution => execution.StartedOnUtc)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
@@ -120,10 +120,10 @@ internal sealed class ScheduledJobExecutionRepository : IScheduledJobExecutionRe
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Success>> DeleteByScheduledJobIdAsync(Guid scheduledJobId, CancellationToken cancellationToken)
     {
-        ScheduledJobExecutionEntity[] executions = await _luminaDbContext.ScheduledJobExecutions
+        ScheduledJobExecutionEntity[] executions = await _nemeraDbContext.ScheduledJobExecutions
             .Where(execution => execution.ScheduledJobId == scheduledJobId)
             .ToArrayAsync(cancellationToken).ConfigureAwait(false);
-        _luminaDbContext.ScheduledJobExecutions.RemoveRange(executions);
+        _nemeraDbContext.ScheduledJobExecutions.RemoveRange(executions);
         return Result.Success;
     }
 
@@ -137,7 +137,7 @@ internal sealed class ScheduledJobExecutionRepository : IScheduledJobExecutionRe
     {
         // The executions are deleted with a single query, without loading them into memory first, because the retention cleanup
         // routinely removes a large number of executions at once.
-        await _luminaDbContext.ScheduledJobExecutions
+        await _nemeraDbContext.ScheduledJobExecutions
             .Where(execution => execution.StartedOnUtc < cutoffUtc)
             .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
         return Result.Success;

@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Lumina.Plugins.Calibre.UnitTests")]
-[assembly: InternalsVisibleTo("Lumina.Plugins.Calibre.SecurityTests")]
-[assembly: InternalsVisibleTo("Lumina.Plugins.Calibre.IntegrationTests")]
-[assembly: InternalsVisibleTo("Lumina.Plugins.Calibre.Fixtures")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.Calibre.UnitTests")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.Calibre.SecurityTests")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.Calibre.IntegrationTests")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.Calibre.Fixtures")]

@@ -1,6 +1,6 @@
-# Lumina API
+# Nemera API
 
-- [Lumina API](#lumina-api)
+- [Nemera API](#nemera-api)
   - [Settings](#settings)
     - [Get User Settings](#get-user-settings)
       - [Get User Settings Request](#get-user-settings-request)

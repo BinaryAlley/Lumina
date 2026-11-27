@@ -1,13 +1,13 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.ShuffleTracks;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.ShuffleTracks;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -20,7 +20,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.ShuffleTracks;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.ShuffleTracks;
 
 /// <summary>
 /// Contains security tests for the <see cref="ShuffleTracksEndpoint"/> class.
@@ -31,9 +31,9 @@ namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibr
 /// apply either, because the route performs no credential comparison.
 /// </remarks>
 [ExcludeFromCodeCoverage]
-public class ShuffleTracksEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class ShuffleTracksEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -50,12 +50,12 @@ public class ShuffleTracksEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
     /// Initializes a new instance of the <see cref="ShuffleTracksEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public ShuffleTracksEndpointTests(LuminaApiFactory apiFactory)
+    public ShuffleTracksEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
     }
 
     [Fact]
@@ -226,7 +226,7 @@ public class ShuffleTracksEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("at Lumina", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("at Nemera", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(payload, content, StringComparison.Ordinal);
         Assert.DoesNotContain("testuser_", content, StringComparison.OrdinalIgnoreCase);
         using JsonDocument problemDetails = JsonDocument.Parse(content);
@@ -241,7 +241,7 @@ public class ShuffleTracksEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
     private async Task<Guid> SeedOtherUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         string username = $"otheruser_{Guid.NewGuid()}";
         dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: username, password: "TestPass123!"));
@@ -259,7 +259,7 @@ public class ShuffleTracksEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
     private async Task<Guid> SeedLibraryAsync(Guid userId, string title)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.NewGuid();
         dbContext.Libraries.Add(_libraryEntityFixture.Create(
             id: libraryId, userId: userId, title: title, libraryType: LibraryType.Music, contentLocations: []));
@@ -276,7 +276,7 @@ public class ShuffleTracksEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
     private async Task<Guid> SeedArtistAsync(Guid libraryId, string name)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid artistId = Guid.NewGuid();
         dbContext.Artists.Add(_artistEntityFixture.Create(
             id: artistId, libraryId: libraryId, name: name, includeAlbums: false, includeContributors: false));
@@ -294,7 +294,7 @@ public class ShuffleTracksEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
     private async Task<Guid> SeedAlbumAsync(Guid libraryId, Guid artistId, string title)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid albumId = Guid.NewGuid();
         AlbumEntity album = _albumEntityFixture.Create(
             id: albumId,
@@ -323,7 +323,7 @@ public class ShuffleTracksEndpointTests : IClassFixture<LuminaApiFactory>, IDisp
     private async Task<Guid> SeedTrackAsync(Guid libraryId, Guid albumId, string title)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid trackId = Guid.NewGuid();
         TrackEntity track = _trackEntityFixture.Create(
             id: trackId,

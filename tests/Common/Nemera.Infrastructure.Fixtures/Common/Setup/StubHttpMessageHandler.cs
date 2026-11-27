@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Fixtures.Common.Setup;
+namespace Nemera.Infrastructure.Fixtures.Common.Setup;
 
 /// <summary>
 /// <see cref="HttpMessageHandler"/> test double that returns the configured response for every request, without performing any network I/O.

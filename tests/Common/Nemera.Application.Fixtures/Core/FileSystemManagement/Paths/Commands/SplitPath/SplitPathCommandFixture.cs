@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
+using Nemera.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.FileSystemManagement.Paths.Commands.SplitPath;
+namespace Nemera.Application.Fixtures.Core.FileSystemManagement.Paths.Commands.SplitPath;
 
 /// <summary>
 /// Fixture class for the <see cref="SplitPathCommand"/> class.

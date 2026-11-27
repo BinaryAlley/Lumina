@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.Authentication;
-using Lumina.Contracts.Responses.Authentication;
+using Nemera.Contracts.Requests.Authentication;
+using Nemera.Contracts.Responses.Authentication;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.RecoverPassword;
+namespace Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.RecoverPassword;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="RecoverPasswordEndpoint"/> API endpoint, for OpenAPI.

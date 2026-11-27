@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
+namespace Nemera.Presentation.Web.Common.DTO.FileSystemManagement;
 
 /// <summary>
 /// Base data transfer object for files and directories displayed in custom directory/file browser dialogs.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Plugins;
-using Lumina.Application.Common.Infrastructure.Reading;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.Contracts.Core.Reading;
+using Nemera.Application.Common.Infrastructure.Plugins;
+using Nemera.Application.Common.Infrastructure.Reading;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.Contracts.Core.Reading;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using System;
@@ -13,7 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+namespace Nemera.Infrastructure.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 
 /// <summary>
 /// Contains unit tests for the <see cref="BookReaderRegistry"/> class.

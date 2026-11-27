@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.Common;
 using System;
 #endregion
 
-namespace Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+namespace Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 
 /// <summary>
 /// Data transfer object for a book metadata lookup.

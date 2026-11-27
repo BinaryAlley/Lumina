@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Plugins.Epub.Core.Epub;
-using Lumina.Plugins.Epub.Fixtures.Core.Epub;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Plugins.Epub.Core.Epub;
+using Nemera.Plugins.Epub.Fixtures.Core.Epub;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading;
 #endregion
 
-namespace Lumina.Plugins.Epub.IntegrationTests.Core.Epub;
+namespace Nemera.Plugins.Epub.IntegrationTests.Core.Epub;
 
 /// <summary>
 /// Contains integration tests for the <see cref="EpubDocumentParser"/> class.
@@ -21,7 +21,7 @@ namespace Lumina.Plugins.Epub.IntegrationTests.Core.Epub;
 [ExcludeFromCodeCoverage]
 public class EpubDocumentParserTests : IDisposable
 {
-    private readonly string _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"lumina-epub-tests-{Guid.NewGuid():N}");
+    private readonly string _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"nemera-epub-tests-{Guid.NewGuid():N}");
     private readonly string _epubPath;
 
     /// <summary>
@@ -69,7 +69,7 @@ public class EpubDocumentParserTests : IDisposable
         Assert.Equal("image/png", resource.Value.MimeType);
         Assert.True(File.Exists(Path.Combine(workingDirectory, resource.Value.RelativeFilePath)));
         string sectionContent = File.ReadAllText(Path.Combine(workingDirectory, result.Spine[0].RelativeSectionFilePath));
-        Assert.Contains($"data-lumina-resource=\"{expectedKey}\"", sectionContent, StringComparison.Ordinal);
+        Assert.Contains($"data-nemera-resource=\"{expectedKey}\"", sectionContent, StringComparison.Ordinal);
         Assert.DoesNotContain("src=\"images/cover.png\"", sectionContent, StringComparison.Ordinal);
     }
 
@@ -89,7 +89,7 @@ public class EpubDocumentParserTests : IDisposable
         string expectedKey = CreateResourceKey("images/cover.png");
         // The DTD declaration was tolerated and the named character references resolved, so the section was rewritten instead of
         // being served "as-is": the internal image reference became the resource marker and the non-breaking spaces were decoded.
-        Assert.Contains($"data-lumina-resource=\"{expectedKey}\"", sectionContent, StringComparison.Ordinal);
+        Assert.Contains($"data-nemera-resource=\"{expectedKey}\"", sectionContent, StringComparison.Ordinal);
         Assert.DoesNotContain("src=\"images/cover.png\"", sectionContent, StringComparison.Ordinal);
         Assert.DoesNotContain("<!DOCTYPE", sectionContent, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("&nbsp;", sectionContent, StringComparison.Ordinal);
@@ -466,8 +466,8 @@ public class EpubDocumentParserTests : IDisposable
         string sectionContent = File.ReadAllText(Path.Combine(workingDirectory, result.Spine[0].RelativeSectionFilePath));
         string expectedKey = CreateResourceKey("images/cover.png");
         // The resolvable internal image is rewritten to the resource marker; the fragment variant resolves to the same image.
-        Assert.Contains($"data-lumina-resource=\"{expectedKey}\"", sectionContent, StringComparison.Ordinal);
-        Assert.Equal(2, CountOccurrences(sectionContent, "data-lumina-resource"));
+        Assert.Contains($"data-nemera-resource=\"{expectedKey}\"", sectionContent, StringComparison.Ordinal);
+        Assert.Equal(2, CountOccurrences(sectionContent, "data-nemera-resource"));
         // The same-page anchor, data URI, absolute links, mailto, and broken path keep their original value.
         Assert.Contains("href=\"#part\"", sectionContent, StringComparison.Ordinal);
         Assert.Contains("data:image/png;base64,AAAA", sectionContent, StringComparison.Ordinal);

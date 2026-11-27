@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Fixtures.Core.Requests.Playlists;
-using Lumina.Contracts.Requests.Playlists;
+using Nemera.Contracts.Fixtures.Core.Requests.Playlists;
+using Nemera.Contracts.Requests.Playlists;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Contracts.UnitTests.Requests.Playlists;
+namespace Nemera.Contracts.UnitTests.Requests.Playlists;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetPlaylistRequest"/> record.

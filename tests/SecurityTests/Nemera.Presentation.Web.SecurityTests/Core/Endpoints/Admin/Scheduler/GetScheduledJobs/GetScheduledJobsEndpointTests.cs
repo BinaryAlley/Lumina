@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Scheduling;
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Scheduler.GetScheduledJobs;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Scheduling;
-using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Scheduling;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Scheduler.GetScheduledJobs;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Scheduling;
+using Nemera.Presentation.Web.Fixtures.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -13,15 +13,15 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Scheduler.GetScheduledJobs;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Scheduler.GetScheduledJobs;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetScheduledJobsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetScheduledJobsEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetScheduledJobsEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
     private readonly ScheduledJobDtoFixture _scheduledJobDtoFixture = new();
 
@@ -29,7 +29,7 @@ public class GetScheduledJobsEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="GetScheduledJobsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetScheduledJobsEndpointTests(LuminaWebFactory apiFactory)
+    public GetScheduledJobsEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

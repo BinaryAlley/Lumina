@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Scheduling.Commands.RemoveScheduledJob;
+using Nemera.Application.Core.Scheduling.Commands.RemoveScheduledJob;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Scheduling.Commands.RemoveScheduledJob;
+namespace Nemera.Application.Fixtures.Core.Scheduling.Commands.RemoveScheduledJob;
 
 /// <summary>
 /// Fixture class for the <see cref="RemoveScheduledJobCommand"/> class.

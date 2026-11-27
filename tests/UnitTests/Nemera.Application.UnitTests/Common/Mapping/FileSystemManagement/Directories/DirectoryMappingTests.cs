@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.FileSystemManagement.Directories;
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Contracts.Responses.FileSystemManagement.Directories;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Directories;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Contracts.Responses.FileSystemManagement.Directories;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Directories;
+namespace Nemera.Application.UnitTests.Common.Mapping.FileSystemManagement.Directories;
 
 /// <summary>
 /// Contains unit tests for the <see cref="DirectoryMapping"/> class.

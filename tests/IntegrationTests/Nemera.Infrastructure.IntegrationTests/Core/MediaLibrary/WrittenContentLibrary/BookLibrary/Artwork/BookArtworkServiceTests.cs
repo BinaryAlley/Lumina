@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
-using Lumina.Application.Fixtures.Common.Infrastructure.Models.DTO.Configuration;
-using Lumina.Contracts.Fixtures.Core.DTO.Common;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
-using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
-using Lumina.Infrastructure.Fixtures.Common.Setup;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Application.Fixtures.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Contracts.Fixtures.Core.DTO.Common;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Nemera.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
+using Nemera.Infrastructure.Fixtures.Common.Setup;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using System;
@@ -24,7 +24,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.IntegrationTests.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
+namespace Nemera.Infrastructure.IntegrationTests.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Artwork;
 
 /// <summary>
 /// Contains integration tests for the <see cref="BookArtworkService"/> class.
@@ -163,9 +163,9 @@ public class BookArtworkServiceTests
     public async Task SaveBookArtworkAsync_WhenLocalArtworkIsALink_ShouldReturnInvalidPath()
     {
         // Arrange
-        string targetDirectory = Path.Combine(Path.GetTempPath(), $"lumina-junction-target-{Guid.NewGuid():N}");
+        string targetDirectory = Path.Combine(Path.GetTempPath(), $"nemera-junction-target-{Guid.NewGuid():N}");
         Directory.CreateDirectory(targetDirectory);
-        string linkPath = Path.Combine(Path.GetTempPath(), $"lumina-junction-link-{Guid.NewGuid():N}");
+        string linkPath = Path.Combine(Path.GetTempPath(), $"nemera-junction-link-{Guid.NewGuid():N}");
         if (!TryCreateJunction(linkPath, targetDirectory))
         {
             Directory.Delete(targetDirectory, true);
@@ -651,7 +651,7 @@ public class BookArtworkServiceTests
     /// <returns>The file system path of the created temporary image file.</returns>
     private static string CreateTempImageFile(int smallImageBytes)
     {
-        string sourcePath = Path.Combine(Path.GetTempPath(), $"lumina-artwork-source-{Guid.NewGuid():N}.jpg");
+        string sourcePath = Path.Combine(Path.GetTempPath(), $"nemera-artwork-source-{Guid.NewGuid():N}.jpg");
         File.WriteAllBytes(sourcePath, new byte[smallImageBytes]);
         return sourcePath;
     }

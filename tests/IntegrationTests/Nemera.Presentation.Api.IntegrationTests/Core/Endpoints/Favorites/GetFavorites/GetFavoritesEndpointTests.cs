@@ -1,24 +1,24 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Responses.Common;
-using Lumina.Contracts.Responses.Favorites;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Favorites.GetFavorites;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Responses.Common;
+using Nemera.Contracts.Responses.Favorites;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Favorites.GetFavorites;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -32,18 +32,18 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Favorites.GetFavorites;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Favorites.GetFavorites;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetFavoritesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetFavoritesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetFavoritesEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private const string PATH = "/api/v1/users/me/favorites";
 
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -68,7 +68,7 @@ public class GetFavoritesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     /// Initializes a new instance of the <see cref="GetFavoritesEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetFavoritesEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetFavoritesEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -362,7 +362,7 @@ public class GetFavoritesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain(trackId.ToString(), content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina.", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera.", content, StringComparison.Ordinal);
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -375,7 +375,7 @@ public class GetFavoritesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private async Task<Guid> SeedLibraryAsync(Guid userId, LibraryType libraryType)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.NewGuid();
         dbContext.Libraries.Add(_libraryEntityFixture.Create(
             id: libraryId, userId: userId, title: $"Library-{Guid.NewGuid():N}", libraryType: libraryType, contentLocations: []));
@@ -393,7 +393,7 @@ public class GetFavoritesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private async Task<Guid> SeedArtistAsync(Guid libraryId, string name)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid artistId = Guid.NewGuid();
         dbContext.Artists.Add(_artistEntityFixture.Create(
             id: artistId, libraryId: libraryId, name: name, includeAlbums: false, includeContributors: false));
@@ -411,7 +411,7 @@ public class GetFavoritesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private async Task<Guid> SeedAlbumAsync(Guid libraryId, Guid artistId, string title)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid albumId = Guid.NewGuid();
         AlbumEntity album = _albumEntityFixture.Create(
             id: albumId,
@@ -440,7 +440,7 @@ public class GetFavoritesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private async Task<Guid> SeedTrackAsync(Guid libraryId, Guid albumId, string title)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid trackId = Guid.NewGuid();
         TrackEntity track = _trackEntityFixture.Create(
             id: trackId,
@@ -478,7 +478,7 @@ public class GetFavoritesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private async Task SeedAlbumCoverAsync(Guid albumId, string fileName)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         dbContext.MusicArtwork.Add(_musicArtworkEntityFixture.Create(
             ownerType: MusicArtworkOwnerType.Album,
             ownerId: albumId,
@@ -498,7 +498,7 @@ public class GetFavoritesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private async Task<Guid> SeedBookAsync(Guid libraryId, string title, string authorName)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid bookId = Guid.NewGuid();
         Guid contributorId = Guid.NewGuid();
         dbContext.Books.Add(_bookEntityFixture.Create(id: bookId, libraryId: libraryId, title: title, includeMetadata: false));
@@ -519,7 +519,7 @@ public class GetFavoritesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private async Task<Guid> SeedFavoriteAsync(Guid userId, FavoriteMediaKind mediaKind, Guid mediaItemId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid favoriteId = Guid.NewGuid();
         dbContext.Favorites.Add(_favoriteEntityFixture.Create(
             id: favoriteId,
@@ -542,7 +542,7 @@ public class GetFavoritesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private async Task SetCreatedOnUtcAsync(Guid favoriteId, DateTime createdOnUtc)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         await dbContext.Favorites
             .Where(favorite => favorite.Id == favoriteId)
             .ExecuteUpdateAsync(setters => setters.SetProperty(favorite => favorite.CreatedOnUtc, createdOnUtc));
@@ -556,7 +556,7 @@ public class GetFavoritesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private async Task<FavoriteEntity> GetFavoriteAsync(Guid favoriteId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         return await dbContext.Favorites.AsNoTracking().FirstAsync(favorite => favorite.Id == favoriteId);
     }
 
@@ -567,7 +567,7 @@ public class GetFavoritesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private async Task<Guid> SeedOtherUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         string username = $"otheruser_{Guid.NewGuid()}";
         dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: username, password: "TestPass123!"));
@@ -583,7 +583,7 @@ public class GetFavoritesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     private Guid GetCurrentUserId()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         UserEntity user = dbContext.Users.First(candidate => candidate.Username == _apiFactory.TestUsername);
         return user.Id;
     }
@@ -617,7 +617,7 @@ public class GetFavoritesEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     {
         using (IServiceScope scope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             List<Guid> libraryIds = [.. _seededLibraryIds];
             List<Guid> albumIds = await dbContext.Albums.Where(album => libraryIds.Contains(album.LibraryId)).Select(album => album.Id).ToListAsync();
             List<Guid> bookIds = await dbContext.Books.Where(book => libraryIds.Contains(book.LibraryId)).Select(book => book.Id).ToListAsync();

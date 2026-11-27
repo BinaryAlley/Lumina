@@ -36,16 +36,16 @@
  *
  * The needs normalization event
  * -----------------------------
- * It is published on the player event bus as {@link LuminaAudioPlayer.PlayerEvent.NEEDS_NORMALIZATION}, with the payload
+ * It is published on the player event bus as {@link NemeraAudioPlayer.PlayerEvent.NEEDS_NORMALIZATION}, with the payload
  * { container, codec, reason }, plus isDirectPlay when the caller supplied it, where the reason is one of the
- * {@link LuminaAudioPlayer.PlayerErrorReason} values NO_DEMUXER, CODEC_UNSUPPORTED or DEMUXER_FAILED. A consumer that
+ * {@link NemeraAudioPlayer.PlayerErrorReason} values NO_DEMUXER, CODEC_UNSUPPORTED or DEMUXER_FAILED. A consumer that
  * asked for a normalized delivery uses it to request one. A normalized manifest, whose isDirectPlay flag is false, is
- * refused by {@link LuminaAudioPlayer.createDemuxerForManifest} without an event, because the server already normalized
+ * refused by {@link NemeraAudioPlayer.createDemuxerForManifest} without an event, because the server already normalized
  * such a track on purpose and its stream is not in the stored container. The normalized delivery is parsed by
- * {@link LuminaAudioPlayer.NormalizedSegmentDemuxer}, which builds one of these same demuxers per segment from the
+ * {@link NemeraAudioPlayer.NormalizedSegmentDemuxer}, which builds one of these same demuxers per segment from the
  * delivery container and codec of the manifest.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -59,7 +59,7 @@
     function resolveDependencies(options = {}) {
         const settings = options || {};
         return {
-            registry: settings.registry || LuminaAudioPlayer.demuxerRegistry,
+            registry: settings.registry || NemeraAudioPlayer.demuxerRegistry,
             capabilities: settings.capabilities || null,
             events: settings.events || null
         };
@@ -83,15 +83,15 @@
      * @param {Object} events - The event bus.
      * @param {string} container - The canonical container of the track.
      * @param {string} codec - The canonical codec of the track.
-     * @param {string} reason - One of the {@link LuminaAudioPlayer.PlayerErrorReason} values.
+     * @param {string} reason - One of the {@link NemeraAudioPlayer.PlayerErrorReason} values.
      * @param {boolean} [isDirectPlay] - The direct play flag of the manifest, when the caller has one.
      */
     function publishNeedsNormalization(events, container, codec, reason, isDirectPlay) {
-        if (!events || !LuminaAudioPlayer.PlayerEvent || typeof events.emit !== 'function')
+        if (!events || !NemeraAudioPlayer.PlayerEvent || typeof events.emit !== 'function')
             return;
         const payload = {
-            container: LuminaAudioPlayer.canonicalizeDemuxerContainer(container),
-            codec: LuminaAudioPlayer.canonicalizeDemuxerCodec(codec),
+            container: NemeraAudioPlayer.canonicalizeDemuxerContainer(container),
+            codec: NemeraAudioPlayer.canonicalizeDemuxerCodec(codec),
             reason
         };
         // The direct play flag is carried only when the caller supplied it: an omitted flag means the caller does not
@@ -100,7 +100,7 @@
         // track the server chose to normalize.
         if (isDirectPlay !== undefined)
             payload.isDirectPlay = isDirectPlay === true;
-        events.emit(LuminaAudioPlayer.PlayerEvent.NEEDS_NORMALIZATION, Object.freeze(payload));
+        events.emit(NemeraAudioPlayer.PlayerEvent.NEEDS_NORMALIZATION, Object.freeze(payload));
     }
 
     /**
@@ -110,8 +110,8 @@
         /**
          * Creates an instance of DemuxerCapabilities.
          * @param {Object} [options] - The options.
-         * @param {LuminaAudioPlayer.DemuxerRegistry} [options.registry] - The demuxer registry. Defaults to the process wide registry, the one collaborator that is not injected.
-         * @param {LuminaAudioPlayer.PlayerCapabilities} [options.capabilities] - The browser capability detector, injected by the caller. A method that probes without it fails loudly.
+         * @param {NemeraAudioPlayer.DemuxerRegistry} [options.registry] - The demuxer registry. Defaults to the process wide registry, the one collaborator that is not injected.
+         * @param {NemeraAudioPlayer.PlayerCapabilities} [options.capabilities] - The browser capability detector, injected by the caller. A method that probes without it fails loudly.
          * @param {Object} [options.events] - The player event bus, injected by the caller.
          */
         constructor(options = {}) {
@@ -160,7 +160,7 @@
         /**
          * Asks the browser whether it can decode the exact configuration a demuxer extracted from a track. It is the
          * exact check, usable once the demuxer was initialized.
-         * @param {Object} configuration - A configuration, per {@link LuminaAudioPlayer.Demuxer#getConfiguration}.
+         * @param {Object} configuration - A configuration, per {@link NemeraAudioPlayer.Demuxer#getConfiguration}.
          * @returns {Promise<boolean>} True when the browser can decode the configuration.
          * @throws {TypeError} When no capability detector was injected.
          */
@@ -187,11 +187,11 @@
             const events = requireInjected(this.events, 'event bus');
             const descriptor = this.match(container, codec);
             if (!descriptor) {
-                publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.NO_DEMUXER, isDirectPlay);
+                publishNeedsNormalization(events, container, codec, NemeraAudioPlayer.PlayerErrorReason.NO_DEMUXER, isDirectPlay);
                 return false;
             }
             if (!await this.isCodecSupportedAsync(descriptor)) {
-                publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.CODEC_UNSUPPORTED, isDirectPlay);
+                publishNeedsNormalization(events, container, codec, NemeraAudioPlayer.PlayerErrorReason.CODEC_UNSUPPORTED, isDirectPlay);
                 return false;
             }
             return true;
@@ -213,7 +213,7 @@
          * Builds the value of the 'capabilities' query parameter of the manifest request from the demuxers that loaded,
          * without consulting the browser. It is the set the player can demux, which is what the server already assumes
          * when it applies its own default; a caller that needs the set the player can also decode uses
-         * {@link LuminaAudioPlayer.DemuxerCapabilities#describeFormatsAsync}.
+         * {@link NemeraAudioPlayer.DemuxerCapabilities#describeFormatsAsync}.
          * @returns {string} A comma separated list of container/codec pairs.
          */
         describeFormats() {
@@ -246,14 +246,14 @@
         }
     }
 
-    LuminaAudioPlayer.DemuxerCapabilities = DemuxerCapabilities;
+    NemeraAudioPlayer.DemuxerCapabilities = DemuxerCapabilities;
 
     /**
-     * Creates a demux capability resolver. See {@link LuminaAudioPlayer.DemuxerCapabilities} for the options.
+     * Creates a demux capability resolver. See {@link NemeraAudioPlayer.DemuxerCapabilities} for the options.
      * @param {Object} [options] - The options.
-     * @returns {LuminaAudioPlayer.DemuxerCapabilities} The resolver.
+     * @returns {NemeraAudioPlayer.DemuxerCapabilities} The resolver.
      */
-    LuminaAudioPlayer.createDemuxerCapabilities = function (options) {
+    NemeraAudioPlayer.createDemuxerCapabilities = function (options) {
         return new DemuxerCapabilities(options);
     };
 
@@ -275,13 +275,13 @@
      * normalization event, rather than by the null itself.
      * @param {string} container - The container of the track.
      * @param {string} codec - The codec of the track.
-     * @param {Object} [options] - The demuxer options, plus the injected capabilities and events, per {@link LuminaAudioPlayer.DemuxerCapabilities}.
-     * @returns {Promise<LuminaAudioPlayer.Demuxer|null>} The ready demuxer, or null when the pair must be normalized or the probe was stopped intentionally.
+     * @param {Object} [options] - The demuxer options, plus the injected capabilities and events, per {@link NemeraAudioPlayer.DemuxerCapabilities}.
+     * @returns {Promise<NemeraAudioPlayer.Demuxer|null>} The ready demuxer, or null when the pair must be normalized or the probe was stopped intentionally.
      * @throws {TypeError} When no event bus was injected. It is a composition error, not a property of the track, so it
      *     rejects rather than resolving to a null the caller would have to classify without an event to classify it by.
-     * @throws {LuminaAudioPlayer.PlayerError} When the bytes could not be fetched because of a transport failure, which is not a format the server could normalize.
+     * @throws {NemeraAudioPlayer.PlayerError} When the bytes could not be fetched because of a transport failure, which is not a format the server could normalize.
      */
-    LuminaAudioPlayer.createDemuxerFor = async function (container, codec, options) {
+    NemeraAudioPlayer.createDemuxerFor = async function (container, codec, options) {
         const settings = options || {};
         const dependencies = resolveDependencies(settings);
         // The event bus is required rather than optional, because a caller tells a track that must be normalized from an
@@ -290,7 +290,7 @@
         const events = requireInjected(dependencies.events, 'event bus');
         const descriptor = dependencies.registry ? dependencies.registry.find(container, codec) : null;
         if (!descriptor) {
-            publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.NO_DEMUXER, settings.isDirectPlay);
+            publishNeedsNormalization(events, container, codec, NemeraAudioPlayer.PlayerErrorReason.NO_DEMUXER, settings.isDirectPlay);
             return null;
         }
         let demuxer = null;
@@ -303,13 +303,13 @@
                 await demuxer.destroyAsync();
             // An intentional download stop, a teardown that crossed the header probe, is not a track the server has to
             // normalize, so it is not published as one; the demuxer already reports it as a normal stop everywhere else.
-            if (LuminaAudioPlayer.isDownloadAbort(error))
+            if (NemeraAudioPlayer.isDownloadAbort(error))
                 return null;
             // A transport failure says nothing about the format of the track either: the server must not normalize a file
             // whose bytes could not be fetched, so the failure is propagated and reported as the download failure it is.
-            if (error instanceof LuminaAudioPlayer.PlayerError && error.code === LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED)
+            if (error instanceof NemeraAudioPlayer.PlayerError && error.code === NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED)
                 throw error;
-            publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.DEMUXER_FAILED, settings.isDirectPlay);
+            publishNeedsNormalization(events, container, codec, NemeraAudioPlayer.PlayerErrorReason.DEMUXER_FAILED, settings.isDirectPlay);
             return null;
         }
         const configuration = demuxer.getConfiguration();
@@ -325,7 +325,7 @@
         }
         if (!isConfigurationSupported) {
             await demuxer.destroyAsync();
-            publishNeedsNormalization(events, container, codec, LuminaAudioPlayer.PlayerErrorReason.CODEC_UNSUPPORTED, settings.isDirectPlay);
+            publishNeedsNormalization(events, container, codec, NemeraAudioPlayer.PlayerErrorReason.CODEC_UNSUPPORTED, settings.isDirectPlay);
             return null;
         }
         // The demuxer is usable, so the caller's error callback is attached from here on: a failure while reading is a
@@ -342,32 +342,32 @@
      * publish a normalization request for a track the server already normalized, a normalization loop. Such a manifest
      * therefore resolves to null here, silently, and a caller that has one runs the normalized pipeline instead.
      * @param {Object} manifest - The playback manifest.
-     * @param {Object} [options] - The demuxer options, per {@link LuminaAudioPlayer.createDemuxerFor}.
-     * @returns {Promise<LuminaAudioPlayer.Demuxer|null>} The ready demuxer, or null for a manifest that is not a direct play, or one that must be normalized.
+     * @param {Object} [options] - The demuxer options, per {@link NemeraAudioPlayer.createDemuxerFor}.
+     * @returns {Promise<NemeraAudioPlayer.Demuxer|null>} The ready demuxer, or null for a manifest that is not a direct play, or one that must be normalized.
      */
-    LuminaAudioPlayer.createDemuxerForManifest = function (manifest, options) {
+    NemeraAudioPlayer.createDemuxerForManifest = function (manifest, options) {
         if (!manifest || manifest.isDirectPlay !== true)
             return Promise.resolve(null);
-        return LuminaAudioPlayer.createDemuxerFor(manifest.sourceContainer, manifest.sourceCodec, Object.assign({}, options, { isDirectPlay: true }));
+        return NemeraAudioPlayer.createDemuxerFor(manifest.sourceContainer, manifest.sourceCodec, Object.assign({}, options, { isDirectPlay: true }));
     };
 
     /**
      * Builds the value of the 'capabilities' query parameter of the manifest request from the process wide registry,
-     * without consulting the browser. See {@link LuminaAudioPlayer.describeDemuxerFormatsAsync} for the decode aware set.
+     * without consulting the browser. See {@link NemeraAudioPlayer.describeDemuxerFormatsAsync} for the decode aware set.
      * @returns {string} A comma separated list of container/codec pairs.
      */
-    LuminaAudioPlayer.describeDemuxerFormats = function () {
+    NemeraAudioPlayer.describeDemuxerFormats = function () {
         return new DemuxerCapabilities().describeFormats();
     };
 
     /**
      * Builds the value of the 'capabilities' query parameter of the manifest request from the process wide registry,
      * keeping only the pairs whose codec the browser can decode, which is the set the parameter is documented to carry.
-     * @param {Object} [options] - The options, with the injected capability detector and event bus, per {@link LuminaAudioPlayer.DemuxerCapabilities}.
+     * @param {Object} [options] - The options, with the injected capability detector and event bus, per {@link NemeraAudioPlayer.DemuxerCapabilities}.
      * @returns {Promise<string>} A promise resolving to a comma separated list of container/codec pairs.
      * @throws {TypeError} When no capability detector was injected.
      */
-    LuminaAudioPlayer.describeDemuxerFormatsAsync = function (options) {
+    NemeraAudioPlayer.describeDemuxerFormatsAsync = function (options) {
         return new DemuxerCapabilities(options).describeFormatsAsync();
     };
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
+namespace Nemera.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
 
 /// <summary>
 /// Query for retrieving the authorization roles and permissions of an account.

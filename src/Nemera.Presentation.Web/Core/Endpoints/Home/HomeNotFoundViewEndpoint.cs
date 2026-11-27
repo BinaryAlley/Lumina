@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Primitives;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Lumina.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Common;
+using Nemera.Presentation.Web.Core.Themes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Home;
+namespace Nemera.Presentation.Web.Core.Endpoints.Home;
 
 /// <summary>
 /// API endpoint for the <c>/{culture}/not-found</c> route.
@@ -21,8 +21,8 @@ namespace Lumina.Presentation.Web.Core.Endpoints.Home;
 public class HomeNotFoundViewEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
     // The resource base name deliberately excludes the "Core.Resources" segment: the localization factory re-roots it with the configured ResourcesPath.
-    private const string VIEW_RESOURCE_BASE_NAME = "Lumina.Presentation.Web.Views.Shared.NotFound";
-    private const string VIEW_RESOURCE_LOCATION = "Lumina.Presentation.Web";
+    private const string VIEW_RESOURCE_BASE_NAME = "Nemera.Presentation.Web.Views.Shared.NotFound";
+    private const string VIEW_RESOURCE_LOCATION = "Nemera.Presentation.Web";
     // The page key mirrors the path of the Razor view under Core/Views, so that theme templates can override it at the page, section or default scope.
     private const string VIEW_PAGE_KEY = "shared/not-found";
 

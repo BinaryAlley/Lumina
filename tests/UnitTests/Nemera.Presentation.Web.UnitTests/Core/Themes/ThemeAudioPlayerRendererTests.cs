@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Enums.Primitives;
-using Lumina.Presentation.Web.Common.Primitives;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Enums.Primitives;
+using Nemera.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Themes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using NSubstitute;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Themes;
+namespace Nemera.Presentation.Web.UnitTests.Core.Themes;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ThemeAudioPlayerRenderer"/> class.
@@ -56,7 +56,7 @@ public class ThemeAudioPlayerRendererTests
     public async Task RenderAsync_WhenCalled_ShouldRenderTheShellWithTheThemeAssetBaseAndThePlayerModel()
     {
         // Arrange
-        StubTemplate(THEME_ID, SHELL_PAGE_KEY, "<div class=\"lumina-audio-player\" data-asset-base=\"{{{assetBase}}}\" data-queue-label=\"{{strings.queue}}\"></div>");
+        StubTemplate(THEME_ID, SHELL_PAGE_KEY, "<div class=\"nemera-audio-player\" data-asset-base=\"{{{assetBase}}}\" data-queue-label=\"{{strings.queue}}\"></div>");
         StubTemplate(THEME_ID, QUEUE_ITEM_PAGE_KEY, string.Empty);
         StubTemplate(THEME_ID, PLAYLIST_ITEM_PAGE_KEY, string.Empty);
 
@@ -105,7 +105,7 @@ public class ThemeAudioPlayerRendererTests
     public async Task RenderAsync_WhenSubTemplateResolvesToTheShellTemplate_ShouldInlineAnEmptySubTemplate()
     {
         // Arrange
-        string shellTemplate = "<div class=\"lumina-audio-player\">{{{queueItemTemplate}}}|{{{playlistItemTemplate}}}</div>";
+        string shellTemplate = "<div class=\"nemera-audio-player\">{{{queueItemTemplate}}}|{{{playlistItemTemplate}}}</div>";
         StubTemplate(THEME_ID, SHELL_PAGE_KEY, shellTemplate);
         StubTemplate(THEME_ID, QUEUE_ITEM_PAGE_KEY, shellTemplate);
         StubTemplate(THEME_ID, PLAYLIST_ITEM_PAGE_KEY, shellTemplate);
@@ -115,7 +115,7 @@ public class ThemeAudioPlayerRendererTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal("<div class=\"lumina-audio-player\">|</div>", result.Value);
+        Assert.Equal("<div class=\"nemera-audio-player\">|</div>", result.Value);
     }
 
     [Fact]

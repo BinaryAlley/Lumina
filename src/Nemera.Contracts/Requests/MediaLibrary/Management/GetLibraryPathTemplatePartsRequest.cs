@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.MediaLibrary.Management;
+namespace Nemera.Contracts.Requests.MediaLibrary.Management;
 
 /// <summary>
 /// Represents a request to get the path parts available for a media library type.

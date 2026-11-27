@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Plugins.Index;
+namespace Nemera.Presentation.Web.Core.Endpoints.Plugins.Index;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="PluginsIndexViewEndpoint"/> endpoint, for OpenAPI.

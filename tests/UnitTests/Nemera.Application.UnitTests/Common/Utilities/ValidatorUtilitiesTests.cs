@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
-using Lumina.Application.Fixtures.Common.Utilities;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
+using Nemera.Application.Fixtures.Common.Utilities;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Utilities;
+namespace Nemera.Application.UnitTests.Common.Utilities;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ValidatorUtilities"/> class.

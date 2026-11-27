@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
-using Lumina.DataAccess.Core.Repositories.Authorization;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.DataAccess.Core.Repositories.Authorization;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.Authorization;
+namespace Nemera.DataAccess.UnitTests.Core.Repositories.Authorization;
 
 /// <summary>
 /// Contains unit tests for the <see cref="RoleRepository"/> class.
@@ -26,7 +26,7 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.Authorization;
 [ExcludeFromCodeCoverage]
 public class RoleRepositoryTests
 {
-    private readonly LuminaDbContext _mockContext;
+    private readonly NemeraDbContext _mockContext;
     private readonly RoleRepository _sut;
     private readonly RoleEntityFixture _roleEntityFixture = new();
     private readonly RolePermissionEntityFixture _rolePermissionEntityFixture = new();
@@ -36,7 +36,7 @@ public class RoleRepositoryTests
     /// </summary>
     public RoleRepositoryTests()
     {
-        _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
+        _mockContext = Create.MockedDbContextFor<NemeraDbContext>();
         _sut = new RoleRepository(_mockContext);
     }
 

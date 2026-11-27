@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Configuration;
-using Lumina.Presentation.Web.Common.HealthChecks;
+using Nemera.Presentation.Web.Common.DTO.Configuration;
+using Nemera.Presentation.Web.Common.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using System.Diagnostics.CodeAnalysis;
@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+namespace Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 
 /// <summary>
 /// API reachability health check that always reports a healthy state.

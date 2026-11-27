@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.Playlists;
-using Lumina.Contracts.Responses.Playlists;
+using Nemera.Contracts.Requests.Playlists;
+using Nemera.Contracts.Responses.Playlists;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Playlists.AddPlaylistScopeEntries;
+namespace Nemera.Presentation.Api.Core.Endpoints.Playlists.AddPlaylistScopeEntries;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="AddPlaylistScopeEntriesEndpoint"/> endpoint, for OpenAPI.

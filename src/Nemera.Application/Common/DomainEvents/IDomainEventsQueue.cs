@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Events;
+using Nemera.Domain.Common.Events;
 #endregion
 
-namespace Lumina.Application.Common.DomainEvents;
+namespace Nemera.Application.Common.DomainEvents;
 
 /// <summary>
 /// Interface for a thread-safe queue for managing domain events.

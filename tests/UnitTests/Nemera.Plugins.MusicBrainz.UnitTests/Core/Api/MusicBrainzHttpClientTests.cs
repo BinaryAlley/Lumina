@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Common.Http;
-using Lumina.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
-using Lumina.Plugins.MusicBrainz.Core;
-using Lumina.Plugins.MusicBrainz.Core.Api;
-using Lumina.Plugins.MusicBrainz.Core.Settings;
-using Lumina.Plugins.MusicBrainz.Fixtures.Common.Models.DTO.Settings;
-using Lumina.Plugins.MusicBrainz.UnitTests.Common.TestHelpers;
+using Nemera.Plugins.Contracts.Common.Http;
+using Nemera.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
+using Nemera.Plugins.MusicBrainz.Core;
+using Nemera.Plugins.MusicBrainz.Core.Api;
+using Nemera.Plugins.MusicBrainz.Core.Settings;
+using Nemera.Plugins.MusicBrainz.Fixtures.Common.Models.DTO.Settings;
+using Nemera.Plugins.MusicBrainz.UnitTests.Common.TestHelpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.UnitTests.Core.Api;
+namespace Nemera.Plugins.MusicBrainz.UnitTests.Core.Api;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MusicBrainzHttpClient"/> class.
@@ -319,7 +319,7 @@ public class MusicBrainzHttpClientTests
 
         // Assert
         string userAgent = handler.Requests[0].Headers.UserAgent.ToString();
-        Assert.Contains("Lumina-Test/1.0", userAgent);
+        Assert.Contains("Nemera-Test/1.0", userAgent);
         Assert.Contains("contact@example.com", userAgent);
     }
 
@@ -334,7 +334,7 @@ public class MusicBrainzHttpClientTests
 
         // Assert
         string userAgent = handler.Requests[0].Headers.UserAgent.ToString();
-        Assert.Equal("Lumina-Test/1.0", userAgent);
+        Assert.Equal("Nemera-Test/1.0", userAgent);
     }
 
     [Fact]
@@ -698,7 +698,7 @@ public class MusicBrainzHttpClientTests
         MusicBrainzSettingsProvider settingsProvider = new(null, MusicBrainzPlugin.s_pluginId, _musicBrainzSettingsDtoFixture.Create(
             baseUrl: baseUrl,
             doesAllowPrivateBaseUrl: doesAllowPrivateBaseUrl,
-            userAgent: "Lumina-Test/1.0",
+            userAgent: "Nemera-Test/1.0",
             contactEmail: contactEmail,
             includeContactEmail: contactEmail is not null,
             searchResultLimit: 10,

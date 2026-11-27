@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.Infrastructure.Security;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
-using Lumina.Contracts.Requests.Authentication;
-using Lumina.Contracts.Responses.Authentication;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Infrastructure.Core.Authentication;
-using Lumina.Infrastructure.Core.Security;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.Infrastructure.Security;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.Authentication;
+using Nemera.Contracts.Requests.Authentication;
+using Nemera.Contracts.Responses.Authentication;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Infrastructure.Core.Authentication;
+using Nemera.Infrastructure.Core.Security;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,16 +26,16 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagement.Authentication;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagement.Authentication;
 
 /// <summary>
 /// Contains integration tests for the <see cref="RecoverPasswordEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly PasswordHashService _hashService = new();
     private readonly UserEntityFixture _userEntityFixture = new();
     private readonly RecoverPasswordRequestFixture _recoverPasswordRequestFixture = new();
@@ -52,7 +52,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     /// Initializes a new instance of the <see cref="RecoverPasswordEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public RecoverPasswordEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public RecoverPasswordEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -103,7 +103,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
 
         // Create a new context to get fresh data.
         using IServiceScope verificationScope = _apiFactory.Services.CreateScope();
-        LuminaDbContext verificationContext = verificationScope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext verificationContext = verificationScope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         // Ensure we get fresh data from the database.
         verificationContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
@@ -247,7 +247,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
         // Setup user without TOTP.
         using (IServiceScope scope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             UserEntity userWithoutTotp = _userEntityFixture.Create(username: "userwithoutotp2", password: _hashService.HashString("OldPass123!"));
             userWithoutTotp.TotpSecret = null; // No TOTP configured.
             dbContext.Users.Add(userWithoutTotp);
@@ -308,7 +308,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     private async Task<UserEntity> CreateUserWithTotp()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         byte[] totpSecret = _totpTokenGenerator.GenerateSecret();
         UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("OldPass123!"));
@@ -326,7 +326,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     private async Task<UserEntity> CreateUserWithoutTotp()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("OldPass123!"));
         user.TotpSecret = null;
@@ -342,7 +342,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<AuthenticatedLuminaApi
     public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == _testUsername);
         if (user is not null)

@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DTO.Playlists;
+namespace Nemera.Application.Common.DTO.Playlists;
 
 /// <summary>
 /// Data transfer object for the display data of the media item referenced by a playlist entry, together with its collection and creator.

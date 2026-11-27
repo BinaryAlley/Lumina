@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Application.Common.DTO.Pagination;
+namespace Nemera.Application.Common.DTO.Pagination;
 
 /// <summary>
 /// Represents a paginated result containing a subset of data and pagination metadata for the current page.

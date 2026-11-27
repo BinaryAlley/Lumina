@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.MusicBrainz.Core;
-using Lumina.Plugins.MusicBrainz.Core.Api;
-using Lumina.Plugins.MusicBrainz.Core.Settings;
-using Lumina.Plugins.MusicBrainz.Fixtures.Common.Models.DTO.Settings;
-using Lumina.Plugins.MusicBrainz.UnitTests.Common.TestHelpers;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.MusicBrainz.Core;
+using Nemera.Plugins.MusicBrainz.Core.Api;
+using Nemera.Plugins.MusicBrainz.Core.Settings;
+using Nemera.Plugins.MusicBrainz.Fixtures.Common.Models.DTO.Settings;
+using Nemera.Plugins.MusicBrainz.UnitTests.Common.TestHelpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.UnitTests.Core;
+namespace Nemera.Plugins.MusicBrainz.UnitTests.Core;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MusicBrainzTrackMetadataProvider"/> class.

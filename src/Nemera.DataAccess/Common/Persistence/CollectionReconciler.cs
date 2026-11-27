@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.DataAccess.Common.Persistence;
+namespace Nemera.DataAccess.Common.Persistence;
 
 /// <summary>
 /// Reconciles the children of a tracked entity against a desired set, preserving the identity of the children that already exist.

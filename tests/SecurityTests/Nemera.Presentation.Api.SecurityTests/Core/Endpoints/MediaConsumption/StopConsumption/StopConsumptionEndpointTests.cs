@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Fixtures.Core.Requests.MediaConsumption;
-using Lumina.Contracts.Requests.MediaConsumption;
-using Lumina.Contracts.Responses.MediaConsumption;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.MediaConsumption.StopConsumption;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaConsumption;
+using Nemera.Contracts.Requests.MediaConsumption;
+using Nemera.Contracts.Responses.MediaConsumption;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.MediaConsumption.StopConsumption;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -21,13 +21,13 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.MediaConsumption.StopConsumption;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.MediaConsumption.StopConsumption;
 
 /// <summary>
 /// Contains security tests for the <see cref="StopConsumptionEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class StopConsumptionEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class StopConsumptionEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
     private const string JWT_SECRET = "test-key-thats-at-least-32-chars-long-for-jwt";
     private const long SEEDED_VERSION = 7;
@@ -35,7 +35,7 @@ public class StopConsumptionEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     private static readonly DateTime s_startedOnUtc = new(2026, 3, 1, 10, 0, 0, DateTimeKind.Utc);
     private static readonly DateTime s_lastActivityOnUtc = new(2026, 3, 1, 10, 5, 0, DateTimeKind.Utc);
 
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -53,12 +53,12 @@ public class StopConsumptionEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     /// Initializes a new instance of the <see cref="StopConsumptionEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public StopConsumptionEndpointTests(LuminaApiFactory apiFactory)
+    public StopConsumptionEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
     }
 
     [Fact]
@@ -160,7 +160,7 @@ public class StopConsumptionEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         AssertNoSensitiveData(content);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         MediaConsumptionRecordEntity? storedRecord = dbContext.MediaConsumptionRecords.FirstOrDefault(record => record.Id == otherRecordId);
         Assert.NotNull(storedRecord);
         Assert.Equal(ConsumptionStatus.InProgress, storedRecord!.Status);
@@ -251,7 +251,7 @@ public class StopConsumptionEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         Assert.Equal(location, record.LastPosition.Location);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         MediaConsumptionRecordEntity? storedRecord = dbContext.MediaConsumptionRecords.FirstOrDefault(candidate => candidate.Id == recordId);
         Assert.NotNull(storedRecord);
         Assert.Equal(location, storedRecord!.LastPositionLocation);
@@ -276,7 +276,7 @@ public class StopConsumptionEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     private async Task<(Guid UserId, string Username)> SeedOtherUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         string username = $"otheruser_{Guid.NewGuid()}";
         UserEntity user = _userEntityFixture.Create(id: userId, username: username, password: "TestPass123!");
@@ -309,7 +309,7 @@ public class StopConsumptionEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         string? lastPositionLocation)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.NewGuid();
         Guid mediaItemId = Guid.NewGuid();
         Guid recordId = Guid.NewGuid();
@@ -484,7 +484,7 @@ public class StopConsumptionEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina.", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera.", content, StringComparison.Ordinal);
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(JWT_SECRET, content, StringComparison.Ordinal);
         Assert.DoesNotContain("Data Source", content, StringComparison.OrdinalIgnoreCase);

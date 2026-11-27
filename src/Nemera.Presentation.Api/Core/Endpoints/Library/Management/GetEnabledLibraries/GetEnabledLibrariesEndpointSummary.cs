@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.GetEnabledLibraries;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.Management.GetEnabledLibraries;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetEnabledLibrariesEndpoint"/> API endpoint, for OpenAPI.

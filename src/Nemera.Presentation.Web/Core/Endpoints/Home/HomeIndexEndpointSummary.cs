@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Home;
+namespace Nemera.Presentation.Web.Core.Endpoints.Home;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="HomeIndexEndpoint"/> endpoint, for OpenAPI.

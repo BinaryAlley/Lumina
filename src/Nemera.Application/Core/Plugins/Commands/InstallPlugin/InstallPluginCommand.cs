@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 using System.IO;
 #endregion
 
-namespace Lumina.Application.Core.Plugins.Commands.InstallPlugin;
+namespace Nemera.Application.Core.Plugins.Commands.InstallPlugin;
 
 /// <summary>
 /// Command for installing a plugin from an uploaded archive, placing its assemblies into the plugin storage directory.

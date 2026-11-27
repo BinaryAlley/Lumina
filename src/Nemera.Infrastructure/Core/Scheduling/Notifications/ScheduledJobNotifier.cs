@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Scheduling.Notifications;
-using Lumina.Contracts.Responses.Scheduling;
+using Nemera.Application.Core.Scheduling.Notifications;
+using Nemera.Contracts.Responses.Scheduling;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Scheduling.Notifications;
+namespace Nemera.Infrastructure.Core.Scheduling.Notifications;
 
 /// <summary>
 /// Class used to notify SignalR clients about the scheduled jobs and their executions.

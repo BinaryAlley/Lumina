@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
+using Nemera.Infrastructure.Core.MediaLibrary.Management.Scanning.Progress;
 using Microsoft.AspNetCore.SignalR;
 using NSubstitute;
 using System;
@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.MediaLibrary.Management.Scanning.Progress;
+namespace Nemera.Infrastructure.UnitTests.Core.MediaLibrary.Management.Scanning.Progress;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MediaLibraryScanProgressHub"/> class.

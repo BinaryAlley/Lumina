@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Tools.Settings.GetPlaybackState;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.UsersManagement;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Tools.Settings.GetPlaybackState;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.UsersManagement;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -11,7 +11,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Tools.Settings.GetPlaybackState;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Tools.Settings.GetPlaybackState;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetPlaybackStateEndpoint"/> class.
@@ -21,16 +21,16 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Tools.Settings.Ge
 /// limiting, timing attack resistance and token claim correctness are not applicable to it.
 /// </remarks>
 [ExcludeFromCodeCoverage]
-public class GetPlaybackStateEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetPlaybackStateEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly PlaybackStateDtoFixture _playbackStateDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPlaybackStateEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetPlaybackStateEndpointTests(LuminaWebFactory apiFactory)
+    public GetPlaybackStateEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

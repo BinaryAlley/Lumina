@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
+namespace Nemera.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
 
 /// <summary>
 /// Represents a response for a work from the Open Library API.

@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 #endregion
 
-namespace Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
+namespace Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
 
 /// <summary>
 /// Interface for checking the type of the current Operating System platform.

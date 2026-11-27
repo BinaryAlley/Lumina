@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.Telemetry;
+namespace Nemera.Application.Common.Telemetry;
 
 /// <summary>
 /// Decorator that wraps an <see cref="IQueryHandler{TQuery,TResult}"/> to emit traces, metrics, and structured logs for every query execution.

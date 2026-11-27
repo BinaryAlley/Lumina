@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Common.DataAccess.Repositories.MediaConsumption;
-using Lumina.DataAccess.Common.Persistence;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Common.DataAccess.Repositories.MediaConsumption;
+using Nemera.DataAccess.Common.Persistence;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.MediaConsumption;
+namespace Nemera.DataAccess.Core.Repositories.MediaConsumption;
 
 /// <summary>
 /// Repository for media resume points.
@@ -24,15 +24,15 @@ namespace Lumina.DataAccess.Core.Repositories.MediaConsumption;
 /// </remarks>
 internal sealed class MediaResumePointRepository : IMediaResumePointRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaResumePointRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public MediaResumePointRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public MediaResumePointRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ internal sealed class MediaResumePointRepository : IMediaResumePointRepository
     public async Task<Result<MediaResumePointEntity?>> GetForUserAndMediaItemAsync(Guid userId, MediaKind mediaKind, Guid mediaItemId, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
         // The user is part of the filter rather than a check performed after the read, so the storage medium never returns a resume point that belongs to another user in the first place.
-        IQueryable<MediaResumePointEntity> query = _luminaDbContext.MediaResumePoints
+        IQueryable<MediaResumePointEntity> query = _nemeraDbContext.MediaResumePoints
             .Where(resumePoint => resumePoint.UserId == userId &&
                                   resumePoint.MediaKind == mediaKind &&
                                   resumePoint.MediaItemId == mediaItemId);
@@ -69,11 +69,11 @@ internal sealed class MediaResumePointRepository : IMediaResumePointRepository
     public async Task<Result<Updated>> UpsertForUserAsync(MediaResumePointEntity data, Guid userId, CancellationToken cancellationToken)
     {
         // The business key is located in the tracked entities first, so an upsert of a resume point that this unit of work already loaded updates that instance instead of materializing a second copy.
-        MediaResumePointEntity? foundResumePoint = _luminaDbContext.MediaResumePoints.Local
+        MediaResumePointEntity? foundResumePoint = _nemeraDbContext.MediaResumePoints.Local
             .FirstOrDefault(resumePoint => resumePoint.UserId == userId &&
                                            resumePoint.MediaKind == data.MediaKind &&
                                            resumePoint.MediaItemId == data.MediaItemId)
-            ?? await _luminaDbContext.MediaResumePoints
+            ?? await _nemeraDbContext.MediaResumePoints
                 .FirstOrDefaultAsync(resumePoint => resumePoint.UserId == userId &&
                                                    resumePoint.MediaKind == data.MediaKind &&
                                                    resumePoint.MediaItemId == data.MediaItemId, cancellationToken).ConfigureAwait(false);
@@ -81,7 +81,7 @@ internal sealed class MediaResumePointRepository : IMediaResumePointRepository
         {
             // The user argument is authoritative for the owner of the new row, not the owner carried by the caller.
             data.UserId = userId;
-            _luminaDbContext.MediaResumePoints.Add(data);
+            _nemeraDbContext.MediaResumePoints.Add(data);
             return Result.Updated;
         }
 
@@ -94,7 +94,7 @@ internal sealed class MediaResumePointRepository : IMediaResumePointRepository
         MediaKind mediaKind = foundResumePoint.MediaKind;
         Guid mediaItemId = foundResumePoint.MediaItemId;
         long version = foundResumePoint.Version;
-        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundResumePoint, data);
+        EditableValuesCopier.CopyEditableValues(_nemeraDbContext, foundResumePoint, data);
         foundResumePoint.UserId = storedUserId;
         foundResumePoint.MediaKind = mediaKind;
         foundResumePoint.MediaItemId = mediaItemId;
@@ -113,18 +113,18 @@ internal sealed class MediaResumePointRepository : IMediaResumePointRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful deletion, or an error.</returns>
     public async Task<Result<Deleted>> DeleteForUserAndMediaItemAsync(Guid userId, MediaKind mediaKind, Guid mediaItemId, CancellationToken cancellationToken)
     {
-        MediaResumePointEntity? resumePoint = _luminaDbContext.MediaResumePoints.Local
+        MediaResumePointEntity? resumePoint = _nemeraDbContext.MediaResumePoints.Local
             .FirstOrDefault(trackedResumePoint => trackedResumePoint.UserId == userId &&
                                                   trackedResumePoint.MediaKind == mediaKind &&
                                                   trackedResumePoint.MediaItemId == mediaItemId)
-            ?? await _luminaDbContext.MediaResumePoints
+            ?? await _nemeraDbContext.MediaResumePoints
                 .FirstOrDefaultAsync(foundResumePoint => foundResumePoint.UserId == userId &&
                                                          foundResumePoint.MediaKind == mediaKind &&
                                                          foundResumePoint.MediaItemId == mediaItemId, cancellationToken).ConfigureAwait(false);
         if (resumePoint is null)
             return Result.Deleted;
 
-        _luminaDbContext.MediaResumePoints.Remove(resumePoint);
+        _nemeraDbContext.MediaResumePoints.Remove(resumePoint);
         return Result.Deleted;
     }
 
@@ -136,11 +136,11 @@ internal sealed class MediaResumePointRepository : IMediaResumePointRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful deletion, or an error.</returns>
     public async Task<Result<Deleted>> DeleteAllForUserAsync(Guid userId, CancellationToken cancellationToken)
     {
-        List<MediaResumePointEntity> resumePoints = await _luminaDbContext.MediaResumePoints
+        List<MediaResumePointEntity> resumePoints = await _nemeraDbContext.MediaResumePoints
             .Where(resumePoint => resumePoint.UserId == userId)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
         if (resumePoints.Count > 0)
-            _luminaDbContext.MediaResumePoints.RemoveRange(resumePoints);
+            _nemeraDbContext.MediaResumePoints.RemoveRange(resumePoints);
         return Result.Deleted;
     }
 
@@ -153,11 +153,11 @@ internal sealed class MediaResumePointRepository : IMediaResumePointRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful deletion, or an error.</returns>
     public async Task<Result<Deleted>> DeleteAllForUserInLibraryAsync(Guid userId, Guid libraryId, CancellationToken cancellationToken)
     {
-        List<MediaResumePointEntity> resumePoints = await _luminaDbContext.MediaResumePoints
+        List<MediaResumePointEntity> resumePoints = await _nemeraDbContext.MediaResumePoints
             .Where(resumePoint => resumePoint.UserId == userId && resumePoint.LibraryId == libraryId)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
         if (resumePoints.Count > 0)
-            _luminaDbContext.MediaResumePoints.RemoveRange(resumePoints);
+            _nemeraDbContext.MediaResumePoints.RemoveRange(resumePoints);
         return Result.Deleted;
     }
 

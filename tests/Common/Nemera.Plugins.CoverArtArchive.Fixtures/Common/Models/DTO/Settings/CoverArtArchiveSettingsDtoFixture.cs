@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Plugins.CoverArtArchive.Common.Models.DTO.Settings;
+using Nemera.Plugins.CoverArtArchive.Common.Models.DTO.Settings;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.Fixtures.Common.Models.DTO.Settings;
+namespace Nemera.Plugins.CoverArtArchive.Fixtures.Common.Models.DTO.Settings;
 
 /// <summary>
 /// Fixture class for the <see cref="CoverArtArchiveSettingsDto"/> class.
@@ -33,7 +33,7 @@ internal sealed class CoverArtArchiveSettingsDtoFixture
     {
         return new CoverArtArchiveSettingsDto
         {
-            UserAgent = userAgent ?? $"Lumina-CoverArtArchive/{_faker.Random.Int(1, 9)}.{_faker.Random.Int(0, 9)}",
+            UserAgent = userAgent ?? $"Nemera-CoverArtArchive/{_faker.Random.Int(1, 9)}.{_faker.Random.Int(0, 9)}",
             ContactEmail = includeContactEmail ? contactEmail ?? _faker.Internet.Email() : null,
             MinimumRequestInterval = minimumRequestInterval ?? TimeSpan.FromSeconds(_faker.Random.Double(0, 5))
         };

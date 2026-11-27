@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Configuration;
-using Lumina.Presentation.Web.Common.Primitives;
-using Lumina.Presentation.Web.Common.Validators;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Configuration;
-using Lumina.Presentation.Web.UnitTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Configuration;
+using Nemera.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.Validators;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Configuration;
+using Nemera.Presentation.Web.UnitTests.Common.Setup;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.Validators;
+namespace Nemera.Presentation.Web.UnitTests.Common.Validators;
 
 /// <summary>
 /// Contains unit tests for the <see cref="EncryptionSettingsDtoValidator"/> class.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Playlists.Queries.GetPlaylists;
+using Nemera.Application.Core.Playlists.Queries.GetPlaylists;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Playlists.Queries.GetPlaylists;
+namespace Nemera.Application.Fixtures.Core.Playlists.Queries.GetPlaylists;
 
 /// <summary>
 /// Fixture class for the <see cref="GetPlaylistsQuery"/> record.

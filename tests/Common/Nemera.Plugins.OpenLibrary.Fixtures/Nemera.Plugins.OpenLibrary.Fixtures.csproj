@@ -18,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\plugins\Lumina.Plugins.OpenLibrary\Lumina.Plugins.OpenLibrary.csproj" />
-        <ProjectReference Include="..\..\..\src\Lumina.Plugins.Contracts\Lumina.Plugins.Contracts.csproj" />
+        <ProjectReference Include="..\..\..\plugins\Nemera.Plugins.OpenLibrary\Nemera.Plugins.OpenLibrary.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Plugins.Contracts\Nemera.Plugins.Contracts.csproj" />
     </ItemGroup>
 </Project>

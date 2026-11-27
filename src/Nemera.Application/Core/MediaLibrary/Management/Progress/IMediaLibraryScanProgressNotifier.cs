@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.ValueObjects;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Progress;
+namespace Nemera.Application.Core.MediaLibrary.Management.Progress;
 
 /// <summary>
 /// Interface for the class used to notify SignalR clients about changes in the progress of a media library scan.

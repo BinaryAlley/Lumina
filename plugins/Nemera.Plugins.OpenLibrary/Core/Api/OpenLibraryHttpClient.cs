@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
-using Lumina.Plugins.OpenLibrary.Common.Models.DTO.Settings;
-using Lumina.Plugins.OpenLibrary.Core.Mapping;
-using Lumina.Plugins.OpenLibrary.Core.Settings;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
+using Nemera.Plugins.OpenLibrary.Common.Models.DTO.Settings;
+using Nemera.Plugins.OpenLibrary.Core.Mapping;
+using Nemera.Plugins.OpenLibrary.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.Core.Api;
+namespace Nemera.Plugins.OpenLibrary.Core.Api;
 
 /// <summary>
 /// HTTP client that calls the Open Library API and deserializes its JSON responses into typed response models.

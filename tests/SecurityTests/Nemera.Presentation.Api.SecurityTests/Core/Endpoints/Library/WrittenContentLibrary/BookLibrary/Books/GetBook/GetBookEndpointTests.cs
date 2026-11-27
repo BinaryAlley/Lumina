@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBook;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Presentation.Api.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBook;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -9,21 +9,21 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBook;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.GetBook;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetBookEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetBookEndpointTests : IClassFixture<LuminaApiFactory>
+public class GetBookEndpointTests : IClassFixture<NemeraApiFactory>
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetBookEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetBookEndpointTests(LuminaApiFactory apiFactory)
+    public GetBookEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Scheduling.Execution;
+namespace Nemera.Infrastructure.Core.Scheduling.Execution;
 
 /// <summary>
 /// Default <see cref="IScheduledJobCycleTicker"/> implementation that ticks on a <see cref="PeriodicTimer"/>.

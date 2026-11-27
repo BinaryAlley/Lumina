@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.MediaConsumption;
-using Lumina.Application.Common.Mapping.MediaConsumption;
-using Lumina.Contracts.Responses.MediaConsumption;
-using Lumina.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.Common.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.MediaConsumptionBoundedContext.Common.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Application.Common.DTO.MediaConsumption;
+using Nemera.Application.Common.Mapping.MediaConsumption;
+using Nemera.Contracts.Responses.MediaConsumption;
+using Nemera.Domain.Core.BoundedContexts.MediaConsumptionBoundedContext.Common.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.MediaConsumptionBoundedContext.Common.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.MediaConsumption;
+namespace Nemera.Application.UnitTests.Common.Mapping.MediaConsumption;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MediaPositionMapping"/> class.

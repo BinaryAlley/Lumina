@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
-using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.MusicBrainz.Core;
-using Lumina.Plugins.MusicBrainz.Core.Settings;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Plugins.Contracts.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.MusicBrainz.Core;
+using Nemera.Plugins.MusicBrainz.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.UnitTests.Core;
+namespace Nemera.Plugins.MusicBrainz.UnitTests.Core;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MusicBrainzPlugin"/> class.
@@ -49,7 +49,7 @@ public class MusicBrainzPluginTests
         string result = _sut.Author;
 
         // Assert
-        Assert.Equal("Lumina", result);
+        Assert.Equal("Nemera", result);
     }
 
     [Fact]

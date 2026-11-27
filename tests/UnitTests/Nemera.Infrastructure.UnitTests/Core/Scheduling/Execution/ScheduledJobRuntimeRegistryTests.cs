@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
-using Lumina.Infrastructure.Core.Scheduling.Execution;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
+using Nemera.Infrastructure.Core.Scheduling.Execution;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Scheduling.Execution;
+namespace Nemera.Infrastructure.UnitTests.Core.Scheduling.Execution;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ScheduledJobRuntimeRegistry"/> class.

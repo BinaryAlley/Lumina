@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.UsersManagement.Authentication.Queries.GetUsers;
-using Lumina.Contracts.Fixtures.Core.Responses.UsersManagement.Users;
-using Lumina.Contracts.Responses.UsersManagement.Users;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.GetUsers;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.UsersManagement.Authentication.Queries.GetUsers;
+using Nemera.Contracts.Fixtures.Core.Responses.UsersManagement.Users;
+using Nemera.Contracts.Responses.UsersManagement.Users;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.GetUsers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authentication.GetUsers;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authentication.GetUsers;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetUsersEndpoint"/> class.

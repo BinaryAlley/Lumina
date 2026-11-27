@@ -33,7 +33,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Lumina.Contracts\Lumina.Contracts.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Contracts.Fixtures\Lumina.Contracts.Fixtures.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Contracts\Nemera.Contracts.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Contracts.Fixtures\Nemera.Contracts.Fixtures.csproj" />
     </ItemGroup>
 </Project>

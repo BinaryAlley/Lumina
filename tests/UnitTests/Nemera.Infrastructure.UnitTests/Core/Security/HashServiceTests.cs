@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Core.Security;
+using Nemera.Infrastructure.Core.Security;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Security;
+namespace Nemera.Infrastructure.UnitTests.Core.Security;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PasswordHashService"/> class.

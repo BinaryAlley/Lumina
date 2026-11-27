@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.DTO.FileSystemManagement;
+using Nemera.Contracts.DTO.FileSystemManagement;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.DTO.FileSystemManagement;
+namespace Nemera.Contracts.Fixtures.Core.DTO.FileSystemManagement;
 
 /// <summary>
 /// Fixture class for the <see cref="FileSystemItemDto"/> class.

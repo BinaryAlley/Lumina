@@ -2,7 +2,7 @@
 using System.Net.Http;
 #endregion
 
-namespace Lumina.Plugins.Contracts.Common.Http;
+namespace Nemera.Plugins.Contracts.Common.Http;
 
 /// <summary>
 /// Options that a request may set to control how the host establishes the connection it is sent through.

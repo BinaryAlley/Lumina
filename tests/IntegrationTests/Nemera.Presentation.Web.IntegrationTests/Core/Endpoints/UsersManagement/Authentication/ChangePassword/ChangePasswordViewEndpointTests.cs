@@ -1,28 +1,28 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
 
 /// <summary>
 /// Contains integration tests for the <see cref="ChangePasswordViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class ChangePasswordViewEndpointTests : IClassFixture<LuminaWebFactory>
+public class ChangePasswordViewEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ChangePasswordViewEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public ChangePasswordViewEndpointTests(LuminaWebFactory apiFactory)
+    public ChangePasswordViewEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

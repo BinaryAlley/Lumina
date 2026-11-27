@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.MediaConsumption;
+namespace Nemera.Contracts.Requests.MediaConsumption;
 
 /// <summary>
 /// Represents a request to report a position in a media consumption session.

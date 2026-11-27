@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
+namespace Nemera.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
 
 /// <summary>
 /// Query for retrieving the thumbnail of a file at a path.

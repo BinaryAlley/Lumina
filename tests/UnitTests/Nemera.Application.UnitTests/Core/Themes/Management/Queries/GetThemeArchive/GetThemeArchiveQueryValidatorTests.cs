@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Themes.Management.Queries.GetThemeArchive;
-using Lumina.Application.Fixtures.Core.Themes.Management.Queries.GetThemeArchive;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Core.Themes.Management.Queries.GetThemeArchive;
+using Nemera.Application.Fixtures.Core.Themes.Management.Queries.GetThemeArchive;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Themes.Management.Queries.GetThemeArchive;
+namespace Nemera.Application.UnitTests.Core.Themes.Management.Queries.GetThemeArchive;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetThemeArchiveQueryValidator"/> class.

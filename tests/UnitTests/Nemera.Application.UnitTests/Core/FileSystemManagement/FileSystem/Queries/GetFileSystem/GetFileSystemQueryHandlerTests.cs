@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
-using Lumina.Application.Fixtures.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
-using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Nemera.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
+using Nemera.Application.Fixtures.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
+using Nemera.Contracts.Responses.FileSystemManagement.FileSystem;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
+using Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
+namespace Nemera.Application.UnitTests.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetFileSystemQueryHandler"/> class.

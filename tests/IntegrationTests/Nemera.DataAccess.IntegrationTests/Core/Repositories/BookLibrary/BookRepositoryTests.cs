@@ -1,19 +1,19 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.DataAccess.Common.Interceptors;
-using Lumina.DataAccess.Core.Repositories.BookLibrary;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Common;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.DataAccess.Common.Interceptors;
+using Nemera.DataAccess.Core.Repositories.BookLibrary;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -25,7 +25,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.BookLibrary;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.BookLibrary;
 
 /// <summary>
 /// Contains integration tests for the <see cref="BookRepository"/> class, exercising it against a real SQLite database.
@@ -47,9 +47,9 @@ public class BookRepositoryTests
     {
         // Arrange
         // The reset methods use ExecuteUpdateAsync, which is not supported by the in-memory provider, so a real SQLite database is used.
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-reset-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-reset-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
@@ -87,9 +87,9 @@ public class BookRepositoryTests
     {
         // Arrange
         // A scan of a very large library stages more paths than SQLite accepts as the parameters of one statement, which used to fail the whole scan.
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-existingpaths-large-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-existingpaths-large-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
@@ -116,9 +116,9 @@ public class BookRepositoryTests
     {
         // Arrange
         // The reset methods use ExecuteUpdateAsync, which is not supported by the in-memory provider, so a real SQLite database is used.
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-reset-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-reset-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
@@ -151,9 +151,9 @@ public class BookRepositoryTests
     {
         // Arrange
         // The reset methods use ExecuteUpdateAsync, which is not supported by the in-memory provider, so a real SQLite database is used.
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-reset-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-reset-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
@@ -185,9 +185,9 @@ public class BookRepositoryTests
     public async Task InsertAsync_WhenCalledWithAValidBook_ShouldPersistTheBook()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-insert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-insert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
@@ -210,9 +210,9 @@ public class BookRepositoryTests
     public async Task InsertAsync_WhenAnotherBookOfTheSameLibraryHasTheSamePath_ShouldReturnBookAlreadyExists()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-insert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-insert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
@@ -239,11 +239,11 @@ public class BookRepositoryTests
     public async Task UpdateAsync_WhenNothingChanged_ShouldNotChangeAnyAuditColumn()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-update-noop-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-update-noop-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
         book.Contributors = [_bookContributorEntityFixture.Create(bookId: book.Id)];
@@ -273,11 +273,11 @@ public class BookRepositoryTests
     public async Task UpdateAsync_WhenOnlyTheMetadataChanged_ShouldStampTheBookAndKeepTheChildRowsUntouched()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-update-metadata-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-update-metadata-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
         book.Contributors = [_bookContributorEntityFixture.Create(bookId: book.Id)];
@@ -310,11 +310,11 @@ public class BookRepositoryTests
     public async Task UpdateAsync_WhenAContributorIsRemoved_ShouldDeleteOnlyThatParticipationAndKeepTheOtherIdentity()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-update-removecontributor-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-update-removecontributor-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
         Guid keptMediaContributorId = Guid.NewGuid();
@@ -343,11 +343,11 @@ public class BookRepositoryTests
     public async Task UpdateAsync_WhenAContributorIsAdded_ShouldInsertOnlyTheNewParticipationAndKeepTheExistingIdentity()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-update-addcontributor-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-update-addcontributor-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
         Guid keptMediaContributorId = Guid.NewGuid();
@@ -376,9 +376,9 @@ public class BookRepositoryTests
     public async Task UpdateAsync_WhenNothingChanged_ShouldNotDuplicateAnyReconciledChildCollection()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-update-noop-collections-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-update-noop-collections-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
@@ -425,9 +425,9 @@ public class BookRepositoryTests
     public async Task UpdateAsync_WhenOneItemIsRemovedFromEachReconciledChildCollection_ShouldRemoveOnlyThoseItems()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-update-remove-collections-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-update-remove-collections-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
@@ -479,9 +479,9 @@ public class BookRepositoryTests
     {
         // Arrange
         // The delete uses ExecuteDeleteAsync, which is not supported by the in-memory provider, so a real SQLite database is used.
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-deletebylibrary-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-deletebylibrary-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
 
@@ -510,9 +510,9 @@ public class BookRepositoryTests
     public async Task GetByIdsAsync_WhenIdsIsEmpty_ShouldReturnAnEmptyList()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-getbyids-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         context.Books.Add(_bookEntityFixture.Create(includeMetadata: false));
         await context.SaveChangesAsync();
@@ -530,9 +530,9 @@ public class BookRepositoryTests
     public async Task GetByIdsAsync_WhenCalled_ShouldReturnOnlyTheRequestedBooks()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-getbyids-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         BookEntity firstBook = _bookEntityFixture.Create(includeMetadata: false);
         BookEntity secondBook = _bookEntityFixture.Create(includeMetadata: false);
@@ -556,9 +556,9 @@ public class BookRepositoryTests
     public async Task GetByIdsAsync_WhenNavigationPropertiesShouldNotBeIncluded_ShouldNotLoadTheRelatedCollections()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-getbyids-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         MediaContributorEntity author = _mediaContributorEntityFixture.Create(displayName: "Frank Herbert");
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
@@ -597,9 +597,9 @@ public class BookRepositoryTests
     public async Task GetByIdsAsync_WhenNavigationPropertiesShouldBeIncluded_ShouldLoadTheRelatedCollections()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-include-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-getbyids-include-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         MediaContributorEntity author = _mediaContributorEntityFixture.Create(displayName: "Frank Herbert");
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
@@ -632,9 +632,9 @@ public class BookRepositoryTests
     public async Task GetByIdsAsync_WhenExactlyFiveHundredIdsAreRequested_ShouldReturnEveryBook()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-boundary-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-getbyids-boundary-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         const int BOOK_COUNT = 500;
         List<BookEntity> books = CreateBooks(BOOK_COUNT);
@@ -658,9 +658,9 @@ public class BookRepositoryTests
     public async Task GetByIdsAsync_WhenMoreThanFiveHundredIdsAreRequested_ShouldReturnEveryBook()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-getbyids-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-getbyids-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         const int BOOK_COUNT = 501;
         List<BookEntity> books = CreateBooks(BOOK_COUNT);
@@ -684,9 +684,9 @@ public class BookRepositoryTests
     public async Task GetAuthorsDisplayNamesByBookIdsAsync_WhenBookHasMultipleAuthors_ShouldReturnTheMinimumAuthorDisplayName()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-authors-min-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-authors-min-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
         MediaContributorEntity firstAuthor = _mediaContributorEntityFixture.Create(displayName: "Zoe Author");
@@ -714,9 +714,9 @@ public class BookRepositoryTests
     public async Task GetAuthorsDisplayNamesByBookIdsAsync_WhenABookIsNotRequested_ShouldNotReturnIt()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-authors-requested-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-authors-requested-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         BookEntity requestedBook = _bookEntityFixture.Create(includeMetadata: false);
         BookEntity bookNotRequested = _bookEntityFixture.Create(includeMetadata: false);
@@ -743,9 +743,9 @@ public class BookRepositoryTests
     public async Task GetAuthorsDisplayNamesByBookIdsAsync_WhenBookIdsIsEmpty_ShouldReturnAnEmptyDictionary()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-authors-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-authors-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         BookEntity book = _bookEntityFixture.Create(includeMetadata: false);
         MediaContributorEntity author = _mediaContributorEntityFixture.Create();
@@ -769,9 +769,9 @@ public class BookRepositoryTests
     public async Task GetAuthorsDisplayNamesByBookIdsAsync_WhenMoreThanFiveHundredIdsAreRequested_ShouldReturnTheAuthorOfEveryRequestedBook()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-bookrepo-authors-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-bookrepo-authors-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         BookRepository sut = new(context, Substitute.For<IDateTimeProvider>());
         const int BOOK_COUNT = 501;
         List<BookEntity> books = CreateBooks(BOOK_COUNT);
@@ -811,9 +811,9 @@ public class BookRepositoryTests
     /// </summary>
     /// <param name="anchorConnection">The open in-memory SQLite connection that keeps the database alive for the duration of the test.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateContext(SqliteConnection anchorConnection)
+    private static NemeraDbContext CreateContext(SqliteConnection anchorConnection)
     {
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .Options);
         context.Database.EnsureCreated();
@@ -827,13 +827,13 @@ public class BookRepositoryTests
     /// <param name="userId">The Id of the user reported as the current user.</param>
     /// <param name="utcNow">The current UTC time reported by the time provider.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
+    private static NemeraDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
     {
         ICurrentUserService currentUserService = Substitute.For<ICurrentUserService>();
         currentUserService.UserId.Returns(userId);
         IDateTimeProvider dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(utcNow);
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .AddInterceptors(new UpdateAuditableEntitiesInterceptor(currentUserService, dateTimeProvider))
             .Options);
@@ -847,7 +847,7 @@ public class BookRepositoryTests
     /// <param name="context">The context that tracks the stored book.</param>
     /// <param name="bookId">The Id of the book to load.</param>
     /// <returns>The detached copy of the book.</returns>
-    private static async Task<BookEntity> LoadDetachedBookAsync(LuminaDbContext context, Guid bookId)
+    private static async Task<BookEntity> LoadDetachedBookAsync(NemeraDbContext context, Guid bookId)
     {
         return await context.Books
             .AsNoTracking()

@@ -2,8 +2,8 @@
 /tools/settings
 *@
 
-@using Lumina.Presentation.Web.Common.DTO.UsersManagement
-@using Lumina.Presentation.Web.Common.Services
+@using Nemera.Presentation.Web.Common.DTO.UsersManagement
+@using Nemera.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
 
 @{
@@ -412,8 +412,8 @@
                 notificationService.show(@Json.Serialize(_localizer["SettingsSaved"].Value), NotificationType.SUCCESS);
                 // The player lives in the layout and is not recreated by the navigation manager, so the saved playback and
                 // VU meter settings are handed to it directly instead of waiting for a full page reload.
-                if (window.LuminaAudioPlayer && window.LuminaAudioPlayer.instance && typeof window.LuminaAudioPlayer.instance.reloadPreferencesAsync === 'function')
-                    await window.LuminaAudioPlayer.instance.reloadPreferencesAsync();
+                if (window.NemeraAudioPlayer && window.NemeraAudioPlayer.instance && typeof window.NemeraAudioPlayer.instance.reloadPreferencesAsync === 'function')
+                    await window.NemeraAudioPlayer.instance.reloadPreferencesAsync();
             }
         }
 

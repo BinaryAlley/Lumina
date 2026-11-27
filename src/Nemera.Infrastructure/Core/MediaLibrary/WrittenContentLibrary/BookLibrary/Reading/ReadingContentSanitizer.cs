@@ -2,7 +2,7 @@
 using Ganss.Xss;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+namespace Nemera.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 
 /// <summary>
 /// Sanitizes the HTML content of the reading sections extracted from the books, stripping every active content and keeping only the inert markup a reader can render.
@@ -13,7 +13,7 @@ public static class ReadingContentSanitizer
     /// <summary>
     /// The name of the attribute that carries the opaque key of a resource referenced by a reading section, which the reader replaces with the URL of the resource endpoint.
     /// </summary>
-    public const string RESOURCE_ATTRIBUTE = "data-lumina-resource";
+    public const string RESOURCE_ATTRIBUTE = "data-nemera-resource";
 
     // The sanitizer that preserves the style attribute, used for the users who want the books to keep their original look, and the
     // sanitizer that strips it, used for the users who prefer a book to never be able to load resources through its styles.
@@ -62,13 +62,13 @@ public static class ReadingContentSanitizer
         sanitizer.AllowedAttributes.UnionWith(
         [
             "class", "id", "title", "lang", "dir", "align", "valign", "width", "height",
-            "colspan", "rowspan", "scope", "href", "src", "alt", "data-lumina-resource"
+            "colspan", "rowspan", "scope", "href", "src", "alt", "data-nemera-resource"
         ]);
         // The style attribute is what keeps the original look of a book (fonts, colors, alignment), but its CSS can also reference
         // resources from external servers, which those servers could observe; whether it survives sanitization is a per-user choice.
         if (shouldPreserveStyles)
             sanitizer.AllowedAttributes.Add("style");
-        // Only the safe web schemes are allowed, so that a reference to javascript or a custom scheme is stripped; the data-lumina-resource attribute carries an opaque key instead of a URL, so it needs no scheme.
+        // Only the safe web schemes are allowed, so that a reference to javascript or a custom scheme is stripped; the data-nemera-resource attribute carries an opaque key instead of a URL, so it needs no scheme.
         sanitizer.AllowedSchemes.Clear();
         sanitizer.AllowedSchemes.UnionWith(["http", "https", "mailto", "tel"]);
         sanitizer.UriAttributes.Clear();

@@ -1,4 +1,4 @@
-﻿namespace Lumina.Presentation.Web.Common.Enums.FileSystem;
+﻿namespace Nemera.Presentation.Web.Common.Enums.FileSystem;
 
 /// <summary>
 /// Represents the different view modes for displaying file system items.

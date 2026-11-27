@@ -1,28 +1,28 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Repositories.Authorization;
-using Lumina.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Repositories.Authorization;
+using Nemera.DataAccess.Core.UoW;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Authorization;
+namespace Nemera.DataAccess.Core.Repositories.Authorization;
 
 /// <summary>
 /// Repository for authorization user roles.
 /// </summary>
 internal sealed class UserRoleRepository : IUserRoleRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserRoleRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public UserRoleRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public UserRoleRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -33,7 +33,7 @@ internal sealed class UserRoleRepository : IUserRoleRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public Task<Result<Created>> InsertAsync(UserRoleEntity userRole, CancellationToken cancellationToken)
     {
-        _luminaDbContext.UserRoles.Add(userRole);
+        _nemeraDbContext.UserRoles.Add(userRole);
         return Task.FromResult(Result.From(Result.Created));
     }
 }

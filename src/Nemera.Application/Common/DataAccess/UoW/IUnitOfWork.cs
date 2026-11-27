@@ -1,22 +1,22 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Repositories.Authorization;
-using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.Favorites;
-using Lumina.Application.Common.DataAccess.Repositories.MediaConsumption;
-using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.Playlists;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
-using Lumina.Application.Common.DataAccess.Repositories.Themes;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Repositories.Authorization;
+using Nemera.Application.Common.DataAccess.Repositories.BookLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.Favorites;
+using Nemera.Application.Common.DataAccess.Repositories.MediaConsumption;
+using Nemera.Application.Common.DataAccess.Repositories.MediaContributors;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.Playlists;
+using Nemera.Application.Common.DataAccess.Repositories.Plugins;
+using Nemera.Application.Common.DataAccess.Repositories.Scheduling;
+using Nemera.Application.Common.DataAccess.Repositories.Themes;
+using Nemera.Application.Common.DataAccess.Repositories.Users;
+using Nemera.Domain.Common.Primitives;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.UoW;
+namespace Nemera.Application.Common.DataAccess.UoW;
 
 /// <summary>
 /// Interaction boundary with the Data Access Layer.

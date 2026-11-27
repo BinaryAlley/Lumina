@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.MediaLibrary.Management;
-using Lumina.Application.Common.Infrastructure.Plugins;
-using Lumina.Application.Common.Infrastructure.Reading;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.Contracts.Core.Reading;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.MediaLibrary.Management;
+using Nemera.Application.Common.Infrastructure.Plugins;
+using Nemera.Application.Common.Infrastructure.Reading;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.Contracts.Core.Reading;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Plugins;
+namespace Nemera.Infrastructure.Core.Plugins;
 
 /// <summary>
 /// Store of the metadata, artwork and book reader configurations of the media libraries.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
-using Lumina.Presentation.Web.Common.Requests.FileSystemManagement.Path;
+using Nemera.Presentation.Web.Common.DTO.FileSystemManagement;
+using Nemera.Presentation.Web.Common.Requests.FileSystemManagement.Path;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.FileSystemManagement.Path.GetPathRoot;
+namespace Nemera.Presentation.Web.Core.Endpoints.FileSystemManagement.Path.GetPathRoot;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetPathRootEndpoint"/> endpoint, for OpenAPI.

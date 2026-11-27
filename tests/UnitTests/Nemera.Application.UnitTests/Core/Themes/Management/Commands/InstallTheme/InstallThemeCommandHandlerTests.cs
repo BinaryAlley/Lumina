@@ -1,20 +1,20 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Common.DataAccess.Repositories.Themes;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
-using Lumina.Application.Common.Infrastructure.Themes;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.Themes.Management.Commands.InstallTheme;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Fixtures.Common.Infrastructure.Models.DTO.Themes;
-using Lumina.Application.Fixtures.Core.Themes.Management.Commands.InstallTheme;
-using Lumina.Contracts.Responses.Themes;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Themes;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Common.DataAccess.Repositories.Themes;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Themes;
+using Nemera.Application.Common.Infrastructure.Themes;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.Themes.Management.Commands.InstallTheme;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Fixtures.Common.Infrastructure.Models.DTO.Themes;
+using Nemera.Application.Fixtures.Core.Themes.Management.Commands.InstallTheme;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Themes;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -22,10 +22,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Themes.Management.Commands.InstallTheme;
+namespace Nemera.Application.UnitTests.Core.Themes.Management.Commands.InstallTheme;
 
 /// <summary>
 /// Contains unit tests for the <see cref="InstallThemeCommandHandler"/> class.

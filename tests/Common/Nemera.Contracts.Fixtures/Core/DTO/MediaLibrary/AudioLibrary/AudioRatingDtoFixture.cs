@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary;
+namespace Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary;
 
 /// <summary>
 /// Fixture class for the <see cref="AudioRatingDto"/> record.

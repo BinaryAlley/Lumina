@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Infrastructure.Core.Authorization.Policies.Over18;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Repositories.Users;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Infrastructure.Core.Authorization.Policies.Over18;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Authorization.Policies.Over18;
+namespace Nemera.Infrastructure.UnitTests.Core.Authorization.Policies.Over18;
 
 /// <summary>
 /// Contains unit tests for the <see cref="Over18Policy"/> class.

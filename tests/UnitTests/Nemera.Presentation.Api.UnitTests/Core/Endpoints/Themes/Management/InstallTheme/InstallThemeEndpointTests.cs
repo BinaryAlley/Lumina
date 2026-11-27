@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Core.Themes.Management.Commands.InstallTheme;
-using Lumina.Contracts.Fixtures.Core.Responses.Themes;
-using Lumina.Contracts.Responses.Themes;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Themes.Management.InstallTheme;
+using Nemera.Application.Core.Themes.Management.Commands.InstallTheme;
+using Nemera.Contracts.Fixtures.Core.Responses.Themes;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Themes.Management.InstallTheme;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -16,10 +16,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Themes.Management.InstallTheme;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Themes.Management.InstallTheme;
 
 /// <summary>
 /// Contains unit tests for the <see cref="InstallThemeEndpoint"/> class.

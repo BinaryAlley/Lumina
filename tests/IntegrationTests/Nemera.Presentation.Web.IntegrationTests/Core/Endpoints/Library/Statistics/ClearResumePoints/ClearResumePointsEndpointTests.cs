@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Requests.Library.Statistics;
-using Lumina.Presentation.Web.Core.Endpoints.Library.Statistics.ClearResumePoints;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.Statistics;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Statistics.ClearResumePoints;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -15,25 +15,25 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Statistics.ClearResumePoints;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Statistics.ClearResumePoints;
 
 /// <summary>
 /// Contains integration tests for the <see cref="ClearResumePointsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class ClearResumePointsEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class ClearResumePointsEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private static readonly string s_userId = Guid.NewGuid().ToString();
     private static readonly string s_libraryId = Guid.NewGuid().ToString();
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly ClearResumePointsRequestFixture _clearResumePointsRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ClearResumePointsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public ClearResumePointsEndpointTests(LuminaWebFactory apiFactory)
+    public ClearResumePointsEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

@@ -1,4 +1,4 @@
-namespace Lumina.Contracts.DTO.Common;
+namespace Nemera.Contracts.DTO.Common;
 
 /// <summary>
 /// Base type for all metadata returned by a metadata provider.

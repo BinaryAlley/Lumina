@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Primitives;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.UnitTests.Common.Enums.Primitives;
+namespace Nemera.Domain.SharedKernel.UnitTests.Common.Enums.Primitives;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ErrorType"/> enumeration.

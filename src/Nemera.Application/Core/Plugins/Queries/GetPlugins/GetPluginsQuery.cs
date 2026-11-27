@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 #endregion
 
-namespace Lumina.Application.Core.Plugins.Queries.GetPlugins;
+namespace Nemera.Application.Core.Plugins.Queries.GetPlugins;
 
 /// <summary>
 /// Query for getting all the detected plugins.

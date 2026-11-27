@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.UnitTests.Common.Enums.Plugins;
+namespace Nemera.Domain.SharedKernel.UnitTests.Common.Enums.Plugins;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PluginSettingType"/> enumeration.

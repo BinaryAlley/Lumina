@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
-using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Common.DataAccess.Repositories.Common.Actions;
+using Nemera.Application.Common.DataAccess.Repositories.Common.Base;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Repositories.Themes;
+namespace Nemera.Application.Common.DataAccess.Repositories.Themes;
 
 /// <summary>
 /// Interface for the repository for themes.

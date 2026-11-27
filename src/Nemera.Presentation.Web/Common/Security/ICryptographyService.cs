@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Security;
+namespace Nemera.Presentation.Web.Common.Security;
 
 /// <summary>
 /// Interface for the service for cryptographic concerns.

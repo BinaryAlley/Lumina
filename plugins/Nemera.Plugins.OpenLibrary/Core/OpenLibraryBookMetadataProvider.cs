@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
-using Lumina.Plugins.OpenLibrary.Common.Models.DTO.Settings;
-using Lumina.Plugins.OpenLibrary.Core.Api;
-using Lumina.Plugins.OpenLibrary.Core.Mapping;
-using Lumina.Plugins.OpenLibrary.Core.Settings;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
+using Nemera.Plugins.OpenLibrary.Common.Models.DTO.Settings;
+using Nemera.Plugins.OpenLibrary.Core.Api;
+using Nemera.Plugins.OpenLibrary.Core.Mapping;
+using Nemera.Plugins.OpenLibrary.Core.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.Core;
+namespace Nemera.Plugins.OpenLibrary.Core;
 
 /// <summary>
 /// Provides book metadata from the Open Library by resolving lookups into book metadata DTOs.

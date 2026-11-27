@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
-using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.LocalMusicArtwork.Common.DependencyInjection;
-using Lumina.Plugins.LocalMusicArtwork.Core.Settings;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Plugins.Contracts.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.LocalMusicArtwork.Common.DependencyInjection;
+using Nemera.Plugins.LocalMusicArtwork.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Plugins.LocalMusicArtwork.Core;
+namespace Nemera.Plugins.LocalMusicArtwork.Core;
 
 /// <summary>
 /// Plugin that provides the artwork of music artists and albums from the images stored in the folders of a local music library.
@@ -34,7 +34,7 @@ public sealed class LocalMusicArtworkPlugin : IPlugin, IPluginServiceRegistrator
     /// <summary>
     /// Gets the author of the plugin.
     /// </summary>
-    public string Author => "Lumina";
+    public string Author => "Nemera";
 
     /// <summary>
     /// Gets the version of the plugin.

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
-using Lumina.Presentation.Web.Common.Requests.FileSystemManagement.Directories;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.FileSystemManagement.Directories.GetDirectories;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.FileSystemManagement.Directories;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.FileSystemManagement;
+using Nemera.Presentation.Web.Common.Requests.FileSystemManagement.Directories;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.FileSystemManagement.Directories.GetDirectories;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.FileSystemManagement.Directories;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System;
@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.FileSystemManagement.Directories.GetDirectories;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.FileSystemManagement.Directories.GetDirectories;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetDirectoriesEndpoint"/> class.

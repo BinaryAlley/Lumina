@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.FileSystemManagement.Directories;
-using Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
-using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Directories;
-using Lumina.Contracts.Requests.FileSystemManagement.Directories;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Directories;
+using Nemera.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
+using Nemera.Contracts.Fixtures.Core.Requests.FileSystemManagement.Directories;
+using Nemera.Contracts.Requests.FileSystemManagement.Directories;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Directories;
+namespace Nemera.Application.UnitTests.Common.Mapping.FileSystemManagement.Directories;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetDirectoriesRequestMapping"/> class.

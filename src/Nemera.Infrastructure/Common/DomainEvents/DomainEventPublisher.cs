@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Events;
+using Nemera.Domain.Common.Events;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Common.DomainEvents;
+namespace Nemera.Infrastructure.Common.DomainEvents;
 
 /// <summary>
 /// Publishes domain events to all handlers registered for the event type, by resolving them from the dependency injection container.

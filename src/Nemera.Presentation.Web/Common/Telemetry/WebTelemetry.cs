@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Telemetry;
+namespace Nemera.Presentation.Web.Common.Telemetry;
 
 /// <summary>
 /// Central registry of the <see cref="ActivitySource"/> used by the Presentation Web layer to emit traces.
@@ -12,7 +12,7 @@ public static class WebTelemetry
     /// <summary>
     /// The source name shared by the <see cref="ActivitySource"/> of the Presentation Web layer.
     /// </summary>
-    public const string SOURCE_NAME = "Lumina.Web";
+    public const string SOURCE_NAME = "Nemera.Web";
 
     /// <summary>
     /// The source of the traces emitted by the Presentation Web layer.

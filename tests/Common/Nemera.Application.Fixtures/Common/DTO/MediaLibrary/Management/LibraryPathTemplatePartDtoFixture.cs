@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.MediaLibrary.Management;
+using Nemera.Application.Common.DTO.MediaLibrary.Management;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.DTO.MediaLibrary.Management;
+namespace Nemera.Application.Fixtures.Common.DTO.MediaLibrary.Management;
 
 /// <summary>
 /// Fixture class for the <see cref="LibraryPathTemplatePartDto"/> record.

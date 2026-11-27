@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
-using Lumina.Application.Fixtures.Core.Admin.Authorization.Roles.Commands.DeleteRole;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
+using Nemera.Application.Fixtures.Core.Admin.Authorization.Roles.Commands.DeleteRole;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.DeleteRole;
+namespace Nemera.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.DeleteRole;
 
 /// <summary>
 /// Contains unit tests for the <see cref="DeleteRoleCommandValidator"/> class.

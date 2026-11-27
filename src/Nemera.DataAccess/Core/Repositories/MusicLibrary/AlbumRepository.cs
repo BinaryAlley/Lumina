@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
-using Lumina.DataAccess.Common.Persistence;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.MusicLibrary;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+using Nemera.DataAccess.Common.Persistence;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -20,26 +20,26 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.MusicLibrary;
+namespace Nemera.DataAccess.Core.Repositories.MusicLibrary;
 
 /// <summary>
 /// Repository for albums.
 /// </summary>
 internal sealed class AlbumRepository : IAlbumRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
     private readonly ITrackRepository _trackRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AlbumRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
     /// <param name="trackRepository">Injected repository for tracks.</param>
     /// <param name="dateTimeProvider">Injected provider for the current UTC time, used to stamp deletions deterministically.</param>
-    public AlbumRepository(LuminaDbContext luminaDbContext, ITrackRepository trackRepository, IDateTimeProvider dateTimeProvider)
+    public AlbumRepository(NemeraDbContext nemeraDbContext, ITrackRepository trackRepository, IDateTimeProvider dateTimeProvider)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
         _trackRepository = trackRepository;
         _dateTimeProvider = dateTimeProvider;
     }
@@ -52,7 +52,7 @@ internal sealed class AlbumRepository : IAlbumRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(AlbumEntity album, CancellationToken cancellationToken)
     {
-        bool doesAlbumExist = await _luminaDbContext.Albums.AnyAsync(repositoryAlbum => repositoryAlbum.Id == album.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
+        bool doesAlbumExist = await _nemeraDbContext.Albums.AnyAsync(repositoryAlbum => repositoryAlbum.Id == album.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (doesAlbumExist)
             return Errors.Music.AlbumAlreadyExists;
 
@@ -65,11 +65,11 @@ internal sealed class AlbumRepository : IAlbumRepository
         // Resolve the tags and genres referenced by the album and its tracks to a single instance per name, replacing the stored ones where they exist, so that
         // neither a stored row nor a name shared by the album and its tracks of the same request is tracked more than once.
         Result<IReadOnlyDictionary<string, TagEntity>> resolveTagsResult = await SharedReferenceResolver.ResolveAsync(
-            _luminaDbContext, album.Tags.Concat(album.Tracks.SelectMany(track => track.Tags)), Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+            _nemeraDbContext, album.Tags.Concat(album.Tracks.SelectMany(track => track.Tags)), Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
         if (resolveTagsResult.IsFailure)
             return resolveTagsResult.Errors;
         Result<IReadOnlyDictionary<string, GenreEntity>> resolveGenresResult = await SharedReferenceResolver.ResolveAsync(
-            _luminaDbContext, album.Genres.Concat(album.Tracks.SelectMany(track => track.Genres)), Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+            _nemeraDbContext, album.Genres.Concat(album.Tracks.SelectMany(track => track.Genres)), Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
         if (resolveGenresResult.IsFailure)
             return resolveGenresResult.Errors;
 
@@ -82,7 +82,7 @@ internal sealed class AlbumRepository : IAlbumRepository
             track.Genres = [.. SharedReferenceResolver.Normalize(track.Genres, resolveGenresResult.Value)];
         }
 
-        _luminaDbContext.Albums.Add(album);
+        _nemeraDbContext.Albums.Add(album);
         return Result.Created;
     }
 
@@ -119,7 +119,7 @@ internal sealed class AlbumRepository : IAlbumRepository
     public async Task<Result<Updated>> UpdateAsync(AlbumEntity data, CancellationToken cancellationToken)
     {
         // Every collection that is reconciled must be loaded, so that the reconciliation can see the rows that are already stored and leave the unchanged ones alone.
-        AlbumEntity? foundAlbum = await _luminaDbContext.Albums
+        AlbumEntity? foundAlbum = await _nemeraDbContext.Albums
             .Include(repositoryAlbum => repositoryAlbum.Tags)
             .Include(repositoryAlbum => repositoryAlbum.Genres)
             .Include(repositoryAlbum => repositoryAlbum.Ratings)
@@ -147,21 +147,21 @@ internal sealed class AlbumRepository : IAlbumRepository
         Guid libraryId = foundAlbum.LibraryId;
         bool isDeleted = foundAlbum.IsDeleted;
         DateTime? deletedOnUtc = foundAlbum.DeletedOnUtc;
-        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundAlbum, data);
+        EditableValuesCopier.CopyEditableValues(_nemeraDbContext, foundAlbum, data);
         foundAlbum.ArtistId = artistId;
         foundAlbum.LibraryId = libraryId;
         // The deletion state is owned by the explicit delete and restore operations. Clearing the modified flags keeps it out of the UPDATE statement,
         // so an edit that raced with a delete can never write the deletion state back and resurrect the album.
         foundAlbum.IsDeleted = isDeleted;
         foundAlbum.DeletedOnUtc = deletedOnUtc;
-        _luminaDbContext.Entry(foundAlbum).Property(album => album.IsDeleted).IsModified = false;
-        _luminaDbContext.Entry(foundAlbum).Property(album => album.DeletedOnUtc).IsModified = false;
+        _nemeraDbContext.Entry(foundAlbum).Property(album => album.IsDeleted).IsModified = false;
+        _nemeraDbContext.Entry(foundAlbum).Property(album => album.DeletedOnUtc).IsModified = false;
 
         // Tags and genres are shared across the whole database, so the stored rows whose names already exist are reused, and only the missing names are inserted.
-        Result<Updated> reconcileTagsResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundAlbum.Tags, data.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        Result<Updated> reconcileTagsResult = await SharedReferenceResolver.ReconcileAsync(_nemeraDbContext, foundAlbum.Tags, data.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
         if (reconcileTagsResult.IsFailure)
             return reconcileTagsResult.Errors;
-        Result<Updated> reconcileGenresResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundAlbum.Genres, data.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        Result<Updated> reconcileGenresResult = await SharedReferenceResolver.ReconcileAsync(_nemeraDbContext, foundAlbum.Genres, data.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
         if (reconcileGenresResult.IsFailure)
             return reconcileGenresResult.Errors;
 
@@ -217,7 +217,7 @@ internal sealed class AlbumRepository : IAlbumRepository
     public async Task<Result<AlbumEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
         // A deleted album, or an album of a deleted artist, is kept in the storage medium only so that its paths stay reserved and it can be restored, so it is never returned to a caller.
-        IQueryable<AlbumEntity> query = _luminaDbContext.Albums.Where(album => !album.IsDeleted && !album.Artist!.IsDeleted);
+        IQueryable<AlbumEntity> query = _nemeraDbContext.Albums.Where(album => !album.IsDeleted && !album.Artist!.IsDeleted);
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         if (shouldIncludeNavigationProperties)
@@ -253,7 +253,7 @@ internal sealed class AlbumRepository : IAlbumRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="AlbumEntity"/>, or an error.</returns>
     public async Task<Result<IReadOnlyList<AlbumEntity>>> GetByArtistIdAsync(Guid artistId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Albums
+        return await _nemeraDbContext.Albums
             .Include(album => album.Ratings)
             .Include(album => album.Tags)
             .Include(album => album.Genres)
@@ -285,7 +285,7 @@ internal sealed class AlbumRepository : IAlbumRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="AlbumEntity"/>, or an error.</returns>
     public async Task<Result<IReadOnlyList<AlbumEntity>>> GetByArtistIdIncludingDeletedAsync(Guid artistId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Albums
+        return await _nemeraDbContext.Albums
             .AsNoTracking()
             .Where(album => album.ArtistId == artistId)
             .OrderBy(album => album.Title)
@@ -301,7 +301,7 @@ internal sealed class AlbumRepository : IAlbumRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="AlbumEntity"/>, or an error.</returns>
     public async Task<Result<AlbumEntity?>> GetIncludingDeletedByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Albums
+        return await _nemeraDbContext.Albums
             .AsNoTracking()
             .FirstOrDefaultAsync(album => album.Id == id, cancellationToken).ConfigureAwait(false);
     }
@@ -319,7 +319,7 @@ internal sealed class AlbumRepository : IAlbumRepository
         // The lightweight read models are always retrieved without tracking, because they are never modified by the caller.
         // The release year and the release types are exposed so that the clients can group and order the releases of an artist.
         // The cover of the album is the cover artwork stored for it, if any, and it is exposed so that the clients can display it without loading the whole album.
-        IQueryable<AlbumLiteRow> liteRowsQuery = _luminaDbContext.Albums
+        IQueryable<AlbumLiteRow> liteRowsQuery = _nemeraDbContext.Albums
             .AsNoTracking()
             .Where(album => album.ArtistId == artistId && !album.IsDeleted && !album.Artist!.IsDeleted)
             .OrderBy(album => album.Title)
@@ -328,7 +328,7 @@ internal sealed class AlbumRepository : IAlbumRepository
                 album.Id,
                 album.Title,
                 album.TotalTracks,
-                _luminaDbContext.MusicArtwork
+                _nemeraDbContext.MusicArtwork
                     .Where(artwork => artwork.OwnerType == MusicArtworkOwnerType.Album && artwork.OwnerId == album.Id && artwork.ArtworkType == ArtworkType.Cover)
                     .Select(artwork => artwork.FileName)
                     .FirstOrDefault(),
@@ -376,7 +376,7 @@ internal sealed class AlbumRepository : IAlbumRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="AlbumEntity"/> with the provided title, or an error.</returns>
     public async Task<Result<AlbumEntity?>> GetByTitleAsync(Guid artistId, string title, CancellationToken cancellationToken)
     {
-        AlbumEntity? album = await _luminaDbContext.Albums
+        AlbumEntity? album = await _nemeraDbContext.Albums
             .FirstOrDefaultAsync(repositoryAlbum => repositoryAlbum.ArtistId == artistId && repositoryAlbum.Title == title && !repositoryAlbum.IsDeleted && !repositoryAlbum.Artist!.IsDeleted, cancellationToken).ConfigureAwait(false);
         return album;
     }
@@ -392,7 +392,7 @@ internal sealed class AlbumRepository : IAlbumRepository
     {
         // The trailing separator is part of the prefix, so a directory whose name is a prefix of another directory does not match it.
         string directoryPrefix = directoryPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
-        AlbumEntity? album = await _luminaDbContext.Albums
+        AlbumEntity? album = await _nemeraDbContext.Albums
             .FirstOrDefaultAsync(repositoryAlbum => repositoryAlbum.ArtistId == artistId
                 && !repositoryAlbum.IsDeleted
                 && !repositoryAlbum.Artist!.IsDeleted
@@ -408,7 +408,7 @@ internal sealed class AlbumRepository : IAlbumRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted <see cref="AlbumEntity"/>, <see langword="null"/> when the album does not exist, is not soft deleted, or its artist is soft deleted, or an error.</returns>
     public async Task<Result<AlbumEntity?>> GetSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Albums
+        return await _nemeraDbContext.Albums
             .AsNoTracking()
             .FirstOrDefaultAsync(album => album.Id == id && album.IsDeleted && !album.Artist!.IsDeleted, cancellationToken).ConfigureAwait(false);
     }
@@ -421,7 +421,7 @@ internal sealed class AlbumRepository : IAlbumRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted albums, or an error.</returns>
     public async Task<Result<IReadOnlyList<AlbumEntity>>> GetSoftDeletedByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Albums
+        return await _nemeraDbContext.Albums
             .AsNoTracking()
             .Include(album => album.Artist)
             .Where(album => album.LibraryId == libraryId && album.IsDeleted && !album.Artist!.IsDeleted)
@@ -449,10 +449,10 @@ internal sealed class AlbumRepository : IAlbumRepository
         DateTime deletedOnUtc = _dateTimeProvider.UtcNow;
 
         // The condition that an artist must have at least one remaining album is re-checked here so a delete that raced with another cannot leave the artist without albums.
-        int updatedRows = await _luminaDbContext.Albums
+        int updatedRows = await _nemeraDbContext.Albums
             .Where(album => album.Id == id
                 && !album.IsDeleted
-                && _luminaDbContext.Albums.Any(sibling => sibling.ArtistId == album.ArtistId && sibling.Id != album.Id && !sibling.IsDeleted))
+                && _nemeraDbContext.Albums.Any(sibling => sibling.ArtistId == album.ArtistId && sibling.Id != album.Id && !sibling.IsDeleted))
             .ExecuteUpdateAsync(setters => setters
                 .SetProperty(album => album.IsDeleted, true)
                 .SetProperty(album => album.DeletedOnUtc, deletedOnUtc), cancellationToken).ConfigureAwait(false);
@@ -461,7 +461,7 @@ internal sealed class AlbumRepository : IAlbumRepository
 
         // The update matched nothing, so the album is missing, is already deleted, or is the last visible album of its artist. The row is read
         // only to report the reason, never to decide the transition.
-        AlbumEntity? album = await _luminaDbContext.Albums
+        AlbumEntity? album = await _nemeraDbContext.Albums
             .AsNoTracking()
             .FirstOrDefaultAsync(candidate => candidate.Id == id, cancellationToken).ConfigureAwait(false);
         if (album is null || album.IsDeleted)
@@ -477,7 +477,7 @@ internal sealed class AlbumRepository : IAlbumRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> RestoreSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        AlbumEntity? album = await _luminaDbContext.Albums.FirstOrDefaultAsync(repositoryAlbum => repositoryAlbum.Id == id, cancellationToken).ConfigureAwait(false);
+        AlbumEntity? album = await _nemeraDbContext.Albums.FirstOrDefaultAsync(repositoryAlbum => repositoryAlbum.Id == id, cancellationToken).ConfigureAwait(false);
         if (album is null || !album.IsDeleted)
             return Errors.Music.AlbumNotFound;
 
@@ -494,12 +494,12 @@ internal sealed class AlbumRepository : IAlbumRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        AlbumEntity? album = await _luminaDbContext.Albums
+        AlbumEntity? album = await _nemeraDbContext.Albums
             .FirstOrDefaultAsync(repositoryAlbum => repositoryAlbum.Id == id, cancellationToken).ConfigureAwait(false);
         if (album is null)
             return Errors.Music.AlbumNotFound;
 
-        _luminaDbContext.Albums.Remove(album);
+        _nemeraDbContext.Albums.Remove(album);
         return Result.Deleted;
     }
 
@@ -511,7 +511,7 @@ internal sealed class AlbumRepository : IAlbumRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the number of albums needing their metadata enriched, or an error.</returns>
     public async Task<Result<int>> GetAlbumsNeedingMetadataCountAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Albums
+        return await _nemeraDbContext.Albums
             .CountAsync(album => album.LibraryId == libraryId && !album.IsDeleted && !album.Artist!.IsDeleted && album.MetadataStatus != MetadataStatus.Enriched, cancellationToken).ConfigureAwait(false);
     }
 
@@ -523,11 +523,11 @@ internal sealed class AlbumRepository : IAlbumRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the number of albums needing their artwork resolved, or an error.</returns>
     public async Task<Result<int>> GetAlbumsNeedingArtworkCountAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Albums
+        return await _nemeraDbContext.Albums
             .CountAsync(album => album.LibraryId == libraryId
                         && !album.IsDeleted
                         && !album.Artist!.IsDeleted
-                        && !_luminaDbContext.MusicArtwork.Any(musicArtwork => musicArtwork.OwnerType == MusicArtworkOwnerType.Album
+                        && !_nemeraDbContext.MusicArtwork.Any(musicArtwork => musicArtwork.OwnerType == MusicArtworkOwnerType.Album
                             && musicArtwork.OwnerId == album.Id
                             && (musicArtwork.Status == ArtworkStatus.Enriched || musicArtwork.Status == ArtworkStatus.NotAvailable)), cancellationToken).ConfigureAwait(false);
     }
@@ -544,14 +544,14 @@ internal sealed class AlbumRepository : IAlbumRepository
     public async Task<Result<IReadOnlyList<AlbumEntity>>> GetAlbumsNeedingArtworkAsync(Guid libraryId, IReadOnlyCollection<Guid> excludedAlbumIds, int pageSize, CancellationToken cancellationToken)
     {
         List<Guid> excludedIds = [.. excludedAlbumIds];
-        return await _luminaDbContext.Albums
+        return await _nemeraDbContext.Albums
             .AsNoTracking()
             .Include(album => album.Artist)
             .Where(album => album.LibraryId == libraryId
                         && !album.IsDeleted
                         && !album.Artist!.IsDeleted
                         && !excludedIds.Contains(album.Id)
-                        && !_luminaDbContext.MusicArtwork.Any(musicArtwork => musicArtwork.OwnerType == MusicArtworkOwnerType.Album
+                        && !_nemeraDbContext.MusicArtwork.Any(musicArtwork => musicArtwork.OwnerType == MusicArtworkOwnerType.Album
                             && musicArtwork.OwnerId == album.Id
                             && (musicArtwork.Status == ArtworkStatus.Enriched || musicArtwork.Status == ArtworkStatus.NotAvailable)))
             .OrderBy(album => album.Id)
@@ -571,7 +571,7 @@ internal sealed class AlbumRepository : IAlbumRepository
         if (albumIdsList.Count == 0)
             return new Dictionary<Guid, string>();
 
-        List<AlbumTrackPathRow> rows = await _luminaDbContext.Tracks
+        List<AlbumTrackPathRow> rows = await _nemeraDbContext.Tracks
             .AsNoTracking()
             .Where(track => albumIdsList.Contains(track.AlbumId) && !track.IsDeleted)
             .OrderBy(track => track.AlbumId)
@@ -594,7 +594,7 @@ internal sealed class AlbumRepository : IAlbumRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> ResetMetadataStatusForLibraryAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        await _luminaDbContext.Albums
+        await _nemeraDbContext.Albums
             .Where(album => album.LibraryId == libraryId)
             .ExecuteUpdateAsync(setters => setters.SetProperty(album => album.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
         return Result.Updated;

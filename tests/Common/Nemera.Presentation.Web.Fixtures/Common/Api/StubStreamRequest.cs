@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Api;
+namespace Nemera.Presentation.Web.Fixtures.Common.Api;
 
 /// <summary>
 /// A streamed request that was sent to the <see cref="StubStreamingApiHttpClient"/> stub.

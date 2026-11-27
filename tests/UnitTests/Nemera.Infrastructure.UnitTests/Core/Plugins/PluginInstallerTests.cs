@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Infrastructure.Core.Plugins;
-using Lumina.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Infrastructure.Core.Plugins;
+using Nemera.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Plugins;
+namespace Nemera.Infrastructure.UnitTests.Core.Plugins;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PluginInstaller"/> class.

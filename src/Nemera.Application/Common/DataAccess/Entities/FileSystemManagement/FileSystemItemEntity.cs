@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.FileSystemManagement;
+namespace Nemera.Application.Common.DataAccess.Entities.FileSystemManagement;
 
 /// <summary>
 /// Generic filesystem data transfer object.

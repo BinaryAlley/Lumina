@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
-using Lumina.Plugins.MusicBrainz.Common.Models.DTO.Settings;
-using Lumina.Plugins.MusicBrainz.Core.Api;
-using Lumina.Plugins.MusicBrainz.Core.Mapping;
-using Lumina.Plugins.MusicBrainz.Core.Settings;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
+using Nemera.Plugins.MusicBrainz.Common.Models.DTO.Settings;
+using Nemera.Plugins.MusicBrainz.Core.Api;
+using Nemera.Plugins.MusicBrainz.Core.Mapping;
+using Nemera.Plugins.MusicBrainz.Core.Settings;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.Core;
+namespace Nemera.Plugins.MusicBrainz.Core;
 
 /// <summary>
 /// Provides music artist metadata from MusicBrainz by resolving lookups into artist metadata DTOs.

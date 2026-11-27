@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Requests.UsersManagement;
-using Lumina.Presentation.Web.Common.Responses.UsersManagement;
-using Lumina.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Register;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
-using Lumina.Presentation.Web.Fixtures.Common.Responses.UsersManagement;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Requests.UsersManagement;
+using Nemera.Presentation.Web.Common.Responses.UsersManagement;
+using Nemera.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Register;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
+using Nemera.Presentation.Web.Fixtures.Common.Responses.UsersManagement;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -15,15 +15,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.UsersManagement.Authentication.Register;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.UsersManagement.Authentication.Register;
 
 /// <summary>
 /// Contains integration tests for the <see cref="RegisterEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RegisterEndpointTests : IClassFixture<LuminaWebFactory>
+public class RegisterEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly RegisterRequestFixture _registerRequestFixture = new();
     private readonly RegisterResponseFixture _registerResponseFixture = new();
 
@@ -31,7 +31,7 @@ public class RegisterEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="RegisterEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public RegisterEndpointTests(LuminaWebFactory apiFactory)
+    public RegisterEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

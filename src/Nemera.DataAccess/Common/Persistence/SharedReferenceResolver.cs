@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Common.Persistence;
+namespace Nemera.DataAccess.Common.Persistence;
 
 /// <summary>
 /// Resolves shared reference rows, whose identity is their name, so that each distinct name is represented by a single tracked instance.
@@ -37,7 +37,7 @@ internal static class SharedReferenceResolver
     /// <param name="invalidNameError">The error returned when a shared reference carries a name that is null or whitespace.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>A result containing either a dictionary that maps each distinct normalized name to the single instance that represents it, or an error.</returns>
-    internal static async Task<Result<IReadOnlyDictionary<string, TEntity>>> ResolveAsync<TEntity>(LuminaDbContext context, IEnumerable<TEntity> incomingEntities, Error invalidNameError, CancellationToken cancellationToken)
+    internal static async Task<Result<IReadOnlyDictionary<string, TEntity>>> ResolveAsync<TEntity>(NemeraDbContext context, IEnumerable<TEntity> incomingEntities, Error invalidNameError, CancellationToken cancellationToken)
         where TEntity : class, ISharedReferenceEntity
     {
         // A shared reference whose name is null or whitespace cannot be keyed, and the database requires the name to be present, so the whole resolution
@@ -132,7 +132,7 @@ internal static class SharedReferenceResolver
     /// <param name="invalidNameError">The error returned when a shared reference carries a name that is null or whitespace.</param>
     /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
-    internal static async Task<Result<Updated>> ReconcileAsync<TEntity>(LuminaDbContext context, ICollection<TEntity> existingEntities, IEnumerable<TEntity> incomingEntities, Error invalidNameError, CancellationToken cancellationToken)
+    internal static async Task<Result<Updated>> ReconcileAsync<TEntity>(NemeraDbContext context, ICollection<TEntity> existingEntities, IEnumerable<TEntity> incomingEntities, Error invalidNameError, CancellationToken cancellationToken)
         where TEntity : class, ISharedReferenceEntity
     {
         List<TEntity> incomingList = [.. incomingEntities];

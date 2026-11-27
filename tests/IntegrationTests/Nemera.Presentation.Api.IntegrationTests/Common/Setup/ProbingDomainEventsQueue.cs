@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DomainEvents;
-using Lumina.Domain.Common.Events;
+using Nemera.Application.Common.DomainEvents;
+using Nemera.Domain.Common.Events;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+namespace Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 
 /// <summary>
 /// Domain events queue that exposes its enqueuing and dequeuing to a <see cref="DomainEventsQueueProbe"/>.

@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Application.Common.CQRS;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
 #endregion
 
-namespace Lumina.Application.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
+namespace Nemera.Application.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
 
 /// <summary>
 /// Command for updating the settings of the current user.

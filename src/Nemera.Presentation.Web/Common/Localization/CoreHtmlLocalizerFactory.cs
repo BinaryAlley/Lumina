@@ -4,7 +4,7 @@ using Microsoft.Extensions.Localization;
 using System;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Localization;
+namespace Nemera.Presentation.Web.Common.Localization;
 
 /// <summary>
 /// <see cref="IHtmlLocalizerFactory"/> that resolves the resources of the views that live under the <c>Core/Views</c> directory.

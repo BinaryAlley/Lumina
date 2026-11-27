@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Api.Common.Routes.Favorites;
+namespace Nemera.Presentation.Api.Common.Routes.Favorites;
 
 /// <summary>
 /// Class for the collection of the favorite routes of the API.

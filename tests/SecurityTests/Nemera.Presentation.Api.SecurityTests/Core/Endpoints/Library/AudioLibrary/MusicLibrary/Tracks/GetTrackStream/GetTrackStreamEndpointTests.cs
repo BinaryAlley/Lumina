@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackStream;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackStream;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackStream;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackStream;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetTrackStreamEndpoint"/> class.
@@ -27,13 +27,13 @@ namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibr
 /// normalization pipeline and ffmpeg, neither of which is available in the test environment.
 /// </remarks>
 [ExcludeFromCodeCoverage]
-public class GetTrackStreamEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class GetTrackStreamEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
     private const string ACTIVE_CONTENT_BODY = "<html><body><script>alert('active')</script></body></html>";
 
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
-    private readonly string _contentRootPath = Path.Combine(Path.GetTempPath(), $"lumina-track-stream-security-tests-{Guid.NewGuid():N}");
+    private readonly string _contentRootPath = Path.Combine(Path.GetTempPath(), $"nemera-track-stream-security-tests-{Guid.NewGuid():N}");
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -50,12 +50,12 @@ public class GetTrackStreamEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     /// Initializes a new instance of the <see cref="GetTrackStreamEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetTrackStreamEndpointTests(LuminaApiFactory apiFactory)
+    public GetTrackStreamEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
         Directory.CreateDirectory(_contentRootPath);
     }
 
@@ -102,7 +102,7 @@ public class GetTrackStreamEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("at Lumina", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("at Nemera", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(payload, content, StringComparison.Ordinal);
         Assert.DoesNotContain("/etc/passwd", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("C:\\", content, StringComparison.OrdinalIgnoreCase);
@@ -205,7 +205,7 @@ public class GetTrackStreamEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         // Arrange
         (Guid userId, string username) = await _apiFactory.CreateAndAuthenticateUserAsync(_client);
         _seededUsernames.Add(username);
-        string outsideFilePath = Path.Combine(Path.GetTempPath(), $"lumina-track-stream-outside-{Guid.NewGuid():N}.mp3");
+        string outsideFilePath = Path.Combine(Path.GetTempPath(), $"nemera-track-stream-outside-{Guid.NewGuid():N}.mp3");
         await File.WriteAllBytesAsync(outsideFilePath, [1, 2, 3, 4]);
         _temporaryFiles.Add(outsideFilePath);
         (Guid libraryId, Guid artistId, Guid albumId, Guid trackId) = await SeedLibraryArtistAlbumAndTrackAsync(userId, outsideFilePath);
@@ -276,7 +276,7 @@ public class GetTrackStreamEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     private async Task<Guid> SeedOtherUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         string username = $"otheruser_{Guid.NewGuid()}";
         dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: username, password: "TestPass123!"));
@@ -293,7 +293,7 @@ public class GetTrackStreamEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     private async Task<Guid> SeedEmptyLibraryAsync(Guid userId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.NewGuid();
         dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Other Library", libraryType: LibraryType.Music, contentLocations: [_contentRootPath]));
         await dbContext.SaveChangesAsync();
@@ -309,7 +309,7 @@ public class GetTrackStreamEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     private async Task<(Guid libraryId, Guid artistId, Guid albumId, Guid trackId)> SeedLibraryArtistAlbumAndTrackAsync(Guid userId, string trackPath)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.NewGuid();
         Guid artistId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();

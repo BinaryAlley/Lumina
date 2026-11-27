@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Contracts.Fixtures.Core.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Fixture class for the <see cref="PlaybackManifestResponse"/> record.

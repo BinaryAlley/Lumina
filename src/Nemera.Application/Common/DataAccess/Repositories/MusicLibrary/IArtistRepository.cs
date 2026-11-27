@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
-using Lumina.Application.Common.DataAccess.Repositories.Common.Base;
-using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.Common.Actions;
+using Nemera.Application.Common.DataAccess.Repositories.Common.Base;
+using Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
+namespace Nemera.Application.Common.DataAccess.Repositories.MusicLibrary;
 
 /// <summary>
 /// Interface for the repository for artists.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Commands.DeleteLibrary;
+namespace Nemera.Application.Core.MediaLibrary.Management.Commands.DeleteLibrary;
 
 /// <summary>
 /// Command for deleting a media library by its Id.

@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.ID3.Core.Tags;
+using Nemera.Plugins.ID3.Core.Tags;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.ID3.UnitTests.Core.Tags;
+namespace Nemera.Plugins.ID3.UnitTests.Core.Tags;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AudioContainerResolver"/> class.

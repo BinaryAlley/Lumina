@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
+namespace Nemera.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="GetThumbnailQuery"/>.

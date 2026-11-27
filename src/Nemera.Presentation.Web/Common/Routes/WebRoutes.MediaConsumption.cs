@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.Routes;
+namespace Nemera.Presentation.Web.Common.Routes;
 
 /// <summary>
 /// Class for the collection of routes defined in the Web application.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.Playlists;
-using Lumina.Application.Core.Playlists.Commands.MovePlaylistEntry;
-using Lumina.Contracts.Fixtures.Core.Requests.Playlists;
-using Lumina.Contracts.Requests.Playlists;
+using Nemera.Application.Common.Mapping.Playlists;
+using Nemera.Application.Core.Playlists.Commands.MovePlaylistEntry;
+using Nemera.Contracts.Fixtures.Core.Requests.Playlists;
+using Nemera.Contracts.Requests.Playlists;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.Playlists;
+namespace Nemera.Application.UnitTests.Common.Mapping.Playlists;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MovePlaylistEntryRequestMapping"/> class.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Playlists.Commands.AddPlaylistScopeEntries;
+namespace Nemera.Application.Core.Playlists.Commands.AddPlaylistScopeEntries;
 
 /// <summary>
 /// Command to add every track of a music library, an artist or an album to a playlist, with the track Ids resolved by the server.

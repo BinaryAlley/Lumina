@@ -3,7 +3,7 @@ using FastEndpoints;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.DeleteBook;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.DeleteBook;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="DeleteBookEndpoint"/> endpoint, for OpenAPI.

@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Common.DataAccess.Repositories.Themes;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
-using Lumina.Application.Common.Infrastructure.Themes;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
-using Lumina.Infrastructure.Core.Scheduling.Execution.TaskExecutors;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Common.DataAccess.Repositories.Themes;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Themes;
+using Nemera.Application.Common.Infrastructure.Themes;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Infrastructure.Core.Scheduling.Execution.TaskExecutors;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
@@ -22,7 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Scheduling.Execution.TaskExecutors;
+namespace Nemera.Infrastructure.UnitTests.Core.Scheduling.Execution.TaskExecutors;
 
 /// <summary>
 /// Contains unit tests for the <see cref="RepairThemesTaskExecutor"/> class.

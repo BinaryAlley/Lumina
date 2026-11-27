@@ -4,7 +4,7 @@
  * The player decodes with WebCodecs and outputs through the Web Audio API, so before it can play anything it must know which of those browser capabilities exist, and which audio codecs the
  * browser can decode. The report is produced once, is cached, and is published through the event bus, so that a consumer can present a clear failure instead of a silent, broken player.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -12,7 +12,7 @@
      * @readonly
      * @enum {string}
      */
-    LuminaAudioPlayer.PlayerCapability = Object.freeze({
+    NemeraAudioPlayer.PlayerCapability = Object.freeze({
         // The WebCodecs API, the family of decoders the player feeds.
         WEB_CODECS: 'webCodecs',
         // WebCodecs.AudioDecoder, the audio decoder the player actually consumes.
@@ -29,7 +29,7 @@
      * @readonly
      * @type {Object<string, { codec: string, sampleRate: number, numberOfChannels: number }>}
      */
-    LuminaAudioPlayer.AUDIO_CODEC_PROBES = Object.freeze({
+    NemeraAudioPlayer.AUDIO_CODEC_PROBES = Object.freeze({
         MP3: Object.freeze({ codec: 'mp3', sampleRate: 44100, numberOfChannels: 2 }),
         FLAC: Object.freeze({ codec: 'flac', sampleRate: 44100, numberOfChannels: 2 }),
         OPUS: Object.freeze({ codec: 'opus', sampleRate: 48000, numberOfChannels: 2 }),
@@ -40,13 +40,13 @@
 
     /**
      * The codec configurations probed with AudioDecoder.isConfigSupported, one per audio codec the demuxers of the player
-     * can recognize. It is derived from {@link LuminaAudioPlayer.AUDIO_CODEC_PROBES}, so the same configuration answers
+     * can recognize. It is derived from {@link NemeraAudioPlayer.AUDIO_CODEC_PROBES}, so the same configuration answers
      * both this report and the per demuxer check.
      * @readonly
      * @type {ReadonlyArray<{ name: string, config: Object }>}
      */
-    LuminaAudioPlayer.PROBED_AUDIO_CODECS = Object.freeze(Object.keys(LuminaAudioPlayer.AUDIO_CODEC_PROBES)
-        .map((name) => Object.freeze({ name: name.toLowerCase(), config: LuminaAudioPlayer.AUDIO_CODEC_PROBES[name] })));
+    NemeraAudioPlayer.PROBED_AUDIO_CODECS = Object.freeze(Object.keys(NemeraAudioPlayer.AUDIO_CODEC_PROBES)
+        .map((name) => Object.freeze({ name: name.toLowerCase(), config: NemeraAudioPlayer.AUDIO_CODEC_PROBES[name] })));
 
     /**
      * Builds a stable fingerprint of the codec private data of a configuration, so that two configurations that differ
@@ -179,7 +179,7 @@
          *
          * The returned report has the shape:
          * <code>{ hasWebCodecs, hasAudioDecoder, hasAudioContext, codecs, missing, isSupported }</code>, where <code>codecs</code> maps each probed codec name to a boolean, <code>missing</code> lists the
-         * {@link LuminaAudioPlayer.PlayerCapability} values that are absent, and <code>isSupported</code> is true only when every required capability is present.
+         * {@link NemeraAudioPlayer.PlayerCapability} values that are absent, and <code>isSupported</code> is true only when every required capability is present.
          * @returns {Promise<Object>} The capability report.
          */
         async detectAsync() {
@@ -211,7 +211,7 @@
             if (hasAudioDecoder) {
                 // Each isConfigSupported is an independent round trip to the browser, so they are probed in parallel; the
                 // results are folded in afterwards, in probe order, so the report never depends on which probe finishes first.
-                const probeResults = await Promise.all(LuminaAudioPlayer.PROBED_AUDIO_CODECS.map(async (probe) => {
+                const probeResults = await Promise.all(NemeraAudioPlayer.PROBED_AUDIO_CODECS.map(async (probe) => {
                     return { name: probe.name, isSupported: await this.supportsAudioConfigAsync(probe.config) };
                 }));
                 for (const probeResult of probeResults)
@@ -219,7 +219,7 @@
             } else {
                 // Without a decoder nothing can be probed, but every codec key is still reported as false, so that a
                 // consumer reads the same shape whether the decoder exists or not, instead of testing for a missing key.
-                for (const probe of LuminaAudioPlayer.PROBED_AUDIO_CODECS)
+                for (const probe of NemeraAudioPlayer.PROBED_AUDIO_CODECS)
                     codecs[probe.name] = false;
             }
 
@@ -227,11 +227,11 @@
             // not fatal here, because the server can normalize such a track, which the delivery decision handles at play time.
             const missing = [];
             if (!hasWebCodecs)
-                missing.push(LuminaAudioPlayer.PlayerCapability.WEB_CODECS);
+                missing.push(NemeraAudioPlayer.PlayerCapability.WEB_CODECS);
             if (!hasAudioDecoder)
-                missing.push(LuminaAudioPlayer.PlayerCapability.AUDIO_DECODER);
+                missing.push(NemeraAudioPlayer.PlayerCapability.AUDIO_DECODER);
             if (!hasAudioContext)
-                missing.push(LuminaAudioPlayer.PlayerCapability.AUDIO_CONTEXT);
+                missing.push(NemeraAudioPlayer.PlayerCapability.AUDIO_CONTEXT);
 
             // The report is shared and cached, so it is frozen to stop one consumer from mutating what every other consumer reads.
             return Object.freeze({
@@ -253,5 +253,5 @@
         }
     }
 
-    LuminaAudioPlayer.PlayerCapabilities = PlayerCapabilities;
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+    NemeraAudioPlayer.PlayerCapabilities = PlayerCapabilities;
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Presentation.Web.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Common.Enums.MediaConsumption;
+using Nemera.Presentation.Web.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Common.Enums.MediaConsumption;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
+namespace Nemera.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
 
 /// <summary>
 /// Fixture class for the <see cref="ConsumedItemDto"/> record.

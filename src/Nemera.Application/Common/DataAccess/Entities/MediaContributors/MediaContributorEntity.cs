@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.Common;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.MediaContributors;
+namespace Nemera.Application.Common.DataAccess.Entities.MediaContributors;
 
 /// <summary>
 /// Repository entity for a media contributor, the person that contributed to one or more media items.

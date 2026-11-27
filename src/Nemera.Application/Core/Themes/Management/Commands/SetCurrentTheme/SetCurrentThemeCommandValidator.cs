@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
-using Lumina.Application.Core.Themes.Management.Commands.SetCurrentTheme;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
+using Nemera.Application.Core.Themes.Management.Commands.SetCurrentTheme;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.Core.Themes.Management.Commands.SetCurrentTheme;
+namespace Nemera.Application.Core.Themes.Management.Commands.SetCurrentTheme;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="SetCurrentThemeCommand"/>.

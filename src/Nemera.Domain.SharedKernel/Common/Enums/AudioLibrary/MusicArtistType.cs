@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+namespace Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
 
 /// <summary>
 /// Enumeration for the type of a music artist, describing whether the artist is an individual, an ensemble, or something else.

@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Libraries;
+namespace Nemera.Presentation.Web.Common.DTO.Libraries;
 
 /// <summary>
 /// Data transfer object for the choice made for one metadata provider, artwork provider or book reader of a media library.

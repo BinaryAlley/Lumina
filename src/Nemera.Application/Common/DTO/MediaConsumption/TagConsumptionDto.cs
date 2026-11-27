@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DTO.MediaConsumption;
+namespace Nemera.Application.Common.DTO.MediaConsumption;
 
 /// <summary>
 /// Data transfer object for the consumption statistics of a tag, grouped across media kinds.

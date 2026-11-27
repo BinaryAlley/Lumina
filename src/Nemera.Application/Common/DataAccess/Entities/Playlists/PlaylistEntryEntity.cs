@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.Playlists;
+namespace Nemera.Application.Common.DataAccess.Entities.Playlists;
 
 /// <summary>
 /// Repository entity for an ordered entry of a playlist.

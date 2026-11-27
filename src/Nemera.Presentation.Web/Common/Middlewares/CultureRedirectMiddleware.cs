@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Localization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Middlewares;
+namespace Nemera.Presentation.Web.Common.Middlewares;
 
 /// <summary>
 /// Middleware to handle requests lacking a culture prefix in the URL, by redirecting to a default culture.

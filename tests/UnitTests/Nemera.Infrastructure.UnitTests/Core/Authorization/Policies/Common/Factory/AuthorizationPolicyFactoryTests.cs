@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
-using Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
-using Lumina.Infrastructure.Fixtures.Core.Authorization;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
+using Nemera.Infrastructure.Core.Authorization.Policies.Common.Factory;
+using Nemera.Infrastructure.Fixtures.Core.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Authorization.Policies.Common.Factory;
+namespace Nemera.Infrastructure.UnitTests.Core.Authorization.Policies.Common.Factory;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AuthorizationPolicyFactory"/> class.
@@ -48,7 +48,7 @@ public class AuthorizationPolicyFactoryTests
         Action act = () => policyFactory.CreatePolicy<IUnregisteredPolicy>();
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
           policyFactory.CreatePolicy<IUnregisteredPolicy>());
-        Assert.Equal("No service for type 'Lumina.Infrastructure.Fixtures.Core.Authorization.IUnregisteredPolicy' has been registered.",
+        Assert.Equal("No service for type 'Nemera.Infrastructure.Fixtures.Core.Authorization.IUnregisteredPolicy' has been registered.",
             exception.Message);
     }
 

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibraryScan;
+namespace Nemera.Application.Core.MediaLibrary.Management.Commands.CancelLibraryScan;
 
 /// <summary>
 /// Command for canceling the scan of a media library.

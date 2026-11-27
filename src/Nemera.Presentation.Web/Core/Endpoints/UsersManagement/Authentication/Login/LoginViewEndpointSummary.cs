@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Requests.UsersManagement.Authentication;
+using Nemera.Presentation.Web.Common.Requests.UsersManagement.Authentication;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Login;
+namespace Nemera.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Login;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="LoginViewEndpoint"/> endpoint, for OpenAPI.

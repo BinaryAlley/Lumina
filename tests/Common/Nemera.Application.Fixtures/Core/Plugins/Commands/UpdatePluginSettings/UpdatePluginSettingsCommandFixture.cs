@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Plugins.Commands.UpdatePluginSettings;
+using Nemera.Application.Core.Plugins.Commands.UpdatePluginSettings;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Plugins.Commands.UpdatePluginSettings;
+namespace Nemera.Application.Fixtures.Core.Plugins.Commands.UpdatePluginSettings;
 
 /// <summary>
 /// Fixture class for the <see cref="UpdatePluginSettingsCommand"/> class.

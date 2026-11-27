@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooks;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooks;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooks;
+namespace Nemera.Application.Fixtures.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooks;
 
 /// <summary>
 /// Fixture class for the <see cref="GetBooksQuery"/> class.

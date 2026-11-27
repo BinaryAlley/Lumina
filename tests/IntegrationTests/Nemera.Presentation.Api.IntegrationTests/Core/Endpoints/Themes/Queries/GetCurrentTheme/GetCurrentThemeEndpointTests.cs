@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.Themes;
-using Lumina.Presentation.Api.Core.Endpoints.Themes.Queries.GetCurrentTheme;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.Presentation.Api.Core.Endpoints.Themes.Queries.GetCurrentTheme;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -11,16 +11,16 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Queries.GetCurrentTheme;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Queries.GetCurrentTheme;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetCurrentThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetCurrentThemeEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -31,7 +31,7 @@ public class GetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
     /// Initializes a new instance of the <see cref="GetCurrentThemeEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetCurrentThemeEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetCurrentThemeEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -60,7 +60,7 @@ public class GetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
 
         ThemeResponse? theme = await response.Content.ReadFromJsonAsync<ThemeResponse>(_jsonOptions);
         Assert.NotNull(theme);
-        Assert.Equal("lumina-default", theme!.ThemeId);
+        Assert.Equal("nemera-default", theme!.ThemeId);
         Assert.True(theme.IsCurrent);
     }
 

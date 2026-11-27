@@ -1,4 +1,4 @@
-namespace Lumina.Plugins.OpenLibrary.Core.Settings;
+namespace Nemera.Plugins.OpenLibrary.Core.Settings;
 
 /// <summary>
 /// Keys of the settings of the Open Library metadata plugin, shared by the settings schema and the settings loader.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
+namespace Nemera.Plugins.Contracts.Common.Models.DTO.Settings;
 
 /// <summary>
 /// Data transfer object describing a single setting of a plugin, used by the host to render the plugin settings page.

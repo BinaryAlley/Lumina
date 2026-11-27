@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Fixtures.Core.Requests.Themes;
-using Lumina.Contracts.Requests.Themes;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Contracts.Fixtures.Core.Requests.Themes;
+using Nemera.Contracts.Requests.Themes;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -9,15 +9,15 @@ using System.Net.Http.Json;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Themes.Management.SetCurrentTheme;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Themes.Management.SetCurrentTheme;
 
 /// <summary>
 /// Contains security tests for the <see cref="SetCurrentThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class SetCurrentThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class SetCurrentThemeEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly SetCurrentThemeRequestFixture _setCurrentThemeRequestFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -29,12 +29,12 @@ public class SetCurrentThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     /// Initializes a new instance of the <see cref="SetCurrentThemeEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public SetCurrentThemeEndpointTests(LuminaApiFactory apiFactory)
+    public SetCurrentThemeEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
     }
 
     [Fact]

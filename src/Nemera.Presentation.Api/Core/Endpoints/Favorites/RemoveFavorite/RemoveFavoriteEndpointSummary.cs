@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Favorites.RemoveFavorite;
+namespace Nemera.Presentation.Api.Core.Endpoints.Favorites.RemoveFavorite;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="RemoveFavoriteEndpoint"/> API endpoint, for OpenAPI.

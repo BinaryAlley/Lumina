@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+namespace Nemera.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
 
 /// <summary>
 /// Represents a request to draw a random selection of tracks from a media library, an artist or an album.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Scheduling;
+namespace Nemera.Application.Common.Infrastructure.Scheduling;
 
 /// <summary>
 /// Interface for the service that schedules and executes the tasks of scheduled jobs.

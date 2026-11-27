@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Infrastructure.Common.Errors;
-using Lumina.Infrastructure.Common.Models.DTO.Configuration;
-using Lumina.Infrastructure.Common.Validators;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Infrastructure.Common.Errors;
+using Nemera.Infrastructure.Common.Models.DTO.Configuration;
+using Nemera.Infrastructure.Common.Validators;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Common.Validators;
+namespace Nemera.Infrastructure.UnitTests.Common.Validators;
 
 /// <summary>
 /// Contains unit tests for the <see cref="EncryptionSettingsDtoValidator"/> class.

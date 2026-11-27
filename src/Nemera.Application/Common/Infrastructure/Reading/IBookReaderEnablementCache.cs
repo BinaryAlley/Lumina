@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Reading;
+namespace Nemera.Application.Common.Infrastructure.Reading;
 
 /// <summary>
 /// Cache of whether the book reader of a plugin is enabled for a media library. The enablement is read from the database on its first

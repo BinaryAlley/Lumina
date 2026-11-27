@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.Common;
+namespace Nemera.Domain.SharedKernel.Common.Enums.Common;
 
 /// <summary>
 /// Enumeration for the sort order.

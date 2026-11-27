@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
-using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
-using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
+using Nemera.Contracts.Responses.FileSystemManagement.FileSystem;
+using Nemera.Presentation.Api.Common.Routes.FileSystemManagement;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.FileSystem.GetType;
+namespace Nemera.Presentation.Api.Core.Endpoints.FileSystemManagement.FileSystem.GetType;
 
 /// <summary>
 /// API endpoint for the <c>/file-system/get-type</c> route.

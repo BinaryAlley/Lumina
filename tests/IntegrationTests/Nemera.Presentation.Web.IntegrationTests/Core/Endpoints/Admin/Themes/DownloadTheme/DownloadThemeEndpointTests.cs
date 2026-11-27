@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.DownloadTheme;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Themes.DownloadTheme;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -10,22 +10,22 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Themes.DownloadTheme;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Themes.DownloadTheme;
 
 /// <summary>
 /// Contains integration tests for the <see cref="DownloadThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class DownloadThemeEndpointTests : IClassFixture<LuminaWebFactory>
+public class DownloadThemeEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly BlobDataDtoFixture _blobDataDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DownloadThemeEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public DownloadThemeEndpointTests(LuminaWebFactory apiFactory)
+    public DownloadThemeEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

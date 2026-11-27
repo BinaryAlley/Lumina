@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Favorites;
-using Lumina.Domain.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate;
+using Nemera.Application.Common.DataAccess.Entities.Favorites;
+using Nemera.Domain.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Favorites;
+namespace Nemera.Application.Common.Mapping.Favorites;
 
 /// <summary>
 /// Extension methods for converting <see cref="Favorite"/>.

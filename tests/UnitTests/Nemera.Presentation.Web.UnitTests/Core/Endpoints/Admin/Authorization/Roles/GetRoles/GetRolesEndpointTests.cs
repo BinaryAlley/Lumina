@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Authorization;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Authorization.Roles.GetRoles;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Authorization;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Authorization.Roles.GetRoles;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Admin.Authorization.Roles.GetRoles;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Admin.Authorization.Roles.GetRoles;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetRolesEndpoint"/> class.

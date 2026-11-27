@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Repositories.Playlists;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Playlists;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Core.Playlists.Queries.GetPlaylists;
-using Lumina.Application.Fixtures.Common.DTO.Playlists;
-using Lumina.Application.Fixtures.Core.Playlists.Queries.GetPlaylists;
-using Lumina.Contracts.Responses.Playlists;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Application.Common.DataAccess.Repositories.Playlists;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Playlists;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Core.Playlists.Queries.GetPlaylists;
+using Nemera.Application.Fixtures.Common.DTO.Playlists;
+using Nemera.Application.Fixtures.Core.Playlists.Queries.GetPlaylists;
+using Nemera.Contracts.Responses.Playlists;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -16,10 +16,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Playlists.Queries.GetPlaylists;
+namespace Nemera.Application.UnitTests.Core.Playlists.Queries.GetPlaylists;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetPlaylistsQueryHandler"/> class.

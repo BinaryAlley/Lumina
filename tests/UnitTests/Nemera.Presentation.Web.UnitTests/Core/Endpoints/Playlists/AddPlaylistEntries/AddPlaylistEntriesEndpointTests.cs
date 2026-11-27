@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Playlists;
-using Lumina.Presentation.Web.Common.Requests.Playlists;
-using Lumina.Presentation.Web.Core.Endpoints.Playlists.AddPlaylistEntries;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Playlists;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Playlists;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Playlists;
+using Nemera.Presentation.Web.Common.Requests.Playlists;
+using Nemera.Presentation.Web.Core.Endpoints.Playlists.AddPlaylistEntries;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Playlists;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Playlists;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System;
@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Playlists.AddPlaylistEntries;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Playlists.AddPlaylistEntries;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AddPlaylistEntriesEndpoint"/> class.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.UsersManagement.Settings.Queries.GetUserSettings;
+using Nemera.Application.Core.UsersManagement.Settings.Queries.GetUserSettings;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.UsersManagement.Settings.Queries.GetUserSettings;
+namespace Nemera.Application.Fixtures.Core.UsersManagement.Settings.Queries.GetUserSettings;
 
 /// <summary>
 /// Fixture class for the <see cref="GetUserSettingsQuery"/> class.

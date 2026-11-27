@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.DTO.Authentication;
+namespace Nemera.Contracts.DTO.Authentication;
 
 /// <summary>
 /// Data transfer object for an authorization role.

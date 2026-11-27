@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+namespace Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
 
 /// <summary>
 /// Enumeration for the type of the music library item that owns a piece of artwork.

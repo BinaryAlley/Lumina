@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
-using Lumina.Contracts.Requests.Authentication;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Infrastructure.Core.Security;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.Authentication;
+using Nemera.Contracts.Requests.Authentication;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Infrastructure.Core.Security;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -15,18 +15,18 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authentication;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authentication;
 
 /// <summary>
 /// Contains security tests for the <see cref="RegisterEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class RegisterEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
     private readonly PasswordHashService _hashService = new();
     private readonly UserEntityFixture _userEntityFixture = new();
     private readonly RegistrationRequestFixture _registrationRequestFixture = new();
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -35,7 +35,7 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     };
     private readonly string _testUsername;
 
-    public RegisterEndpointTests(LuminaApiFactory apiFactory)
+    public RegisterEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
@@ -223,7 +223,7 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     private async Task<UserEntity> CreateTestUser()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
 
@@ -235,7 +235,7 @@ public class RegisterEndpointTests : IClassFixture<LuminaApiFactory>, IDisposabl
     public void Dispose()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == _testUsername);
         if (user is not null)

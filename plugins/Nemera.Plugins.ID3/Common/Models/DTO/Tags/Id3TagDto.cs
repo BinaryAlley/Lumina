@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Plugins.ID3.Common.Models.DTO.Tags;
+namespace Nemera.Plugins.ID3.Common.Models.DTO.Tags;
 
 /// <summary>
 /// Snapshot of the metadata read from the embedded tags of a single audio file.

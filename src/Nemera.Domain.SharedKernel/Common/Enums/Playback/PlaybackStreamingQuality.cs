@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.Playback;
+namespace Nemera.Domain.SharedKernel.Common.Enums.Playback;
 
 /// <summary>
 /// Enumeration for the quality cap applied to the audio the server normalizes (remuxes or transcodes) for a user.

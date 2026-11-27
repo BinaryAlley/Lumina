@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.Authentication;
+namespace Nemera.Contracts.Responses.Authentication;
 
 /// <summary>
 /// Represents the response model for user authentication.

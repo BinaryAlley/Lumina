@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Primitives;
+using Nemera.Presentation.Web.Common.Enums.Primitives;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Primitives;
+namespace Nemera.Presentation.Web.Common.Primitives;
 
 /// <summary>
 /// Represents an error that can be implicitly converted to a Result.

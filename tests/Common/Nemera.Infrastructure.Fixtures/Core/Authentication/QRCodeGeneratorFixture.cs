@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.Fixtures.Core.Authentication;
+namespace Nemera.Infrastructure.Fixtures.Core.Authentication;
 
 /// <summary>
 /// Test-support class for QR code generation tests.
@@ -32,6 +32,6 @@ public class QRCodeGeneratorFixture
     /// <returns>The formatted otpauth URI.</returns>
     public static string GetExpectedOtpauthUri(string username, string base32Secret)
     {
-        return $"otpauth://totp/Lumina:{Uri.EscapeDataString(username)}?secret={base32Secret}&issuer=Lumina";
+        return $"otpauth://totp/Nemera:{Uri.EscapeDataString(username)}?secret={base32Secret}&issuer=Nemera";
     }
 }

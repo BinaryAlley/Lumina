@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.Infrastructure.Themes;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Presentation.Api.Core.Endpoints.Themes.Management.RestoreTheme;
-using Lumina.Presentation.Api.Fixtures.Core.Endpoints.Themes;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.Infrastructure.Themes;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Presentation.Api.Core.Endpoints.Themes.Management.RestoreTheme;
+using Nemera.Presentation.Api.Fixtures.Core.Endpoints.Themes;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,16 +22,16 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Management.RestoreTheme;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Management.RestoreTheme;
 
 /// <summary>
 /// Contains integration tests for the <see cref="RestoreThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RestoreThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class RestoreThemeEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly TestThemeArchiveFixture _testThemeArchiveFixture = new();
     private readonly List<string> _installedThemeIds = [];
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -44,7 +44,7 @@ public class RestoreThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     /// Initializes a new instance of the <see cref="RestoreThemeEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public RestoreThemeEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public RestoreThemeEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -65,7 +65,7 @@ public class RestoreThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
         await ThemeTestHelpers.WaitForBundledThemeAsync(_apiFactory);
         using (IServiceScope scope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             ThemeEntity? theme = await dbContext.Themes.FirstOrDefaultAsync(candidate => candidate.ThemeId == "editorial-paper");
             Assert.NotNull(theme);
             theme!.IsDeleted = true;
@@ -81,13 +81,13 @@ public class RestoreThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
 
         // The theme is available again and appears in the list.
         using IServiceScope verificationScope = _apiFactory.Services.CreateScope();
-        LuminaDbContext verificationContext = verificationScope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext verificationContext = verificationScope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         ThemeEntity? restoredTheme = await verificationContext.Themes.FirstOrDefaultAsync(candidate => candidate.ThemeId == "editorial-paper");
         Assert.NotNull(restoredTheme);
         Assert.False(restoredTheme!.IsDeleted);
 
         HttpResponseMessage listResponse = await _client.GetAsync("/api/v1/themes");
-        List<Lumina.Contracts.Responses.Themes.ThemeResponse>? themes = await listResponse.Content.ReadFromJsonAsync<List<Lumina.Contracts.Responses.Themes.ThemeResponse>>(_jsonOptions);
+        List<Nemera.Contracts.Responses.Themes.ThemeResponse>? themes = await listResponse.Content.ReadFromJsonAsync<List<Nemera.Contracts.Responses.Themes.ThemeResponse>>(_jsonOptions);
         Assert.NotNull(themes);
         Assert.Contains(themes!, theme => theme.ThemeId == "editorial-paper" && !theme.IsDeleted);
     }
@@ -203,7 +203,7 @@ public class RestoreThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         foreach (string themeId in _installedThemeIds)
         {

@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Models.DTO.Configuration;
+namespace Nemera.Infrastructure.Common.Models.DTO.Configuration;
 
 /// <summary>
 /// Data transfer object for deserializing encryption settings.

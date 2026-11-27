@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Common;
+namespace Nemera.Presentation.Web.Common.DTO.Common;
 
 /// <summary>
 /// Data transfer object for a page of elements together with its pagination metadata.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.UsersManagement;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Tools.Settings.UpdatePlaybackState;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.UsersManagement;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.UsersManagement;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Tools.Settings.UpdatePlaybackState;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.UsersManagement;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Tools.Settings.UpdatePlaybackState;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Tools.Settings.UpdatePlaybackState;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdatePlaybackStateEndpoint"/> class.

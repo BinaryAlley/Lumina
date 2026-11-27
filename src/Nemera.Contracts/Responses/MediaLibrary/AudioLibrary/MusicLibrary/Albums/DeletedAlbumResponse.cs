@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+namespace Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 
 /// <summary>
 /// Represents a music album that the user deleted and can restore.

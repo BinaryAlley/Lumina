@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.ConsumptionActivity;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.ConsumptionActivity;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Authorization.Policies.ConsumptionActivity;
+namespace Nemera.Infrastructure.Core.Authorization.Policies.ConsumptionActivity;
 
 /// <summary>
 /// Authorization policy that checks whether a user can access the consumption activity of a user: admins can access any user's consumption activity,

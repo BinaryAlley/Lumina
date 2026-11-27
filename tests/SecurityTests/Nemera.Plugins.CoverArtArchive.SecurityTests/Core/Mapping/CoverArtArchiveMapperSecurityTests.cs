@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Plugins.CoverArtArchive.Common.Models.Contracts.Responses;
-using Lumina.Plugins.CoverArtArchive.Core.Mapping;
-using Lumina.Plugins.CoverArtArchive.Fixtures.Common.Models.Contracts.Responses;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Plugins.CoverArtArchive.Common.Models.Contracts.Responses;
+using Nemera.Plugins.CoverArtArchive.Core.Mapping;
+using Nemera.Plugins.CoverArtArchive.Fixtures.Common.Models.Contracts.Responses;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.SecurityTests.Core.Mapping;
+namespace Nemera.Plugins.CoverArtArchive.SecurityTests.Core.Mapping;
 
 /// <summary>
 /// Contains security tests for the <see cref="CoverArtArchiveMapper"/> class, exercised through the artwork it emits.

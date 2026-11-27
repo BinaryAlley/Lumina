@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Presentation.Web.Common.Enums.MediaConsumption;
-using Lumina.Presentation.Web.Common.Requests.MediaConsumption;
+using Nemera.Presentation.Web.Common.Enums.MediaConsumption;
+using Nemera.Presentation.Web.Common.Requests.MediaConsumption;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Requests.MediaConsumption;
+namespace Nemera.Presentation.Web.Fixtures.Common.Requests.MediaConsumption;
 
 /// <summary>
 /// Fixture class for the <see cref="MediaPositionRequest"/> record.

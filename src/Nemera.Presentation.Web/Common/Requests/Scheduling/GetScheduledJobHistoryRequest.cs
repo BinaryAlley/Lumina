@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.Scheduling;
+namespace Nemera.Presentation.Web.Common.Requests.Scheduling;
 
 /// <summary>
 /// Request for getting the history of the executions of the tasks of scheduled jobs.

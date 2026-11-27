@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+namespace Nemera.Application.Fixtures.Common.DataAccess.Entities.Plugins;
 
 /// <summary>
 /// Fixture class for the <see cref="LibraryArtworkProviderConfigurationEntity"/> class.

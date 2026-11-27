@@ -5,15 +5,15 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 #endregion
 
-namespace Lumina.Application.Common.Telemetry;
+namespace Nemera.Application.Common.Telemetry;
 
 /// <summary>
 /// Helper that emits the traces, metrics, and structured logs for the execution of application handlers.
 /// </summary>
 internal static class ApplicationHandlerTelemetry
 {
-    private const string HANDLER_DURATION_METRIC_NAME = "lumina.application.handler.duration";
-    private const string HANDLER_INVOCATIONS_METRIC_NAME = "lumina.application.handler.invocations";
+    private const string HANDLER_DURATION_METRIC_NAME = "nemera.application.handler.duration";
+    private const string HANDLER_INVOCATIONS_METRIC_NAME = "nemera.application.handler.invocations";
 
     private static readonly Histogram<double> s_handlerDuration = ApplicationTelemetry.Meter.CreateHistogram<double>(
         name: HANDLER_DURATION_METRIC_NAME,
@@ -32,8 +32,8 @@ internal static class ApplicationHandlerTelemetry
     public static Activity? StartActivity(string handlerName, string handlerType)
     {
         Activity? activity = ApplicationTelemetry.ActivitySource.StartActivity($"Handle {handlerName}", ActivityKind.Internal);
-        activity?.SetTag("lumina.handler.type", handlerType);
-        activity?.SetTag("lumina.handler.name", handlerName);
+        activity?.SetTag("nemera.handler.type", handlerType);
+        activity?.SetTag("nemera.handler.name", handlerName);
         return activity;
     }
 
@@ -100,12 +100,12 @@ internal static class ApplicationHandlerTelemetry
     {
         TagList tags = new()
         {
-            { "lumina.handler.type", handlerType },
-            { "lumina.handler.name", handlerName },
-            { "lumina.outcome", isSuccess ? "success" : "failure" }
+            { "nemera.handler.type", handlerType },
+            { "nemera.handler.name", handlerName },
+            { "nemera.outcome", isSuccess ? "success" : "failure" }
         };
         s_handlerInvocations.Add(1, tags);
         s_handlerDuration.Record(duration.TotalMilliseconds, tags);
-        activity?.SetTag("lumina.outcome", isSuccess ? "success" : "failure");
+        activity?.SetTag("nemera.outcome", isSuccess ? "success" : "failure");
     }
 }

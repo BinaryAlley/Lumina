@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Library.Statistics.DeleteConsumptionRecord;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Library.Statistics.DeleteConsumptionRecord;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -22,19 +22,19 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Library.Statistics.DeleteConsumptionRecord;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Library.Statistics.DeleteConsumptionRecord;
 
 /// <summary>
 /// Contains integration tests for the <see cref="DeleteUserConsumptionRecordEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class DeleteUserConsumptionRecordEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class DeleteUserConsumptionRecordEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private static readonly DateTime s_startedOnUtc = new(2026, 4, 3, 18, 5, 0, DateTimeKind.Utc);
     private static readonly DateTime s_lastActivityOnUtc = new(2026, 4, 3, 18, 40, 0, DateTimeKind.Utc);
 
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -48,7 +48,7 @@ public class DeleteUserConsumptionRecordEndpointTests : IClassFixture<Authentica
     /// Initializes a new instance of the <see cref="DeleteUserConsumptionRecordEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public DeleteUserConsumptionRecordEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public DeleteUserConsumptionRecordEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -193,7 +193,7 @@ public class DeleteUserConsumptionRecordEndpointTests : IClassFixture<Authentica
     private async Task<Guid> SeedLibraryAsync(Guid userId, string title)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.NewGuid();
         dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: title, libraryType: LibraryType.Music, contentLocations: [], shouldTrackConsumptionProgress: true, completionThresholdPercentage: 100));
         await dbContext.SaveChangesAsync();
@@ -211,7 +211,7 @@ public class DeleteUserConsumptionRecordEndpointTests : IClassFixture<Authentica
     private async Task<Guid> SeedConsumptionRecordAsync(Guid userId, Guid libraryId, DateTime startedOnUtc, DateTime lastActivityOnUtc)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid recordId = Guid.NewGuid();
         MediaConsumptionRecordEntity record = _mediaConsumptionRecordEntityFixture.Create(
             id: recordId,
@@ -241,7 +241,7 @@ public class DeleteUserConsumptionRecordEndpointTests : IClassFixture<Authentica
     private async Task<Guid> SeedOtherUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: $"otheruser_{Guid.NewGuid()}", password: "TestPass123!"));
         await dbContext.SaveChangesAsync();
@@ -255,7 +255,7 @@ public class DeleteUserConsumptionRecordEndpointTests : IClassFixture<Authentica
     private Guid GetCurrentUserId()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         UserEntity user = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername);
         return user.Id;
     }
@@ -267,7 +267,7 @@ public class DeleteUserConsumptionRecordEndpointTests : IClassFixture<Authentica
     private async Task AssertConsumptionRecordsAreDeletedAsync(params Guid[] recordIds)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         List<MediaConsumptionRecordEntity> storedRecords = [];
         // The request transaction is committed or rolled back after the response has been sent, so the stored state is read until that completion
         // has run, instead of assuming that it already has.
@@ -290,7 +290,7 @@ public class DeleteUserConsumptionRecordEndpointTests : IClassFixture<Authentica
     private async Task AssertConsumptionRecordsArePreservedAsync(params Guid[] recordIds)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         List<MediaConsumptionRecordEntity> storedRecords = [];
         // The request transaction is committed or rolled back after the response has been sent, so a record that must survive is read until that
         // completion has run, instead of trusting the state observed right after the response.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Core.Plugins;
+using Nemera.Infrastructure.Core.Plugins;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 #endregion
 
-namespace Lumina.Infrastructure.IntegrationTests.Core.Plugins;
+namespace Nemera.Infrastructure.IntegrationTests.Core.Plugins;
 
 /// <summary>
 /// Contains integration tests for the <see cref="PluginLoadContext"/> class.
@@ -34,7 +34,7 @@ public class PluginLoadContextTests
     {
         // Arrange
         using TemporaryPluginDirectory temporaryPluginDirectory = new();
-        string destinationPath = temporaryPluginDirectory.CopyDll(Path.Combine(AppContext.BaseDirectory, "Lumina.TestPlugin.dll"), "PluginLocalDependency.dll");
+        string destinationPath = temporaryPluginDirectory.CopyDll(Path.Combine(AppContext.BaseDirectory, "Nemera.TestPlugin.dll"), "PluginLocalDependency.dll");
         PluginLoadContext sut = new(temporaryPluginDirectory.Path, "test-context");
         MethodInfo loadMethod = typeof(PluginLoadContext).GetMethod("Load", BindingFlags.Instance | BindingFlags.NonPublic)!;
 
@@ -43,7 +43,7 @@ public class PluginLoadContextTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal("Lumina.TestPlugin", result!.GetName().Name);
+        Assert.Equal("Nemera.TestPlugin", result!.GetName().Name);
         Assert.Equal(destinationPath, result.Location);
     }
 
@@ -70,7 +70,7 @@ public class PluginLoadContextTests
 
         public TemporaryPluginDirectory()
         {
-            Path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"lumina-plugin-load-context-{Guid.NewGuid()}");
+            Path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"nemera-plugin-load-context-{Guid.NewGuid()}");
             Directory.CreateDirectory(Path);
         }
 

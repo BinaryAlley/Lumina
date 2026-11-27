@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.Pdf.Common.DependencyInjection;
+using Nemera.Plugins.Contracts.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.Pdf.Common.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Plugins.Pdf.Core;
+namespace Nemera.Plugins.Pdf.Core;
 
 /// <summary>
 /// Plugin that decodes PDF books into a normalized reading document.
@@ -32,7 +32,7 @@ public sealed class PdfPlugin : IPlugin, IPluginServiceRegistrator
     /// <summary>
     /// Gets the author of the plugin.
     /// </summary>
-    public string Author => "Lumina";
+    public string Author => "Nemera";
 
     /// <summary>
     /// Gets the version of the plugin.

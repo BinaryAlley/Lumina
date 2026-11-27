@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibraries;
+using Nemera.Application.Core.MediaLibrary.Management.Commands.ScanLibraries;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.MediaLibrary.Management.Commands.ScanLibraries;
+namespace Nemera.Application.Fixtures.Core.MediaLibrary.Management.Commands.ScanLibraries;
 
 /// <summary>
 /// Fixture class for the <see cref="ScanLibrariesCommand"/> class.

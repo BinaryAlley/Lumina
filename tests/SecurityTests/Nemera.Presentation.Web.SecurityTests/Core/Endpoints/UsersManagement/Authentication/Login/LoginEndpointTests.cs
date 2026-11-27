@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Requests.UsersManagement;
-using Lumina.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Login;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Requests.UsersManagement;
+using Nemera.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Login;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
@@ -13,15 +13,15 @@ using System.Net.Http.Json;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.Login;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.Login;
 
 /// <summary>
 /// Contains security tests for the <see cref="LoginEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class LoginEndpointTests : IClassFixture<LuminaWebFactory>
+public class LoginEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly LoginRequestFixture _loginRequestFixture = new();
     private readonly ProblemDetailsDtoFixture _problemDetailsDtoFixture = new();
 
@@ -29,7 +29,7 @@ public class LoginEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="LoginEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public LoginEndpointTests(LuminaWebFactory apiFactory)
+    public LoginEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -102,7 +102,7 @@ public class LoginEndpointTests : IClassFixture<LuminaWebFactory>
 
         // Assert
         response.EnsureSuccessStatusCode();
-        string authCookie = response.Headers.GetValues("Set-Cookie").First(cookie => cookie.StartsWith(".Lumina.Auth", StringComparison.Ordinal));
+        string authCookie = response.Headers.GetValues("Set-Cookie").First(cookie => cookie.StartsWith(".Nemera.Auth", StringComparison.Ordinal));
         Assert.Contains("httponly", authCookie, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("secure", authCookie, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("samesite=strict", authCookie, StringComparison.OrdinalIgnoreCase);

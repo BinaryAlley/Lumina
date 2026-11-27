@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Primitives;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using System;
@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Themes;
+namespace Nemera.Presentation.Web.Core.Themes;
 
 /// <summary>
 /// Renders the themed shell of a page, wrapping the page section in the layout and navigation templates of the active theme.
@@ -53,7 +53,7 @@ public class ThemeLayoutRenderer
         _navBuilder = navBuilder;
         _audioPlayerRenderer = audioPlayerRenderer;
         _httpContextAccessor = httpContextAccessor;
-        _layoutLocalizer = stringLocalizerFactory.Create("Lumina.Presentation.Web.Views.Shared._Layout", "Lumina.Presentation.Web");
+        _layoutLocalizer = stringLocalizerFactory.Create("Nemera.Presentation.Web.Views.Shared._Layout", "Nemera.Presentation.Web");
     }
 
     /// <summary>

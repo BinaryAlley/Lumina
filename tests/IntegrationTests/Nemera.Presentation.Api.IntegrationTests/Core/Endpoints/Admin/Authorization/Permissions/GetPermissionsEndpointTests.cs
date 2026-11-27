@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Responses.Authorization;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Responses.Authorization;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,16 +19,16 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Admin.Authorization.Permissions;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Admin.Authorization.Permissions;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetPermissionsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -39,7 +39,7 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     /// Initializes a new instance of the <see cref="GetPermissionsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetPermissionsEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetPermissionsEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -120,7 +120,7 @@ public class GetPermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiF
         await _apiFactory.RemoveTestUserAsync();
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         // Clear junction tables first.
         await dbContext.Set<RolePermissionEntity>().ExecuteDeleteAsync();

@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.Http;
+namespace Nemera.Presentation.Web.Common.Http;
 
 /// <summary>
 /// Constants shared by HttpContext across a HTTP request (avoid magic strings).

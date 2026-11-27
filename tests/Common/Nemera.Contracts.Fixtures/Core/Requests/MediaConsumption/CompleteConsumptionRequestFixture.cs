@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Requests.MediaConsumption;
+using Nemera.Contracts.Requests.MediaConsumption;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Requests.MediaConsumption;
+namespace Nemera.Contracts.Fixtures.Core.Requests.MediaConsumption;
 
 /// <summary>
 /// Fixture class for the <see cref="CompleteConsumptionRequest"/> record.

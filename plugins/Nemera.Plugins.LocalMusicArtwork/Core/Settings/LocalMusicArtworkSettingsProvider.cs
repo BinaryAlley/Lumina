@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.LocalMusicArtwork.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.LocalMusicArtwork.Common.Models.DTO.Settings;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.LocalMusicArtwork.Core.Settings;
+namespace Nemera.Plugins.LocalMusicArtwork.Core.Settings;
 
 /// <summary>
 /// Provides the runtime settings of the local music artwork plugin, overlaying the settings persisted by the host over the configured defaults.

@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 #endregion
 
-namespace Lumina.Application.Core.Plugins.Queries.GetPluginSettings;
+namespace Nemera.Application.Core.Plugins.Queries.GetPluginSettings;
 
 /// <summary>
 /// Query for getting the settings of a plugin and their schema.

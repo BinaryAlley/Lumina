@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Application.Common.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+namespace Nemera.Application.Common.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 
 /// <summary>
 /// Lightweight read model of a book, containing only the fields needed to display the book in a card-based grid or a list.

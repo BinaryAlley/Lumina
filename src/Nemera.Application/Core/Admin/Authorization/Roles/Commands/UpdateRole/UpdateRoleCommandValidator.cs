@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
 using System;
 #endregion
 
-namespace Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
+namespace Nemera.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="UpdateRoleCommand"/>.

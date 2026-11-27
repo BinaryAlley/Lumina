@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Enums.AudioLibrary;
+namespace Nemera.Presentation.Web.Common.Enums.AudioLibrary;
 
 /// <summary>
 /// Enumeration for the direction in which each channel of the VU meter of the audio player grows.

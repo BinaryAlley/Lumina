@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.DeletedBooks;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.DeletedBooks;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="DeletedBooksViewEndpoint"/> endpoint, for OpenAPI.

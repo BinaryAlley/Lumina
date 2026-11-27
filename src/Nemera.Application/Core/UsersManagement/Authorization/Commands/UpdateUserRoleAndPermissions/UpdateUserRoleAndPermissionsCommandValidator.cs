@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
 using System;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
+namespace Nemera.Application.Core.UsersManagement.Authorization.Commands.UpdateUserRoleAndPermissions;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="UpdateUserRoleAndPermissionsCommand"/>.

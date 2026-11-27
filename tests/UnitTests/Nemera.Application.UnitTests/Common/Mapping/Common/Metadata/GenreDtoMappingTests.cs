@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.Common.Metadata;
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.Fixtures.Core.DTO.Common;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Common.ValueObjects.Metadata;
+using Nemera.Application.Common.Mapping.Common.Metadata;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.Fixtures.Core.DTO.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.Common.Metadata;
+namespace Nemera.Application.UnitTests.Common.Mapping.Common.Metadata;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GenreDtoMapping"/> class.

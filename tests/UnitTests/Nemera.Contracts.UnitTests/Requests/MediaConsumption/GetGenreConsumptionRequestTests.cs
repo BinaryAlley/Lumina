@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Fixtures.Core.Requests.MediaConsumption;
-using Lumina.Contracts.Requests.MediaConsumption;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaConsumption;
+using Nemera.Contracts.Requests.MediaConsumption;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 #endregion
 
-namespace Lumina.Contracts.UnitTests.Requests.MediaConsumption;
+namespace Nemera.Contracts.UnitTests.Requests.MediaConsumption;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetGenreConsumptionRequest"/> record.

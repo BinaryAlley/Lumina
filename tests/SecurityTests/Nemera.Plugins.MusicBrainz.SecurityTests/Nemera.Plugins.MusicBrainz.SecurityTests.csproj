@@ -38,10 +38,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\plugins\Lumina.Plugins.MusicBrainz\Lumina.Plugins.MusicBrainz.csproj" />
-        <ProjectReference Include="..\..\..\src\Lumina.Plugins.Contracts\Lumina.Plugins.Contracts.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Plugins.MusicBrainz.Fixtures\Lumina.Plugins.MusicBrainz.Fixtures.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Contracts.Fixtures\Lumina.Contracts.Fixtures.csproj" />
+        <ProjectReference Include="..\..\..\plugins\Nemera.Plugins.MusicBrainz\Nemera.Plugins.MusicBrainz.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Plugins.Contracts\Nemera.Plugins.Contracts.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Plugins.MusicBrainz.Fixtures\Nemera.Plugins.MusicBrainz.Fixtures.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Contracts.Fixtures\Nemera.Contracts.Fixtures.csproj" />
     </ItemGroup>
 
 </Project>

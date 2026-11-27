@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Domain.Common.Events;
+namespace Nemera.Domain.Common.Events;
 
 /// <summary>
 /// Publishes domain events to all handlers registered for the event type.

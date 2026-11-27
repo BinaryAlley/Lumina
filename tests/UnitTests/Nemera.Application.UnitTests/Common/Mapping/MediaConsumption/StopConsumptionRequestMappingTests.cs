@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.MediaConsumption;
-using Lumina.Application.Core.MediaConsumption.Commands.StopConsumption;
-using Lumina.Contracts.Fixtures.Core.Requests.MediaConsumption;
-using Lumina.Contracts.Requests.MediaConsumption;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Application.Common.Mapping.MediaConsumption;
+using Nemera.Application.Core.MediaConsumption.Commands.StopConsumption;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaConsumption;
+using Nemera.Contracts.Requests.MediaConsumption;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.MediaConsumption;
+namespace Nemera.Application.UnitTests.Common.Mapping.MediaConsumption;
 
 /// <summary>
 /// Contains unit tests for the <see cref="StopConsumptionRequestMapping"/> class.

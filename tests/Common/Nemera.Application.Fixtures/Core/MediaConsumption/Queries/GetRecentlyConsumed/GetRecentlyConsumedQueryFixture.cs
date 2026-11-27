@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Core.MediaConsumption.Queries.GetRecentlyConsumed;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Core.MediaConsumption.Queries.GetRecentlyConsumed;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,7 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.MediaConsumption.Queries.GetRecentlyConsumed;
+namespace Nemera.Application.Fixtures.Core.MediaConsumption.Queries.GetRecentlyConsumed;
 
 /// <summary>
 /// Fixture class for the <see cref="GetRecentlyConsumedQuery"/> record.

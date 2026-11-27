@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.LocalMusicArtwork.Common.Models.DTO.Settings;
-using Lumina.Plugins.LocalMusicArtwork.Core;
-using Lumina.Plugins.LocalMusicArtwork.Core.Settings;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.LocalMusicArtwork.Common.Models.DTO.Settings;
+using Nemera.Plugins.LocalMusicArtwork.Core;
+using Nemera.Plugins.LocalMusicArtwork.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 #endregion
 
-namespace Lumina.Plugins.LocalMusicArtwork.Common.DependencyInjection;
+namespace Nemera.Plugins.LocalMusicArtwork.Common.DependencyInjection;
 
 /// <summary>
 /// Utility class for registering the services of the local music artwork providers into the Dependency Injection container.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.Scheduling;
+namespace Nemera.Contracts.Responses.Scheduling;
 
 /// <summary>
 /// Represents the display preferences of the scheduler page of a user.

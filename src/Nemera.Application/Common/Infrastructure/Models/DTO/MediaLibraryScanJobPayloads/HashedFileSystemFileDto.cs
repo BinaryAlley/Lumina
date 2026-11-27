@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
+namespace Nemera.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
 
 /// <summary>
 /// Represents an item for the payload of the file hashing media library scan job.

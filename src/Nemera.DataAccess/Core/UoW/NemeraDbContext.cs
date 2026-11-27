@@ -1,30 +1,30 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.DataAccess.Entities.Playlists;
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Common.ValueGeneration;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Common.DataAccess.Entities.Playlists;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Common.ValueGeneration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 #endregion
 
-namespace Lumina.DataAccess.Core.UoW;
+namespace Nemera.DataAccess.Core.UoW;
 
 /// <summary>
-/// DbContext for the Lumina application.
+/// DbContext for the Nemera application.
 /// </summary>
-/// <remarks>To add a new migration: add-migration InitialMigration -p Lumina.DataAccess -s Lumina.Presentation.Api -o Common\Migrations</remarks>
-/// <remarks>To update the database: update-database -p Lumina.DataAccess -s Lumina.Presentation.Api</remarks>
-public class LuminaDbContext : DbContext
+/// <remarks>To add a new migration: add-migration InitialMigration -p Nemera.DataAccess -s Nemera.Presentation.Api -o Common\Migrations</remarks>
+/// <remarks>To update the database: update-database -p Nemera.DataAccess -s Nemera.Presentation.Api</remarks>
+public class NemeraDbContext : DbContext
 {
     /// <summary>
     /// Gets or sets the books stored in the database.
@@ -203,10 +203,10 @@ public class LuminaDbContext : DbContext
     internal bool IsInitializationSave { get; set; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="LuminaDbContext"/> class.
+    /// Initializes a new instance of the <see cref="NemeraDbContext"/> class.
     /// </summary>
     /// <param name="options">The options for configuring the database context.</param>
-    public LuminaDbContext(DbContextOptions<LuminaDbContext> options) : base(options)
+    public NemeraDbContext(DbContextOptions<NemeraDbContext> options) : base(options)
     {
     }
 
@@ -217,7 +217,7 @@ public class LuminaDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Find all the entity configurations in the assembly and apply them.
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(LuminaDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(NemeraDbContext).Assembly);
 
         // The relational provider seeds its Guid value generators from Guid.NewGuid, so replace them with a time ordered generator for every
         // identifier that the persistence layer assigns itself. This covers real keys, such as PermissionEntity.Id, and the shadow keys of

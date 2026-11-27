@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.Scheduling;
+namespace Nemera.Contracts.Requests.Scheduling;
 
 /// <summary>
 /// Represents a request to fire the task of a scheduled job once, without affecting its execution cycle.

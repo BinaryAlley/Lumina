@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
 using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Scheduling.Execution.TaskExecutors;
+namespace Nemera.Infrastructure.Core.Scheduling.Execution.TaskExecutors;
 
 /// <summary>
 /// Task executor that cleans the technical data that is no longer valid.

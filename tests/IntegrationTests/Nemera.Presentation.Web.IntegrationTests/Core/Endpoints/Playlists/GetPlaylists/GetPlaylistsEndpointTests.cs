@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Playlists;
-using Lumina.Presentation.Web.Common.Enums.Playlists;
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Core.Endpoints.Playlists.GetPlaylists;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Playlists;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Playlists;
+using Nemera.Presentation.Web.Common.Enums.Playlists;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Core.Endpoints.Playlists.GetPlaylists;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Playlists;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -18,17 +18,17 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Playlists.GetPlaylists;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Playlists.GetPlaylists;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetPlaylistsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetPlaylistsEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class GetPlaylistsEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string UPSTREAM_ENDPOINT = "users/me/playlists";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly PlaylistSummaryDtoFixture _playlistSummaryDtoFixture = new();
     private readonly ProblemDetailsDtoFixture _problemDetailsDtoFixture = new();
 
@@ -36,7 +36,7 @@ public class GetPlaylistsEndpointTests : IClassFixture<LuminaWebFactory>, IDispo
     /// Initializes a new instance of the <see cref="GetPlaylistsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetPlaylistsEndpointTests(LuminaWebFactory apiFactory)
+    public GetPlaylistsEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -123,7 +123,7 @@ public class GetPlaylistsEndpointTests : IClassFixture<LuminaWebFactory>, IDispo
         Assert.False(json.RootElement.GetProperty("success").GetBoolean());
         Assert.False(json.RootElement.TryGetProperty("data", out _));
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     [Fact]

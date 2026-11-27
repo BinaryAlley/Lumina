@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.Common;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.DTO.Common;
+namespace Nemera.Contracts.Fixtures.Core.DTO.Common;
 
 /// <summary>
 /// Fixture class for the <see cref="MoodDto"/> record.

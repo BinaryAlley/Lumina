@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
-using Lumina.Contracts.Requests.Authentication;
-using Lumina.Contracts.Responses.Authentication;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Infrastructure.Core.Security;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.Authentication;
+using Nemera.Contracts.Requests.Authentication;
+using Nemera.Contracts.Responses.Authentication;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Infrastructure.Core.Security;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,15 +17,15 @@ using System.Net.Http.Json;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authentication;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authentication;
 
 /// <summary>
 /// Contains security tests for the <see cref="ChangePasswordEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class ChangePasswordEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly PasswordHashService _hashService = new();
     private readonly UserEntityFixture _userEntityFixture = new();
@@ -41,7 +41,7 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     /// Initializes a new instance of the <see cref="LoginEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public ChangePasswordEndpointTests(LuminaApiFactory apiFactory)
+    public ChangePasswordEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
@@ -129,7 +129,7 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
         Assert.DoesNotContain("SqliteException", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         UserEntity? storedUser = await dbContext.Users.FirstOrDefaultAsync(candidate => candidate.Id == user.Id);
         Assert.NotNull(storedUser);
         Assert.Equal(originalPasswordHash, storedUser!.Password);
@@ -156,7 +156,7 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     private async Task<UserEntity> CreateAndAuthenticateUser()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         // Create test user.
         UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
@@ -188,7 +188,7 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDis
     public void Dispose()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == _testUsername);
         if (user is not null)

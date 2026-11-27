@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 #endregion
 
-namespace Lumina.Plugins.LocalMusicArtwork.Fixtures.Core;
+namespace Nemera.Plugins.LocalMusicArtwork.Fixtures.Core;
 
 /// <summary>
 /// Builds minimal, structurally valid WAV files used as test input for the artwork scanning and embedded cover extraction tests.

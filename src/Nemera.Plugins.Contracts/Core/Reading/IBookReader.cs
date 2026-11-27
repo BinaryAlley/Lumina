@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.Contracts.Core.Reading;
+namespace Nemera.Plugins.Contracts.Core.Reading;
 
 /// <summary>
 /// Contract for a plugin that decodes a book format into a normalized reading document.

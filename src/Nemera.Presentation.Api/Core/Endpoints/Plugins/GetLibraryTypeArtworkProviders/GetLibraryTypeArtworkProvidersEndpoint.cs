@@ -1,20 +1,20 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.Plugins;
-using Lumina.Application.Core.Plugins.Queries.GetLibraryTypeArtworkProviders;
-using Lumina.Contracts.Requests.Plugins;
-using Lumina.Contracts.Responses.Plugins;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.Library.Management;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.Plugins;
+using Nemera.Application.Core.Plugins.Queries.GetLibraryTypeArtworkProviders;
+using Nemera.Contracts.Requests.Plugins;
+using Nemera.Contracts.Responses.Plugins;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.Library.Management;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Plugins.GetLibraryTypeArtworkProviders;
+namespace Nemera.Presentation.Api.Core.Endpoints.Plugins.GetLibraryTypeArtworkProviders;
 
 /// <summary>
 /// API endpoint for the <c>/libraries/artwork-providers/{libraryType}</c> route.

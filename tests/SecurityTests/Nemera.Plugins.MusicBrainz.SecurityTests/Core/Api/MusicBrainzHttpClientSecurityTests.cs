@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.MusicBrainz.Core;
-using Lumina.Plugins.MusicBrainz.Core.Api;
-using Lumina.Plugins.MusicBrainz.Core.Settings;
-using Lumina.Plugins.MusicBrainz.Fixtures.Common.Models.DTO.Settings;
+using Nemera.Plugins.MusicBrainz.Core;
+using Nemera.Plugins.MusicBrainz.Core.Api;
+using Nemera.Plugins.MusicBrainz.Core.Settings;
+using Nemera.Plugins.MusicBrainz.Fixtures.Common.Models.DTO.Settings;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.SecurityTests.Core.Api;
+namespace Nemera.Plugins.MusicBrainz.SecurityTests.Core.Api;
 
 /// <summary>
 /// Contains security tests for the <see cref="MusicBrainzHttpClient"/> class.
@@ -75,7 +75,7 @@ public class MusicBrainzHttpClientSecurityTests
     {
         MusicBrainzSettingsProvider settingsProvider = new(null, MusicBrainzPlugin.s_pluginId, _musicBrainzSettingsDtoFixture.Create(
             baseUrl: "http://musicbrainz.example/ws/2/",
-            userAgent: "Lumina-Test/1.0",
+            userAgent: "Nemera-Test/1.0",
             includeContactEmail: false,
             searchResultLimit: 10,
             releaseLookupLimit: 25,

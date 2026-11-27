@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.Playback;
+namespace Nemera.Domain.SharedKernel.Common.Enums.Playback;
 
 /// <summary>
 /// Enumeration for the direction in which each channel of the VU meter of the audio player grows.

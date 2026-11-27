@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.Scheduling;
+using Nemera.Contracts.Responses.Scheduling;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Scheduling.Notifications;
+namespace Nemera.Infrastructure.Core.Scheduling.Notifications;
 
 /// <summary>
 /// Interface for the SignalR client of the scheduled jobs hub.

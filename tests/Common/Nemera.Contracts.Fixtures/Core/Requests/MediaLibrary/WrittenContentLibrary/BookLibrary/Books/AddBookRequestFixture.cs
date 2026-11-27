@@ -1,13 +1,13 @@
 ﻿#region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaContributors;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Contracts.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -15,7 +15,7 @@ using System.IO;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
+namespace Nemera.Contracts.Fixtures.Core.Requests.MediaLibrary.WrittenContentLibrary.BookLibrary.Books;
 
 /// <summary>
 /// Fixture class for the <see cref="AddBookRequest"/> class.
@@ -121,7 +121,7 @@ public class AddBookRequestFixture
                 default!,
                 default!
             ))
-            .RuleFor(x => x.Path, f => path ?? Path.Combine(Path.GetTempPath(), "lumina-books", f.System.FileName()))
+            .RuleFor(x => x.Path, f => path ?? Path.Combine(Path.GetTempPath(), "nemera-books", f.System.FileName()))
             .RuleFor(x => x.Metadata, metadata ?? _writtenContentMetadataDtoFixture.Create())
             .RuleFor(x => x.Format, f => format ?? (includeFormat ? f.PickRandom<BookFormat>() : null))
             .RuleFor(x => x.Edition, f => edition ?? (includeEdition ? f.Random.String2(f.Random.Number(1, 50)) : null))

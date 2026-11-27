@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Playlists.Commands.RemovePlaylistEntry;
-using Lumina.Application.Fixtures.Core.Playlists.Commands.RemovePlaylistEntry;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Core.Playlists.Commands.RemovePlaylistEntry;
+using Nemera.Application.Fixtures.Core.Playlists.Commands.RemovePlaylistEntry;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Playlists.Commands.RemovePlaylistEntry;
+namespace Nemera.Application.UnitTests.Core.Playlists.Commands.RemovePlaylistEntry;
 
 /// <summary>
 /// Contains unit tests for the <see cref="RemovePlaylistEntryCommandValidator"/> class.

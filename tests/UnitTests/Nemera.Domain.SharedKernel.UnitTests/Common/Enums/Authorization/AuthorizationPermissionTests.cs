@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.UnitTests.Common.Enums.Authorization;
+namespace Nemera.Domain.SharedKernel.UnitTests.Common.Enums.Authorization;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AuthorizationPermission"/> enumeration.

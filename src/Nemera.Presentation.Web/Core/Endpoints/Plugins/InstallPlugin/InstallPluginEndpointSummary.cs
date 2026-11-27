@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Common;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Plugins.InstallPlugin;
+namespace Nemera.Presentation.Web.Core.Endpoints.Plugins.InstallPlugin;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="InstallPluginEndpoint"/> endpoint, for OpenAPI.

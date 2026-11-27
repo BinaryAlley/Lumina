@@ -1,23 +1,23 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Common;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.DataAccess.Common.Interceptors;
-using Lumina.DataAccess.Core.Repositories.MusicLibrary;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Common;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.DataAccess.Common.Interceptors;
+using Nemera.DataAccess.Core.Repositories.MusicLibrary;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -29,7 +29,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.MusicLibrary;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.MusicLibrary;
 
 /// <summary>
 /// Contains integration tests for the <see cref="TrackRepository"/> class, exercising it against a real SQLite database.
@@ -64,9 +64,9 @@ public class TrackRepositoryTests
     public async Task InsertAsync_WhenCalledWithAValidTrack_ShouldPersistTheTrackAndItsChildren()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-insert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-insert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         TrackRepository sut = CreateTrackRepository(context);
 
@@ -113,9 +113,9 @@ public class TrackRepositoryTests
     public async Task InsertAsync_WhenAnotherTrackOfTheSameLibraryHasTheSamePath_ShouldReturnTrackAlreadyExists()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-insert-conflict-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-insert-conflict-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         TrackRepository sut = CreateTrackRepository(context);
 
@@ -139,9 +139,9 @@ public class TrackRepositoryTests
     public async Task InsertAsync_WhenAnotherLibraryHasATrackWithTheSamePath_ShouldPersistTheTrack()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-insert-otherlibrary-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-insert-otherlibrary-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         TrackRepository sut = CreateTrackRepository(context);
 
@@ -171,9 +171,9 @@ public class TrackRepositoryTests
     public async Task GetExistingPathsAsync_WhenCalled_ShouldReturnOnlyThePathsOfTheLibraryCaseSensitively()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-existingpaths-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-existingpaths-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         TrackRepository sut = CreateTrackRepository(context);
 
@@ -204,9 +204,9 @@ public class TrackRepositoryTests
     {
         // Arrange
         // A scan of a very large library stages more paths than SQLite accepts as the parameters of one statement, which used to fail the whole scan.
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-existingpaths-large-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-existingpaths-large-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         TrackRepository sut = CreateTrackRepository(context);
 
@@ -231,11 +231,11 @@ public class TrackRepositoryTests
     public async Task UpdateAsync_WhenNothingChanged_ShouldNotChangeAnyAuditColumn()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-update-noop-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-update-noop-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
@@ -280,11 +280,11 @@ public class TrackRepositoryTests
     public async Task UpdateAsync_WhenOnlyTheMetadataChanged_ShouldStampTheTrackAndKeepTheChildRowsUntouched()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-update-metadata-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-update-metadata-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
@@ -324,11 +324,11 @@ public class TrackRepositoryTests
     public async Task UpdateAsync_WhenAContributorIsRemoved_ShouldDeleteOnlyThatParticipationAndKeepTheOtherIdentity()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-update-removecontributor-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-update-removecontributor-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
@@ -365,11 +365,11 @@ public class TrackRepositoryTests
     public async Task UpdateAsync_WhenAContributorIsAdded_ShouldInsertOnlyTheNewParticipationAndKeepTheExistingIdentity()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-update-addcontributor-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-update-addcontributor-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
@@ -407,11 +407,11 @@ public class TrackRepositoryTests
     public async Task UpdateAsync_WhenDataContainsExistingTagAndGenreNames_ShouldReuseTheStoredTagAndGenreEntities()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-update-tags-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-update-tags-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
@@ -449,11 +449,11 @@ public class TrackRepositoryTests
     public async Task UpdateAsync_WhenOwnedAudioCollectionsChange_ShouldReconcileRatingsMoodsAndIsrcs()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-update-owned-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-update-owned-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         TrackRepository sut = CreateTrackRepository(context);
 
         Guid libraryId = Guid.NewGuid();
@@ -510,9 +510,9 @@ public class TrackRepositoryTests
     public async Task GetByIdAsync_WhenTrackExists_ShouldIncludeTheNavigationProperties()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyid-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-getbyid-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         TrackRepository sut = CreateTrackRepository(context);
 
@@ -551,9 +551,9 @@ public class TrackRepositoryTests
     public async Task GetByIdAsync_WhenEntitiesShouldNotBeTracked_ShouldReturnAnUntrackedTrack()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyid-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-getbyid-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         TrackRepository sut = CreateTrackRepository(context);
 
@@ -578,9 +578,9 @@ public class TrackRepositoryTests
     public async Task GetByAlbumIdAsync_WhenCalled_ShouldReturnTheAlbumTracksInOrderWithTheirCollections()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyalbum-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-getbyalbum-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         TrackRepository sut = CreateTrackRepository(context);
 
@@ -632,9 +632,9 @@ public class TrackRepositoryTests
     public async Task GetTracksLiteByAlbumIdAsync_WhenPaginationDataIsNull_ShouldReturnAllTracksOfTheAlbum()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-lite-null-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-lite-null-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         TrackRepository sut = CreateTrackRepository(context);
 
@@ -681,9 +681,9 @@ public class TrackRepositoryTests
     public async Task GetTracksLiteByAlbumIdAsync_WhenATrackHasNoDiscNumber_ShouldTreatItAsTheFirstDisc()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-lite-nodisc-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-lite-nodisc-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         TrackRepository sut = CreateTrackRepository(context);
 
@@ -713,9 +713,9 @@ public class TrackRepositoryTests
         int requestedPage, int perPage, int expectedCurrentPage, int expectedRowCount)
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-lite-page-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-lite-page-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         TrackRepository sut = CreateTrackRepository(context);
 
@@ -758,9 +758,9 @@ public class TrackRepositoryTests
     public async Task GetByAlbumIdAsync_WhenATrackHasNoDiscNumber_ShouldTreatItAsTheFirstDisc()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-nodisc-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-nodisc-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         TrackRepository sut = CreateTrackRepository(context);
 
@@ -786,9 +786,9 @@ public class TrackRepositoryTests
     public async Task GetTracksLiteByAlbumIdAsync_WhenCalled_ShouldProjectTheDurationInSeconds()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-lite-duration-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-lite-duration-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         TrackRepository sut = CreateTrackRepository(context);
 
@@ -812,9 +812,9 @@ public class TrackRepositoryTests
     public async Task GetByIdsAsync_WhenIdsIsEmpty_ShouldReturnAnEmptyList()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-getbyids-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -834,9 +834,9 @@ public class TrackRepositoryTests
     public async Task GetByIdsAsync_WhenCalled_ShouldReturnOnlyTheRequestedTracks()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-getbyids-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -862,9 +862,9 @@ public class TrackRepositoryTests
     public async Task GetByIdsAsync_WhenNavigationPropertiesShouldNotBeIncluded_ShouldNotLoadTheNonOwnedNavigationProperties()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-getbyids-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -904,9 +904,9 @@ public class TrackRepositoryTests
     public async Task GetByIdsAsync_WhenNavigationPropertiesShouldBeIncluded_ShouldLoadTheAlbumArtistAndRelatedCollections()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-include-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-getbyids-include-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId, includeMetadata: true);
@@ -948,9 +948,9 @@ public class TrackRepositoryTests
     public async Task GetByIdsAsync_WhenMoreThanFiveHundredIdsAreRequested_ShouldReturnEveryTrack()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-getbyids-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -976,9 +976,9 @@ public class TrackRepositoryTests
     public async Task GetShuffleTracksLiteAsync_WhenCalled_ShouldReturnOnlyTracksOfTheRequestedLibrary()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-library-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-shuffle-library-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1005,9 +1005,9 @@ public class TrackRepositoryTests
     public async Task GetShuffleTracksLiteAsync_WhenArtistIdIsProvided_ShouldReturnOnlyTracksOfThatArtist()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-artist-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-shuffle-artist-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1033,9 +1033,9 @@ public class TrackRepositoryTests
     public async Task GetShuffleTracksLiteAsync_WhenAlbumIdIsProvided_ShouldReturnOnlyTracksOfThatAlbum()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-album-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-shuffle-album-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1060,9 +1060,9 @@ public class TrackRepositoryTests
     public async Task GetShuffleTracksLiteAsync_WhenArtistIdAndAlbumIdAreProvided_ShouldApplyBothFilters()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-bothfilters-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-shuffle-bothfilters-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1090,9 +1090,9 @@ public class TrackRepositoryTests
     public async Task GetShuffleTracksLiteAsync_WhenExcludedTrackIdsAreProvided_ShouldExcludeEveryOneOfThem()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-excluded-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-shuffle-excluded-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1116,9 +1116,9 @@ public class TrackRepositoryTests
     public async Task GetShuffleTracksLiteAsync_WhenCountIsLowerThanTheAvailableTracks_ShouldReturnAtMostCount()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-count-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-shuffle-count-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1139,9 +1139,9 @@ public class TrackRepositoryTests
     public async Task GetShuffleTracksLiteAsync_WhenTheLibraryHasFewerTracksThanCount_ShouldReturnEveryAvailableTrack()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-fewertracks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-shuffle-fewertracks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1162,9 +1162,9 @@ public class TrackRepositoryTests
     public async Task GetShuffleTracksLiteAsync_WhenNothingMatches_ShouldReturnAnEmptyList()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-nomatch-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-shuffle-nomatch-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1185,9 +1185,9 @@ public class TrackRepositoryTests
     public async Task GetShuffleTracksLiteAsync_WhenCalled_ShouldProjectEveryField()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-projection-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-shuffle-projection-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1221,9 +1221,9 @@ public class TrackRepositoryTests
     public async Task GetShuffleTracksLiteAsync_WhenTheAlbumHasACoverArtwork_ShouldProjectItsFileName()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-cover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-shuffle-cover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1246,9 +1246,9 @@ public class TrackRepositoryTests
     public async Task GetShuffleTracksLiteAsync_WhenTheAlbumHasNoArtwork_ShouldProjectANullCoverPath()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-nocover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-shuffle-nocover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1269,9 +1269,9 @@ public class TrackRepositoryTests
     public async Task GetShuffleTracksLiteAsync_WhenTheAlbumOnlyHasANonCoverArtwork_ShouldNotUseItAsTheCover()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-noncover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-shuffle-noncover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1293,9 +1293,9 @@ public class TrackRepositoryTests
     public async Task GetShuffleTracksLiteAsync_WhenOnlyAnotherAlbumHasACover_ShouldNotUseThatCover()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-othercover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-shuffle-othercover-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1318,9 +1318,9 @@ public class TrackRepositoryTests
     public async Task InsertAsync_WhenATrackWithTheSamePathIsSoftDeleted_ShouldReturnTrackAlreadyExists()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-insert-deleted-path-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-insert-deleted-path-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -1344,9 +1344,9 @@ public class TrackRepositoryTests
     public async Task GetExistingPathsAsync_WhenTheOnlyTrackIsSoftDeleted_ShouldStillReportThePath()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-existing-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-existing-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -1368,9 +1368,9 @@ public class TrackRepositoryTests
     public async Task GetByPathAsync_WhenTheTrackIsSoftDeleted_ShouldReturnIt()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbypath-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-getbypath-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -1393,9 +1393,9 @@ public class TrackRepositoryTests
     public async Task GetByIdAsync_WhenTheTrackIsSoftDeleted_ShouldReturnNull()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyid-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-getbyid-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -1419,9 +1419,9 @@ public class TrackRepositoryTests
     public async Task GetByIdAsync_WhenAnAncestorIsSoftDeleted_ShouldReturnNull(bool isAlbumDeleted)
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyid-deleted-ancestor-{isAlbumDeleted}-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-getbyid-deleted-ancestor-{isAlbumDeleted}-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1446,9 +1446,9 @@ public class TrackRepositoryTests
     public async Task GetByAlbumIdAsync_WhenTracksAreSoftDeleted_ShouldExcludeThem()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyalbum-deleted-tracks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-getbyalbum-deleted-tracks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -1471,9 +1471,9 @@ public class TrackRepositoryTests
     public async Task GetByAlbumIdAsync_WhenTheAlbumIsSoftDeleted_ShouldReturnEmpty()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyalbum-deleted-album-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-getbyalbum-deleted-album-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -1495,9 +1495,9 @@ public class TrackRepositoryTests
     public async Task GetByAlbumIdIncludingDeletedAsync_WhenCalled_ShouldReturnEveryTrackOfTheAlbumOrdered()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyalbum-including-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-getbyalbum-including-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -1522,9 +1522,9 @@ public class TrackRepositoryTests
     public async Task GetShuffleTracksLiteAsync_WhenTracksOrAncestorsAreSoftDeleted_ShouldExcludeThem()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-shuffle-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-shuffle-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity visibleArtist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1562,9 +1562,9 @@ public class TrackRepositoryTests
     public async Task GetTrackStreamInfoAsync_WhenTheTrackIsOrHasASoftDeletedAncestor_ShouldReturnNull(bool isTrackDeleted)
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-stream-deleted-{isTrackDeleted}-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-stream-deleted-{isTrackDeleted}-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1591,9 +1591,9 @@ public class TrackRepositoryTests
     public async Task GetPlaybackManifestInfoAsync_WhenTheTrackIsOrHasASoftDeletedAncestor_ShouldReturnNull(bool isTrackDeleted)
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-manifest-deleted-{isTrackDeleted}-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-manifest-deleted-{isTrackDeleted}-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1618,9 +1618,9 @@ public class TrackRepositoryTests
     public async Task GetAccessInfoByIdsAsync_WhenTracksOrAncestorsAreSoftDeleted_ShouldExcludeThem()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-access-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-access-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1652,9 +1652,9 @@ public class TrackRepositoryTests
     public async Task GetByIdsAsync_WhenTracksOrAncestorsAreSoftDeleted_ShouldExcludeThem()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getbyids-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-getbyids-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1685,9 +1685,9 @@ public class TrackRepositoryTests
     public async Task GetTracksNeedingMetadataCountAsync_WhenATrackOrItsAncestorsAreSoftDeleted_ShouldNotCountIt()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-count-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-count-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = await SeedArtistAsync(context, libraryId, "Queen");
@@ -1718,9 +1718,9 @@ public class TrackRepositoryTests
     public async Task SoftDeleteByIdAsync_WhenCalled_ShouldPersistTheDeletionStateAndProviderTime()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-softdelete-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-softdelete-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -1742,9 +1742,9 @@ public class TrackRepositoryTests
     public async Task SoftDeleteByIdAsync_WhenTrackIsAlreadyDeleted_ShouldReturnTrackNotFound()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-softdelete-already-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-softdelete-already-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -1769,9 +1769,9 @@ public class TrackRepositoryTests
     public async Task SoftDeleteByIdAsync_WhenTrackDoesNotExist_ShouldReturnTrackNotFound()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-softdelete-missing-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-softdelete-missing-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
 
         // Act
@@ -1786,9 +1786,9 @@ public class TrackRepositoryTests
     public async Task RestoreSoftDeletedByIdAsync_WhenCalled_ShouldPersistTheClearedDeletionState()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-restore-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-restore-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -1813,9 +1813,9 @@ public class TrackRepositoryTests
     public async Task GetSoftDeletedByLibraryIdAsync_WhenCalled_ShouldReturnOnlyDeletedTracksWithVisibleAncestorsOrdered()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-getdeleted-library-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-getdeleted-library-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         DateTime deletedOnUtc = _mockDateTimeProvider.UtcNow;
@@ -1860,9 +1860,9 @@ public class TrackRepositoryTests
     public async Task UpdateAsync_WhenTheTrackIsSoftDeleted_ShouldReturnTrackNotFound()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-update-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-update-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -1886,9 +1886,9 @@ public class TrackRepositoryTests
     public async Task UpdateAsync_WhenIncomingDataIsMarkedDeleted_ShouldPreserveTheActiveRowsDeletionState()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-trackrepo-update-preserve-deletion-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-trackrepo-update-preserve-deletion-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         TrackRepository sut = CreateTrackRepository(context);
         Guid libraryId = Guid.NewGuid();
         AlbumEntity album = await SeedAlbumAsync(context, libraryId);
@@ -1931,7 +1931,7 @@ public class TrackRepositoryTests
     /// </summary>
     /// <param name="context">The context the repository operates on.</param>
     /// <returns>The created repository.</returns>
-    private TrackRepository CreateTrackRepository(LuminaDbContext context)
+    private TrackRepository CreateTrackRepository(NemeraDbContext context)
     {
         return new TrackRepository(context, _mockDateTimeProvider);
     }
@@ -1941,9 +1941,9 @@ public class TrackRepositoryTests
     /// </summary>
     /// <param name="anchorConnection">The open in-memory SQLite connection that keeps the database alive for the duration of the test.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateContext(SqliteConnection anchorConnection)
+    private static NemeraDbContext CreateContext(SqliteConnection anchorConnection)
     {
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .Options);
         context.Database.EnsureCreated();
@@ -1957,7 +1957,7 @@ public class TrackRepositoryTests
     /// <param name="libraryId">The Id of the library the album belongs to.</param>
     /// <param name="includeMetadata">Whether the album and its artist should carry tags and genres, or empty collections.</param>
     /// <returns>The persisted album.</returns>
-    private async Task<AlbumEntity> SeedAlbumAsync(LuminaDbContext context, Guid libraryId, bool includeMetadata = false)
+    private async Task<AlbumEntity> SeedAlbumAsync(NemeraDbContext context, Guid libraryId, bool includeMetadata = false)
     {
         ArtistEntity? artist = await context.Artists.FirstOrDefaultAsync(existing => existing.LibraryId == libraryId);
         if (artist is null)
@@ -1991,13 +1991,13 @@ public class TrackRepositoryTests
     /// <param name="userId">The Id of the user reported as the current user.</param>
     /// <param name="utcNow">The current UTC time reported by the time provider.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
+    private static NemeraDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
     {
         ICurrentUserService currentUserService = Substitute.For<ICurrentUserService>();
         currentUserService.UserId.Returns(userId);
         IDateTimeProvider dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(utcNow);
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .AddInterceptors(new UpdateAuditableEntitiesInterceptor(currentUserService, dateTimeProvider))
             .Options);
@@ -2011,7 +2011,7 @@ public class TrackRepositoryTests
     /// <param name="context">The context that tracks the stored track.</param>
     /// <param name="trackId">The Id of the track to load.</param>
     /// <returns>The detached copy of the track.</returns>
-    private static async Task<TrackEntity> LoadDetachedTrackAsync(LuminaDbContext context, Guid trackId)
+    private static async Task<TrackEntity> LoadDetachedTrackAsync(NemeraDbContext context, Guid trackId)
     {
         return await context.Tracks
             .AsNoTracking()
@@ -2031,7 +2031,7 @@ public class TrackRepositoryTests
     /// <param name="libraryId">The Id of the library the artist belongs to.</param>
     /// <param name="name">The name of the artist.</param>
     /// <returns>The persisted artist.</returns>
-    private async Task<ArtistEntity> SeedArtistAsync(LuminaDbContext context, Guid libraryId, string name)
+    private async Task<ArtistEntity> SeedArtistAsync(NemeraDbContext context, Guid libraryId, string name)
     {
         ArtistEntity artist = _artistEntityFixture.Create(libraryId: libraryId, name: name, includeAlbums: false, includeContributors: false);
         context.Artists.Add(artist);
@@ -2047,7 +2047,7 @@ public class TrackRepositoryTests
     /// <param name="artistId">The Id of the artist the album belongs to.</param>
     /// <param name="title">The title of the album.</param>
     /// <returns>The persisted album.</returns>
-    private async Task<AlbumEntity> SeedAlbumForArtistAsync(LuminaDbContext context, Guid libraryId, Guid artistId, string title)
+    private async Task<AlbumEntity> SeedAlbumForArtistAsync(NemeraDbContext context, Guid libraryId, Guid artistId, string title)
     {
         AlbumEntity album = _albumEntityFixture.Create(
             artistId: artistId, libraryId: libraryId, title: title, includeTracks: false, includeMetadata: false);
@@ -2064,7 +2064,7 @@ public class TrackRepositoryTests
     /// <param name="libraryId">The Id of the library that owns the tracks.</param>
     /// <param name="count">The number of tracks to seed.</param>
     /// <returns>The persisted tracks.</returns>
-    private async Task<List<TrackEntity>> SeedShuffleTracksAsync(LuminaDbContext context, AlbumEntity album, Guid libraryId, int count)
+    private async Task<List<TrackEntity>> SeedShuffleTracksAsync(NemeraDbContext context, AlbumEntity album, Guid libraryId, int count)
     {
         List<TrackEntity> tracks = [.. Enumerable.Range(0, count).Select(index => _trackEntityFixture.Create(
             albumId: album.Id,
@@ -2084,7 +2084,7 @@ public class TrackRepositoryTests
     /// <param name="albumId">The Id of the album that owns the artwork.</param>
     /// <param name="artworkType">The type of the artwork.</param>
     /// <param name="fileName">The relative file name of the stored artwork.</param>
-    private async Task AddArtworkAsync(LuminaDbContext context, Guid albumId, ArtworkType artworkType, string fileName)
+    private async Task AddArtworkAsync(NemeraDbContext context, Guid albumId, ArtworkType artworkType, string fileName)
     {
         context.MusicArtwork.Add(_musicArtworkEntityFixture.Create(
             ownerType: MusicArtworkOwnerType.Album,

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Favorites;
-using Lumina.Presentation.Web.Core.Endpoints.Favorites.RemoveFavorite;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Enums.Favorites;
+using Nemera.Presentation.Web.Core.Endpoints.Favorites.RemoveFavorite;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -14,23 +14,23 @@ using System.Text;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Favorites.RemoveFavorite;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Favorites.RemoveFavorite;
 
 /// <summary>
 /// Contains security tests for the <see cref="RemoveFavoriteEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RemoveFavoriteEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class RemoveFavoriteEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string ZERO_GUID = "00000000-0000-0000-0000-000000000000";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RemoveFavoriteEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public RemoveFavoriteEndpointTests(LuminaWebFactory apiFactory)
+    public RemoveFavoriteEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -114,7 +114,7 @@ public class RemoveFavoriteEndpointTests : IClassFixture<LuminaWebFactory>, IDis
         Assert.DoesNotContain(Uri.EscapeDataString(payload), string.Join(",", removeEndpoints), StringComparison.Ordinal);
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     [Theory]
@@ -143,7 +143,7 @@ public class RemoveFavoriteEndpointTests : IClassFixture<LuminaWebFactory>, IDis
         Assert.DoesNotContain(Uri.EscapeDataString(payload), string.Join(",", removeEndpoints), StringComparison.Ordinal);
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -167,7 +167,7 @@ public class RemoveFavoriteEndpointTests : IClassFixture<LuminaWebFactory>, IDis
         Assert.Equal([expectedUpstreamEndpoint], GetRemoveEndpointCalls());
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     /// <summary>

@@ -1,8 +1,8 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
+namespace Nemera.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
 
 /// <summary>
 /// Query for retrieving the list of drives.

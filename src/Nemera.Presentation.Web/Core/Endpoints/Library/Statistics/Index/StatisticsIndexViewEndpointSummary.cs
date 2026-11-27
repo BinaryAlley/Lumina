@@ -3,7 +3,7 @@ using FastEndpoints;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.Statistics.Index;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.Statistics.Index;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="StatisticsIndexViewEndpoint"/> endpoint, for OpenAPI.

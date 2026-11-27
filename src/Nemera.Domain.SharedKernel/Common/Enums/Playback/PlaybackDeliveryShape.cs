@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.Playback;
+namespace Nemera.Domain.SharedKernel.Common.Enums.Playback;
 
 /// <summary>
 /// Enumeration for the shapes in which delivered audio is addressed and seeked.

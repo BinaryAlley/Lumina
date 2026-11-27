@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.CoverArtArchive.Core;
-using Lumina.Plugins.CoverArtArchive.Core.Api;
-using Lumina.Plugins.CoverArtArchive.Core.Settings;
-using Lumina.Plugins.CoverArtArchive.Fixtures.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.CoverArtArchive.Core;
+using Nemera.Plugins.CoverArtArchive.Core.Api;
+using Nemera.Plugins.CoverArtArchive.Core.Settings;
+using Nemera.Plugins.CoverArtArchive.Fixtures.Common.Models.DTO.Settings;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.SecurityTests.Core.Api;
+namespace Nemera.Plugins.CoverArtArchive.SecurityTests.Core.Api;
 
 /// <summary>
 /// Contains security tests for the <see cref="CoverArtArchiveHttpClient"/> class, exercised through the requests it sends.
@@ -92,7 +92,7 @@ public class CoverArtArchiveHttpClientSecurityTests
         mockStore.GetSettingsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(
             new Dictionary<string, string> { [CoverArtArchiveSettingsKeys.CONTACT_EMAIL] = maliciousEmail });
         CoverArtArchiveSettingsProvider settingsProvider = new(mockStore, CoverArtArchivePlugin.s_pluginId, _coverArtArchiveSettingsDtoFixture.Create(
-            userAgent: "Lumina-Security/1.0",
+            userAgent: "Nemera-Security/1.0",
             includeContactEmail: false,
             minimumRequestInterval: TimeSpan.Zero));
         CapturingHttpMessageHandler handler = new((request, callIndex) => CreateJsonResponse("""{"images":[]}"""));
@@ -103,7 +103,7 @@ public class CoverArtArchiveHttpClientSecurityTests
 
         // Assert
         HttpRequestMessage request = Assert.Single(handler.Requests);
-        Assert.Equal("Lumina-Security/1.0", request.Headers.UserAgent.ToString());
+        Assert.Equal("Nemera-Security/1.0", request.Headers.UserAgent.ToString());
         Assert.False(request.Headers.Contains("X-Injected"));
     }
 
@@ -115,7 +115,7 @@ public class CoverArtArchiveHttpClientSecurityTests
     private CoverArtArchiveHttpClient CreateClient(HttpMessageHandler handler)
     {
         CoverArtArchiveSettingsProvider settingsProvider = new(null, CoverArtArchivePlugin.s_pluginId, _coverArtArchiveSettingsDtoFixture.Create(
-            userAgent: "Lumina-Security/1.0",
+            userAgent: "Nemera-Security/1.0",
             includeContactEmail: false,
             minimumRequestInterval: TimeSpan.Zero));
         return new CoverArtArchiveHttpClient(new HttpClient(handler), settingsProvider, new CoverArtArchiveRequestThrottle(), new CoverArtArchiveResponseCache());

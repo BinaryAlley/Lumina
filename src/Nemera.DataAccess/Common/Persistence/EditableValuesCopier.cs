@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.DataAccess.Core.UoW;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.DataAccess.Common.Persistence;
+namespace Nemera.DataAccess.Common.Persistence;
 
 /// <summary>
 /// Copies the editable scalar values of a mapped repository entity onto its tracked counterpart, while leaving the primary key and the audit columns under the sole ownership of the persistence medium.
@@ -28,7 +28,7 @@ internal static class EditableValuesCopier
     /// <param name="context">The Entity Framework context that tracks <paramref name="tracked"/>.</param>
     /// <param name="tracked">The tracked entity whose editable values are updated.</param>
     /// <param name="incoming">The mapped entity carrying the desired values.</param>
-    public static void CopyEditableValues<TEntity>(LuminaDbContext context, TEntity tracked, TEntity incoming) where TEntity : class, IAuditableEntity
+    public static void CopyEditableValues<TEntity>(NemeraDbContext context, TEntity tracked, TEntity incoming) where TEntity : class, IAuditableEntity
     {
         EntityEntry<TEntity> trackedEntry = context.Entry(tracked);
         EntityEntry<TEntity> incomingEntry = context.Entry(incoming);

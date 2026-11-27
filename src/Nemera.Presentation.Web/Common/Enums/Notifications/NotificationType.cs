@@ -1,4 +1,4 @@
-﻿namespace Lumina.Presentation.Web.Common.Enums.Notifications;
+﻿namespace Nemera.Presentation.Web.Common.Enums.Notifications;
 
 /// <summary>
 /// Enum for the types of notifications.

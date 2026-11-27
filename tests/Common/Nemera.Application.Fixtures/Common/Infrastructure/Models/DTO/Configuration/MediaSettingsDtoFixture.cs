@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Configuration;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.Infrastructure.Models.DTO.Configuration;
+namespace Nemera.Application.Fixtures.Common.Infrastructure.Models.DTO.Configuration;
 
 /// <summary>
 /// Fixture class for the <see cref="MediaSettingsDto"/> class.

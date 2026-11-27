@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Repositories.Authorization;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Errors;
-using Lumina.DataAccess.Common.Persistence;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Repositories.Authorization;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Errors;
+using Nemera.DataAccess.Common.Persistence;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,22 +16,22 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Authorization;
+namespace Nemera.DataAccess.Core.Repositories.Authorization;
 
 /// <summary>
 /// Repository for authorization roles.
 /// </summary>
 internal sealed class RoleRepository : IRoleRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RoleRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public RoleRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public RoleRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -42,11 +42,11 @@ internal sealed class RoleRepository : IRoleRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(RoleEntity role, CancellationToken cancellationToken)
     {
-        bool doesRoleExist = await _luminaDbContext.Roles.AnyAsync(repositoryRole => repositoryRole.Id == role.Id || repositoryRole.RoleName == role.RoleName, cancellationToken).ConfigureAwait(false);
+        bool doesRoleExist = await _nemeraDbContext.Roles.AnyAsync(repositoryRole => repositoryRole.Id == role.Id || repositoryRole.RoleName == role.RoleName, cancellationToken).ConfigureAwait(false);
         if (doesRoleExist)
             return Errors.Authorization.RoleAlreadyExists;
 
-        _luminaDbContext.Roles.Add(role);
+        _nemeraDbContext.Roles.Add(role);
         return Result.Created;
     }
 
@@ -64,7 +64,7 @@ internal sealed class RoleRepository : IRoleRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a paginated result of <see cref="RoleEntity"/>, or an error.</returns>
     public async Task<Result<PaginatedResultDto<RoleEntity>>> GetAllAsync<TFilter>(PaginationDataDto? paginationData = null, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
     {
-        IQueryable<RoleEntity> query = _luminaDbContext.Roles;
+        IQueryable<RoleEntity> query = _nemeraDbContext.Roles;
         // Apply no-tracking when the caller only reads, so the entities are not tracked by the context.
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
@@ -112,7 +112,7 @@ internal sealed class RoleRepository : IRoleRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="RoleEntity"/> if found, or an error.</returns>
     public async Task<Result<RoleEntity?>> GetByNameAsync(string roleType, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Roles
+        return await _nemeraDbContext.Roles
             .Include(role => role.RolePermissions)
             .ThenInclude(library => library.Permission)
             .AsSplitQuery()
@@ -130,7 +130,7 @@ internal sealed class RoleRepository : IRoleRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="RoleEntity"/> identified by <paramref name="id"/>, or an error.</returns>
     public async Task<Result<RoleEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
-        IQueryable<RoleEntity> query = _luminaDbContext.Roles;
+        IQueryable<RoleEntity> query = _nemeraDbContext.Roles;
         // Apply no-tracking when the caller only reads, so the entities are not tracked by the context.
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
@@ -151,7 +151,7 @@ internal sealed class RoleRepository : IRoleRepository
     public async Task<Result<Updated>> UpdateAsync(RoleEntity data, CancellationToken cancellationToken)
     {
         // Check if a role with the requested Id exists, and retrieve it.
-        RoleEntity? foundRole = await _luminaDbContext.Roles
+        RoleEntity? foundRole = await _nemeraDbContext.Roles
             .Include(role => role.RolePermissions)
             .ThenInclude(rolePermission => rolePermission.Permission)
             .AsSplitQuery()
@@ -160,7 +160,7 @@ internal sealed class RoleRepository : IRoleRepository
             return Errors.Authorization.RoleNotFound;
 
         // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
-        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundRole, data);
+        EditableValuesCopier.CopyEditableValues(_nemeraDbContext, foundRole, data);
 
         // A permission participation is matched by its permission. Matched participations keep their identity and their audit columns, so a permission
         // that is referenced elsewhere is never deleted and re-inserted just because another field of the role was edited.
@@ -189,13 +189,13 @@ internal sealed class RoleRepository : IRoleRepository
     public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         // Check if a role with the requested Id exists, and retrieve it.
-        RoleEntity? foundRole = await _luminaDbContext.Roles
+        RoleEntity? foundRole = await _nemeraDbContext.Roles
             .FirstOrDefaultAsync(role => role.Id == id, cancellationToken).ConfigureAwait(false);
         if (foundRole is null)
             return Errors.Authorization.RoleNotFound;
 
         // Remove the role.
-        _luminaDbContext.Remove(foundRole);
+        _nemeraDbContext.Remove(foundRole);
         return Result.Deleted;
     }
 }

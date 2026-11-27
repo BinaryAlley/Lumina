@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Requests.UsersManagement;
-using Lumina.Presentation.Web.Common.Responses.UsersManagement;
-using Lumina.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
-using Lumina.Presentation.Web.Fixtures.Common.Responses.UsersManagement;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Requests.UsersManagement;
+using Nemera.Presentation.Web.Common.Responses.UsersManagement;
+using Nemera.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
+using Nemera.Presentation.Web.Fixtures.Common.Responses.UsersManagement;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
@@ -16,15 +16,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
 
 /// <summary>
 /// Contains integration tests for the <see cref="ChangePasswordEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class ChangePasswordEndpointTests : IClassFixture<LuminaWebFactory>
+public class ChangePasswordEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly ChangePasswordRequestFixture _changePasswordRequestFixture = new();
     private readonly ChangePasswordResponseFixture _changePasswordResponseFixture = new();
 
@@ -32,7 +32,7 @@ public class ChangePasswordEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="ChangePasswordEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public ChangePasswordEndpointTests(LuminaWebFactory apiFactory)
+    public ChangePasswordEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

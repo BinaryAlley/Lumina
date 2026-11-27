@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+namespace Nemera.Infrastructure.UnitTests.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ReadingContentSanitizer"/> class.
@@ -69,7 +69,7 @@ public class ReadingContentSanitizerTests
     }
 
     [Fact]
-    public void Sanitize_WhenHtmlContainsDataLuminaResourceMarker_ShouldKeepTheMarker()
+    public void Sanitize_WhenHtmlContainsDataNemeraResourceMarker_ShouldKeepTheMarker()
     {
         // Arrange
         string html = $"<img {ReadingContentSanitizer.RESOURCE_ATTRIBUTE}=\"page:1\" alt=\"Page\" />";

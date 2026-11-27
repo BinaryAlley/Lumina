@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Themes;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.GetThemes;
+namespace Nemera.Presentation.Web.Core.Endpoints.Admin.Themes.GetThemes;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetThemesEndpoint"/> endpoint, for OpenAPI.

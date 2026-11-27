@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Responses.Playlists;
+using Nemera.Contracts.Responses.Playlists;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Responses.Playlists;
+namespace Nemera.Contracts.Fixtures.Core.Responses.Playlists;
 
 /// <summary>
 /// Fixture class for the <see cref="PlaylistEntriesAddedResponse"/> record.

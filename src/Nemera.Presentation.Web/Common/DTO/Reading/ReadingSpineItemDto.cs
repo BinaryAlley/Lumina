@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Reading;
+namespace Nemera.Presentation.Web.Common.DTO.Reading;
 
 /// <summary>
 /// Data transfer object for an item of the spine of the reading manifest of a book.

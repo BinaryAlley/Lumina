@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.MediaConsumption;
+using Nemera.Presentation.Web.Common.Enums.MediaConsumption;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.Library.Statistics;
+namespace Nemera.Presentation.Web.Common.Requests.Library.Statistics;
 
 /// <summary>
 /// Represents a request for getting a window of the recently consumed media items of a user.

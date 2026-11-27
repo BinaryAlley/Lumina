@@ -15,7 +15,7 @@
  * (as RIFF defines 8 bit samples), an integer stream of 16, 24 or 32 bits is signed, and a 32 bit IEEE float stream is
  * 'pcm-f32'. A format or a bit depth the player has no codec string for is refused as unsupported.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -72,10 +72,10 @@
     /**
      * Demuxes a WAV (RIFF) stream.
      */
-    class WavDemuxer extends LuminaAudioPlayer.Demuxer {
+    class WavDemuxer extends NemeraAudioPlayer.Demuxer {
         /**
          * Creates an instance of WavDemuxer.
-         * @param {Object} options - The demuxer options, per {@link LuminaAudioPlayer.Demuxer}.
+         * @param {Object} options - The demuxer options, per {@link NemeraAudioPlayer.Demuxer}.
          */
         constructor(options = {}) {
             super(options);
@@ -96,32 +96,32 @@
         /**
          * Reads the RIFF header and walks the chunks to find the fmt chunk and the data chunk.
          * @returns {Promise<void>} A promise resolving when the stream is ready to be read.
-         * @throws {LuminaAudioPlayer.PlayerError} When the bytes are not a WAV stream the player decodes.
+         * @throws {NemeraAudioPlayer.PlayerError} When the bytes are not a WAV stream the player decodes.
          */
         async initializeAsync() {
             if (this.isInitialized())
                 return;
             if (this.destroyed)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The demuxer was destroyed.');
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The demuxer was destroyed.');
             try {
                 const riff = await this.reader.readAsync(0, 12);
-                if (!LuminaAudioPlayer.demuxBytesEqualAscii(riff, 0, 'RIFF') || !LuminaAudioPlayer.demuxBytesEqualAscii(riff, 8, 'WAVE'))
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The bytes are not a WAV stream.', { reason: 'no-riff-magic' });
+                if (!NemeraAudioPlayer.demuxBytesEqualAscii(riff, 0, 'RIFF') || !NemeraAudioPlayer.demuxBytesEqualAscii(riff, 8, 'WAVE'))
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The bytes are not a WAV stream.', { reason: 'no-riff-magic' });
                 const result = await this.readChunksAsync();
                 if (result.formatResult === null)
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The WAV stream carries no format chunk.', { reason: 'no-format-chunk' });
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The WAV stream carries no format chunk.', { reason: 'no-format-chunk' });
                 if (result.formatResult.status === 'invalid')
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The WAV format chunk is too short or malformed to describe the audio.', { reason: 'invalid-format-chunk' });
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The WAV format chunk is too short or malformed to describe the audio.', { reason: 'invalid-format-chunk' });
                 if (result.formatResult.status === 'unsupported')
                     // The chunk is present and well formed, but it names a format or a bit depth the player decodes no PCM
                     // codec string for, which is a different outcome from a chunk that is missing, and is reported as such.
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The WAV stream holds an audio format the player does not decode.', {
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The WAV stream holds an audio format the player does not decode.', {
                         reason: 'unsupported-format',
                         audioFormat: result.formatResult.audioFormat,
                         bitsPerSample: result.formatResult.bitsPerSample
                     });
                 if (result.dataStart === null)
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The WAV stream carries no data chunk.', { reason: 'no-data-chunk' });
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The WAV stream carries no data chunk.', { reason: 'no-data-chunk' });
                 const format = result.formatResult.format;
                 this.format = format;
                 this.dataStart = result.dataStart;
@@ -165,7 +165,7 @@
         /**
          * Reads the next block of whole frames from the data chunk as an encoded packet.
          * @returns {Promise<Object|null>} The packet, or null once the stream ended.
-         * @throws {LuminaAudioPlayer.PlayerError} When the stream can no longer be parsed.
+         * @throws {NemeraAudioPlayer.PlayerError} When the stream can no longer be parsed.
          */
         async readPacketAsync() {
             this.ensureInitialized();
@@ -188,7 +188,7 @@
                 // The duration is kept unrounded while the timeline accumulates it, so that rounding it per packet does not
                 // make the timeline drift; only the packet the decoder receives carries a whole number of microseconds.
                 const duration = (frames / format.sampleRate) * 1000000;
-                const packet = LuminaAudioPlayer.createDemuxerPacket(data, this.timelineMicros, duration);
+                const packet = NemeraAudioPlayer.createDemuxerPacket(data, this.timelineMicros, duration);
                 this.timelineMicros += duration;
                 this.offset += length;
                 if (this.offset + format.blockAlign > this.dataEnd)
@@ -242,7 +242,7 @@
                 if (header.length < 8)
                     break;
                 const id = String.fromCharCode(header[0], header[1], header[2], header[3]);
-                const size = LuminaAudioPlayer.demuxReadUintLE(header, 4, 4) || 0;
+                const size = NemeraAudioPlayer.demuxReadUintLE(header, 4, 4) || 0;
                 const bodyStart = cursor + 8;
                 if (id === 'fmt ')
                     formatResult = await this.parseFormatChunkAsync(bodyStart, size);
@@ -270,15 +270,15 @@
                 return { status: 'invalid' };
             // The first sixteen bytes of a fmt chunk are the format tag, the channel count, the sample rate, the byte rate,
             // the block alignment and the bits per sample, in that order, every one little endian.
-            let audioFormat = LuminaAudioPlayer.demuxReadUintLE(bytes, 0, 2);
-            const channels = LuminaAudioPlayer.demuxReadUintLE(bytes, 2, 2);
-            const sampleRate = LuminaAudioPlayer.demuxReadUintLE(bytes, 4, 4);
-            const byteRate = LuminaAudioPlayer.demuxReadUintLE(bytes, 8, 4);
-            let blockAlign = LuminaAudioPlayer.demuxReadUintLE(bytes, 12, 2);
-            const bitsPerSample = LuminaAudioPlayer.demuxReadUintLE(bytes, 14, 2);
+            let audioFormat = NemeraAudioPlayer.demuxReadUintLE(bytes, 0, 2);
+            const channels = NemeraAudioPlayer.demuxReadUintLE(bytes, 2, 2);
+            const sampleRate = NemeraAudioPlayer.demuxReadUintLE(bytes, 4, 4);
+            const byteRate = NemeraAudioPlayer.demuxReadUintLE(bytes, 8, 4);
+            let blockAlign = NemeraAudioPlayer.demuxReadUintLE(bytes, 12, 2);
+            const bitsPerSample = NemeraAudioPlayer.demuxReadUintLE(bytes, 14, 2);
             // An extensible format names its real format in the first two bytes of the subformat GUID.
             if (audioFormat === FORMAT_EXTENSIBLE && size >= 40 && bytes.length >= 40)
-                audioFormat = LuminaAudioPlayer.demuxReadUintLE(bytes, 24, 2);
+                audioFormat = NemeraAudioPlayer.demuxReadUintLE(bytes, 24, 2);
             if (!channels || channels <= 0 || !sampleRate || sampleRate <= 0 || !bitsPerSample)
                 return { status: 'invalid' };
             const codec = resolvePcmCodec(audioFormat, bitsPerSample);
@@ -292,12 +292,12 @@
         }
     }
 
-    LuminaAudioPlayer.WavDemuxer = WavDemuxer;
+    NemeraAudioPlayer.WavDemuxer = WavDemuxer;
 
-    LuminaAudioPlayer.registerDemuxer({
-        container: LuminaAudioPlayer.DemuxerContainer.WAV,
-        codec: LuminaAudioPlayer.DemuxerCodec.PCM,
-        probe: LuminaAudioPlayer.AUDIO_CODEC_PROBES.PCM,
+    NemeraAudioPlayer.registerDemuxer({
+        container: NemeraAudioPlayer.DemuxerContainer.WAV,
+        codec: NemeraAudioPlayer.DemuxerCodec.PCM,
+        probe: NemeraAudioPlayer.AUDIO_CODEC_PROBES.PCM,
         create: (options) => new WavDemuxer(options)
     });
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

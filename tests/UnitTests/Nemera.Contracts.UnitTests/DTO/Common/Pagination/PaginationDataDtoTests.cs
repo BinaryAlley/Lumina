@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common.Pagination;
-using Lumina.Contracts.Fixtures.Core.DTO.Common.Pagination;
+using Nemera.Contracts.DTO.Common.Pagination;
+using Nemera.Contracts.Fixtures.Core.DTO.Common.Pagination;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Contracts.UnitTests.DTO.Common.Pagination;
+namespace Nemera.Contracts.UnitTests.DTO.Common.Pagination;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PaginationDataDto"/> record.

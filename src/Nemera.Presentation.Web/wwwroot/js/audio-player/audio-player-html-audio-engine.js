@@ -26,7 +26,7 @@
  * accurately. It also provides no server normalized delivery, because the independent segments cannot be stitched into
  * one element source. Seeking itself is delegated to the element, which fetches the range of the target.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -34,7 +34,7 @@
      * @readonly
      * @type {string}
      */
-    LuminaAudioPlayer.HTML_AUDIO_ENGINE_NAME = 'htmlAudio';
+    NemeraAudioPlayer.HTML_AUDIO_ENGINE_NAME = 'htmlAudio';
 
     /**
      * The timeout, in milliseconds, of a load that waits for the metadata of the element.
@@ -87,7 +87,7 @@
      * @returns {number|null} The finite number, or null.
      */
     function toFiniteNumber(value) {
-        return LuminaAudioPlayer.toFiniteNumber(value);
+        return NemeraAudioPlayer.toFiniteNumber(value);
     }
 
     /**
@@ -178,9 +178,9 @@
          */
         subscribeToPreferences() {
             const events = this.host && this.host.events;
-            if (!events || typeof events.on !== 'function' || !LuminaAudioPlayer.PlayerEvent)
+            if (!events || typeof events.on !== 'function' || !NemeraAudioPlayer.PlayerEvent)
                 return;
-            this.unsubscribePreferences = events.on(LuminaAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, (preferences) => {
+            this.unsubscribePreferences = events.on(NemeraAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, (preferences) => {
                 if (!preferences || typeof preferences.replayGainMode !== 'string')
                     return;
                 this.replayGainMode = preferences.replayGainMode;
@@ -310,9 +310,9 @@
          * @param {number} rampSeconds - The duration of the ramp to the new value, in seconds. Zero applies it at once.
          */
         applyReplayGain(rampSeconds) {
-            if (!this.trackGainNode || typeof LuminaAudioPlayer.computeReplayGainTrackGain !== 'function')
+            if (!this.trackGainNode || typeof NemeraAudioPlayer.computeReplayGainTrackGain !== 'function')
                 return;
-            const gain = LuminaAudioPlayer.computeReplayGainTrackGain(this.manifest, this.replayGainMode);
+            const gain = NemeraAudioPlayer.computeReplayGainTrackGain(this.manifest, this.replayGainMode);
             this.setAudioParamValue(this.trackGainNode.gain, gain, rampSeconds);
         }
 
@@ -473,12 +473,12 @@
 
         /**
          * Creates the typed error of a media element failure.
-         * @returns {LuminaAudioPlayer.PlayerError} The typed error.
+         * @returns {NemeraAudioPlayer.PlayerError} The typed error.
          */
         createMediaError() {
             const mediaError = this.audio.error;
-            return new LuminaAudioPlayer.PlayerError(
-                LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR,
+            return new NemeraAudioPlayer.PlayerError(
+                NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR,
                 'The browser could not play the track with its native audio player.',
                 mediaError && Number.isFinite(Number(mediaError.code)) ? { mediaErrorCode: Number(mediaError.code) } : null);
         }
@@ -507,11 +507,11 @@
          * @param {Object} descriptor - The play descriptor of the track.
          * @param {Object} [options] - The load options. The fallback ignores the buffering hint of the player.
          * @returns {Promise<void>} A promise that completes when the element is ready to play.
-         * @throws {LuminaAudioPlayer.PlayerError} When the manifest cannot be read, the stream path is not safe, or the element cannot load the track.
+         * @throws {NemeraAudioPlayer.PlayerError} When the manifest cannot be read, the stream path is not safe, or the element cannot load the track.
          */
         async loadAsync(descriptor, options = {}) {
             if (this.isDestroyed)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The HTML audio fallback engine was destroyed.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The HTML audio fallback engine was destroyed.');
             const token = {};
             this.loadToken = token;
             this.isLoading = true;
@@ -523,7 +523,7 @@
                 const transport = typeof this.host.fetchJsonAsync === 'function'
                     ? (url, signal, label, requestOptions) => this.host.fetchJsonAsync(url, signal, label, requestOptions)
                     : null;
-                const manifest = await LuminaAudioPlayer.fetchPlaybackManifestAsync({
+                const manifest = await NemeraAudioPlayer.fetchPlaybackManifestAsync({
                     configuration: configuration,
                     descriptor: descriptor,
                     capabilities: describeNativeCapabilities(this.audio),
@@ -531,7 +531,7 @@
                 });
                 if (!this.isLoadCurrent(token))
                     throw this.createSupersededLoadError();
-                const streamUrl = LuminaAudioPlayer.resolveStreamUrl(manifest, descriptor, configuration);
+                const streamUrl = NemeraAudioPlayer.resolveStreamUrl(manifest, descriptor, configuration);
                 const duration = Number(manifest.durationInSeconds);
                 this.descriptor = descriptor;
                 this.manifest = manifest;
@@ -582,8 +582,8 @@
                         settle(reject, this.createSupersededLoadError());
                         return;
                     }
-                    settle(reject, new LuminaAudioPlayer.PlayerError(
-                        LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED,
+                    settle(reject, new NemeraAudioPlayer.PlayerError(
+                        NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED,
                         'The browser did not report the metadata of the track in time.'));
                 }, METADATA_TIMEOUT_MS);
                 this.audio.addEventListener('loadedmetadata', onLoaded);
@@ -602,13 +602,13 @@
 
         /**
          * Creates the typed error that tells the player a load was overtaken by a newer play request.
-         * @returns {LuminaAudioPlayer.PlayerError} The superseded load error.
+         * @returns {NemeraAudioPlayer.PlayerError} The superseded load error.
          */
         createSupersededLoadError() {
-            return new LuminaAudioPlayer.PlayerError(
-                LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE,
+            return new NemeraAudioPlayer.PlayerError(
+                NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE,
                 'The load was superseded by a newer play request.',
-                { reason: LuminaAudioPlayer.PlayerErrorReason.LOAD_SUPERSEDED });
+                { reason: NemeraAudioPlayer.PlayerErrorReason.LOAD_SUPERSEDED });
         }
 
         /**
@@ -652,8 +652,8 @@
                 this.audio.currentTime = duration > 0 ? Math.min(position, duration) : position;
                 this.host.reportTime(this.audio.currentTime, duration);
             } catch (error) {
-                throw new LuminaAudioPlayer.PlayerError(
-                    LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR,
+                throw new NemeraAudioPlayer.PlayerError(
+                    NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR,
                     'The browser could not seek the native audio element.',
                     { cause: error });
             }
@@ -778,43 +778,43 @@
         }
     }
 
-    LuminaAudioPlayer.HtmlAudioPlayerEngine = HtmlAudioPlayerEngine;
+    NemeraAudioPlayer.HtmlAudioPlayerEngine = HtmlAudioPlayerEngine;
 
     /**
-     * Creates an HTML audio fallback engine. See {@link LuminaAudioPlayer.HtmlAudioPlayerEngine} for the options.
+     * Creates an HTML audio fallback engine. See {@link NemeraAudioPlayer.HtmlAudioPlayerEngine} for the options.
      * @param {Object} host - The engine host provided by the player controller.
      * @param {Object} [options] - The engine options.
-     * @returns {LuminaAudioPlayer.HtmlAudioPlayerEngine} The created engine.
+     * @returns {NemeraAudioPlayer.HtmlAudioPlayerEngine} The created engine.
      */
-    LuminaAudioPlayer.createHtmlAudioPlayerEngine = function (host, options) {
+    NemeraAudioPlayer.createHtmlAudioPlayerEngine = function (host, options) {
         return new HtmlAudioPlayerEngine(host, options);
     };
 
     /**
      * Registers the HTML audio engine as the fallback of a player, without changing the engine it runs with when its
      * capabilities are present.
-     * @param {LuminaAudioPlayer.AudioPlayer} player - The player to install the fallback on.
-     * @returns {LuminaAudioPlayer.AudioPlayer} The same player, for chaining.
+     * @param {NemeraAudioPlayer.AudioPlayer} player - The player to install the fallback on.
+     * @returns {NemeraAudioPlayer.AudioPlayer} The same player, for chaining.
      */
-    LuminaAudioPlayer.installHtmlAudioFallbackEngine = function (player) {
+    NemeraAudioPlayer.installHtmlAudioFallbackEngine = function (player) {
         if (!player)
             return player;
-        player.registerEngine(LuminaAudioPlayer.HTML_AUDIO_ENGINE_NAME, (host) => new HtmlAudioPlayerEngine(host));
-        return player.registerFallbackEngine(LuminaAudioPlayer.HTML_AUDIO_ENGINE_NAME);
+        player.registerEngine(NemeraAudioPlayer.HTML_AUDIO_ENGINE_NAME, (host) => new HtmlAudioPlayerEngine(host));
+        return player.registerFallbackEngine(NemeraAudioPlayer.HTML_AUDIO_ENGINE_NAME);
     };
 
     /**
      * Installs the fallback on the application singleton when the player module is loaded.
      */
     function installOnDefaultPlayer() {
-        if (typeof LuminaAudioPlayer.createDefaultPlayer !== 'function')
+        if (typeof NemeraAudioPlayer.createDefaultPlayer !== 'function')
             return;
-        const player = LuminaAudioPlayer.createDefaultPlayer();
-        LuminaAudioPlayer.installHtmlAudioFallbackEngine(player);
+        const player = NemeraAudioPlayer.createDefaultPlayer();
+        NemeraAudioPlayer.installHtmlAudioFallbackEngine(player);
     }
 
     if (document.readyState === 'loading')
         document.addEventListener('DOMContentLoaded', installOnDefaultPlayer);
     else
         installOnDefaultPlayer();
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

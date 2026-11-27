@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Domain.Common.Models.Core;
+namespace Nemera.Domain.Common.Models.Core;
 
 /// <summary>
 /// Base class for all entity identifiers.

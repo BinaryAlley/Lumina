@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Bmp;
@@ -12,7 +12,7 @@ using System.IO;
 using Xunit;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.Fixtures.Common.Enums.PhotoLibrary;
+namespace Nemera.Domain.SharedKernel.Fixtures.Common.Enums.PhotoLibrary;
 
 /// <summary>
 /// Test-support class providing image byte data for each supported <see cref="ImageType"/>.

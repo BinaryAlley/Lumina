@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Plugins.Commands.InstallPlugin;
+using Nemera.Application.Core.Plugins.Commands.InstallPlugin;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Plugins.Commands.InstallPlugin;
+namespace Nemera.Application.Fixtures.Core.Plugins.Commands.InstallPlugin;
 
 /// <summary>
 /// Fixture class for the <see cref="InstallPluginCommand"/> class.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Requests.Themes;
+using Nemera.Contracts.Requests.Themes;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Requests.Themes;
+namespace Nemera.Contracts.Fixtures.Core.Requests.Themes;
 
 /// <summary>
 /// Fixture class for the <see cref="GetThemeAssetRequest"/> record.

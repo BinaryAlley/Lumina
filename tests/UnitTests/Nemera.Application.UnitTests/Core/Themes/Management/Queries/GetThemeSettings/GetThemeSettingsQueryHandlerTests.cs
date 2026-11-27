@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Themes;
-using Lumina.Application.Core.Themes.Management.Queries.GetThemeSettings;
-using Lumina.Application.Fixtures.Core.Themes.Management.Queries.GetThemeSettings;
-using Lumina.Contracts.Responses.Themes;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.Infrastructure.Themes;
+using Nemera.Application.Core.Themes.Management.Queries.GetThemeSettings;
+using Nemera.Application.Fixtures.Core.Themes.Management.Queries.GetThemeSettings;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.Domain.Common.Primitives;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Themes.Management.Queries.GetThemeSettings;
+namespace Nemera.Application.UnitTests.Core.Themes.Management.Queries.GetThemeSettings;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetThemeSettingsQueryHandler"/> class.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
-using Lumina.Infrastructure.Common.Utilities;
+using Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Nemera.Infrastructure.Common.Utilities;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Common.Utilities;
+namespace Nemera.Infrastructure.UnitTests.Common.Utilities;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ImageTypeUtilities"/> class.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Queries.GetTrackSegment;
-using Lumina.Application.Fixtures.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
-using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackSegment;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Queries.GetTrackSegment;
+using Nemera.Application.Fixtures.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackSegment;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -18,10 +18,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackSegment;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackSegment;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetTrackSegmentEndpoint"/> class.
@@ -71,9 +71,9 @@ public class GetTrackSegmentEndpointTests
         Assert.Equal("nosniff", _sut.HttpContext.Response.Headers["X-Content-Type-Options"].ToString());
         Assert.Equal("private, no-store", _sut.HttpContext.Response.Headers["Cache-Control"].ToString());
         Assert.Equal("Authorization", _sut.HttpContext.Response.Headers["Vary"].ToString());
-        Assert.Equal("12", _sut.HttpContext.Response.Headers["X-Lumina-Segment-Count"].ToString());
+        Assert.Equal("12", _sut.HttpContext.Response.Headers["X-Nemera-Segment-Count"].ToString());
         Assert.Equal("6.5", _sut.HttpContext.Response.Headers["X-Segment-Start-Seconds"].ToString());
-        Assert.Equal("300", _sut.HttpContext.Response.Headers["X-Lumina-Track-Duration-Seconds"].ToString());
+        Assert.Equal("300", _sut.HttpContext.Response.Headers["X-Nemera-Track-Duration-Seconds"].ToString());
         _sut.HttpContext.Response.Body = new MemoryStream();
         await streamResult.ExecuteAsync(_sut.HttpContext);
         Assert.Equal(expectedContentType, _sut.HttpContext.Response.ContentType);

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.CoverArtArchive.Common.Models.DTO.Settings;
-using Lumina.Plugins.CoverArtArchive.Core.Settings;
-using Lumina.Plugins.CoverArtArchive.Fixtures.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.CoverArtArchive.Common.Models.DTO.Settings;
+using Nemera.Plugins.CoverArtArchive.Core.Settings;
+using Nemera.Plugins.CoverArtArchive.Fixtures.Common.Models.DTO.Settings;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.UnitTests.Core.Settings;
+namespace Nemera.Plugins.CoverArtArchive.UnitTests.Core.Settings;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CoverArtArchiveSettingsProvider"/> class.
@@ -34,7 +34,7 @@ public class CoverArtArchiveSettingsProviderTests
 
         // Assert
         Assert.NotSame(defaults, result);
-        Assert.Equal("Lumina-CoverArtArchive/1.0", result.UserAgent);
+        Assert.Equal("Nemera-CoverArtArchive/1.0", result.UserAgent);
         Assert.Equal("default@example.com", result.ContactEmail);
         Assert.Equal(TimeSpan.FromSeconds(1), result.MinimumRequestInterval);
     }
@@ -51,7 +51,7 @@ public class CoverArtArchiveSettingsProviderTests
         CoverArtArchiveSettingsDto result = await sut.GetAsync(CancellationToken.None);
 
         // Assert
-        Assert.Equal("Lumina-CoverArtArchive/1.0", result.UserAgent);
+        Assert.Equal("Nemera-CoverArtArchive/1.0", result.UserAgent);
         Assert.Equal("default@example.com", result.ContactEmail);
         Assert.Equal(TimeSpan.FromSeconds(1), result.MinimumRequestInterval);
     }
@@ -205,7 +205,7 @@ public class CoverArtArchiveSettingsProviderTests
     private CoverArtArchiveSettingsDto CreateDefaults()
     {
         return _coverArtArchiveSettingsDtoFixture.Create(
-            userAgent: "Lumina-CoverArtArchive/1.0",
+            userAgent: "Nemera-CoverArtArchive/1.0",
             contactEmail: "default@example.com",
             minimumRequestInterval: TimeSpan.FromSeconds(1));
     }

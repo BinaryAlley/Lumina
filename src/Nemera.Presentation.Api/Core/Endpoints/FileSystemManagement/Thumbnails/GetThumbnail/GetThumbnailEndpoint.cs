@@ -1,21 +1,21 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.FileSystemManagement.Files;
-using Lumina.Application.Common.Mapping.FileSystemManagement.Thumbnails;
-using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
-using Lumina.Contracts.Requests.FileSystemManagement.Thumbnails;
-using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.MimeTypes;
-using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Files;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Thumbnails;
+using Nemera.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
+using Nemera.Contracts.Requests.FileSystemManagement.Thumbnails;
+using Nemera.Contracts.Responses.FileSystemManagement.Thumbnails;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.MimeTypes;
+using Nemera.Presentation.Api.Common.Routes.FileSystemManagement;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Thumbnails.GetThumbnail;
+namespace Nemera.Presentation.Api.Core.Endpoints.FileSystemManagement.Thumbnails.GetThumbnail;
 
 /// <summary>
 /// API endpoint for the <c>/thumbnails/get-thumbnail</c> route.

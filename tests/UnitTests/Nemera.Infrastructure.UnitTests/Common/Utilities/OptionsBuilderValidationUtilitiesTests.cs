@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Infrastructure.Common.Utilities;
-using Lumina.Infrastructure.Common.Validation;
-using Lumina.Infrastructure.Fixtures.Common.Utilities;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Infrastructure.Common.Utilities;
+using Nemera.Infrastructure.Common.Validation;
+using Nemera.Infrastructure.Fixtures.Common.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -13,7 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Common.Utilities;
+namespace Nemera.Infrastructure.UnitTests.Common.Utilities;
 
 /// <summary>
 /// Contains unit tests for the <see cref="OptionsBuilderValidationUtilities"/> class.

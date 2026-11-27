@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.MediaConsumption.Commands.ClearResumePoints;
-using Lumina.Contracts.Fixtures.Core.Requests.MediaConsumption;
-using Lumina.Contracts.Requests.MediaConsumption;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Library.Statistics.ClearResumePoints;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.MediaConsumption.Commands.ClearResumePoints;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaConsumption;
+using Nemera.Contracts.Requests.MediaConsumption;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Library.Statistics.ClearResumePoints;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -13,11 +13,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Library.Statistics.ClearResumePoints;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Library.Statistics.ClearResumePoints;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ClearUserResumePointsEndpoint"/> class.

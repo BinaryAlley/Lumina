@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Requests.Playlists;
+using Nemera.Contracts.Requests.Playlists;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Requests.Playlists;
+namespace Nemera.Contracts.Fixtures.Core.Requests.Playlists;
 
 /// <summary>
 /// Fixture class for the <see cref="AddPlaylistEntryRequest"/> record.

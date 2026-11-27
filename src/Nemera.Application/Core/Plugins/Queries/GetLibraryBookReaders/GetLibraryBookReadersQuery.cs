@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 #endregion
 
-namespace Lumina.Application.Core.Plugins.Queries.GetLibraryBookReaders;
+namespace Nemera.Application.Core.Plugins.Queries.GetLibraryBookReaders;
 
 /// <summary>
 /// Query for getting the book readers configured for a media library.

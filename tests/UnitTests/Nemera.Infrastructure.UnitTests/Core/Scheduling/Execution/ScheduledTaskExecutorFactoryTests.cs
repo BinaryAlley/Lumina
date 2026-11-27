@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
-using Lumina.Infrastructure.Core.Scheduling.Execution;
-using Lumina.Infrastructure.Core.Scheduling.Execution.TaskExecutors;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Infrastructure.Core.Scheduling.Execution;
+using Nemera.Infrastructure.Core.Scheduling.Execution.TaskExecutors;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Scheduling.Execution;
+namespace Nemera.Infrastructure.UnitTests.Core.Scheduling.Execution;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ScheduledTaskExecutorFactory"/> class.
@@ -40,7 +40,7 @@ public class ScheduledTaskExecutorFactoryTests
         _mockTemporaryFilesCleanupTaskExecutor = Substitute.For<TemporaryFilesCleanupTaskExecutor>(
             Substitute.For<ILogger<TemporaryFilesCleanupTaskExecutor>>());
         _mockRepairThemesTaskExecutor = Substitute.For<RepairThemesTaskExecutor>(
-            Substitute.For<Lumina.Application.Common.Infrastructure.Themes.IThemeService>(),
+            Substitute.For<Nemera.Application.Common.Infrastructure.Themes.IThemeService>(),
             Substitute.For<ILogger<RepairThemesTaskExecutor>>(),
             Substitute.For<IUnitOfWork>());
         _mockCleanScheduledJobExecutionHistoryTaskExecutor = Substitute.For<CleanScheduledJobExecutionHistoryTaskExecutor>(

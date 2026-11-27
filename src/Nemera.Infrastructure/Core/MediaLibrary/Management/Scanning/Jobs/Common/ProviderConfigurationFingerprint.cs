@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
+namespace Nemera.Infrastructure.Core.MediaLibrary.Management.Scanning.Jobs.Common;
 
 /// <summary>
 /// Computes the fingerprint of the provider configuration of a media library, used to detect whether the configuration

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Telemetry;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
+using Nemera.Application.Common.Telemetry;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Telemetry;
+namespace Nemera.Application.UnitTests.Common.Telemetry;
 
 /// <summary>
 /// Contains unit tests for the <see cref="TelemetryDomainEventHandlerDecorator{TDomainEvent}"/> class.
@@ -58,10 +58,10 @@ public class TelemetryDomainEventHandlerDecoratorTests
         await _mockInnerHandler.Received(1).HandleAsync(domainEvent, CancellationToken.None);
         Activity activity = Assert.Single(capturedActivities);
         Assert.Equal($"Handle {_mockInnerHandler.GetType().Name}", activity.OperationName);
-        Assert.Equal("domain-event", activity.GetTagItem("lumina.handler.type"));
+        Assert.Equal("domain-event", activity.GetTagItem("nemera.handler.type"));
         Assert.Equal(ActivityStatusCode.Ok, activity.Status);
-        Assert.Contains(metricMeasurements, measurement => measurement.InstrumentName == "lumina.application.handler.duration" && measurement.Outcome == "success");
-        Assert.Contains(metricMeasurements, measurement => measurement.InstrumentName == "lumina.application.handler.invocations" && measurement.Outcome == "success");
+        Assert.Contains(metricMeasurements, measurement => measurement.InstrumentName == "nemera.application.handler.duration" && measurement.Outcome == "success");
+        Assert.Contains(metricMeasurements, measurement => measurement.InstrumentName == "nemera.application.handler.invocations" && measurement.Outcome == "success");
     }
 
     [Fact]
@@ -83,6 +83,6 @@ public class TelemetryDomainEventHandlerDecoratorTests
         // Assert
         Activity activity = Assert.Single(capturedActivities);
         Assert.Equal(ActivityStatusCode.Error, activity.Status);
-        Assert.Contains(metricMeasurements, measurement => measurement.InstrumentName == "lumina.application.handler.duration" && measurement.Outcome == "failure");
+        Assert.Contains(metricMeasurements, measurement => measurement.InstrumentName == "nemera.application.handler.duration" && measurement.Outcome == "failure");
     }
 }

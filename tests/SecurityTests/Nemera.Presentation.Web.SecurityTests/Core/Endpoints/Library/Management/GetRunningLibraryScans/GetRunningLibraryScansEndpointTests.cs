@@ -1,27 +1,27 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Library.Management.GetRunningLibraryScans;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Management.GetRunningLibraryScans;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.GetRunningLibraryScans;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.GetRunningLibraryScans;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetRunningLibraryScansEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetRunningLibraryScansEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetRunningLibraryScansEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetRunningLibraryScansEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetRunningLibraryScansEndpointTests(LuminaWebFactory apiFactory)
+    public GetRunningLibraryScansEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

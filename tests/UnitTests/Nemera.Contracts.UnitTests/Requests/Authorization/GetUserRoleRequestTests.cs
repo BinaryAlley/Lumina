@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
-using Lumina.Contracts.Requests.Authorization;
+using Nemera.Contracts.Fixtures.Core.Requests.Authorization;
+using Nemera.Contracts.Requests.Authorization;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Contracts.UnitTests.Requests.Authorization;
+namespace Nemera.Contracts.UnitTests.Requests.Authorization;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetUserRoleRequest"/> record.

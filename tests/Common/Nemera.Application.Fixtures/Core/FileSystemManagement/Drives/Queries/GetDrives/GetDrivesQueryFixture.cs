@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
+using Nemera.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.FileSystemManagement.Drives.Queries.GetDrives;
+namespace Nemera.Application.Fixtures.Core.FileSystemManagement.Drives.Queries.GetDrives;
 
 /// <summary>
 /// Fixture class for the <see cref="GetDrivesQuery"/> class.

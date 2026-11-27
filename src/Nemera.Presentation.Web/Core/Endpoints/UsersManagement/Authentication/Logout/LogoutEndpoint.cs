@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Common.Services;
-using Lumina.Presentation.Web.Core.Endpoints.Common;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Common.Services;
+using Nemera.Presentation.Web.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Logout;
+namespace Nemera.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Logout;
 
 /// <summary>
 /// API endpoint for the <c>/{culture}/auth/logout</c> route.

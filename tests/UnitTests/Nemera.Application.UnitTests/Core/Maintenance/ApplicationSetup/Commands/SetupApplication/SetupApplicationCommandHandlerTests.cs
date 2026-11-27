@@ -1,27 +1,27 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
-using Lumina.Application.Common.DataAccess.Seed;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DomainEvents;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Security;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.Application.Fixtures.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
-using Lumina.Contracts.Responses.Authentication;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Repositories.Scheduling;
+using Nemera.Application.Common.DataAccess.Repositories.Users;
+using Nemera.Application.Common.DataAccess.Seed;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DomainEvents;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Security;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Application.Fixtures.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
+using Nemera.Contracts.Responses.Authentication;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -29,7 +29,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
+namespace Nemera.Application.UnitTests.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
 
 /// <summary>
 /// Contains unit tests for the <see cref="SetupApplicationCommandHandler"/> class.

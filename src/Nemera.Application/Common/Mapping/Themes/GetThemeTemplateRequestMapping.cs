@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Themes.Management.Queries.GetThemeTemplate;
-using Lumina.Contracts.Requests.Themes;
+using Nemera.Application.Core.Themes.Management.Queries.GetThemeTemplate;
+using Nemera.Contracts.Requests.Themes;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Themes;
+namespace Nemera.Application.Common.Mapping.Themes;
 
 /// <summary>
 /// Extension methods for converting <see cref="GetThemeTemplateRequest"/>.

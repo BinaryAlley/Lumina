@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.DTO.Themes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
+namespace Nemera.Presentation.Web.Fixtures.Common.DTO.Themes;
 
 /// <summary>
 /// Fixture class for the <see cref="ThemeNavMenuDto"/> record.

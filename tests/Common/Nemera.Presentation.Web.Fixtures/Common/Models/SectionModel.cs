@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Models;
+namespace Nemera.Presentation.Web.Fixtures.Common.Models;
 
 /// <summary>
 /// Small model class used to verify section rendering against a plain object scope.

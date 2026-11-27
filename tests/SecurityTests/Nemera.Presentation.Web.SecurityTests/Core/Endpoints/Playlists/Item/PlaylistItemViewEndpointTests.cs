@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Playlists;
-using Lumina.Presentation.Web.Common.Enums.Playlists;
-using Lumina.Presentation.Web.Core.Endpoints.Playlists.Item;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Playlists;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Playlists;
+using Nemera.Presentation.Web.Common.Enums.Playlists;
+using Nemera.Presentation.Web.Core.Endpoints.Playlists.Item;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Playlists;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -15,17 +15,17 @@ using System.Net.Http;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Playlists.Item;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Playlists.Item;
 
 /// <summary>
 /// Contains security tests for the <see cref="PlaylistItemViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class PlaylistItemViewEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class PlaylistItemViewEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string ZERO_GUID = "00000000-0000-0000-0000-000000000000";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly PlaylistDtoFixture _playlistDtoFixture = new();
     private readonly PlaylistEntryDtoFixture _playlistEntryDtoFixture = new();
     private readonly PaginatedDtoFixture<PlaylistEntryDto> _paginatedDtoFixture = new();
@@ -34,7 +34,7 @@ public class PlaylistItemViewEndpointTests : IClassFixture<LuminaWebFactory>, ID
     /// Initializes a new instance of the <see cref="PlaylistItemViewEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public PlaylistItemViewEndpointTests(LuminaWebFactory apiFactory)
+    public PlaylistItemViewEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -82,7 +82,7 @@ public class PlaylistItemViewEndpointTests : IClassFixture<LuminaWebFactory>, ID
         Assert.Contains("Cookie", response.Headers.Vary);
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -131,7 +131,7 @@ public class PlaylistItemViewEndpointTests : IClassFixture<LuminaWebFactory>, ID
         Assert.DoesNotContain(payload, content, StringComparison.Ordinal);
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     /// <summary>

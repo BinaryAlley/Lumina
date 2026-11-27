@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.Core.Endpoints.Library.Management.CancelLibrariesScan;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Api.Core.Endpoints.Library.Management.CancelLibrariesScan;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -10,22 +10,22 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Library.Management.CancelLibrariesScan;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Library.Management.CancelLibrariesScan;
 
 /// <summary>
 /// Contains integration tests for the <see cref="CancelLibrariesScanEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class CancelLibrariesScanEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class CancelLibrariesScanEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CancelLibrariesScanEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public CancelLibrariesScanEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public CancelLibrariesScanEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;

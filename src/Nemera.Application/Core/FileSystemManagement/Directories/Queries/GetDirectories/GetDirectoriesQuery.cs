@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
+namespace Nemera.Application.Core.FileSystemManagement.Directories.Queries.GetDirectories;
 
 /// <summary>
 /// Query for retrieving the list of directories at a path.

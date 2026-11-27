@@ -29,7 +29,7 @@
  * container supports a time seek, and reports a segment covering position so the engine's existing seek trim applies. No
  * range request is ever issued for a segment, and no byte range is mapped to a time.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -37,7 +37,7 @@
      * @readonly
      * @type {string}
      */
-    const SEGMENT_COUNT_HEADER = 'X-Lumina-Segment-Count';
+    const SEGMENT_COUNT_HEADER = 'X-Nemera-Segment-Count';
 
     /**
      * The response header that carries the exact start of a segment on the track timeline, in seconds.
@@ -51,7 +51,7 @@
      * @readonly
      * @type {string}
      */
-    const TRACK_DURATION_SECONDS_HEADER = 'X-Lumina-Track-Duration-Seconds';
+    const TRACK_DURATION_SECONDS_HEADER = 'X-Nemera-Track-Duration-Seconds';
 
     /**
      * The delays, in milliseconds, between the attempts of a segment request that the server answered as temporarily unavailable.
@@ -289,13 +289,13 @@
          * Gets one segment, from memory when it was already fetched, otherwise from the segment route.
          * @param {number} index - The zero based index of the segment.
          * @returns {Promise<Uint8Array|null>} The bytes of the segment, or null when the index is past the produced audio.
-         * @throws {LuminaAudioPlayer.PlayerError} When the segment cannot be fetched, or the download was aborted.
+         * @throws {NemeraAudioPlayer.PlayerError} When the segment cannot be fetched, or the download was aborted.
          */
         async getSegmentAsync(index) {
             if (this.destroyed)
                 throw this.createAbortError();
             if (!Number.isInteger(index) || index < 0)
-                throw this.recordError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The segment index is not valid.'));
+                throw this.recordError(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The segment index is not valid.'));
             // The production stated how many segments it holds, so an index at or past that count is the end of the audio and needs no request.
             if (this.segmentCount !== null && index >= this.segmentCount)
                 return null;
@@ -370,9 +370,9 @@
          * the lookahead of a track that is already loaded.
          */
         subscribeToPreferences() {
-            if (!this.events || !LuminaAudioPlayer.PlayerEvent || typeof this.events.on !== 'function')
+            if (!this.events || !NemeraAudioPlayer.PlayerEvent || typeof this.events.on !== 'function')
                 return;
-            this.unsubscribePreferences = this.events.on(LuminaAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, (preferences) => {
+            this.unsubscribePreferences = this.events.on(NemeraAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, (preferences) => {
                 if (preferences && typeof preferences.shouldKeepDownloadingWhilePaused === 'boolean')
                     this.setKeepDownloadingWhilePaused(preferences.shouldKeepDownloadingWhilePaused);
             });
@@ -383,7 +383,7 @@
          * @param {number} index - The zero based index of the segment.
          * @param {boolean} [isSpeculative=false] - True for a background lookahead, whose failure must not be recorded as the failure of the track.
          * @returns {Promise<Uint8Array|null>} The bytes of the segment, or null when the server reports no such segment.
-         * @throws {LuminaAudioPlayer.PlayerError} When the request fails or is aborted.
+         * @throws {NemeraAudioPlayer.PlayerError} When the request fails or is aborted.
          */
         async fetchSegmentAsync(index, isSpeculative = false) {
             if (this.destroyed)
@@ -407,7 +407,7 @@
                     try {
                         const url = typeof this.urlBuilder === 'function' ? this.urlBuilder(index) : null;
                         if (typeof url !== 'string' || url.length === 0)
-                            throw this.createRequestFailure('The segment URL is not configured.', null, isSpeculative, LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED);
+                            throw this.createRequestFailure('The segment URL is not configured.', null, isSpeculative, NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED);
                         response = await fetch(url, {
                             method: 'GET',
                             credentials: 'same-origin',
@@ -416,11 +416,11 @@
                             signal: controller ? controller.signal : undefined
                         });
                     } catch (error) {
-                        if (LuminaAudioPlayer.isAbortError(error) || this.destroyed || this.abortGeneration !== abortGeneration)
+                        if (NemeraAudioPlayer.isAbortError(error) || this.destroyed || this.abortGeneration !== abortGeneration)
                             throw this.createAbortError();
                         // A speculative read must not record the first failure, because the required read that follows owns the
                         // track's error state; the recorded failure is the one the user should see.
-                        if (error instanceof LuminaAudioPlayer.PlayerError)
+                        if (error instanceof NemeraAudioPlayer.PlayerError)
                             throw isSpeculative ? error : this.recordError(error);
                         throw this.createRequestFailure('The segment could not be requested.', { cause: error }, isSpeculative);
                     }
@@ -428,7 +428,7 @@
                         throw this.createRequestFailure('The segment request returned no response.', null, isSpeculative);
                     // Redirects are not followed: an expired session answers with a redirect to the login page, whose HTML must never be parsed as audio.
                     if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400))
-                        throw this.createRequestFailure('The session expired while a segment was requested.', { reason: LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED }, isSpeculative);
+                        throw this.createRequestFailure('The session expired while a segment was requested.', { reason: NemeraAudioPlayer.PlayerErrorReason.SESSION_EXPIRED }, isSpeculative);
                     if (!response.ok) {
                         const status = response.status;
                         // Every non-success path discards the body first, so the connection is released instead of being held by a response nobody reads.
@@ -446,10 +446,10 @@
                         // The reason is part of the error contract: the engine uses SEGMENT_NOT_FOUND and PLAYBACK_DELIVERY_CHANGED
                         // to refresh the manifest, and reports the other reasons as ordinary playback failures.
                         const reason = status === 503
-                            ? LuminaAudioPlayer.PlayerErrorReason.NORMALIZATION_UNAVAILABLE
+                            ? NemeraAudioPlayer.PlayerErrorReason.NORMALIZATION_UNAVAILABLE
                             : (status === 409
-                                ? LuminaAudioPlayer.PlayerErrorReason.PLAYBACK_DELIVERY_CHANGED
-                                : (status === 404 ? LuminaAudioPlayer.PlayerErrorReason.SEGMENT_NOT_FOUND : LuminaAudioPlayer.PlayerErrorReason.HTTP_REQUEST_FAILED));
+                                ? NemeraAudioPlayer.PlayerErrorReason.PLAYBACK_DELIVERY_CHANGED
+                                : (status === 404 ? NemeraAudioPlayer.PlayerErrorReason.SEGMENT_NOT_FOUND : NemeraAudioPlayer.PlayerErrorReason.HTTP_REQUEST_FAILED));
                         throw this.createRequestFailure('The segment request failed.', { reason, status }, isSpeculative);
                     }
                     // A proxy or an error page can answer 200 with a non-audio body, so the media type is checked before the bytes ever reach a demuxer.
@@ -489,7 +489,7 @@
                         // The controller is still registered here, so an abort now cancels this body read instead of after it completed.
                         bytes = new Uint8Array(await response.arrayBuffer());
                     } catch (error) {
-                        if (LuminaAudioPlayer.isAbortError(error) || this.destroyed || this.abortGeneration !== abortGeneration)
+                        if (NemeraAudioPlayer.isAbortError(error) || this.destroyed || this.abortGeneration !== abortGeneration)
                             throw this.createAbortError();
                         throw this.createRequestFailure('The segment body could not be read.', { cause: error }, isSpeculative);
                     }
@@ -525,7 +525,7 @@
          * @param {number} delay - The delay, in milliseconds.
          * @param {number} abortGeneration - The abort generation the attempt belongs to.
          * @returns {Promise<void>} A promise that completes when the delay elapsed.
-         * @throws {LuminaAudioPlayer.PlayerError} When the downloader was aborted or released during the delay.
+         * @throws {NemeraAudioPlayer.PlayerError} When the downloader was aborted or released during the delay.
          */
         waitBeforeRetryAsync(delay, abortGeneration) {
             return new Promise((resolve, reject) => {
@@ -717,7 +717,7 @@
 
         /**
          * Gets the last failure the downloader recorded, or null.
-         * @returns {LuminaAudioPlayer.PlayerError|null} The recorded failure.
+         * @returns {NemeraAudioPlayer.PlayerError|null} The recorded failure.
          */
         getError() {
             return this.error;
@@ -738,17 +738,17 @@
          * @param {Object|null} details - Optional structured details.
          * @param {boolean} isSpeculative - True when the failure belongs to a background lookahead.
          * @param {string} [code] - The player error code. Defaults to DOWNLOAD_FAILED.
-         * @returns {LuminaAudioPlayer.PlayerError} The typed failure, recorded when it is not speculative.
+         * @returns {NemeraAudioPlayer.PlayerError} The typed failure, recorded when it is not speculative.
          */
-        createRequestFailure(message, details, isSpeculative, code = LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED) {
-            const error = new LuminaAudioPlayer.PlayerError(code, message, details);
+        createRequestFailure(message, details, isSpeculative, code = NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED) {
+            const error = new NemeraAudioPlayer.PlayerError(code, message, details);
             return isSpeculative ? error : this.recordError(error);
         }
 
         /**
          * Records a failure once and reports it to the caller, so a failed segment is never retried silently and never overwrites the cause of the first failure.
-         * @param {LuminaAudioPlayer.PlayerError} error - The failure to record.
-         * @returns {LuminaAudioPlayer.PlayerError} The recorded failure.
+         * @param {NemeraAudioPlayer.PlayerError} error - The failure to record.
+         * @returns {NemeraAudioPlayer.PlayerError} The recorded failure.
          */
         recordError(error) {
             if (this.error)
@@ -766,10 +766,10 @@
 
         /**
          * Creates the typed abort of an intentionally stopped segment request.
-         * @returns {LuminaAudioPlayer.PlayerError} The abort.
+         * @returns {NemeraAudioPlayer.PlayerError} The abort.
          */
         createAbortError() {
-            return new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The segment request was aborted.');
+            return new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The segment request was aborted.');
         }
 
         /**
@@ -802,7 +802,7 @@
          * Creates an instance of NormalizedSegmentDemuxer.
          * @param {Object} options - The demuxer options.
          * @param {Object} options.manifest - The playback manifest of the normalized track.
-         * @param {LuminaAudioPlayer.NormalizedSegmentDownloader} options.downloader - The downloader of the segments.
+         * @param {NemeraAudioPlayer.NormalizedSegmentDownloader} options.downloader - The downloader of the segments.
          * @param {Object} [options.registry] - The demuxer registry. Defaults to the process wide registry.
          * @param {Object} [options.capabilities] - The browser capability detector.
          * @param {Object} [options.events] - The player event bus.
@@ -813,12 +813,12 @@
             const manifest = settings.manifest || {};
             this.manifest = manifest;
             this.downloader = settings.downloader;
-            this.registry = settings.registry || LuminaAudioPlayer.demuxerRegistry;
+            this.registry = settings.registry || NemeraAudioPlayer.demuxerRegistry;
             this.capabilities = settings.capabilities || null;
             this.events = settings.events || null;
             this.onError = typeof settings.onError === 'function' ? settings.onError : null;
-            this.container = LuminaAudioPlayer.canonicalizeDemuxerContainer(manifest.deliveryContainer);
-            this.codec = LuminaAudioPlayer.canonicalizeDemuxerCodec(manifest.deliveryCodec);
+            this.container = NemeraAudioPlayer.canonicalizeDemuxerContainer(manifest.deliveryContainer);
+            this.codec = NemeraAudioPlayer.canonicalizeDemuxerCodec(manifest.deliveryCodec);
             this.segmentDurationSeconds = Math.max(0, Number(manifest.segmentDurationSeconds) || 0);
             this.durationInSeconds = Math.max(0, Number(manifest.durationInSeconds) || 0);
             this.inner = null;
@@ -847,7 +847,7 @@
          * @param {number} index - The zero based index of the segment.
          * @param {boolean} [forceReload=false] - True to reload a segment that is already open, used by a seek.
          * @returns {Promise<boolean>} True when the segment was loaded, false when it does not exist.
-         * @throws {LuminaAudioPlayer.PlayerError} When the segment or its format cannot be read.
+         * @throws {NemeraAudioPlayer.PlayerError} When the segment or its format cannot be read.
          */
         async loadSegmentAsync(index, forceReload = false) {
             if (this.destroyed)
@@ -876,11 +876,11 @@
             try {
                 bytes = await this.downloader.getSegmentAsync(index);
             } catch (error) {
-                if (LuminaAudioPlayer.isDownloadAbort(error))
+                if (NemeraAudioPlayer.isDownloadAbort(error))
                     throw this.createAbortError();
                 // The downloader has already classified the failure, but this wrapper owns the stream error that the decode pipeline
                 // reads, so the failure is recorded with the download code before it is thrown.
-                this.recordFailure(LuminaAudioPlayer.PlayerError.from(error, LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED));
+                this.recordFailure(NemeraAudioPlayer.PlayerError.from(error, NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED));
                 throw this.error;
             }
             if (bytes === null) {
@@ -890,7 +890,7 @@
             }
             const descriptor = this.registry ? this.registry.find(this.container, this.codec) : null;
             if (!descriptor) {
-                this.recordFailure(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The bundled player has no demuxer for the normalized delivery.', { reason: LuminaAudioPlayer.PlayerErrorReason.NO_DEMUXER }));
+                this.recordFailure(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The bundled player has no demuxer for the normalized delivery.', { reason: NemeraAudioPlayer.PlayerErrorReason.NO_DEMUXER }));
                 throw this.error;
             }
             // The inner demuxer reads only from this segment's bytes. Its error callback is left null because this wrapper records and classifies every failure itself.
@@ -909,9 +909,9 @@
                 } catch (destroyError) {
                     console.debug('Audio player: the failed normalized segment could not be released.', destroyError);
                 }
-                if (LuminaAudioPlayer.isDownloadAbort(error))
+                if (NemeraAudioPlayer.isDownloadAbort(error))
                     throw this.createAbortError();
-                this.recordFailure(LuminaAudioPlayer.PlayerError.from(error, LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED));
+                this.recordFailure(NemeraAudioPlayer.PlayerError.from(error, NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED));
                 throw this.error;
             }
             // Initialization is asynchronous, so the stream may have been released while it ran. The new demuxer must be released too,
@@ -933,19 +933,19 @@
         /**
          * Loads the first segment and prepares the decoder configuration of the normalized stream.
          * @returns {Promise<void>} A promise that completes when the stream is ready to be read.
-         * @throws {LuminaAudioPlayer.PlayerError} When the first segment does not exist or is not in the delivered format.
+         * @throws {NemeraAudioPlayer.PlayerError} When the first segment does not exist or is not in the delivered format.
          */
         async initializeAsync() {
             if (this.destroyed)
                 throw this.createAbortError();
             if (this.segmentDurationSeconds <= 0)
-                throw this.recordFailure(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The normalized delivery has no segment duration.'));
+                throw this.recordFailure(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The normalized delivery has no segment duration.'));
             const loaded = await this.loadSegmentAsync(0);
             if (!loaded || !this.inner)
-                throw this.recordFailure(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The normalized delivery has no segments.'));
+                throw this.recordFailure(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The normalized delivery has no segments.'));
             const configuration = this.inner.getConfiguration();
             if (!configuration) {
-                const failure = this.recordFailure(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The normalized delivery reported no decoder configuration.'));
+                const failure = this.recordFailure(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The normalized delivery reported no decoder configuration.'));
                 // The wrapper is not returned to the engine after a failed initialization, so the already opened segment and its demuxer are
                 // released here instead of waiting for garbage collection.
                 await this.destroyAsync();
@@ -954,7 +954,7 @@
             if (this.capabilities && typeof this.capabilities.supportsAudioConfigAsync === 'function') {
                 const isSupported = await this.capabilities.supportsAudioConfigAsync(configuration);
                 if (!isSupported) {
-                    const failure = this.recordFailure(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The browser cannot decode the normalized delivery.', { reason: LuminaAudioPlayer.PlayerErrorReason.CODEC_UNSUPPORTED }));
+                    const failure = this.recordFailure(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The browser cannot decode the normalized delivery.', { reason: NemeraAudioPlayer.PlayerErrorReason.CODEC_UNSUPPORTED }));
                     await this.destroyAsync();
                     throw failure;
                 }
@@ -987,7 +987,7 @@
         /**
          * Reads the next encoded packet of the normalized stream, moving to the next segment when the current one ends.
          * @returns {Promise<Object|null>} The packet with an absolute timestamp, or null once the stream ended.
-         * @throws {LuminaAudioPlayer.PlayerError} When a segment cannot be read.
+         * @throws {NemeraAudioPlayer.PlayerError} When a segment cannot be read.
          */
         async readPacketAsync() {
             this.ensureInitialized();
@@ -1036,7 +1036,7 @@
          * @param {number} seconds - The target position, in seconds.
          * @returns {Promise<number>} Zero, which is not a byte offset: the normalized stream is always repositioned by loading a new segment
          * and dropping the packets before the target, so no container level byte seek is left for the engine to perform.
-         * @throws {LuminaAudioPlayer.PlayerError} When the target segment cannot be read.
+         * @throws {NemeraAudioPlayer.PlayerError} When the target segment cannot be read.
          */
         async seekToTimeAsync(seconds) {
             this.ensureInitialized();
@@ -1097,7 +1097,7 @@
 
         /**
          * Gets the last failure the stream recorded, or null.
-         * @returns {LuminaAudioPlayer.PlayerError|null} The recorded failure.
+         * @returns {NemeraAudioPlayer.PlayerError|null} The recorded failure.
          */
         getError() {
             return this.error;
@@ -1105,13 +1105,13 @@
 
         /**
          * Records a failure once and reports it to the caller, so the decode pipeline stops with a typed error.
-         * @param {LuminaAudioPlayer.PlayerError} error - The failure to record.
-         * @returns {LuminaAudioPlayer.PlayerError} The recorded failure.
+         * @param {NemeraAudioPlayer.PlayerError} error - The failure to record.
+         * @returns {NemeraAudioPlayer.PlayerError} The recorded failure.
          */
         recordFailure(error) {
             if (this.error)
                 return this.error;
-            const typed = LuminaAudioPlayer.PlayerError.from(error, LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED);
+            const typed = NemeraAudioPlayer.PlayerError.from(error, NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED);
             this.error = typed;
             this.initialized = false;
             if (this.onError) {
@@ -1126,16 +1126,16 @@
 
         /**
          * Creates the typed abort of an intentionally stopped normalized stream.
-         * @returns {LuminaAudioPlayer.PlayerError} The abort.
+         * @returns {NemeraAudioPlayer.PlayerError} The abort.
          */
         createAbortError() {
-            return new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The normalized segment stream was aborted.');
+            return new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The normalized segment stream was aborted.');
         }
 
         /**
          * Ensures the stream was initialized before it is read.
          * @returns {void}
-         * @throws {LuminaAudioPlayer.PlayerError} When the stream was destroyed, failed, or was not initialized.
+         * @throws {NemeraAudioPlayer.PlayerError} When the stream was destroyed, failed, or was not initialized.
          */
         ensureInitialized() {
             if (this.destroyed)
@@ -1143,7 +1143,7 @@
             if (this.error)
                 throw this.error;
             if (!this.initialized)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The normalized segment stream is not initialized.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The normalized segment stream is not initialized.');
         }
 
         /**
@@ -1167,26 +1167,26 @@
         }
     }
 
-    LuminaAudioPlayer.NormalizedSegmentDownloader = NormalizedSegmentDownloader;
-    LuminaAudioPlayer.NormalizedSegmentDemuxer = NormalizedSegmentDemuxer;
+    NemeraAudioPlayer.NormalizedSegmentDownloader = NormalizedSegmentDownloader;
+    NemeraAudioPlayer.NormalizedSegmentDemuxer = NormalizedSegmentDemuxer;
 
     /**
      * Creates the downloader of the segments of a normalized track.
-     * @param {Object} options - The downloader options, per {@link LuminaAudioPlayer.NormalizedSegmentDownloader}.
-     * @returns {LuminaAudioPlayer.NormalizedSegmentDownloader} The downloader.
+     * @param {Object} options - The downloader options, per {@link NemeraAudioPlayer.NormalizedSegmentDownloader}.
+     * @returns {NemeraAudioPlayer.NormalizedSegmentDownloader} The downloader.
      */
-    LuminaAudioPlayer.createNormalizedSegmentDownloader = function (options) {
+    NemeraAudioPlayer.createNormalizedSegmentDownloader = function (options) {
         return new NormalizedSegmentDownloader(options);
     };
 
     /**
      * Creates and initializes the demuxer of a normalized playback manifest.
      * @param {Object} manifest - The playback manifest of the normalized track.
-     * @param {Object} options - The demuxer options, per {@link LuminaAudioPlayer.NormalizedSegmentDemuxer}.
-     * @returns {Promise<LuminaAudioPlayer.NormalizedSegmentDemuxer>} The ready demuxer.
-     * @throws {LuminaAudioPlayer.PlayerError} When the normalized delivery cannot be read.
+     * @param {Object} options - The demuxer options, per {@link NemeraAudioPlayer.NormalizedSegmentDemuxer}.
+     * @returns {Promise<NemeraAudioPlayer.NormalizedSegmentDemuxer>} The ready demuxer.
+     * @throws {NemeraAudioPlayer.PlayerError} When the normalized delivery cannot be read.
      */
-    LuminaAudioPlayer.createNormalizedSegmentDemuxer = async function (manifest, options) {
+    NemeraAudioPlayer.createNormalizedSegmentDemuxer = async function (manifest, options) {
         const demuxer = new NormalizedSegmentDemuxer(Object.assign({}, options, { manifest: manifest }));
         try {
             await demuxer.initializeAsync();
@@ -1201,4 +1201,4 @@
             throw error;
         }
     };
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.DTO.MediaContributors;
+namespace Nemera.Contracts.DTO.MediaContributors;
 
 /// <summary>
 /// Data transfer object for a media contributor.

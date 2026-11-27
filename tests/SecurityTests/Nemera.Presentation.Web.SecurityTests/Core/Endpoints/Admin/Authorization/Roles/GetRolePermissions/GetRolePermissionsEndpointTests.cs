@@ -1,22 +1,22 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Authorization.Roles.GetRolePermissions;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Authorization.Roles.GetRolePermissions;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Authorization.Roles.GetRolePermissions;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Authorization.Roles.GetRolePermissions;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetRolePermissionsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetRolePermissionsEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetRolePermissionsEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
     private readonly RolePermissionsDtoFixture _rolePermissionsDtoFixture = new();
 
@@ -24,7 +24,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="GetRolePermissionsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetRolePermissionsEndpointTests(LuminaWebFactory apiFactory)
+    public GetRolePermissionsEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

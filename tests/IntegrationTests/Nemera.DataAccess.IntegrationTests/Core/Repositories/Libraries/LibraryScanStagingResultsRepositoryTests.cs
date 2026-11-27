@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
-using Lumina.DataAccess.Core.Repositories.Libraries;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
+using Nemera.DataAccess.Core.Repositories.Libraries;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -19,7 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.Libraries;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.Libraries;
 
 /// <summary>
 /// Contains integration tests for the <see cref="LibraryScanStagingResultsRepository"/> class.
@@ -33,7 +33,7 @@ public class LibraryScanStagingResultsRepositoryTests : IDisposable
 {
     private readonly string _connectionString;
     private readonly SqliteConnection _anchorConnection;
-    private readonly LuminaDbContext _context;
+    private readonly NemeraDbContext _context;
     private readonly LibraryScanStagingResultsRepository _sut;
     private readonly LibraryScanStagingResultsEntityFixture _libraryScanStagingResultsEntityFixture = new();
     private readonly LibraryScanSnapshotEntityFixture _libraryScanSnapshotEntityFixture = new();
@@ -47,10 +47,10 @@ public class LibraryScanStagingResultsRepositoryTests : IDisposable
     /// </summary>
     public LibraryScanStagingResultsRepositoryTests()
     {
-        _connectionString = $"Data Source=luminadataccess-staging-tests-{Guid.NewGuid()};Mode=Memory;Cache=Shared";
+        _connectionString = $"Data Source=nemeradataccess-staging-tests-{Guid.NewGuid()};Mode=Memory;Cache=Shared";
         _anchorConnection = new SqliteConnection(_connectionString);
         _anchorConnection.Open();
-        _context = new LuminaDbContext(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(_connectionString).Options);
+        _context = new NemeraDbContext(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(_connectionString).Options);
         _context.Database.EnsureCreated();
         _sut = new LibraryScanStagingResultsRepository(_context);
     }

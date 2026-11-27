@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Contracts.Responses.Themes;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Contracts.Responses.Themes;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Themes;
+namespace Nemera.Application.Common.Mapping.Themes;
 
 /// <summary>
 /// Extension methods for converting <see cref="ThemeEntity"/>.

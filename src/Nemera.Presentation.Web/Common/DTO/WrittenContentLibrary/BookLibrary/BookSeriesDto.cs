@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
+namespace Nemera.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
 
 /// <summary>
 /// Data transfer object for a request to get book series information.

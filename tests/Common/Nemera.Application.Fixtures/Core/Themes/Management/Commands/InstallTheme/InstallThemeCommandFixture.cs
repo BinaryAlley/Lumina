@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Themes.Management.Commands.InstallTheme;
+using Nemera.Application.Core.Themes.Management.Commands.InstallTheme;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Themes.Management.Commands.InstallTheme;
+namespace Nemera.Application.Fixtures.Core.Themes.Management.Commands.InstallTheme;
 
 /// <summary>
 /// Fixture class for the <see cref="InstallThemeCommand"/> class.

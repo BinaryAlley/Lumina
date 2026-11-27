@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
-using Lumina.Contracts.Requests.Authorization;
+using Nemera.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
+using Nemera.Contracts.Requests.Authorization;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Authorization;
+namespace Nemera.Application.Common.Mapping.Authorization;
 
 /// <summary>
 /// Extension methods for converting <see cref="UpdateRoleRequest"/>.

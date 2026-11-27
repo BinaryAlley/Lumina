@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.Common.Utilities;
+namespace Nemera.Application.Common.Utilities;
 
 /// <summary>
 /// Extension methods for the <see cref="FavoriteMediaKind"/> enumeration.

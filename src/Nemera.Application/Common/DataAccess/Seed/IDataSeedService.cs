@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Seed;
+namespace Nemera.Application.Common.DataAccess.Seed;
 
 /// <summary>
 /// Interface for the service for seeding initial data in the persistence medium.

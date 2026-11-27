@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.MusicBrainz.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.MusicBrainz.Common.Models.DTO.Settings;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.Core.Settings;
+namespace Nemera.Plugins.MusicBrainz.Core.Settings;
 
 /// <summary>
 /// Provides the runtime settings of the MusicBrainz metadata plugin, overlaying the settings persisted by the host over the configured defaults.

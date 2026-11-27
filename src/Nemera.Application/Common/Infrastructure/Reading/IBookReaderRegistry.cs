@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Reading;
+namespace Nemera.Application.Common.Infrastructure.Reading;
 
 /// <summary>
 /// Registry of the book readers provided by the loaded plugins.

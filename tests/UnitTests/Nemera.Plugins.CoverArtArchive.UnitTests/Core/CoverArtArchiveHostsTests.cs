@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.CoverArtArchive.Core;
+using Nemera.Plugins.CoverArtArchive.Core;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.UnitTests.Core;
+namespace Nemera.Plugins.CoverArtArchive.UnitTests.Core;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CoverArtArchiveHosts"/> class.

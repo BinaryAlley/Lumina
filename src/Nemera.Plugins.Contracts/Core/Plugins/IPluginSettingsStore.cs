@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.Contracts.Core.Plugins;
+namespace Nemera.Plugins.Contracts.Core.Plugins;
 
 /// <summary>
 /// Contract for reading the settings persisted by the host for a plugin.

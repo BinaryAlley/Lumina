@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Reading;
+using Nemera.Application.Common.Infrastructure.Reading;
 using System;
 using System.Collections.Concurrent;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+namespace Nemera.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 
 /// <summary>
 /// In-memory cache of whether the book reader of a plugin is enabled for a media library. The entries are invalidated when the

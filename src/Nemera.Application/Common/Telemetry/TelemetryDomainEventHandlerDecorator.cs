@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Events;
+using Nemera.Domain.Common.Events;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.Telemetry;
+namespace Nemera.Application.Common.Telemetry;
 
 /// <summary>
 /// Decorator that wraps an <see cref="IDomainEventHandler{TDomainEvent}"/> to emit traces, metrics, and structured logs for every domain event handling.

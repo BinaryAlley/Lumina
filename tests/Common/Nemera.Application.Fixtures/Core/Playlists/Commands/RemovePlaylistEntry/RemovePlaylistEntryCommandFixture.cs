@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Playlists.Commands.RemovePlaylistEntry;
+using Nemera.Application.Core.Playlists.Commands.RemovePlaylistEntry;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Playlists.Commands.RemovePlaylistEntry;
+namespace Nemera.Application.Fixtures.Core.Playlists.Commands.RemovePlaylistEntry;
 
 /// <summary>
 /// Fixture class for the <see cref="RemovePlaylistEntryCommand"/> record.

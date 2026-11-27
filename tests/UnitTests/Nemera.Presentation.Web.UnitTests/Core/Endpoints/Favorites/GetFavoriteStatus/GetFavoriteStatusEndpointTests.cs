@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Favorites;
-using Lumina.Presentation.Web.Common.Enums.Favorites;
-using Lumina.Presentation.Web.Common.Requests.Favorites;
-using Lumina.Presentation.Web.Core.Endpoints.Favorites.GetFavoriteStatus;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Favorites;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Favorites;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Favorites;
+using Nemera.Presentation.Web.Common.Enums.Favorites;
+using Nemera.Presentation.Web.Common.Requests.Favorites;
+using Nemera.Presentation.Web.Core.Endpoints.Favorites.GetFavoriteStatus;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Favorites;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Favorites;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System;
@@ -19,7 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Favorites.GetFavoriteStatus;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Favorites.GetFavoriteStatus;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetFavoriteStatusEndpoint"/> class.

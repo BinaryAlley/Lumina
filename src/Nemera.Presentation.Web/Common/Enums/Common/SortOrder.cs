@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.Enums.Common;
+namespace Nemera.Presentation.Web.Common.Enums.Common;
 
 /// <summary>
 /// Enumeration for the sort order.

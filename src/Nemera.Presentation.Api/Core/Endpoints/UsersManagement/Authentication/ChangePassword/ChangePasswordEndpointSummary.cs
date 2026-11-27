@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.Authentication;
-using Lumina.Contracts.Responses.Authentication;
+using Nemera.Contracts.Requests.Authentication;
+using Nemera.Contracts.Responses.Authentication;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
+namespace Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.ChangePassword;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="ChangePasswordEndpoint"/> API endpoint, for OpenAPI.

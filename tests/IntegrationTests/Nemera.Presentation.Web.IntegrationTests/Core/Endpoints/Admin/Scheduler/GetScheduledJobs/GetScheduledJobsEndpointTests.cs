@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Scheduling;
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Scheduler.GetScheduledJobs;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Scheduling;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Scheduling;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Scheduler.GetScheduledJobs;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Scheduling;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -12,22 +12,22 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Scheduler.GetScheduledJobs;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Scheduler.GetScheduledJobs;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetScheduledJobsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetScheduledJobsEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetScheduledJobsEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly ScheduledJobDtoFixture _scheduledJobDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetScheduledJobsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetScheduledJobsEndpointTests(LuminaWebFactory apiFactory)
+    public GetScheduledJobsEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

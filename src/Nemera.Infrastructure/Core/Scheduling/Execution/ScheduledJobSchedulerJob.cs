@@ -1,19 +1,19 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Infrastructure.Scheduling;
-using Lumina.Application.Common.Infrastructure.Themes;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Common.Mapping.Scheduling;
-using Lumina.Application.Common.Utilities;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
-using Lumina.Infrastructure.Core.Themes;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Scheduling;
+using Nemera.Application.Common.Infrastructure.Themes;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Common.Mapping.Scheduling;
+using Nemera.Application.Common.Utilities;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Infrastructure.Core.Themes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -24,7 +24,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Scheduling.Execution;
+namespace Nemera.Infrastructure.Core.Scheduling.Execution;
 
 /// <summary>
 /// Background service that schedules and executes the tasks of the scheduled jobs.

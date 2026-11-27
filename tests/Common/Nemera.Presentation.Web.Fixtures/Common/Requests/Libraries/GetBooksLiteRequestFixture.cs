@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Common;
-using Lumina.Presentation.Web.Common.Requests.Libraries;
+using Nemera.Presentation.Web.Common.Enums.Common;
+using Nemera.Presentation.Web.Common.Requests.Libraries;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Libraries;
+namespace Nemera.Presentation.Web.Fixtures.Common.Requests.Libraries;
 
 /// <summary>
 /// Fixture class for the <see cref="GetBooksLiteRequest"/> record.

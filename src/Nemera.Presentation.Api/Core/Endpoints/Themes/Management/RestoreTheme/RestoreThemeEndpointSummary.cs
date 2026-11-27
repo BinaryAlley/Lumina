@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.Themes;
+using Nemera.Contracts.Requests.Themes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Themes.Management.RestoreTheme;
+namespace Nemera.Presentation.Api.Core.Endpoints.Themes.Management.RestoreTheme;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="RestoreThemeEndpoint"/> API endpoint, for OpenAPI.

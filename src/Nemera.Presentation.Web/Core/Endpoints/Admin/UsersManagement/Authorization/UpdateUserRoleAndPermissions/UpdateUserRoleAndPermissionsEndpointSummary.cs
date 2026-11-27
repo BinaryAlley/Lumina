@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.Requests.Authorization;
-using Lumina.Presentation.Web.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.Requests.Authorization;
+using Nemera.Presentation.Web.Common.Responses.Authorization;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Admin.UsersManagement.Authorization.UpdateUserRoleAndPermissions;
+namespace Nemera.Presentation.Web.Core.Endpoints.Admin.UsersManagement.Authorization.UpdateUserRoleAndPermissions;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="UpdateUserRoleAndPermissionsEndpoint"/> endpoint, for OpenAPI.

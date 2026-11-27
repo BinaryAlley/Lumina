@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.Enums.Common;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
+namespace Nemera.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
 
 /// <summary>
 /// Data transfer object for a book.

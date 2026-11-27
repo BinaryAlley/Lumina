@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.MediaConsumption;
+namespace Nemera.Presentation.Web.Common.Requests.MediaConsumption;
 
 /// <summary>
 /// Represents a request to report that a media consumption session stopped.

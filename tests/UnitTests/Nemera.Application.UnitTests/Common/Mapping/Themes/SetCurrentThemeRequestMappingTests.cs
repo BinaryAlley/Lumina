@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.Themes;
-using Lumina.Application.Core.Themes.Management.Commands.SetCurrentTheme;
-using Lumina.Contracts.Fixtures.Core.Requests.Themes;
-using Lumina.Contracts.Requests.Themes;
+using Nemera.Application.Common.Mapping.Themes;
+using Nemera.Application.Core.Themes.Management.Commands.SetCurrentTheme;
+using Nemera.Contracts.Fixtures.Core.Requests.Themes;
+using Nemera.Contracts.Requests.Themes;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.Themes;
+namespace Nemera.Application.UnitTests.Common.Mapping.Themes;
 
 /// <summary>
 /// Contains unit tests for the <see cref="SetCurrentThemeRequestMapping"/> class.

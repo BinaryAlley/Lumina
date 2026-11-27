@@ -16,8 +16,8 @@
     /playlists/item/{playlistId}
 *@
 
-@using Lumina.Presentation.Web.Common.DTO.Playlists
-@using Lumina.Presentation.Web.Common.Services
+@using Nemera.Presentation.Web.Common.DTO.Playlists
+@using Nemera.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
 @using System
 @using System.Collections.Generic
@@ -1041,7 +1041,7 @@
                 notificationService.show(strings.nothingToPlay, NotificationType.ERROR);
                 return;
             }
-            const player = window.LuminaAudioPlayer && window.LuminaAudioPlayer.instance;
+            const player = window.NemeraAudioPlayer && window.NemeraAudioPlayer.instance;
             if (!player) {
                 notificationService.show(strings.playerUnavailable, NotificationType.ERROR);
                 return;
@@ -1172,7 +1172,7 @@
             }
         }
 
-        document.addEventListener('lumina:playlist-updated', handlePlaylistUpdated);
+        document.addEventListener('nemera:playlist-updated', handlePlaylistUpdated);
         if (entriesContainer) {
             entriesContainer.addEventListener('dragover', event => {
                 if (draggedEntryId)
@@ -1230,7 +1230,7 @@
                 artistCombobox.removeEventListener('click', artistComboboxHandler);
             if (albumCombobox && albumComboboxHandler)
                 albumCombobox.removeEventListener('click', albumComboboxHandler);
-            document.removeEventListener('lumina:playlist-updated', handlePlaylistUpdated);
+            document.removeEventListener('nemera:playlist-updated', handlePlaylistUpdated);
             console.log(`Unloaded @scriptId`);
         };
         console.log(`Loaded @scriptId`);

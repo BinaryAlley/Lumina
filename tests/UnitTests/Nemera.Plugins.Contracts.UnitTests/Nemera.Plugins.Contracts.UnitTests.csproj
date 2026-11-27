@@ -38,9 +38,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Lumina.Plugins.Contracts\Lumina.Plugins.Contracts.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Plugins.Contracts.Fixtures\Lumina.Plugins.Contracts.Fixtures.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Contracts.Fixtures\Lumina.Contracts.Fixtures.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Plugins.Contracts\Nemera.Plugins.Contracts.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Plugins.Contracts.Fixtures\Nemera.Plugins.Contracts.Fixtures.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Contracts.Fixtures\Nemera.Contracts.Fixtures.csproj" />
     </ItemGroup>
 
 </Project>

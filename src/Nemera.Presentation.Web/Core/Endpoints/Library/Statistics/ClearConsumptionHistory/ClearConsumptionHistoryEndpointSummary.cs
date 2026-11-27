@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.Requests.Library.Statistics;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.Statistics.ClearConsumptionHistory;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.Statistics.ClearConsumptionHistory;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="ClearConsumptionHistoryEndpoint"/> endpoint, for OpenAPI.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Presentation.Web.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Common.DTO.Libraries;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Libraries;
+namespace Nemera.Presentation.Web.Fixtures.Common.DTO.Libraries;
 
 /// <summary>
 /// Fixture class for the <see cref="LibraryScanJobProgressDto"/> class.

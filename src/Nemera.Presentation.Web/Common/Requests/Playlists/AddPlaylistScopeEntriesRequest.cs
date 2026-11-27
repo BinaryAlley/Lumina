@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.Playlists;
+namespace Nemera.Presentation.Web.Common.Requests.Playlists;
 
 /// <summary>
 /// Represents a request to add every track of a music library, an artist or an album to a playlist, resolved on the server.

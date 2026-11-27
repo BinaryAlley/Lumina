@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
-using Lumina.Infrastructure.Core.Scheduling.Execution.TaskExecutors;
+using Nemera.Application.Common.DataAccess.Repositories.Scheduling;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Infrastructure.Core.Scheduling.Execution.TaskExecutors;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Scheduling.Execution.TaskExecutors;
+namespace Nemera.Infrastructure.UnitTests.Core.Scheduling.Execution.TaskExecutors;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CleanScheduledJobExecutionHistoryTaskExecutor"/> class.

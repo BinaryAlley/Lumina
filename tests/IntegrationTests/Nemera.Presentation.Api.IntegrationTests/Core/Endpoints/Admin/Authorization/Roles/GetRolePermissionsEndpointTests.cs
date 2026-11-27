@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.DTO.Authentication;
-using Lumina.Contracts.Responses.Authorization;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.DTO.Authentication;
+using Nemera.Contracts.Responses.Authorization;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,16 +21,16 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Admin.Authorization.Roles;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Admin.Authorization.Roles;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetRolePermissionsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -41,7 +41,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
     /// Initializes a new instance of the <see cref="GetRolePermissionsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetRolePermissionsEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetRolePermissionsEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -60,7 +60,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
     {
         // Arrange
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         RoleEntity? role = dbContext.Roles.FirstOrDefault();
         Assert.NotNull(role);
 
@@ -91,7 +91,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         // Arrange
         _client = await _apiFactory.CreateAuthenticatedClientAsync(); // Authenticated user, but not admin.
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         RoleEntity? role = dbContext.Roles.FirstOrDefault();
         Assert.NotNull(role);
 
@@ -141,7 +141,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
         // Arrange
         using CancellationTokenSource cts = new();
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         RoleEntity? role = dbContext.Roles.FirstOrDefault();
         Assert.NotNull(role);
 
@@ -159,7 +159,7 @@ public class GetRolePermissionsEndpointTests : IClassFixture<AuthenticatedLumina
     public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         // Clear junction tables first.
         await dbContext.Set<RolePermissionEntity>().ExecuteDeleteAsync();

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 #endregion
 
-namespace Lumina.Plugins.Pdf.Fixtures.Core.Pdf;
+namespace Nemera.Plugins.Pdf.Fixtures.Core.Pdf;
 
 /// <summary>
 /// Builds a minimal, structurally valid PDF file used as test input for the PDF parsing and rendering tests. The file is produced into a temporary directory

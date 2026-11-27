@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Responses.UsersManagement.Settings;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Settings.GetPlaybackState;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Responses.UsersManagement.Settings;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Settings.GetPlaybackState;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -17,16 +17,16 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagement.Settings.GetPlaybackState;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagement.Settings.GetPlaybackState;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetPlaybackStateEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetPlaybackStateEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetPlaybackStateEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly UserSettingsEntityFixture _userSettingsEntityFixture = new();
     private readonly UserEntityFixture _userEntityFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -39,7 +39,7 @@ public class GetPlaybackStateEndpointTests : IClassFixture<AuthenticatedLuminaAp
     /// Initializes a new instance of the <see cref="GetPlaybackStateEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetPlaybackStateEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetPlaybackStateEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -133,7 +133,7 @@ public class GetPlaybackStateEndpointTests : IClassFixture<AuthenticatedLuminaAp
     private async Task<UserSettingsEntity> CreateTestUserSettings(double volume, bool isMuted)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         Guid userId = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername).Id;
         UserSettingsEntity settings = _userSettingsEntityFixture.Create(userId: userId, volume: volume, isMuted: isMuted);
@@ -152,7 +152,7 @@ public class GetPlaybackStateEndpointTests : IClassFixture<AuthenticatedLuminaAp
     private async Task CreateSettingsForAnotherUserAsync(double volume, bool isMuted)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         UserEntity otherUser = _userEntityFixture.Create(username: $"otheruser_{Guid.NewGuid()}", password: "TestPass123!");
         otherUser.TotpSecret = null;
@@ -167,7 +167,7 @@ public class GetPlaybackStateEndpointTests : IClassFixture<AuthenticatedLuminaAp
     public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         await dbContext.Set<UserSettingsEntity>().ExecuteDeleteAsync();
         await dbContext.Set<UserEntity>().ExecuteDeleteAsync();

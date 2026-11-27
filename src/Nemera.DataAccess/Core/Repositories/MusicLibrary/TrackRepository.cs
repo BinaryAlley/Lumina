@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
-using Lumina.DataAccess.Common.Persistence;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.MusicLibrary;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Common.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.DataAccess.Common.Persistence;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -19,24 +19,24 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.MusicLibrary;
+namespace Nemera.DataAccess.Core.Repositories.MusicLibrary;
 
 /// <summary>
 /// Repository for tracks.
 /// </summary>
 internal sealed class TrackRepository : ITrackRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TrackRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
     /// <param name="dateTimeProvider">Injected provider for the current UTC time, used to stamp deletions deterministically.</param>
-    public TrackRepository(LuminaDbContext luminaDbContext, IDateTimeProvider dateTimeProvider)
+    public TrackRepository(NemeraDbContext nemeraDbContext, IDateTimeProvider dateTimeProvider)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
         _dateTimeProvider = dateTimeProvider;
     }
 
@@ -48,7 +48,7 @@ internal sealed class TrackRepository : ITrackRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(TrackEntity track, CancellationToken cancellationToken)
     {
-        bool doesTrackExist = await _luminaDbContext.Tracks.AnyAsync(repositoryTrack => repositoryTrack.Id == track.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
+        bool doesTrackExist = await _nemeraDbContext.Tracks.AnyAsync(repositoryTrack => repositoryTrack.Id == track.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (doesTrackExist)
             return Errors.Music.TrackAlreadyExists;
 
@@ -60,17 +60,17 @@ internal sealed class TrackRepository : ITrackRepository
             return Errors.Music.TrackAlreadyExists;
 
         // Resolve the tags and genres of the track to a single instance per name, replacing the stored ones where they exist, so that the shared tables are not duplicated.
-        Result<IReadOnlyDictionary<string, TagEntity>> resolveTagsResult = await SharedReferenceResolver.ResolveAsync(_luminaDbContext, track.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        Result<IReadOnlyDictionary<string, TagEntity>> resolveTagsResult = await SharedReferenceResolver.ResolveAsync(_nemeraDbContext, track.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
         if (resolveTagsResult.IsFailure)
             return resolveTagsResult.Errors;
-        Result<IReadOnlyDictionary<string, GenreEntity>> resolveGenresResult = await SharedReferenceResolver.ResolveAsync(_luminaDbContext, track.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        Result<IReadOnlyDictionary<string, GenreEntity>> resolveGenresResult = await SharedReferenceResolver.ResolveAsync(_nemeraDbContext, track.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
         if (resolveGenresResult.IsFailure)
             return resolveGenresResult.Errors;
 
         track.Tags = [.. SharedReferenceResolver.Normalize(track.Tags, resolveTagsResult.Value)];
         track.Genres = [.. SharedReferenceResolver.Normalize(track.Genres, resolveGenresResult.Value)];
 
-        _luminaDbContext.Tracks.Add(track);
+        _nemeraDbContext.Tracks.Add(track);
         return Result.Created;
     }
 
@@ -97,7 +97,7 @@ internal sealed class TrackRepository : ITrackRepository
         const int LOOKUP_CHUNK_SIZE = 20_000;
         List<string> existingPaths = [];
         foreach (string[] chunk in distinctPaths.Chunk(LOOKUP_CHUNK_SIZE))
-            existingPaths.AddRange(await _luminaDbContext.Tracks
+            existingPaths.AddRange(await _nemeraDbContext.Tracks
                 .Where(repositoryTrack => repositoryTrack.LibraryId == libraryId && chunk.Contains(repositoryTrack.Path))
                 .Select(repositoryTrack => repositoryTrack.Path)
                 .ToListAsync(cancellationToken).ConfigureAwait(false));
@@ -113,7 +113,7 @@ internal sealed class TrackRepository : ITrackRepository
     public async Task<Result<Updated>> UpdateAsync(TrackEntity data, CancellationToken cancellationToken)
     {
         // Every collection that is reconciled must be loaded, so that the reconciliation can see the rows that are already stored and leave the unchanged ones alone.
-        TrackEntity? foundTrack = await _luminaDbContext.Tracks
+        TrackEntity? foundTrack = await _nemeraDbContext.Tracks
             .Include(repositoryTrack => repositoryTrack.Tags)
             .Include(repositoryTrack => repositoryTrack.Genres)
             .Include(repositoryTrack => repositoryTrack.Ratings)
@@ -146,21 +146,21 @@ internal sealed class TrackRepository : ITrackRepository
         Guid libraryId = foundTrack.LibraryId;
         bool isDeleted = foundTrack.IsDeleted;
         DateTime? deletedOnUtc = foundTrack.DeletedOnUtc;
-        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundTrack, data);
+        EditableValuesCopier.CopyEditableValues(_nemeraDbContext, foundTrack, data);
         foundTrack.AlbumId = albumId;
         foundTrack.LibraryId = libraryId;
         // The deletion state is owned by the explicit delete and restore operations. Clearing the modified flags keeps it out of the UPDATE statement,
         // so an edit that raced with a delete can never write the deletion state back and resurrect the track.
         foundTrack.IsDeleted = isDeleted;
         foundTrack.DeletedOnUtc = deletedOnUtc;
-        _luminaDbContext.Entry(foundTrack).Property(track => track.IsDeleted).IsModified = false;
-        _luminaDbContext.Entry(foundTrack).Property(track => track.DeletedOnUtc).IsModified = false;
+        _nemeraDbContext.Entry(foundTrack).Property(track => track.IsDeleted).IsModified = false;
+        _nemeraDbContext.Entry(foundTrack).Property(track => track.DeletedOnUtc).IsModified = false;
 
         // Tags and genres are shared across the whole database, so the stored rows whose names already exist are reused, and only the missing names are inserted.
-        Result<Updated> reconcileTagsResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundTrack.Tags, data.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        Result<Updated> reconcileTagsResult = await SharedReferenceResolver.ReconcileAsync(_nemeraDbContext, foundTrack.Tags, data.Tags, Errors.Metadata.TagNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
         if (reconcileTagsResult.IsFailure)
             return reconcileTagsResult.Errors;
-        Result<Updated> reconcileGenresResult = await SharedReferenceResolver.ReconcileAsync(_luminaDbContext, foundTrack.Genres, data.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
+        Result<Updated> reconcileGenresResult = await SharedReferenceResolver.ReconcileAsync(_nemeraDbContext, foundTrack.Genres, data.Genres, Errors.Metadata.GenreNameCannotBeEmpty, cancellationToken).ConfigureAwait(false);
         if (reconcileGenresResult.IsFailure)
             return reconcileGenresResult.Errors;
 
@@ -233,7 +233,7 @@ internal sealed class TrackRepository : ITrackRepository
     {
         // A deleted track, or a track of a deleted album or artist, is kept in the storage medium only so that its path stays reserved and it
         // can be restored, so it is never returned to a caller.
-        IQueryable<TrackEntity> query = _luminaDbContext.Tracks.Where(track => !track.IsDeleted && !track.Album!.IsDeleted && !track.Album!.Artist!.IsDeleted);
+        IQueryable<TrackEntity> query = _nemeraDbContext.Tracks.Where(track => !track.IsDeleted && !track.Album!.IsDeleted && !track.Album!.Artist!.IsDeleted);
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         if (shouldIncludeNavigationProperties)
@@ -260,7 +260,7 @@ internal sealed class TrackRepository : ITrackRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="TrackEntity"/>, or an error.</returns>
     public async Task<Result<IReadOnlyList<TrackEntity>>> GetByAlbumIdAsync(Guid albumId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Tracks
+        return await _nemeraDbContext.Tracks
             .Include(track => track.Ratings)
             .Include(track => track.Tags)
             .Include(track => track.Genres)
@@ -283,7 +283,7 @@ internal sealed class TrackRepository : ITrackRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="TrackEntity"/>, or an error.</returns>
     public async Task<Result<IReadOnlyList<TrackEntity>>> GetByAlbumIdIncludingDeletedAsync(Guid albumId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Tracks
+        return await _nemeraDbContext.Tracks
             .AsNoTracking()
             .Where(track => track.AlbumId == albumId)
             .OrderBy(track => track.DiscNumber ?? 1)
@@ -303,7 +303,7 @@ internal sealed class TrackRepository : ITrackRepository
     public async Task<Result<PaginatedResultDto<TrackLiteRow>>> GetTracksLiteByAlbumIdAsync(Guid albumId, PaginationDataDto? paginationData, CancellationToken cancellationToken)
     {
         // The lightweight read models are always retrieved without tracking, because they are never modified by the caller.
-        IQueryable<TrackLiteRow> liteRowsQuery = _luminaDbContext.Tracks
+        IQueryable<TrackLiteRow> liteRowsQuery = _nemeraDbContext.Tracks
             .AsNoTracking()
             .Where(track => track.AlbumId == albumId && !track.IsDeleted && !track.Album!.IsDeleted && !track.Album!.Artist!.IsDeleted)
             .OrderBy(track => track.DiscNumber ?? 1) // Some releases don't have a disc number, assume 1.
@@ -361,7 +361,7 @@ internal sealed class TrackRepository : ITrackRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="ShuffleTrackRowDto"/>, or an error.</returns>
     public async Task<Result<IReadOnlyList<ShuffleTrackRowDto>>> GetShuffleTracksLiteAsync(Guid libraryId, Guid? artistId, Guid? albumId, IReadOnlyCollection<Guid> excludedTrackIds, int count, CancellationToken cancellationToken)
     {
-        IQueryable<TrackEntity> query = _luminaDbContext.Tracks
+        IQueryable<TrackEntity> query = _nemeraDbContext.Tracks
             .AsNoTracking()
             .Where(track => track.LibraryId == libraryId && !track.IsDeleted && !track.Album!.IsDeleted && !track.Album!.Artist!.IsDeleted);
 
@@ -385,7 +385,7 @@ internal sealed class TrackRepository : ITrackRepository
                 track.AlbumId,
                 track.Album!.Title,
                 track.Album!.ArtistId,
-                _luminaDbContext.MusicArtwork
+                _nemeraDbContext.MusicArtwork
                     .Where(artwork => artwork.OwnerType == MusicArtworkOwnerType.Album && artwork.OwnerId == track.AlbumId && artwork.ArtworkType == ArtworkType.Cover)
                     .Select(artwork => artwork.FileName)
                     .FirstOrDefault()))
@@ -405,7 +405,7 @@ internal sealed class TrackRepository : ITrackRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="TrackEntity"/> stored at the provided path, or an error.</returns>
     public async Task<Result<TrackEntity?>> GetByPathAsync(Guid libraryId, string path, CancellationToken cancellationToken)
     {
-        TrackEntity? track = await _luminaDbContext.Tracks
+        TrackEntity? track = await _nemeraDbContext.Tracks
             .FirstOrDefaultAsync(repositoryTrack => repositoryTrack.LibraryId == libraryId && repositoryTrack.Path == path, cancellationToken).ConfigureAwait(false);
         return track;
     }
@@ -428,7 +428,7 @@ internal sealed class TrackRepository : ITrackRepository
     {
         // The projection is flat and untracked, and the album is joined both to scope the track by its artist and to project the artist Id, so a track
         // that is not in the named library, album and artist simply yields no row.
-        return await _luminaDbContext.Tracks
+        return await _nemeraDbContext.Tracks
             .AsNoTracking()
             .Where(track => track.Id == trackId
                 && track.LibraryId == libraryId
@@ -470,7 +470,7 @@ internal sealed class TrackRepository : ITrackRepository
     {
         // The projection is flat and untracked, and the album is joined both to scope the track by its artist and to project the artist Id, so a track
         // that is not in the named library, album and artist simply yields no row.
-        return await _luminaDbContext.Tracks
+        return await _nemeraDbContext.Tracks
             .AsNoTracking()
             .Where(track => track.Id == trackId
                 && track.LibraryId == libraryId
@@ -503,7 +503,7 @@ internal sealed class TrackRepository : ITrackRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted <see cref="TrackEntity"/>, <see langword="null"/> when the track does not exist, is not soft deleted, or its album or artist is soft deleted, or an error.</returns>
     public async Task<Result<TrackEntity?>> GetSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Tracks
+        return await _nemeraDbContext.Tracks
             .AsNoTracking()
             .FirstOrDefaultAsync(track => track.Id == id
                 && track.IsDeleted
@@ -519,7 +519,7 @@ internal sealed class TrackRepository : ITrackRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the soft deleted tracks, or an error.</returns>
     public async Task<Result<IReadOnlyList<TrackEntity>>> GetSoftDeletedByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Tracks
+        return await _nemeraDbContext.Tracks
             .AsNoTracking()
             .Include(track => track.Album)
                 .ThenInclude(album => album!.Artist)
@@ -551,7 +551,7 @@ internal sealed class TrackRepository : ITrackRepository
         DateTime deletedOnUtc = _dateTimeProvider.UtcNow;
 
         // The update covers the existence check and the transition in one statement, so two concurrent deletes of the same track cannot both succeed.
-        int updatedRows = await _luminaDbContext.Tracks
+        int updatedRows = await _nemeraDbContext.Tracks
             .Where(track => track.Id == id && !track.IsDeleted)
             .ExecuteUpdateAsync(setters => setters
                 .SetProperty(track => track.IsDeleted, true)
@@ -569,7 +569,7 @@ internal sealed class TrackRepository : ITrackRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> RestoreSoftDeletedByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        TrackEntity? track = await _luminaDbContext.Tracks.FirstOrDefaultAsync(repositoryTrack => repositoryTrack.Id == id, cancellationToken).ConfigureAwait(false);
+        TrackEntity? track = await _nemeraDbContext.Tracks.FirstOrDefaultAsync(repositoryTrack => repositoryTrack.Id == id, cancellationToken).ConfigureAwait(false);
         if (track is null || !track.IsDeleted)
             return Errors.Music.TrackNotFound;
 
@@ -586,12 +586,12 @@ internal sealed class TrackRepository : ITrackRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        TrackEntity? track = await _luminaDbContext.Tracks
+        TrackEntity? track = await _nemeraDbContext.Tracks
             .FirstOrDefaultAsync(repositoryTrack => repositoryTrack.Id == id, cancellationToken).ConfigureAwait(false);
         if (track is null)
             return Errors.Music.TrackNotFound;
 
-        _luminaDbContext.Tracks.Remove(track);
+        _nemeraDbContext.Tracks.Remove(track);
         return Result.Deleted;
     }
 
@@ -616,7 +616,7 @@ internal sealed class TrackRepository : ITrackRepository
         // The tracks stored at the changed paths are reset, together with the albums and the artists they belong to, because the metadata of the whole release is re-evaluated.
         List<Guid> trackIds = [];
         foreach (string[] chunk in pathList.Chunk(LOOKUP_CHUNK_SIZE))
-            trackIds.AddRange(await _luminaDbContext.Tracks
+            trackIds.AddRange(await _nemeraDbContext.Tracks
                 .Where(track => track.LibraryId == libraryId && chunk.Contains(track.Path))
                 .Select(track => track.Id)
                 .ToListAsync(cancellationToken).ConfigureAwait(false));
@@ -625,7 +625,7 @@ internal sealed class TrackRepository : ITrackRepository
 
         HashSet<Guid> albumIdSet = [];
         foreach (Guid[] chunk in trackIds.Chunk(LOOKUP_CHUNK_SIZE))
-            albumIdSet.UnionWith(await _luminaDbContext.Tracks
+            albumIdSet.UnionWith(await _nemeraDbContext.Tracks
                 .Where(track => chunk.Contains(track.Id))
                 .Select(track => track.AlbumId)
                 .Distinct()
@@ -634,7 +634,7 @@ internal sealed class TrackRepository : ITrackRepository
 
         HashSet<Guid> artistIdSet = [];
         foreach (Guid[] chunk in albumIds.Chunk(LOOKUP_CHUNK_SIZE))
-            artistIdSet.UnionWith(await _luminaDbContext.Albums
+            artistIdSet.UnionWith(await _nemeraDbContext.Albums
                 .Where(album => chunk.Contains(album.Id))
                 .Select(album => album.ArtistId)
                 .Distinct()
@@ -642,15 +642,15 @@ internal sealed class TrackRepository : ITrackRepository
         List<Guid> artistIds = [.. artistIdSet];
 
         foreach (Guid[] chunk in trackIds.Chunk(LOOKUP_CHUNK_SIZE))
-            await _luminaDbContext.Tracks
+            await _nemeraDbContext.Tracks
                 .Where(track => chunk.Contains(track.Id))
                 .ExecuteUpdateAsync(setters => setters.SetProperty(track => track.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
         foreach (Guid[] chunk in albumIds.Chunk(LOOKUP_CHUNK_SIZE))
-            await _luminaDbContext.Albums
+            await _nemeraDbContext.Albums
                 .Where(album => chunk.Contains(album.Id))
                 .ExecuteUpdateAsync(setters => setters.SetProperty(album => album.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
         foreach (Guid[] chunk in artistIds.Chunk(LOOKUP_CHUNK_SIZE))
-            await _luminaDbContext.Artists
+            await _nemeraDbContext.Artists
                 .Where(artist => chunk.Contains(artist.Id))
                 .ExecuteUpdateAsync(setters => setters.SetProperty(artist => artist.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
 
@@ -665,7 +665,7 @@ internal sealed class TrackRepository : ITrackRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either the number of tracks needing their metadata enriched, or an error.</returns>
     public async Task<Result<int>> GetTracksNeedingMetadataCountAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Tracks
+        return await _nemeraDbContext.Tracks
             .CountAsync(track => track.LibraryId == libraryId
                         && !track.IsDeleted
                         && !track.Album!.IsDeleted
@@ -681,7 +681,7 @@ internal sealed class TrackRepository : ITrackRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> ResetMetadataStatusForLibraryAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        await _luminaDbContext.Tracks
+        await _nemeraDbContext.Tracks
             .Where(track => track.LibraryId == libraryId)
             .ExecuteUpdateAsync(setters => setters.SetProperty(track => track.MetadataStatus, MetadataStatus.Pending), cancellationToken).ConfigureAwait(false);
         return Result.Updated;
@@ -705,7 +705,7 @@ internal sealed class TrackRepository : ITrackRepository
         HashSet<Guid> libraryIds = [];
         foreach (Guid[] chunk in trackIds.Chunk(LOOKUP_CHUNK_SIZE))
         {
-            List<TrackLibraryCount> chunkCounts = await _luminaDbContext.Tracks
+            List<TrackLibraryCount> chunkCounts = await _nemeraDbContext.Tracks
                 .AsNoTracking()
                 .Where(track => chunk.Contains(track.Id) && !track.IsDeleted && !track.Album!.IsDeleted && !track.Album!.Artist!.IsDeleted)
                 .GroupBy(track => track.LibraryId)
@@ -735,7 +735,7 @@ internal sealed class TrackRepository : ITrackRepository
         const int LOOKUP_CHUNK_SIZE = 500;
         foreach (Guid[] chunk in trackIds.Chunk(LOOKUP_CHUNK_SIZE))
         {
-            IQueryable<TrackEntity> query = _luminaDbContext.Tracks.AsNoTracking();
+            IQueryable<TrackEntity> query = _nemeraDbContext.Tracks.AsNoTracking();
             if (shouldIncludeNavigationProperties)
             {
                 query = query

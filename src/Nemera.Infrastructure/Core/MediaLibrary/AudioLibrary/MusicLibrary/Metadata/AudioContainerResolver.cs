@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Metadata;
+namespace Nemera.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Metadata;
 
 /// <summary>
 /// Resolves the canonical name of the container of an audio file from the concrete type the tagging library parsed it as.

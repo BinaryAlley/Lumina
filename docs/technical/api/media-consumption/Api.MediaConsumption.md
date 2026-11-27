@@ -1,6 +1,6 @@
-# Lumina API
+# Nemera API
 
-- [Lumina API](#lumina-api)
+- [Nemera API](#nemera-api)
   - [Media Consumption](#media-consumption)
     - [Start Consumption](#start-consumption)
       - [Start Consumption Request](#start-consumption-request)

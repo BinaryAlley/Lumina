@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Enums.AudioLibrary;
+namespace Nemera.Presentation.Web.Common.Enums.AudioLibrary;
 
 /// <summary>
 /// Enumeration for the type of a music release, describing the format of the release in terms of its content.

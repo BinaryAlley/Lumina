@@ -39,10 +39,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Lumina.Presentation.Api\Lumina.Presentation.Api.csproj" />
-        <ProjectReference Include="..\..\..\src\Lumina.Application\Lumina.Application.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Application.Fixtures\Lumina.Application.Fixtures.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Contracts.Fixtures\Lumina.Contracts.Fixtures.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Domain.Fixtures\Lumina.Domain.Fixtures.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Presentation.Api\Nemera.Presentation.Api.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Application\Nemera.Application.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Application.Fixtures\Nemera.Application.Fixtures.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Contracts.Fixtures\Nemera.Contracts.Fixtures.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Domain.Fixtures\Nemera.Domain.Fixtures.csproj" />
     </ItemGroup>
 </Project>

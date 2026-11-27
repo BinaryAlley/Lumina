@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Mapping.MediaLibrary.Management;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Common.Exceptions;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Mapping.MediaLibrary.Management;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Exceptions;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Events;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Events;
+namespace Nemera.Application.Core.MediaLibrary.Management.Events;
 
 /// <summary>
 /// Handler for the domain event raised when a media library scan is started.

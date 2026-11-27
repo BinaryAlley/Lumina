@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Common;
 using System.Net;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Exceptions;
+namespace Nemera.Presentation.Web.Common.Exceptions;
 
 /// <summary>
 /// Exception for an unsuccessful current-user authorization check, which means that the stored session refers to a user the API no longer knows.

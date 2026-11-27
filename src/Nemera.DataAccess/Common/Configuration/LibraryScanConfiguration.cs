@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 #endregion
 
-namespace Lumina.DataAccess.Common.Configuration;
+namespace Nemera.DataAccess.Common.Configuration;
 
 /// <summary>
 /// Configures the entity mapping for the <see cref="LibraryScanEntity"/> entity.

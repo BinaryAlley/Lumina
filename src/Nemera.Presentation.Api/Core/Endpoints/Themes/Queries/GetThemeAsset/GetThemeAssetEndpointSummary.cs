@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.Themes;
-using Lumina.Contracts.Responses.Themes;
+using Nemera.Contracts.Requests.Themes;
+using Nemera.Contracts.Responses.Themes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemeAsset;
+namespace Nemera.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemeAsset;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetThemeAssetEndpoint"/> API endpoint, for OpenAPI.
@@ -24,7 +24,7 @@ public class GetThemeAssetEndpointSummary : Summary<GetThemeAssetEndpoint, GetTh
         Description = "Retrieves the binary content of an asset file of a theme, with its MIME content type.";
 
         ExampleRequest = new GetThemeAssetRequest(
-            ThemeId: "lumina-default",
+            ThemeId: "nemera-default",
             AssetPath: "assets/style.css"
         );
 

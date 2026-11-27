@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -10,13 +10,13 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.GetLibraryBookReaders;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.GetLibraryBookReaders;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetLibraryBookReadersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetLibraryBookReadersEndpointTests : IClassFixture<LuminaApiFactory>
+public class GetLibraryBookReadersEndpointTests : IClassFixture<NemeraApiFactory>
 {
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -28,7 +28,7 @@ public class GetLibraryBookReadersEndpointTests : IClassFixture<LuminaApiFactory
     /// Initializes a new instance of the <see cref="GetLibraryBookReadersEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetLibraryBookReadersEndpointTests(LuminaApiFactory apiFactory)
+    public GetLibraryBookReadersEndpointTests(NemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
     }

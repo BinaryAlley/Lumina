@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathSeparator;
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.FileSystemManagement.Paths.Queries.GetPathSeparator;
+using Nemera.Contracts.Responses.FileSystemManagement.Path;
+using Nemera.Presentation.Api.Common.Routes.FileSystemManagement;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPathSeparator;
+namespace Nemera.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.GetPathSeparator;
 
 /// <summary>
 /// API endpoint for the <c>/path/get-path-separator</c> route.

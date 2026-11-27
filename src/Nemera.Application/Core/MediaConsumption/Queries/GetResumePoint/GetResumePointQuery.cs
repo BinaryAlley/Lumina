@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.MediaConsumption.Queries.GetResumePoint;
+namespace Nemera.Application.Core.MediaConsumption.Queries.GetResumePoint;
 
 /// <summary>
 /// Query for getting the resume point of the current user for a media item.

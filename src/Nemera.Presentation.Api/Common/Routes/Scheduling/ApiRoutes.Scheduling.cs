@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Api.Common.Routes.Scheduling;
+namespace Nemera.Presentation.Api.Common.Routes.Scheduling;
 
 /// <summary>
 /// Class for the collection of the scheduled job routes of the API.

@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
+namespace Nemera.Application.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
 
 /// <summary>
 /// Query for retrieving the root of a path.

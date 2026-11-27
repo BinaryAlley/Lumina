@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Api.Common.Routes.Maintenance;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Presentation.Api.Common.Routes.Maintenance;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Maintenance;
+namespace Nemera.Presentation.Api.Core.Endpoints.Maintenance;
 
 /// <summary>
 /// API endpoint for the <c>/check-health</c> route.

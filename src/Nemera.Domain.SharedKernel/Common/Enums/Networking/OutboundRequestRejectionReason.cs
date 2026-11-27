@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.Networking;
+namespace Nemera.Domain.SharedKernel.Common.Enums.Networking;
 
 /// <summary>
 /// Enumeration for the reasons an outbound request was rejected by the host address policy.

@@ -6,7 +6,7 @@ using System.IO;
 using System.Reflection;
 #endregion
 
-namespace Lumina.Presentation.Api.Common.DependencyInjection;
+namespace Nemera.Presentation.Api.Common.DependencyInjection;
 
 /// <summary>
 /// Class containing the configuration bindings of the Presentation API layer.

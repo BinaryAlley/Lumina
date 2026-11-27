@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Api;
+namespace Nemera.Presentation.Web.Common.Api;
 
 /// <summary>
 /// Represents the streamed response of a remote API request. It exposes the status code, the range related headers and the
@@ -21,7 +21,7 @@ public sealed class ApiStreamResult : IAsyncDisposable
     /// <summary>
     /// The response header that carries the number of segments of a normalized audio production. It must match the name the API sends.
     /// </summary>
-    public const string SEGMENT_COUNT_HEADER_NAME = "X-Lumina-Segment-Count";
+    public const string SEGMENT_COUNT_HEADER_NAME = "X-Nemera-Segment-Count";
 
     /// <summary>
     /// The response header that carries the exact start of a segment on the track timeline, in seconds. It must match the name the API sends.
@@ -31,7 +31,7 @@ public sealed class ApiStreamResult : IAsyncDisposable
     /// <summary>
     /// The response header that carries the produced duration of the normalized track, in seconds. It must match the name the API sends.
     /// </summary>
-    public const string TRACK_DURATION_SECONDS_HEADER_NAME = "X-Lumina-Track-Duration-Seconds";
+    public const string TRACK_DURATION_SECONDS_HEADER_NAME = "X-Nemera-Track-Duration-Seconds";
 
     private readonly HttpResponseMessage _response;
 

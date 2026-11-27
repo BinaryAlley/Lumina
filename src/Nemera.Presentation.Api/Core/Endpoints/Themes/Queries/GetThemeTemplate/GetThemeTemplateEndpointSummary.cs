@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.Themes;
-using Lumina.Contracts.Responses.Themes;
-using Lumina.Domain.SharedKernel.Common.Enums.Themes;
+using Nemera.Contracts.Requests.Themes;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.Domain.SharedKernel.Common.Enums.Themes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemeTemplate;
+namespace Nemera.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemeTemplate;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetThemeTemplateEndpoint"/> API endpoint, for OpenAPI.
@@ -25,7 +25,7 @@ public class GetThemeTemplateEndpointSummary : Summary<GetThemeTemplateEndpoint,
         Description = "Retrieves the raw template of a theme selected by a page key, after applying the theme engine sanitization.";
 
         ExampleRequest = new GetThemeTemplateRequest(
-            ThemeId: "lumina-default",
+            ThemeId: "nemera-default",
             PageKey: "index"
         );
 
@@ -36,10 +36,10 @@ public class GetThemeTemplateEndpointSummary : Summary<GetThemeTemplateEndpoint,
             example: new ThemeTemplateResponse(
                 new ThemeResponse(
                     Id: Guid.NewGuid(),
-                    ThemeId: "lumina-default",
-                    Name: "Lumina Default",
+                    ThemeId: "nemera-default",
+                    Name: "Nemera Default",
                     Description: "A clean, readable theme.",
-                    Author: "Lumina Team",
+                    Author: "Nemera Team",
                     Version: "1.2.0",
                     PreviewPath: "preview.png",
                     InstallSource: ThemeInstallSource.Bundled,

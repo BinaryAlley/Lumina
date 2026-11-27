@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
-using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.OpenLibrary.Common.DependencyInjection;
-using Lumina.Plugins.OpenLibrary.Core.Settings;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Plugins.Contracts.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.OpenLibrary.Common.DependencyInjection;
+using Nemera.Plugins.OpenLibrary.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.Core;
+namespace Nemera.Plugins.OpenLibrary.Core;
 
 /// <summary>
 /// Plugin that provides book metadata retrieval from Open Library.
@@ -34,7 +34,7 @@ public sealed class OpenLibraryPlugin : IPlugin, IPluginServiceRegistrator
     /// <summary>
     /// Gets the author of the plugin.
     /// </summary>
-    public string Author => "Lumina";
+    public string Author => "Nemera";
 
     /// <summary>
     /// Gets the version of the plugin.

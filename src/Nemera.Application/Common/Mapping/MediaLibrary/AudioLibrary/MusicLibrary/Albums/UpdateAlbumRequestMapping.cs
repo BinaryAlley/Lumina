@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.UpdateAlbum;
-using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Albums.Commands.UpdateAlbum;
+using Nemera.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
+namespace Nemera.Application.Common.Mapping.MediaLibrary.AudioLibrary.MusicLibrary.Albums;
 
 /// <summary>
 /// Extension methods for converting <see cref="UpdateAlbumRequest"/>.

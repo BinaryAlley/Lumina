@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Plugins.Calibre.Fixtures.Core.Metadata;
+namespace Nemera.Plugins.Calibre.Fixtures.Core.Metadata;
 
 /// <summary>
 /// Fixture class for the <see cref="TestMetadataLookup"/> record.

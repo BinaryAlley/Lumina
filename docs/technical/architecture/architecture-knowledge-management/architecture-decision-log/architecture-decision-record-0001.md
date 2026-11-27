@@ -95,9 +95,9 @@ public class JobHandler
 
 ### 3. Registration of `DbContextFactory` instead of `DbContext`
 ```csharp
-services.AddDbContextFactory<LuminaDbContext>(options => 
+services.AddDbContextFactory<NemeraDbContext>(options => 
 {
-    options.UseSqlite($"Data Source={Path.Combine(basePath, "Lumina.db")}");
+    options.UseSqlite($"Data Source={Path.Combine(basePath, "Nemera.db")}");
 }
 ```
 

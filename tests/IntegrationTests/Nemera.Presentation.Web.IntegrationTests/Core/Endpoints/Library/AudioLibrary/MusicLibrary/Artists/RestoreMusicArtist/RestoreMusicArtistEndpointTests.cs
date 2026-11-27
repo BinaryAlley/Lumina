@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.RestoreMusicArtist;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.RestoreMusicArtist;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -13,21 +13,21 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.RestoreMusicArtist;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.RestoreMusicArtist;
 
 /// <summary>
 /// Contains integration tests for the <see cref="RestoreMusicArtistEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RestoreMusicArtistEndpointTests : IClassFixture<LuminaWebFactory>
+public class RestoreMusicArtistEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RestoreMusicArtistEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public RestoreMusicArtistEndpointTests(LuminaWebFactory apiFactory)
+    public RestoreMusicArtistEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

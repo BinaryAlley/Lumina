@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.Common.Authentication;
+using Nemera.Presentation.Api.Common.Authentication;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System;
@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Common.Authentication;
+namespace Nemera.Presentation.Api.UnitTests.Common.Authentication;
 
 /// <summary>
 /// Contains unit tests for the <see cref="HttpContextCurrentUserService"/> class.

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Common.Mapping.Scheduling;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
-using Lumina.Contracts.Responses.Scheduling;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.Mapping.Scheduling;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
+using Nemera.Contracts.Responses.Scheduling;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.Scheduling;
+namespace Nemera.Application.UnitTests.Common.Mapping.Scheduling;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ScheduledJobExecutionEntityMapping"/> class.

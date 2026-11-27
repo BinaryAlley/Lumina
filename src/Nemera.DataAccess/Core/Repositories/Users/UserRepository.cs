@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.DataAccess.Common.Persistence;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Repositories.Users;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.DataAccess.Common.Persistence;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,22 +17,22 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Users;
+namespace Nemera.DataAccess.Core.Repositories.Users;
 
 /// <summary>
 /// Repository for users.
 /// </summary>
 internal sealed class UserRepository : IUserRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public UserRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public UserRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -43,11 +43,11 @@ internal sealed class UserRepository : IUserRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(UserEntity user, CancellationToken cancellationToken)
     {
-        bool doesUserExist = await _luminaDbContext.Users.AnyAsync(repositoryUser => repositoryUser.Id == user.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
+        bool doesUserExist = await _nemeraDbContext.Users.AnyAsync(repositoryUser => repositoryUser.Id == user.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (doesUserExist)
             return Errors.Users.UserAlreadyExists;
 
-        _luminaDbContext.Users.Add(user);
+        _nemeraDbContext.Users.Add(user);
         return Result.Created;
     }
 
@@ -65,7 +65,7 @@ internal sealed class UserRepository : IUserRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a paginated result of <see cref="UserEntity"/>, or an error.</returns>
     public async Task<Result<PaginatedResultDto<UserEntity>>> GetAllAsync<TFilter>(PaginationDataDto? paginationData = null, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
     {
-        IQueryable<UserEntity> query = _luminaDbContext.Users;
+        IQueryable<UserEntity> query = _nemeraDbContext.Users;
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
 
@@ -110,7 +110,7 @@ internal sealed class UserRepository : IUserRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="UserEntity"/> if found, or an error.</returns>
     public async Task<Result<UserEntity?>> GetByUsernameAsync(string username, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Users
+        return await _nemeraDbContext.Users
             .Include(user => user.Libraries)
                 .ThenInclude(library => library.ContentLocations)
             .Include(user => user.UserPermissions)
@@ -130,7 +130,7 @@ internal sealed class UserRepository : IUserRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpdateAsync(UserEntity data, CancellationToken cancellationToken)
     {
-        UserEntity? foundUser = await _luminaDbContext.Users
+        UserEntity? foundUser = await _nemeraDbContext.Users
             .Include(user => user.Libraries)
                 .ThenInclude(library => library.ContentLocations)
             .Include(user => user.UserPermissions)
@@ -144,7 +144,7 @@ internal sealed class UserRepository : IUserRepository
             return Errors.Users.UserDoesNotExist;
 
         // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
-        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundUser, data);
+        EditableValuesCopier.CopyEditableValues(_nemeraDbContext, foundUser, data);
 
         // A permission participation is matched by its permission. Matched participations keep their identity and their audit columns, so a permission
         // that is referenced elsewhere is never deleted and re-inserted just because another field of the user was edited.
@@ -164,9 +164,9 @@ internal sealed class UserRepository : IUserRepository
 
         // Update user role.
         if (foundUser.UserRole != null)
-            _luminaDbContext.UserRoles.Remove(foundUser.UserRole);
+            _nemeraDbContext.UserRoles.Remove(foundUser.UserRole);
         if (data.UserRole is not null)
-            _luminaDbContext.UserRoles.Add(new UserRoleEntity
+            _nemeraDbContext.UserRoles.Add(new UserRoleEntity
             {
                 UserId = foundUser.Id,
                 RoleId = data.UserRole.RoleId,
@@ -186,7 +186,7 @@ internal sealed class UserRepository : IUserRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="UserEntity"/> identified by <paramref name="id"/>, or an error.</returns>
     public async Task<Result<UserEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
-        IQueryable<UserEntity> query = _luminaDbContext.Users;
+        IQueryable<UserEntity> query = _nemeraDbContext.Users;
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         if (shouldIncludeNavigationProperties)

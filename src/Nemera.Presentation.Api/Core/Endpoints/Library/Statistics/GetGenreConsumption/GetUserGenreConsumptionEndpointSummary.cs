@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.MediaConsumption;
-using Lumina.Contracts.Responses.MediaConsumption;
+using Nemera.Contracts.Requests.MediaConsumption;
+using Nemera.Contracts.Responses.MediaConsumption;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.Statistics.GetGenreConsumption;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.Statistics.GetGenreConsumption;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetUserGenreConsumptionEndpoint"/> API endpoint, for OpenAPI.

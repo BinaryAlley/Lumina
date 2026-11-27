@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Api.Core.Endpoints.Maintenance;
+using Nemera.Presentation.Api.Core.Endpoints.Maintenance;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Diagnostics.CodeAnalysis;
@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Maintenance;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Maintenance;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CheckHealthEndpoint"/> class.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Playlists.Commands.DeletePlaylist;
+using Nemera.Application.Core.Playlists.Commands.DeletePlaylist;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Playlists.Commands.DeletePlaylist;
+namespace Nemera.Application.Fixtures.Core.Playlists.Commands.DeletePlaylist;
 
 /// <summary>
 /// Fixture class for the <see cref="DeletePlaylistCommand"/> record.

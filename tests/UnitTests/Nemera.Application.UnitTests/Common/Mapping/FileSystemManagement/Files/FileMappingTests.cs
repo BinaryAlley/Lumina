@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.FileSystemManagement.Files;
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Contracts.Responses.FileSystemManagement.Files;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Files;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Contracts.Responses.FileSystemManagement.Files;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Files;
+namespace Nemera.Application.UnitTests.Common.Mapping.FileSystemManagement.Files;
 
 /// <summary>
 /// Contains unit tests for the <see cref="FileMapping"/> class.

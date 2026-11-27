@@ -19,7 +19,7 @@
  * elements and in the requests in flight: nothing is cached or stored in the browser, so the favorites of one user can
  * never be shown to another user who signs in without a page reload.
  *
- * After every successful change the module dispatches the `lumina:favorite-changed` DOM event on the document, with
+ * After every successful change the module dispatches the `nemera:favorite-changed` DOM event on the document, with
  * `detail = { mediaKind, mediaItemId, isFavorite }`, so a page that lists favorites can react while it stays decoupled
  * from the toggle that caused the change.
  */
@@ -28,7 +28,7 @@
 
     // The layout may render this script on a page that already ran it, and the in-place navigation can evaluate scripts
     // again. A second set of listeners would send every request twice, so the first load owns the document.
-    if (window.LuminaFavorites)
+    if (window.NemeraFavorites)
         return;
 
     // The layout renders the route templates with empty Guids because the kind and the item are not known until a toggle
@@ -41,7 +41,7 @@
     // 10 KB, which is more than the 8 KB request line the web server accepts by default, while 100 ids stay under 6 KB.
     const MAX_STATUS_IDS_PER_REQUEST = 100;
     const TOGGLE_SELECTOR = '[data-favorite-toggle]';
-    const FAVORITE_CHANGED_EVENT = 'lumina:favorite-changed';
+    const FAVORITE_CHANGED_EVENT = 'nemera:favorite-changed';
     const GUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
     // The status checks asked for in the current tick, grouped by kind and then by item Id. They are sent together on the
@@ -589,7 +589,7 @@
         attributeFilter: ['data-favorite-toggle', 'data-favorite-media-kind', 'data-favorite-media-item-id']
     });
 
-    window.LuminaFavorites = {
+    window.NemeraFavorites = {
         hydrate,
         isFavorite,
         setFavoriteAsync

@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Scheduling.Execution;
+namespace Nemera.Infrastructure.Core.Scheduling.Execution;
 
 /// <summary>
 /// Represents a cancellable periodic ticker that drives the cadence of an execution cycle of a scheduled job.

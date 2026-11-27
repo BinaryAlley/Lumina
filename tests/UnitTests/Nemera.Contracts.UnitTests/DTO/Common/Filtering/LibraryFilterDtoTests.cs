@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common.Filtering;
+using Nemera.Contracts.DTO.Common.Filtering;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Contracts.UnitTests.DTO.Common.Filtering;
+namespace Nemera.Contracts.UnitTests.DTO.Common.Filtering;
 
 /// <summary>
 /// Contains unit tests for the <see cref="LibraryFilterDto"/> record.

@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Middlewares;
+using Nemera.Presentation.Web.Common.Middlewares;
 using Microsoft.AspNetCore.Builder;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Utilities;
+namespace Nemera.Presentation.Web.Common.Utilities;
 
 /// <summary>
 /// Extension methods for making it easier for <see cref="CultureRedirectMiddleware"/> to be added the middleware.

@@ -3,7 +3,7 @@ using System;
 using System.IO;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+namespace Nemera.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 
 /// <summary>
 /// Provides the location of the temporary directory into which the reading plugins extract the contents of the books.

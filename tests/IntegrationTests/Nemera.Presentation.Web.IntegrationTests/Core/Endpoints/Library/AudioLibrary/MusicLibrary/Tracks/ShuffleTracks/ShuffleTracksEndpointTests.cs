@@ -1,12 +1,12 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.ShuffleTracks;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.ShuffleTracks;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.AudioLibrary.MusicLibrary;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -20,16 +20,16 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.ShuffleTracks;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.ShuffleTracks;
 
 /// <summary>
 /// Contains integration tests for the <see cref="ShuffleTracksEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class ShuffleTracksEndpointTests : IClassFixture<LuminaWebFactory>
+public class ShuffleTracksEndpointTests : IClassFixture<NemeraWebFactory>
 {
     private const string SHUFFLE_TRACKS_PATH = "/en-us/library/audio-library/music-library/tracks/api-shuffle-tracks";
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly ShuffleTracksRequestFixture _shuffleTracksRequestFixture = new();
     private readonly MusicShuffleTrackDtoFixture _musicShuffleTrackDtoFixture = new();
 
@@ -37,7 +37,7 @@ public class ShuffleTracksEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="ShuffleTracksEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public ShuffleTracksEndpointTests(LuminaWebFactory apiFactory)
+    public ShuffleTracksEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

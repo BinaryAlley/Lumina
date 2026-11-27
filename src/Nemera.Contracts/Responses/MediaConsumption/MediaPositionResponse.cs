@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.MediaConsumption;
+namespace Nemera.Contracts.Responses.MediaConsumption;
 
 /// <summary>
 /// Represents a position reached in a media item during a consumption session.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Reading;
-using Lumina.Plugins.Epub.Common.DependencyInjection;
+using Nemera.Plugins.Contracts.Core.Reading;
+using Nemera.Plugins.Epub.Common.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.Epub.UnitTests.Common.DependencyInjection;
+namespace Nemera.Plugins.Epub.UnitTests.Common.DependencyInjection;
 
 /// <summary>
 /// Contains unit tests for the <see cref="EpubServices"/> class.

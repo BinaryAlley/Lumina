@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.MediaConsumption.Commands.ReportConsumptionProgress;
+namespace Nemera.Application.Core.MediaConsumption.Commands.ReportConsumptionProgress;
 
 /// <summary>
 /// Command for reporting the progress of a consumption session of the current user.

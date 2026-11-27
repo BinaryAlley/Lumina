@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Networking;
+using Nemera.Domain.SharedKernel.Common.Enums.Networking;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Networking;
+namespace Nemera.Infrastructure.Common.Networking;
 
 /// <summary>
 /// Determines whether a host is public, so that a request can never be sent to a private, loopback, link local or otherwise internal address.

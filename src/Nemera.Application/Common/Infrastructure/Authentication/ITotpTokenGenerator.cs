@@ -1,4 +1,4 @@
-namespace Lumina.Application.Common.Infrastructure.Authentication;
+namespace Nemera.Application.Common.Infrastructure.Authentication;
 
 /// <summary>
 /// Interface for the service for generating and validating TOTP tokens.

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Scheduling;
-using Lumina.Application.Core.Scheduling.Events;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
+using Nemera.Application.Common.Infrastructure.Scheduling;
+using Nemera.Application.Core.Scheduling.Events;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Scheduling.Events;
+namespace Nemera.Application.UnitTests.Core.Scheduling.Events;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ScheduledJobFiredDomainEventHandler"/> class.

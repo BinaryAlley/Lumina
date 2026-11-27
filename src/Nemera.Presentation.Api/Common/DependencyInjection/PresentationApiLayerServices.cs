@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using FastEndpoints.Swagger;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Presentation.Api.Common.Authentication;
-using Lumina.Presentation.Api.Common.HealthChecks;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Presentation.Api.Common.Authentication;
+using Nemera.Presentation.Api.Common.HealthChecks;
 using MessagePack;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -24,7 +24,7 @@ using System.Threading.RateLimiting;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Common.DependencyInjection;
+namespace Nemera.Presentation.Api.Common.DependencyInjection;
 
 /// <summary>
 /// Utility class for registering the services of the Presentation Api layer into the Dependency Injection container.
@@ -230,7 +230,7 @@ public static class PresentationApiLayerServices
             documentOptions.DocumentSettings = aspNetCoreOpenApiDocumentGeneratorSettings =>
             {
                 aspNetCoreOpenApiDocumentGeneratorSettings.DocumentName = "v1";
-                aspNetCoreOpenApiDocumentGeneratorSettings.Title = "Lumina API v1";
+                aspNetCoreOpenApiDocumentGeneratorSettings.Title = "Nemera API v1";
                 aspNetCoreOpenApiDocumentGeneratorSettings.Version = "v1";
             };
             documentOptions.RemoveEmptyRequestSchema = true;
@@ -243,7 +243,7 @@ public static class PresentationApiLayerServices
         //    documentOptions.DocumentSettings = aspNetCoreOpenApiDocumentGeneratorSettings =>
         //    {
         //        aspNetCoreOpenApiDocumentGeneratorSettings.DocumentName = "v2";
-        //        aspNetCoreOpenApiDocumentGeneratorSettings.Title = "Lumina API v2";
+        //        aspNetCoreOpenApiDocumentGeneratorSettings.Title = "Nemera API v2";
         //        aspNetCoreOpenApiDocumentGeneratorSettings.Version = "v2";
         //    };
         //});

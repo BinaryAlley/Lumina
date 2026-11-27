@@ -1,23 +1,23 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DomainEvents;
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.ConsumptionActivity;
-using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
-using Lumina.Application.Common.Infrastructure.Plugins;
-using Lumina.Application.Common.Infrastructure.Security;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Application.Core.MediaLibrary.Management.Progress;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Queue;
-using Lumina.Infrastructure.Common.DependencyInjection;
-using Lumina.Infrastructure.Common.Networking;
-using Lumina.Infrastructure.Core.Authorization.Policies.ConsumptionActivity;
-using Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Infrastructure.Core.Security;
-using Lumina.Infrastructure.Core.Time;
-using Lumina.Plugins.Contracts.Core.Plugins;
+using Nemera.Application.Common.DomainEvents;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.ConsumptionActivity;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Application.Common.Infrastructure.Plugins;
+using Nemera.Application.Common.Infrastructure.Security;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Application.Core.MediaLibrary.Management.Progress;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Cancellation;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Queue;
+using Nemera.Infrastructure.Common.DependencyInjection;
+using Nemera.Infrastructure.Common.Networking;
+using Nemera.Infrastructure.Core.Authorization.Policies.ConsumptionActivity;
+using Nemera.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Infrastructure.Core.Security;
+using Nemera.Infrastructure.Core.Time;
+using Nemera.Plugins.Contracts.Core.Plugins;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,7 +27,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Common.DependencyInjection;
+namespace Nemera.Infrastructure.UnitTests.Common.DependencyInjection;
 
 /// <summary>
 /// Contains unit tests for the <see cref="InfrastructureLayerServices"/> class.
@@ -72,8 +72,8 @@ public class InfrastructureLayerServicesTests
 
         // Assert
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IValidator<PluginsSettingsDto>));
-        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IValidator<Lumina.Infrastructure.Common.Models.DTO.Configuration.CorsSettingsDto>));
-        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IValidator<Lumina.Infrastructure.Common.Models.DTO.Configuration.JwtSettingsDto>));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IValidator<Nemera.Infrastructure.Common.Models.DTO.Configuration.CorsSettingsDto>));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IValidator<Nemera.Infrastructure.Common.Models.DTO.Configuration.JwtSettingsDto>));
     }
 
     [Fact]

@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.Enums.Library;
+namespace Nemera.Presentation.Web.Common.Enums.Library;
 
 /// <summary>
 /// Enumeration for the types of libraries.

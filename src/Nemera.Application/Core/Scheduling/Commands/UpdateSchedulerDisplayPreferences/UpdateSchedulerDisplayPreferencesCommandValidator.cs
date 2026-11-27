@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
 #endregion
 
-namespace Lumina.Application.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
+namespace Nemera.Application.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="UpdateSchedulerDisplayPreferencesCommand"/>.

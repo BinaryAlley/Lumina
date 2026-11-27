@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.OpenLibrary.Common.Models.DTO.Settings;
+using Nemera.Plugins.OpenLibrary.Common.Models.DTO.Settings;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.Core.Settings;
+namespace Nemera.Plugins.OpenLibrary.Core.Settings;
 
 /// <summary>
 /// Applies the settings persisted by the host onto the runtime settings of the Open Library metadata plugin.

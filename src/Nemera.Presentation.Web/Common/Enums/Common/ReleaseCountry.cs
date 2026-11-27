@@ -1,5 +1,5 @@
 ﻿
-namespace Lumina.Presentation.Web.Common.Enums.Common;
+namespace Nemera.Presentation.Web.Common.Enums.Common;
 
 /// <summary>
 /// Enumeration for the country of a media release, using the ISO 3166-1 alpha-2 country codes, together with the MusicBrainz special codes for releases issued across Europe or worldwide.

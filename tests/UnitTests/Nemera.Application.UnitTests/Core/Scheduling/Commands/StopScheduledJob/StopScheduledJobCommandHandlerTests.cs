@@ -1,30 +1,30 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DomainEvents;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Infrastructure.Scheduling;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.Scheduling.Commands.StopScheduledJob;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Fixtures.Core.Scheduling.Commands.StopScheduledJob;
-using Lumina.Contracts.Responses.Scheduling;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.DataAccess.Repositories.Scheduling;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DomainEvents;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Scheduling;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.Scheduling.Commands.StopScheduledJob;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Fixtures.Core.Scheduling.Commands.StopScheduledJob;
+using Nemera.Contracts.Responses.Scheduling;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Scheduling.Commands.StopScheduledJob;
+namespace Nemera.Application.UnitTests.Core.Scheduling.Commands.StopScheduledJob;
 
 /// <summary>
 /// Contains unit tests for the <see cref="StopScheduledJobCommandHandler"/> class.
@@ -91,7 +91,7 @@ public class StopScheduledJobCommandHandlerTests
             Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         await _mockScheduledJobScheduler.Received(1).StopCycleAsync(
-            Arg.Is<Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(scheduledJobId => scheduledJobId.Value == command.ScheduledJobId),
+            Arg.Is<Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(scheduledJobId => scheduledJobId.Value == command.ScheduledJobId),
             Arg.Any<CancellationToken>());
         _mockDomainEventsQueue.Received(1).Enqueue(Arg.Is<IDomainEvent>(domainEvent => domainEvent is ScheduledJobCycleStoppedDomainEvent));
     }
@@ -117,7 +117,7 @@ public class StopScheduledJobCommandHandlerTests
         Assert.False(result.IsFailure);
         Assert.Equal(ScheduledJobStatus.Added, result.Value.Status);
         _mockDomainEventsQueue.Received(1).Enqueue(Arg.Is<IDomainEvent>(domainEvent => domainEvent is ScheduledJobExecutionStoppedDomainEvent));
-        await _mockScheduledJobScheduler.Received(1).StopCycleAsync(Arg.Any<Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobScheduler.Received(1).StopCycleAsync(Arg.Any<Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public class StopScheduledJobCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Scheduling.ScheduledJobNotFound, result.FirstError);
         await _mockScheduledJobRepository.DidNotReceive().GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>());
-        await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -183,7 +183,7 @@ public class StopScheduledJobCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Scheduling.ScheduledJobNotFound, result.FirstError);
-        await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -205,7 +205,7 @@ public class StopScheduledJobCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Scheduling.ScheduledJobNotStarted, result.FirstError);
         await _mockScheduledJobRepository.DidNotReceive().UpdateAsync(Arg.Any<ScheduledJobEntity>(), Arg.Any<CancellationToken>());
-        await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -229,7 +229,7 @@ public class StopScheduledJobCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Scheduling.ScheduledJobNotFound, result.FirstError);
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
-        await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -247,7 +247,7 @@ public class StopScheduledJobCommandHandlerTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal(repositoryError, result.FirstError);
-        await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -271,6 +271,6 @@ public class StopScheduledJobCommandHandlerTests
         Assert.True(result.IsFailure);
         Assert.Equal(DomainErrors.Scheduling.IntervalMinutesMustBePositive, result.FirstError);
         await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
-        await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
+        await _mockScheduledJobScheduler.DidNotReceive().StopCycleAsync(Arg.Any<Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects.ScheduledJobId>(), Arg.Any<CancellationToken>());
     }
 }

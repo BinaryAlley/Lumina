@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.Authorization;
-using Lumina.Presentation.Web.Common.Enums.Authorization;
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Http;
-using Lumina.Presentation.Web.Common.Responses.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.Authorization;
+using Nemera.Presentation.Web.Common.Enums.Authorization;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Http;
+using Nemera.Presentation.Web.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.Responses.Authorization;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using Polly.CircuitBreaker;
@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.Authorization;
+namespace Nemera.Presentation.Web.UnitTests.Common.Authorization;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AuthorizationService"/> class.

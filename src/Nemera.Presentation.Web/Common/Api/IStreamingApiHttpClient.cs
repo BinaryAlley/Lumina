@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Api;
+namespace Nemera.Presentation.Web.Common.Api;
 
 /// <summary>
 /// Interface for typed clients that stream responses from the remote API without buffering their content.

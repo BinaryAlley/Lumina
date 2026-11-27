@@ -4,7 +4,7 @@
  * The controller of the player owns the state machine, the play descriptor, the queue and the bar, but it produces no
  * audio. This module is the engine the player runs with: it composes the download engine, the container demuxers, the
  * WebCodecs decode pipeline and the Web Audio scheduler into one pipeline, and implements the engine interface documented
- * in audio-player-engine.js. It is registered under {@link LuminaAudioPlayer.PIPELINE_ENGINE_NAME} and installed on the
+ * in audio-player-engine.js. It is registered under {@link NemeraAudioPlayer.PIPELINE_ENGINE_NAME} and installed on the
  * application singleton when this module loads, so the bar drives a real pipeline instead of the silent engine.
  *
  * What it owns
@@ -62,7 +62,7 @@
  * addressed by the track and its album and artist; expanding an album or an artist context into its tracks is the queue
  * engine's job.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -70,7 +70,7 @@
      * @readonly
      * @type {string}
      */
-    LuminaAudioPlayer.PIPELINE_ENGINE_NAME = 'pipeline';
+    NemeraAudioPlayer.PIPELINE_ENGINE_NAME = 'pipeline';
 
     /**
      * The scheduled ahead duration, in seconds, below which a playing renderer is treated as having underrun.
@@ -124,7 +124,7 @@
      * @returns {number|null} The finite number, or null.
      */
     function toFiniteNumber(value) {
-        return LuminaAudioPlayer.toFiniteNumber(value);
+        return NemeraAudioPlayer.toFiniteNumber(value);
     }
 
     /**
@@ -136,8 +136,8 @@
          * Creates an instance of MediaPipelineEngine.
          * @param {Object} host - The engine host provided by the player controller.
          * @param {Object} [options] - The engine options, for injection in a test.
-         * @param {LuminaAudioPlayer.TrackRenderer} [options.renderer] - The renderer to use instead of creating one.
-         * @param {LuminaAudioPlayer.PlayerCapabilities} [options.capabilities] - The capability detector to use.
+         * @param {NemeraAudioPlayer.TrackRenderer} [options.renderer] - The renderer to use instead of creating one.
+         * @param {NemeraAudioPlayer.PlayerCapabilities} [options.capabilities] - The capability detector to use.
          * @param {Object} [options.configuration] - The endpoints configuration. It overrides the host configuration and exists as an injection seam for a test or a composition that provides its own transport.
          * @param {Function} [options.fetchJsonAsync] - The JSON transport to use instead of the host transport, as an injection seam. It has the signature of the host method.
          */
@@ -148,8 +148,8 @@
             // The player's detector is reused when the host exposes it, so the engine never runs a second, independent capability detection or keeps a second memoization cache.
             this.capabilities = this.options.capabilities
                 || (typeof host.getCapabilityDetector === 'function' ? host.getCapabilityDetector() : null)
-                || new LuminaAudioPlayer.PlayerCapabilities();
-            this.renderer = this.options.renderer || new LuminaAudioPlayer.TrackRenderer({
+                || new NemeraAudioPlayer.PlayerCapabilities();
+            this.renderer = this.options.renderer || new NemeraAudioPlayer.TrackRenderer({
                 events: this.events,
                 replayGainMode: host.getPreferences().replayGainMode,
                 onTimeUpdate: (currentTime) => this.handleTimeUpdate(currentTime),
@@ -179,15 +179,15 @@
         /**
          * Loads a track: fetches its playback manifest, prepares its download, demux and decode stages, and starts decoding
          * ahead. Playback itself is started by playAsync, so the caller can keep the preparation and the audio separate.
-         * @param {Object} descriptor - The play descriptor of the track, per {@link LuminaAudioPlayer.createPlayDescriptor}.
+         * @param {Object} descriptor - The play descriptor of the track, per {@link NemeraAudioPlayer.createPlayDescriptor}.
          * @param {Object} [options] - The load options.
          * @param {boolean} [options.keepBuffering] - True to keep a loading state that was handed to the load by the player, used by an automatic continuation so the teardown of the previous track does not clear it.
          * @returns {Promise<void>} A promise that completes when the track is ready to play.
-         * @throws {LuminaAudioPlayer.PlayerError} When the manifest cannot be read, the track cannot be played directly, or a stage of the pipeline cannot be created.
+         * @throws {NemeraAudioPlayer.PlayerError} When the manifest cannot be read, the track cannot be played directly, or a stage of the pipeline cannot be created.
          */
         async loadAsync(descriptor, options = {}) {
             if (this.destroyed)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The media pipeline engine was destroyed.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The media pipeline engine was destroyed.');
             // The manifest request of the load that is being replaced is aborted, so a slow session never keeps a stale request alive behind the track that the newer load owns.
             this.abortLoad(this.loadToken);
             const token = {
@@ -232,10 +232,10 @@
 
         /**
          * Creates the typed error that tells the player a load was overtaken by a newer play request.
-         * @returns {LuminaAudioPlayer.PlayerError} The superseded load error.
+         * @returns {NemeraAudioPlayer.PlayerError} The superseded load error.
          */
         createSupersededLoadError() {
-            return new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The load was superseded by a newer play request.', { reason: LuminaAudioPlayer.PlayerErrorReason.LOAD_SUPERSEDED });
+            return new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The load was superseded by a newer play request.', { reason: NemeraAudioPlayer.PlayerErrorReason.LOAD_SUPERSEDED });
         }
 
         /**
@@ -417,7 +417,7 @@
                     return;
             }
             if (decoderResetError) {
-                if (LuminaAudioPlayer.isDownloadAbort(decoderResetError))
+                if (NemeraAudioPlayer.isDownloadAbort(decoderResetError))
                     return this.recoverInterruptedSeekAsync(item, token, position, isRetry);
                 this.failItem(item, decoderResetError);
                 return;
@@ -426,7 +426,7 @@
                 try {
                     await decoderReset;
                 } catch (error) {
-                    if (LuminaAudioPlayer.isDownloadAbort(error))
+                    if (NemeraAudioPlayer.isDownloadAbort(error))
                         return this.recoverInterruptedSeekAsync(item, token, position, isRetry);
                     this.failItem(item, error);
                     return;
@@ -458,7 +458,7 @@
             if (seekOutcome.error) {
                 if (!this.isSeekCurrent(item, token))
                     return;
-                if (LuminaAudioPlayer.isDownloadAbort(seekOutcome.error))
+                if (NemeraAudioPlayer.isDownloadAbort(seekOutcome.error))
                     return this.recoverInterruptedSeekAsync(item, token, position, isRetry);
                 this.failItem(item, seekOutcome.error);
                 return;
@@ -474,7 +474,7 @@
                 if (rebuildOutcome.error) {
                     if (!this.isSeekCurrent(item, token))
                         return;
-                    if (LuminaAudioPlayer.isDownloadAbort(rebuildOutcome.error))
+                    if (NemeraAudioPlayer.isDownloadAbort(rebuildOutcome.error))
                         return this.recoverInterruptedSeekAsync(item, token, position, isRetry);
                     this.failItem(item, rebuildOutcome.error);
                     return;
@@ -610,7 +610,7 @@
                 await this.seekAsync(position, true);
                 return;
             }
-            this.failItem(item, new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The seek was interrupted before its target could be read.'));
+            this.failItem(item, new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED, 'The seek was interrupted before its target could be read.'));
         }
 
         /**
@@ -767,12 +767,12 @@
                 if (isNormalizedDelivery) {
                     const segmentDurationSeconds = Number(manifest.segmentDurationSeconds);
                     if (!manifest.deliveryContainer || !manifest.deliveryCodec || !Number.isInteger(segmentDurationSeconds) || segmentDurationSeconds <= 0)
-                        throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The normalized delivery of the track is incomplete.');
+                        throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The normalized delivery of the track is incomplete.');
                     const configuration = this.getConfiguration();
-                    item.downloader = LuminaAudioPlayer.createNormalizedSegmentDownloader({
+                    item.downloader = NemeraAudioPlayer.createNormalizedSegmentDownloader({
                         durationInSeconds: duration,
                         segmentDurationSeconds: segmentDurationSeconds,
-                        urlBuilder: (segmentIndex) => LuminaAudioPlayer.resolveSegmentStreamUrl(manifest, descriptor, configuration, segmentIndex),
+                        urlBuilder: (segmentIndex) => NemeraAudioPlayer.resolveSegmentStreamUrl(manifest, descriptor, configuration, segmentIndex),
                         shouldRetryUnavailable: !isPrefetch,
                         shouldKeepDownloadingWhilePaused: preferences.shouldKeepDownloadingWhilePaused,
                         events: this.events,
@@ -792,15 +792,15 @@
                     };
                     if (!isPrefetch)
                         item.downloader.startAsync();
-                    demuxer = await LuminaAudioPlayer.createNormalizedSegmentDemuxer(manifest, {
+                    demuxer = await NemeraAudioPlayer.createNormalizedSegmentDemuxer(manifest, {
                         downloader: item.downloader,
                         capabilities: this.capabilities,
                         events: this.events,
                         onError: (error) => this.failItem(item, error)
                     });
                 } else {
-                    const streamPath = LuminaAudioPlayer.resolveStreamUrl(manifest, descriptor, this.getConfiguration());
-                    item.downloader = LuminaAudioPlayer.createTrackDownloader({
+                    const streamPath = NemeraAudioPlayer.resolveStreamUrl(manifest, descriptor, this.getConfiguration());
+                    item.downloader = NemeraAudioPlayer.createTrackDownloader({
                         url: streamPath,
                         durationInSeconds: duration,
                         shouldKeepDownloadingWhilePaused: preferences.shouldKeepDownloadingWhilePaused,
@@ -814,7 +814,7 @@
                     if (typeof onItemCreated === 'function')
                         onItemCreated(item);
                     // The demuxer reads through the seek aware source, so a seek can fetch a window below the byte target of the download loop instead of waiting for bytes the loop never fetches.
-                    item.source = new LuminaAudioPlayer.SeekAwareByteSource(item.downloader);
+                    item.source = new NemeraAudioPlayer.SeekAwareByteSource(item.downloader);
                     if (isPrefetch) {
                         // A prefetch fetches only the windows its pre-decode needs, through one-shot range requests, instead of
                         // running a second open-ended download from the moment the current track starts. Its sequential download is
@@ -825,7 +825,7 @@
                     }
                 }
                 if (!demuxer) {
-                    demuxer = await LuminaAudioPlayer.createDemuxerForManifest(manifest, {
+                    demuxer = await NemeraAudioPlayer.createDemuxerForManifest(manifest, {
                         source: item.source,
                         capabilities: this.capabilities,
                         events: this.events,
@@ -837,18 +837,18 @@
                     // they are reported as themselves. Only a probe that actually concluded the bundled player cannot
                     // handle the bytes is reported as a track the server has to normalize.
                     if (item.downloader.isAborted || item.stopped || item.disposed)
-                        throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The header probe of the track was aborted.');
+                        throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_ABORTED, 'The header probe of the track was aborted.');
                     const downloadError = item.downloader.getError();
                     if (downloadError)
                         throw downloadError;
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The track cannot be demuxed and decoded by the bundled player.', { reason: LuminaAudioPlayer.PlayerErrorReason.NORMALIZED_DELIVERY_REQUIRED });
+                    throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The track cannot be demuxed and decoded by the bundled player.', { reason: NemeraAudioPlayer.PlayerErrorReason.NORMALIZED_DELIVERY_REQUIRED });
                 }
                 item.demuxer = demuxer;
                 const configuration = demuxer.getConfiguration();
                 if (!configuration)
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The demuxer of the track reported no decoder configuration.');
-                const schedulerTarget = isPrefetch ? new LuminaAudioPlayer.BufferingScheduler() : this.renderer;
-                item.scheduler = new LuminaAudioPlayer.SeekableScheduler(schedulerTarget, () => {
+                    throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The demuxer of the track reported no decoder configuration.');
+                const schedulerTarget = isPrefetch ? new NemeraAudioPlayer.BufferingScheduler() : this.renderer;
+                item.scheduler = new NemeraAudioPlayer.SeekableScheduler(schedulerTarget, () => {
                     item.hasScheduledAudio = true;
                     // The first frame of a seek is what ends its loading state, not the moment the seek was requested. The same point ends the on-demand range fetch mode of the source:
                     // from here the demuxer reads forward from the seek target, which the regular download loop fetches. A prefetch keeps its on-demand mode until
@@ -861,7 +861,7 @@
                             this.host.reportBuffering(false);
                     }
                 });
-                item.decoder = LuminaAudioPlayer.createTrackDecoder({
+                item.decoder = NemeraAudioPlayer.createTrackDecoder({
                     scheduler: item.scheduler,
                     config: configuration,
                     onError: (error) => this.failItem(item, error)
@@ -878,7 +878,7 @@
          * Resolves the duration of a track: the exact duration the demuxer stated, then the manifest duration, then the duration of the play descriptor.
          * @param {Object} manifest - The playback manifest of the track.
          * @param {Object} descriptor - The play descriptor of the track.
-         * @param {LuminaAudioPlayer.Demuxer|null} demuxer - The demuxer of the track, or null before it exists.
+         * @param {NemeraAudioPlayer.Demuxer|null} demuxer - The demuxer of the track, or null before it exists.
          * @returns {number} The duration in seconds, or zero when no source knows it.
          */
         resolveDuration(manifest, descriptor, demuxer) {
@@ -954,7 +954,7 @@
         async runDecodeLoopAsync(item, token) {
             try {
                 while (!this.destroyed && !item.stopped && !item.failed && item.loopToken === token) {
-                    if (item.isPreloading && item.scheduler.getScheduledAheadSeconds() >= LuminaAudioPlayer.GAPLESS_PRELOAD_SECONDS)
+                    if (item.isPreloading && item.scheduler.getScheduledAheadSeconds() >= NemeraAudioPlayer.GAPLESS_PRELOAD_SECONDS)
                         return;
                     if (item.isDecodeComplete)
                         return;
@@ -982,7 +982,7 @@
                     }
                 }
             } catch (error) {
-                if (this.destroyed || item.stopped || LuminaAudioPlayer.isDownloadAbort(error))
+                if (this.destroyed || item.stopped || NemeraAudioPlayer.isDownloadAbort(error))
                     return;
                 this.failItem(item, error);
             }
@@ -1001,7 +1001,7 @@
             const target = item.skipUntilSeconds;
             const start = toFiniteNumber(packet.timestamp) === null ? 0 : Number(packet.timestamp) / 1000000;
             const duration = toFiniteNumber(packet.duration) === null ? 0 : Number(packet.duration) / 1000000;
-            if (start + duration <= target + LuminaAudioPlayer.SEEK_TRIM_EPSILON_SECONDS)
+            if (start + duration <= target + NemeraAudioPlayer.SEEK_TRIM_EPSILON_SECONDS)
                 return true;
             item.skipUntilSeconds = null;
             item.scheduler.setSeekTarget(target);
@@ -1094,7 +1094,7 @@
 
         /**
          * Waits for a gapless prefetch, bounded by the remaining scheduled audio and by a short maximum. A seek cancels the
-         * wait immediately through {@link LuminaAudioPlayer.MediaPipelineEngine#cancelPrefetchWait}, so a seek never waits for a stalled next track that is kept across it.
+         * wait immediately through {@link NemeraAudioPlayer.MediaPipelineEngine#cancelPrefetchWait}, so a seek never waits for a stalled next track that is kept across it.
          * @param {Object} item - The current item whose decode completion is waiting.
          * @param {Object} token - The prefetch token of the current item.
          * @param {Object} [loopToken] - The token of the decode loop that observed the completion.
@@ -1243,7 +1243,7 @@
                     token.ready = true;
                     return prefetched;
                 } catch (error) {
-                    if (!token.cancelled && !this.destroyed && !LuminaAudioPlayer.isDownloadAbort(error))
+                    if (!token.cancelled && !this.destroyed && !NemeraAudioPlayer.isDownloadAbort(error))
                         console.debug('Audio player: the gapless prefetch of the next track failed.', error);
                     return null;
                 }
@@ -1750,9 +1750,9 @@
          * Subscribes the engine to the stored preference changes of the player.
          */
         subscribeToPreferences() {
-            if (!this.events || !LuminaAudioPlayer.PlayerEvent || typeof this.events.on !== 'function')
+            if (!this.events || !NemeraAudioPlayer.PlayerEvent || typeof this.events.on !== 'function')
                 return;
-            this.unsubscribePreferences = this.events.on(LuminaAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, (preferences) => {
+            this.unsubscribePreferences = this.events.on(NemeraAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, (preferences) => {
                 this.handlePreferencesChanged(preferences);
             });
         }
@@ -1768,7 +1768,7 @@
          * @param {*} error - The failure.
          */
         handleDownloadFailure(item, error) {
-            if (LuminaAudioPlayer.isDownloadAbort(error))
+            if (NemeraAudioPlayer.isDownloadAbort(error))
                 return;
             this.failItem(item, error);
         }
@@ -1782,11 +1782,11 @@
         shouldRecoverDelivery(item, error) {
             if (!item || item !== this.current || item.deliveryRecoveryAttempted || item.deliveryRecoveryInProgress || this.destroyed)
                 return false;
-            if (!error || error.code !== LuminaAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED || !error.details)
+            if (!error || error.code !== NemeraAudioPlayer.PlayerErrorCode.DOWNLOAD_FAILED || !error.details)
                 return false;
             const reason = error.details.reason;
-            return reason === LuminaAudioPlayer.PlayerErrorReason.SEGMENT_NOT_FOUND
-                || reason === LuminaAudioPlayer.PlayerErrorReason.PLAYBACK_DELIVERY_CHANGED;
+            return reason === NemeraAudioPlayer.PlayerErrorReason.SEGMENT_NOT_FOUND
+                || reason === NemeraAudioPlayer.PlayerErrorReason.PLAYBACK_DELIVERY_CHANGED;
         }
 
         /**
@@ -1913,7 +1913,7 @@
         failItem(item, error) {
             if (!item || item.failed || item.stopped || item.disposed || this.destroyed)
                 return;
-            if (LuminaAudioPlayer.isDownloadAbort(error))
+            if (NemeraAudioPlayer.isDownloadAbort(error))
                 return;
             // Errors raised by the old pipeline while it is being replaced by a refreshed delivery belong to that teardown, not to a new failure.
             if (item.deliveryRecoveryInProgress)
@@ -1966,7 +1966,7 @@
             this.renderer.pauseAsync().catch((pauseError) => {
                 console.debug('Audio player: the renderer could not be paused after a failure.', pauseError);
             });
-            this.host.reportError(LuminaAudioPlayer.PlayerError.from(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR));
+            this.host.reportError(NemeraAudioPlayer.PlayerError.from(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR));
             // The failed item is not retained in the error state: its decoder, demuxer, downloader, prefetch and scheduled
             // sources are released now. The player refuses seeks and resumes in the error state anyway, and a replay starts
             // a fresh load.
@@ -2004,19 +2004,19 @@
             if (previous)
                 await previous.destroyAsync();
             if (item.stopped || item.disposed)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The track was released while its demuxer was rebuilt.');
-            const demuxer = await LuminaAudioPlayer.createDemuxerForManifest(item.manifest, {
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The track was released while its demuxer was rebuilt.');
+            const demuxer = await NemeraAudioPlayer.createDemuxerForManifest(item.manifest, {
                 source: item.source || item.downloader,
                 capabilities: this.capabilities,
                 events: this.events,
                 onError: (error) => this.failItem(item, error)
             });
             if (!demuxer)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The track cannot be demuxed again after a seek.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, 'The track cannot be demuxed again after a seek.');
             if (item.stopped || item.disposed) {
                 // The item was released while the demuxer probed its header, so the new demuxer must not be installed after the disposal already walked past a null demuxer.
                 await demuxer.destroyAsync();
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The track was released while its demuxer was rebuilt.');
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The track was released while its demuxer was rebuilt.');
             }
             item.demuxer = demuxer;
             const configuration = demuxer.getConfiguration();
@@ -2161,7 +2161,7 @@
          * @param {Object} descriptor - The play descriptor of the track.
          * @param {AbortSignal} [signal] - An optional signal that cancels the request, used by a cancelled prefetch.
          * @returns {Promise<Object>} The playback manifest.
-         * @throws {LuminaAudioPlayer.PlayerError} When the descriptor is incomplete, the session expired, or the manifest
+         * @throws {NemeraAudioPlayer.PlayerError} When the descriptor is incomplete, the session expired, or the manifest
          * could not be read.
          */
         async fetchManifestAsync(descriptor, signal) {
@@ -2171,7 +2171,7 @@
                 : ((this.host && typeof this.host.fetchJsonAsync === 'function')
                     ? (requestUrl, requestSignal, label, requestOptions) => this.host.fetchJsonAsync(requestUrl, requestSignal, label, requestOptions)
                     : null);
-            return LuminaAudioPlayer.fetchPlaybackManifestAsync({
+            return NemeraAudioPlayer.fetchPlaybackManifestAsync({
                 configuration: this.getConfiguration(),
                 descriptor: descriptor,
                 capabilities: await this.describeCapabilitiesAsync(),
@@ -2185,17 +2185,17 @@
          * @returns {Promise<string>} The comma separated capability list, or an empty string when it cannot be built.
          */
         async describeCapabilitiesAsync() {
-            if (typeof LuminaAudioPlayer.describeDemuxerFormatsAsync !== 'function')
+            if (typeof NemeraAudioPlayer.describeDemuxerFormatsAsync !== 'function')
                 return '';
             try {
-                return await LuminaAudioPlayer.describeDemuxerFormatsAsync({
+                return await NemeraAudioPlayer.describeDemuxerFormatsAsync({
                     capabilities: this.capabilities,
                     events: this.events
                 });
             } catch (error) {
                 // The list is an optimization of the delivery decision, so a failed probe falls back to the static registry rather than making the track unplayable.
                 console.debug('Audio player: the decode aware capability list could not be built.', error);
-                return typeof LuminaAudioPlayer.describeDemuxerFormats === 'function' ? LuminaAudioPlayer.describeDemuxerFormats() : '';
+                return typeof NemeraAudioPlayer.describeDemuxerFormats === 'function' ? NemeraAudioPlayer.describeDemuxerFormats() : '';
             }
         }
 
@@ -2211,29 +2211,29 @@
 
     }
 
-    LuminaAudioPlayer.MediaPipelineEngine = MediaPipelineEngine;
+    NemeraAudioPlayer.MediaPipelineEngine = MediaPipelineEngine;
 
     /**
-     * Creates a media pipeline engine. See {@link LuminaAudioPlayer.MediaPipelineEngine} for the options.
+     * Creates a media pipeline engine. See {@link NemeraAudioPlayer.MediaPipelineEngine} for the options.
      * @param {Object} host - The engine host provided by the player controller.
      * @param {Object} [options] - The engine options.
-     * @returns {LuminaAudioPlayer.MediaPipelineEngine} The created engine.
+     * @returns {NemeraAudioPlayer.MediaPipelineEngine} The created engine.
      */
-    LuminaAudioPlayer.createMediaPipelineEngine = function (host, options) {
+    NemeraAudioPlayer.createMediaPipelineEngine = function (host, options) {
         return new MediaPipelineEngine(host, options);
     };
 
     /**
      * Registers the media pipeline engine on a player and makes it the selected engine. The player is the singleton of
      * the application, so this is what turns the control API and the bar into an actually audible player.
-     * @param {LuminaAudioPlayer.AudioPlayer} player - The player to install the engine on.
-     * @returns {LuminaAudioPlayer.AudioPlayer} The same player, for chaining.
+     * @param {NemeraAudioPlayer.AudioPlayer} player - The player to install the engine on.
+     * @returns {NemeraAudioPlayer.AudioPlayer} The same player, for chaining.
      */
-    LuminaAudioPlayer.installMediaPipelineEngine = function (player) {
+    NemeraAudioPlayer.installMediaPipelineEngine = function (player) {
         if (!player)
             return player;
-        player.registerEngine(LuminaAudioPlayer.PIPELINE_ENGINE_NAME, (host) => new MediaPipelineEngine(host));
-        return player.useEngine(LuminaAudioPlayer.PIPELINE_ENGINE_NAME);
+        player.registerEngine(NemeraAudioPlayer.PIPELINE_ENGINE_NAME, (host) => new MediaPipelineEngine(host));
+        return player.useEngine(NemeraAudioPlayer.PIPELINE_ENGINE_NAME);
     };
 
     /**
@@ -2242,14 +2242,14 @@
      * uses. When the player module is absent the install is skipped instead of throwing, so loading this module early is harmless; the engine is then simply not selected.
      */
     function installOnDefaultPlayer() {
-        if (typeof LuminaAudioPlayer.createDefaultPlayer !== 'function')
+        if (typeof NemeraAudioPlayer.createDefaultPlayer !== 'function')
             return;
-        const player = LuminaAudioPlayer.createDefaultPlayer();
-        LuminaAudioPlayer.installMediaPipelineEngine(player);
+        const player = NemeraAudioPlayer.createDefaultPlayer();
+        NemeraAudioPlayer.installMediaPipelineEngine(player);
     }
 
     if (document.readyState === 'loading')
         document.addEventListener('DOMContentLoaded', installOnDefaultPlayer);
     else
         installOnDefaultPlayer();
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

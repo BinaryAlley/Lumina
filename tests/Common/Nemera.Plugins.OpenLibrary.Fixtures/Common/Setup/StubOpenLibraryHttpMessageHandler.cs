@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.Fixtures.Common.Setup;
+namespace Nemera.Plugins.OpenLibrary.Fixtures.Common.Setup;
 
 /// <summary>
 /// <see cref="HttpMessageHandler"/> test double that routes requests to the configured responses based on their absolute path.

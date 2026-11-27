@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Primitives;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Primitives;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Domain.UnitTests.Common.Errors;
+namespace Nemera.Domain.UnitTests.Common.Errors;
 
 /// <summary>
 /// Contains unit tests for the static <see cref="Errors"/> catalog classes.

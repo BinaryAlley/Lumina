@@ -1,4 +1,4 @@
-# Using Lumina
+# Using Nemera
 
 ## Contents
 
@@ -7,9 +7,9 @@
 1. [Introduction](../index.md)
 2. [Installation](../installation/index.md)
 
-**Using Lumina**
+**Using Nemera**
 
-3. **Using Lumina**
+3. **Using Nemera**
 
 **Administration**
 
@@ -17,7 +17,7 @@
 5. [Plugins](../plugins/index.md)
 6. [Themes](../themes/index.md)
 
-This is the guide to actually using Lumina from the web client, once a server is running and at least one library exists. It covers signing in, finding your way around, browsing and reading what you have, editing an item, and the settings that shape the experience.
+This is the guide to actually using Nemera from the web client, once a server is running and at least one library exists. It covers signing in, finding your way around, browsing and reading what you have, editing an item, and the settings that shape the experience.
 
 ## Getting around
 
@@ -25,11 +25,11 @@ The header menu rearranges itself depending on who you are. Everyone sees a site
 
 The home page is your catalogue: a grid of the libraries you are allowed to see, each shown as a card with its cover when it has one. Selecting a card opens that library's browsing page. Some library types do not have a browsing page yet, and their cards appear as plain panels rather than links.
 
-When the server cannot be reached, Lumina keeps the page you asked for and shows a red banner along the bottom. The banner belongs to the active theme, so its position, size and look can differ between themes.
+When the server cannot be reached, Nemera keeps the page you asked for and shows a red banner along the bottom. The banner belongs to the active theme, so its position, size and look can differ between themes.
 
 ## Your account
 
-Accounts are local to your Lumina server. From the account section you can:
+Accounts are local to your Nemera server. From the account section you can:
 
 - **Register** a new account, when registration is available on the server.
 - **Log in** with your username and password. If your account uses two factor authentication, you are also asked for the current one time code from your authenticator app.
@@ -51,7 +51,7 @@ Opening a book library shows a page with the library title, a search box, a sort
 
 Each book is a card with its cover and title. Clicking a card opens the book in the reader; a book can only be opened when a reader for its format is enabled for the library. Right-clicking a card, or using its actions button, opens a menu with **Read**, **View details** and **Delete**.
 
-Deleting a book asks for confirmation and moves it to the library's **Deleted items**, together with the metadata and artwork Lumina stored for it. The file behind it is left untouched. The book stops appearing in the library, and an automatic scan does not add it back. If the file is later removed from disk, the next scan permanently removes the deleted book, including the metadata and artwork kept for it. The **Deleted items** button on the library page lists the deleted books and restores one when you select **Restore**. The book details page offers the same deletion with its **Delete book** button.
+Deleting a book asks for confirmation and moves it to the library's **Deleted items**, together with the metadata and artwork Nemera stored for it. The file behind it is left untouched. The book stops appearing in the library, and an automatic scan does not add it back. If the file is later removed from disk, the next scan permanently removes the deleted book, including the metadata and artwork kept for it. The **Deleted items** button on the library page lists the deleted books and restores one when you select **Restore**. The book details page offers the same deletion with its **Delete book** button.
 
 ## Reading a book
 
@@ -77,9 +77,9 @@ Opening a music library shows a page with the library title, a search box, a sor
 
 Each artist is a card; selecting it opens the artist's page, and the card's actions menu offers **View details**, **Play**, **Shuffle**, **Add to playlist** and **Delete**. The heart on the card marks the artist as a favorite.
 
-The artist page is also where you edit the artist. It lists the artist's albums as cards, each leading to its own album page, followed by the artist's general information, contributors, ratings, genres, tags, aliases, areas and identifiers. The album page holds the album's information and its tracks, and the track page holds the track's details. The album page also shows the artwork Lumina stored for the album as a strip of thumbnails beside the main image, and selecting a thumbnail displays that image in place of the cover.
+The artist page is also where you edit the artist. It lists the artist's albums as cards, each leading to its own album page, followed by the artist's general information, contributors, ratings, genres, tags, aliases, areas and identifiers. The album page holds the album's information and its tracks, and the track page holds the track's details. The album page also shows the artwork Nemera stored for the album as a strip of thumbnails beside the main image, and selecting a thumbnail displays that image in place of the cover.
 
-Deleting an artist, album or track asks for confirmation and moves it to the library's **Deleted items**, together with the metadata and artwork Lumina stored for it. The file behind it is left untouched. The item stops appearing in the library, and an automatic scan does not add it back. An artist always keeps at least one album, so the last album of an artist cannot be deleted. If a file is later removed from disk, the next scan permanently removes the deleted track, including its stored artwork, and the albums and artists left with no files, including their stored artwork. The **Deleted items** button on the artists page lists the deleted artists, albums and tracks, and restores one when you select **Restore**. Restoring an artist or an album brings back the items inside it that were not deleted on their own.
+Deleting an artist, album or track asks for confirmation and moves it to the library's **Deleted items**, together with the metadata and artwork Nemera stored for it. The file behind it is left untouched. The item stops appearing in the library, and an automatic scan does not add it back. An artist always keeps at least one album, so the last album of an artist cannot be deleted. If a file is later removed from disk, the next scan permanently removes the deleted track, including its stored artwork, and the albums and artists left with no files, including their stored artwork. The **Deleted items** button on the artists page lists the deleted artists, albums and tracks, and restores one when you select **Restore**. Restoring an artist or an album brings back the items inside it that were not deleted on their own.
 
 The music pages also play what they show. The artist page has a **Play all** control that plays the artist's releases in the order the page presents them, one release after another. The actions menu of a music library card on the home page, of an artist card, and of an album card offers **Play** and **Shuffle**. Play starts the library at its first artist and continues through the remaining artists in artist page order, starts the artist's discography in the order the artist page presents it, or starts the release in disc and track order. Shuffle starts the library, the artist's discography or the release with a list of up to 100 tracks sampled uniformly at random from every track of that scope, and continues in random order without repeating a track that is already queued. The album page has a **Play album** control that plays the release in disc and track order, and every track row has its own play control that plays just that track. The track page has a **Play track** control for the track it shows. Every track row on the album page also has an actions menu: **Add to playlist** opens the playlist picker for that track, **Add to play queue** appends it to the end of the player queue or starts it when the queue is empty, and **Play all from here** replaces the queue with that track and the rest of the album and starts playing. Starting playback opens the player bar at the bottom of the window. It keeps playing while you move between pages, and the bar shows the track name, with the album name underneath when the track belongs to a named album, the progress of the current track, a segmented VU meter that follows the level of the track, and the volume, together with previous, play or pause, stop, next and repeat controls. When you expand it, it also shows the cover art, the current track name, the release type, the release name and year, the artist name, and a carousel of the album's stored artwork, next to the queue, where every entry carries its album cover, including when only one track is queued. Selecting an artwork in the carousel shows it as the main cover. The expanded queue moves the current track to the top whenever playback advances, so it stays visible even in a long list. The current track's favorite is the heart on the bar between the repeat and mute controls, and every entry of the expanded queue carries its own heart. The queue's own playlist picker appends the whole queue, in order, to one of your playlists. The double chevron at the right points up to expand the bar and down to collapse it. Stop is the square control next to play or pause; in the condensed bar it stops playback and slides the bar out of view.
 
@@ -87,17 +87,17 @@ Music libraries do not remember positions by default. When progress tracking is 
 
 ## Music playback compatibility
 
-The full music player decodes audio with the WebCodecs API and outputs it through the Web Audio API. A privacy hardened browser can hide WebCodecs even though its own native audio player still works. LibreWolf does this by default: `privacy.resistFingerprinting` is turned on, and the browser then hides the WebCodecs constructors. When Lumina detects that, it switches to a fallback player built on the browser's HTML audio element and shows a notice when the player opens for the first time.
+The full music player decodes audio with the WebCodecs API and outputs it through the Web Audio API. A privacy hardened browser can hide WebCodecs even though its own native audio player still works. LibreWolf does this by default: `privacy.resistFingerprinting` is turned on, and the browser then hides the WebCodecs constructors. When Nemera detects that, it switches to a fallback player built on the browser's HTML audio element and shows a notice when the player opens for the first time.
 
 The fallback is a degraded experience in two ways. It plays only the formats the browser itself can decode, without the server changing the container or the codec first, so a track that needs a server remux or transcode cannot use the fallback. It also has no true gapless playback, because an HTML audio element cannot append the next track sample accurately; the next track starts after the current one ends, with a small gap.
 
 ReplayGain normalization and the VU meter still work in the fallback when the browser also provides the Web Audio API, which is the usual case. The fallback routes the audio element through the same kind of ReplayGain gain and output analyzer the full player uses. If the Web Audio API is missing too, the fallback plays through the element's own output without ReplayGain or a VU meter.
 
-To restore the full player in LibreWolf, exempt the address of your Lumina server from Resist Fingerprinting:
+To restore the full player in LibreWolf, exempt the address of your Nemera server from Resist Fingerprinting:
 
 1. Open `about:config`.
 2. Set `privacy.resistFingerprinting.exemptedDomains` to include the host you use. For a server on the same machine, `localhost,127.0.0.1` covers both common addresses.
-3. Reload Lumina.
+3. Reload Nemera.
 
 ## Playlists
 
@@ -151,11 +151,11 @@ An item that was deleted, or whose library you can no longer access, keeps its p
 
 ## Editing what is catalogued
 
-Both book and music pages double as editors for the items that were scanned in. A book's details page groups its fields into general and release information, language and original language, genres, tags, identifiers, ISBNs, contributors and ratings, and lets you replace its cover. An artist's page lists the artist's albums first, then groups its fields into general information, contributors, ratings, genres, tags, aliases, areas and identifiers, and lets you replace the artist's cover. An album page groups its fields into general information, contributors, ratings, genres, tags, release types, release information, language and original language, and identifiers, and lets you replace the album's cover. A track page groups its fields into general information, contributors, ratings, genres, tags, moods, release information, language and original language, work, ISRCs, identifiers and audio properties. Saving applies the changes to Lumina's catalogue.
+Both book and music pages double as editors for the items that were scanned in. A book's details page groups its fields into general and release information, language and original language, genres, tags, identifiers, ISBNs, contributors and ratings, and lets you replace its cover. An artist's page lists the artist's albums first, then groups its fields into general information, contributors, ratings, genres, tags, aliases, areas and identifiers, and lets you replace the artist's cover. An album page groups its fields into general information, contributors, ratings, genres, tags, release types, release information, language and original language, and identifiers, and lets you replace the album's cover. A track page groups its fields into general information, contributors, ratings, genres, tags, moods, release information, language and original language, work, ISRCs, identifiers and audio properties. Saving applies the changes to Nemera's catalogue.
 
 ## The file system browser
 
-Wherever Lumina needs a folder or a file from the server, it opens the file system browser: a modal that lists the drives, a tree of folders, a pane of the items in the current folder, and an address bar you can walk with. It offers icon view modes, generates thumbnails for images, and can show or hide hidden files. Hidden entries are dimmed by the bundled themes. You will meet it when you pick the content locations of a library, and anywhere else the interface asks you to point at a path on the server.
+Wherever Nemera needs a folder or a file from the server, it opens the file system browser: a modal that lists the drives, a tree of folders, a pane of the items in the current folder, and an address bar you can walk with. It offers icon view modes, generates thumbnails for images, and can show or hide hidden files. Hidden entries are dimmed by the bundled themes. You will meet it when you pick the content locations of a library, and anywhere else the interface asks you to point at a path on the server.
 
 ## Settings and language
 
@@ -165,4 +165,4 @@ Your **settings** decide how lists and books behave for you. Enable pagination a
 
 The **VU meter** group shapes the meter of the player bar. Orientation lays its channels out as columns that grow upwards or rows that grow to the right. Segments per channel sets how finely each channel is divided, and Segment gap sets the space between segments and channels. The medium and high thresholds decide the level at which a segment changes color; the high threshold cannot be lower than the medium one. Show peak keeps a mark at the loudest recent level of each channel. Peak hold is how long that mark stays in place before it falls, in milliseconds, and Level falloff and Peak falloff are how quickly the bars and the peak marks drop once the sound gets quieter, in level units per second. Larger falloff values drop faster. The meter follows the level of the track itself, so muting the player or moving the volume slider does not change the height of the bars, and saving these settings applies them to the player without reloading the page.
 
-The **language** picker switches the interface between the languages Lumina ships with, and remembers your choice.
+The **language** picker switches the interface between the languages Nemera ships with, and remembers your choice.

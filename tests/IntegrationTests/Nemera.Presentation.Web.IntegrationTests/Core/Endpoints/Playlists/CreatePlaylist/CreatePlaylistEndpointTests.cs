@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.DTO.Playlists;
-using Lumina.Presentation.Web.Common.Enums.Playlists;
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Requests.Playlists;
-using Lumina.Presentation.Web.Core.Endpoints.Playlists.CreatePlaylist;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Playlists;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Playlists;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Playlists;
+using Nemera.Presentation.Web.Common.Enums.Playlists;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Requests.Playlists;
+using Nemera.Presentation.Web.Core.Endpoints.Playlists.CreatePlaylist;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Playlists;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Playlists;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -22,17 +22,17 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Playlists.CreatePlaylist;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Playlists.CreatePlaylist;
 
 /// <summary>
 /// Contains integration tests for the <see cref="CreatePlaylistEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class CreatePlaylistEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class CreatePlaylistEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string UPSTREAM_ENDPOINT = "users/me/playlists";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly CreatePlaylistRequestFixture _createPlaylistRequestFixture = new();
     private readonly PlaylistDtoFixture _playlistDtoFixture = new();
     private readonly PlaylistEntryDtoFixture _playlistEntryDtoFixture = new();
@@ -43,7 +43,7 @@ public class CreatePlaylistEndpointTests : IClassFixture<LuminaWebFactory>, IDis
     /// Initializes a new instance of the <see cref="CreatePlaylistEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public CreatePlaylistEndpointTests(LuminaWebFactory apiFactory)
+    public CreatePlaylistEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -132,7 +132,7 @@ public class CreatePlaylistEndpointTests : IClassFixture<LuminaWebFactory>, IDis
         Assert.False(json.RootElement.GetProperty("success").GetBoolean());
         Assert.Contains("<b>", json.RootElement.GetProperty("errorMessage").GetString(), StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     [Fact]

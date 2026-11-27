@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Common.DataAccess.Repositories.MediaConsumption;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Common.DataAccess.Repositories.MediaConsumption;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.MediaConsumption;
+namespace Nemera.DataAccess.Core.Repositories.MediaConsumption;
 
 /// <summary>
 /// Repository for the consumption records used to build consumption statistics.
@@ -23,15 +23,15 @@ namespace Lumina.DataAccess.Core.Repositories.MediaConsumption;
 /// </remarks>
 internal sealed class ConsumptionStatisticsRepository : IConsumptionStatisticsRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ConsumptionStatisticsRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public ConsumptionStatisticsRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public ConsumptionStatisticsRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ internal sealed class ConsumptionStatisticsRepository : IConsumptionStatisticsRe
         Guid userId, Guid? libraryId, MediaKind? mediaKind, DateTime? fromUtc, DateTime? toUtc, CancellationToken cancellationToken)
     {
         // The user is part of the query rather than a check performed after the read, so the storage medium never returns a record of another user.
-        IQueryable<MediaConsumptionRecordEntity> query = _luminaDbContext.MediaConsumptionRecords
+        IQueryable<MediaConsumptionRecordEntity> query = _nemeraDbContext.MediaConsumptionRecords
             .AsNoTracking()
             .Where(record => record.UserId == userId);
         query = ApplyFilters(query, libraryId, mediaKind, fromUtc, toUtc);
@@ -69,7 +69,7 @@ internal sealed class ConsumptionStatisticsRepository : IConsumptionStatisticsRe
         Guid? libraryId, MediaKind? mediaKind, DateTime? fromUtc, DateTime? toUtc, CancellationToken cancellationToken)
     {
         // This is the only query that is not scoped to one user, and it exists only for the explicit admin all-users summary.
-        IQueryable<MediaConsumptionRecordEntity> query = _luminaDbContext.MediaConsumptionRecords.AsNoTracking();
+        IQueryable<MediaConsumptionRecordEntity> query = _nemeraDbContext.MediaConsumptionRecords.AsNoTracking();
         query = ApplyFilters(query, libraryId, mediaKind, fromUtc, toUtc);
         List<MediaConsumptionRecordEntity> records = await query.ToListAsync(cancellationToken).ConfigureAwait(false);
         return Result.From<IReadOnlyList<MediaConsumptionRecordEntity>>(records);

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+namespace Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
 
 /// <summary>
 /// Data transfer object for a MusicBrainz work, the musical composition a track is a recording of.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 #endregion
 
-namespace Lumina.Application.Core.Scheduling.Commands.AddScheduledJob;
+namespace Nemera.Application.Core.Scheduling.Commands.AddScheduledJob;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="AddScheduledJobCommand"/>.

@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.Playlists;
+namespace Nemera.Contracts.Requests.Playlists;
 
 /// <summary>
 /// Represents a request for getting a page of the entries of a playlist of the current user.

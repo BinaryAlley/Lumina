@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Nemera.Contracts.Responses.FileSystemManagement.Thumbnails;
+using Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Thumbnails;
+namespace Nemera.Contracts.Fixtures.Core.Responses.FileSystemManagement.Thumbnails;
 
 /// <summary>
 /// Fixture class for the <see cref="ThumbnailResponse"/> class.

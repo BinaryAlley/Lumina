@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.Plugins;
+namespace Nemera.Presentation.Web.Common.Requests.Plugins;
 
 /// <summary>
 /// Represents a request to get the settings of a plugin.

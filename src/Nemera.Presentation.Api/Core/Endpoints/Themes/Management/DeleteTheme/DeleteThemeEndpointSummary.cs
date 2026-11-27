@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.Themes;
+using Nemera.Contracts.Requests.Themes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Themes.Management.DeleteTheme;
+namespace Nemera.Presentation.Api.Core.Endpoints.Themes.Management.DeleteTheme;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="DeleteThemeEndpoint"/> API endpoint, for OpenAPI.

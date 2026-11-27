@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Authorization;
+namespace Nemera.Presentation.Web.Common.Authorization;
 
 /// <summary>
 /// Defines a requirement for initialization status in the authorization process.

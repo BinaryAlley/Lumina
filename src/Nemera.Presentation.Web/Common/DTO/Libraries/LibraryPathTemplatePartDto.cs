@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Libraries;
+namespace Nemera.Presentation.Web.Common.DTO.Libraries;
 
 /// <summary>
 /// Data transfer object for one part of the path template of a media library.

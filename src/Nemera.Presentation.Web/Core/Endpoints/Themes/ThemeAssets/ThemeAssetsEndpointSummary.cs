@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Requests.Themes;
+using Nemera.Presentation.Web.Common.Requests.Themes;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Themes.ThemeAssets;
+namespace Nemera.Presentation.Web.Core.Endpoints.Themes.ThemeAssets;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="ThemeAssetsEndpoint"/> endpoint, for OpenAPI.
@@ -25,7 +25,7 @@ public class ThemeAssetsEndpointSummary : Summary<ThemeAssetsEndpoint, GetThemeA
         RequestParam(r => r.Path, "The asset path relative to the theme pack root. Required.");
 
         ExampleRequest = new GetThemeAssetRequest(
-            ThemeId: "lumina-default",
+            ThemeId: "nemera-default",
             Path: "assets/style.css"
         );
 

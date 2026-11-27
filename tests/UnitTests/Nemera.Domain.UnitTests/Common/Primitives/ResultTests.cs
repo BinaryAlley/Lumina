@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Domain.UnitTests.Common.Primitives;
+namespace Nemera.Domain.UnitTests.Common.Primitives;
 
 /// <summary>
 /// Contains unit tests for the <see cref="Result{TValue}"/> structure.

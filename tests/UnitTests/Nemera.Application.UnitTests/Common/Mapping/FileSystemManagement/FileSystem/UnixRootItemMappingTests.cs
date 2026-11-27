@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Nemera.Application.Common.Mapping.FileSystemManagement.FileSystem;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.FileSystem;
+namespace Nemera.Application.UnitTests.Common.Mapping.FileSystemManagement.FileSystem;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UnixRootItemMapping"/> class.

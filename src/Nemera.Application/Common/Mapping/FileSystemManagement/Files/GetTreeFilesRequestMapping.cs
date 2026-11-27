@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
-using Lumina.Contracts.Requests.FileSystemManagement.Files;
+using Nemera.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
+using Nemera.Contracts.Requests.FileSystemManagement.Files;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.FileSystemManagement.Files;
+namespace Nemera.Application.Common.Mapping.FileSystemManagement.Files;
 
 /// <summary>
 /// Extension methods for converting <see cref="GetTreeFilesRequest"/>.

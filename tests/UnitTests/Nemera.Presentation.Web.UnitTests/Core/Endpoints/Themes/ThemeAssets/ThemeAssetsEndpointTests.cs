@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Themes.ThemeAssets;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Themes;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Themes.ThemeAssets;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Themes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Themes.ThemeAssets;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Themes.ThemeAssets;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ThemeAssetsEndpoint"/> class.

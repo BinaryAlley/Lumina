@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Libraries;
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Primitives;
-using Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Artists;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Common.Services;
-using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Lumina.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Artists;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Common.Services;
+using Nemera.Presentation.Web.Core.Endpoints.Common;
+using Nemera.Presentation.Web.Core.Themes;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -19,7 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.Index;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.Index;
 
 /// <summary>
 /// API endpoint for the <c>/{culture}/library/audio-library/music-library/artists</c> route.
@@ -27,10 +27,10 @@ namespace Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibra
 public class MusicArtistsIndexViewEndpoint : BaseEndpoint<GetMusicArtistsViewRequest, IResult>
 {
     // The resource base name deliberately excludes the "Core.Resources" segment: the localization factory re-roots it
-    // with the configured ResourcesPath, so "Lumina.Presentation.Web.Views.X" resolves to the embedded
-    // "Lumina.Presentation.Web.Core.Resources.Views.X" resource; including "Core" here would insert it twice.
-    private const string VIEW_RESOURCE_BASE_NAME = "Lumina.Presentation.Web.Views.Library.AudioLibrary.MusicLibrary.Artists.Index";
-    private const string VIEW_RESOURCE_LOCATION = "Lumina.Presentation.Web";
+    // with the configured ResourcesPath, so "Nemera.Presentation.Web.Views.X" resolves to the embedded
+    // "Nemera.Presentation.Web.Core.Resources.Views.X" resource; including "Core" here would insert it twice.
+    private const string VIEW_RESOURCE_BASE_NAME = "Nemera.Presentation.Web.Views.Library.AudioLibrary.MusicLibrary.Artists.Index";
+    private const string VIEW_RESOURCE_LOCATION = "Nemera.Presentation.Web";
     // The page key mirrors the path of the Razor view under Core/Views, so that theme templates can override it at the page, section or default scope.
     private const string VIEW_PAGE_KEY = "library/audio-library/music-library/artists/index";
 

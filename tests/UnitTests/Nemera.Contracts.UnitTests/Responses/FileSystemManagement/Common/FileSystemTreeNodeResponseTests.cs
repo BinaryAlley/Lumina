@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Common;
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Contracts.Fixtures.Core.Responses.FileSystemManagement.Common;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Contracts.UnitTests.Responses.FileSystemManagement.Common;
+namespace Nemera.Contracts.UnitTests.Responses.FileSystemManagement.Common;
 
 /// <summary>
 /// Contains unit tests for the <see cref="FileSystemTreeNodeResponse"/> class.

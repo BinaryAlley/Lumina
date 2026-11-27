@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+namespace Nemera.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
 
 /// <summary>
 /// Represents a request to get the artists of a media library.

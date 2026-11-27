@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackSegment;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetTrackSegment;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetTrackSegmentEndpoint"/> API endpoint, for OpenAPI.
@@ -21,7 +21,7 @@ public class GetTrackSegmentEndpointSummary : Summary<GetTrackSegmentEndpoint, E
         Summary = "Streams one segment of the normalized audio of a track.";
         Description = "Streams a single fixed duration segment of the normalized audio of the track identified by the route. A track that is not a direct play is delivered as fixed duration, time addressed segments, so a player seeks by segment index and never maps a byte range to a time. The delivery handle is the opaque value the playback manifest reports in its deliveryId, and the segment index is zero based; together they name a segment of exactly the delivery the manifest declared, including its quality cap and the source file version it was declared for. Library ownership is re-evaluated on every request, while track membership and content locations are those captured at manifest time, so a deleted track row whose file remains can stay streamable until the handle expires. The first request for a track may wait for the whole normalized audio to be produced and cached. The segment is streamed to an Admin, who can stream the tracks of all libraries, or to the owner of the library of the track.";
 
-        Response(200, "The requested segment is streamed, with the media type of the delivered container, or application/octet-stream when the container is not an audio type, with the length of the segment as its content length, and with the segment count and its exact start time on the track timeline as the X-Lumina-Segment-Count and X-Segment-Start-Seconds headers.", "*/*");
+        Response(200, "The requested segment is streamed, with the media type of the delivered container, or application/octet-stream when the container is not an audio type, with the length of the segment as its content length, and with the segment count and its exact start time on the track timeline as the X-Nemera-Segment-Count and X-Segment-Start-Seconds headers.", "*/*");
 
         Response(401, "Authentication required.", "application/problem+json",
             example: new[]

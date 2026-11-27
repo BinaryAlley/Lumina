@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Contracts.Responses.FileSystemManagement.Thumbnails;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.FileSystemManagement.Thumbnails;
+namespace Nemera.Application.Common.Mapping.FileSystemManagement.Thumbnails;
 
 /// <summary>
 /// Extension methods for converting <see cref="Thumbnail"/>.

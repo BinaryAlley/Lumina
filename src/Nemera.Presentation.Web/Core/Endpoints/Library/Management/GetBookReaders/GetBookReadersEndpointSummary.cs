@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Requests.Library.Management;
+using Nemera.Presentation.Web.Common.Requests.Library.Management;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.Management.GetBookReaders;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.Management.GetBookReaders;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetBookReadersEndpoint"/> endpoint, for OpenAPI.

@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DomainEvents;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Common.Exceptions;
-using Lumina.Presentation.Api.Common.Http;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DomainEvents;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Exceptions;
+using Nemera.Presentation.Api.Common.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Common.Middlewares;
+namespace Nemera.Presentation.Api.Common.Middlewares;
 
 /// <summary>
 /// Middleware that owns the request transaction, committing it and publishing the queued domain events after a successful request, and rolling it back otherwise.

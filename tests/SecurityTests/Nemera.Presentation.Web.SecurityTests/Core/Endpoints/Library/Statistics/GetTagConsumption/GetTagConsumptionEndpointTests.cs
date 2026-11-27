@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Common.Requests.Library.Statistics;
-using Lumina.Presentation.Web.Core.Endpoints.Library.Statistics.GetTagConsumption;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.Statistics;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Statistics.GetTagConsumption;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,17 +17,17 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Statistics.GetTagConsumption;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Library.Statistics.GetTagConsumption;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetTagConsumptionEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetTagConsumptionEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class GetTagConsumptionEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string WEB_ROUTE = "/en-us/library/statistics/api-get-tag-consumption";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly GetTagConsumptionRequestFixture _getTagConsumptionRequestFixture = new();
     private readonly TagConsumptionDtoFixture _tagConsumptionDtoFixture = new();
 
@@ -35,7 +35,7 @@ public class GetTagConsumptionEndpointTests : IClassFixture<LuminaWebFactory>, I
     /// Initializes a new instance of the <see cref="GetTagConsumptionEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetTagConsumptionEndpointTests(LuminaWebFactory apiFactory)
+    public GetTagConsumptionEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -92,7 +92,7 @@ public class GetTagConsumptionEndpointTests : IClassFixture<LuminaWebFactory>, I
         Assert.Contains("Cookie", response.Headers.Vary);
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     /// <summary>

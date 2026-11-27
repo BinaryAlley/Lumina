@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
-using Lumina.Infrastructure.Core.Authorization;
-using Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
-using Lumina.Infrastructure.Fixtures.Core.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Repositories.Users;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Infrastructure.Core.Authorization;
+using Nemera.Infrastructure.Core.Authorization.Policies.Common.Factory;
+using Nemera.Infrastructure.Fixtures.Core.Authorization;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using System;
@@ -20,7 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Authorization;
+namespace Nemera.Infrastructure.UnitTests.Core.Authorization;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AuthorizationService"/> class.

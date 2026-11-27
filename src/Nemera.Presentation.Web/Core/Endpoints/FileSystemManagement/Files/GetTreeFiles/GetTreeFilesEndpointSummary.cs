@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
-using Lumina.Presentation.Web.Common.Requests.FileSystemManagement.Files;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.FileSystemManagement;
+using Nemera.Presentation.Web.Common.Requests.FileSystemManagement.Files;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.FileSystemManagement.Files.GetTreeFiles;
+namespace Nemera.Presentation.Web.Core.Endpoints.FileSystemManagement.Files.GetTreeFiles;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetTreeFilesEndpoint"/> endpoint, for OpenAPI.

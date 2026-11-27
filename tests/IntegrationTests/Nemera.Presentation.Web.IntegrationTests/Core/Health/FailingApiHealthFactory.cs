@@ -1,19 +1,19 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.HealthChecks;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.HealthChecks;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Health;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Health;
 
 /// <summary>
 /// Factory whose API reachability health check always reports an unhealthy state.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class FailingApiHealthFactory : LuminaWebFactory
+public class FailingApiHealthFactory : NemeraWebFactory
 {
     /// <summary>
     /// Configures the web host, replacing the API reachability health check with one that always fails.

@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.Specifications;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.Specifications;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.MusicLibrary.Specifications;
+namespace Nemera.DataAccess.Core.Repositories.MusicLibrary.Specifications;
 
 /// <summary>
 /// Represents a filter specification for filtering artists by the alpha key of their name, for the alpha picker.

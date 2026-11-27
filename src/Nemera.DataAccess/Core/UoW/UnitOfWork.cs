@@ -1,32 +1,32 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Repositories.Authorization;
-using Lumina.Application.Common.DataAccess.Repositories.BookLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.Favorites;
-using Lumina.Application.Common.DataAccess.Repositories.MediaConsumption;
-using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Repositories.Playlists;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
-using Lumina.Application.Common.DataAccess.Repositories.Themes;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.DataAccess.Core.Repositories.Authorization;
-using Lumina.DataAccess.Core.Repositories.BookLibrary;
-using Lumina.DataAccess.Core.Repositories.Favorites;
-using Lumina.DataAccess.Core.Repositories.Libraries;
-using Lumina.DataAccess.Core.Repositories.MediaConsumption;
-using Lumina.DataAccess.Core.Repositories.MediaContributors;
-using Lumina.DataAccess.Core.Repositories.MusicLibrary;
-using Lumina.DataAccess.Core.Repositories.Playlists;
-using Lumina.DataAccess.Core.Repositories.Plugins;
-using Lumina.DataAccess.Core.Repositories.Scheduling;
-using Lumina.DataAccess.Core.Repositories.Themes;
-using Lumina.DataAccess.Core.Repositories.Users;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Repositories.Authorization;
+using Nemera.Application.Common.DataAccess.Repositories.BookLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.Favorites;
+using Nemera.Application.Common.DataAccess.Repositories.MediaConsumption;
+using Nemera.Application.Common.DataAccess.Repositories.MediaContributors;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Repositories.Playlists;
+using Nemera.Application.Common.DataAccess.Repositories.Plugins;
+using Nemera.Application.Common.DataAccess.Repositories.Scheduling;
+using Nemera.Application.Common.DataAccess.Repositories.Themes;
+using Nemera.Application.Common.DataAccess.Repositories.Users;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.DataAccess.Core.Repositories.Authorization;
+using Nemera.DataAccess.Core.Repositories.BookLibrary;
+using Nemera.DataAccess.Core.Repositories.Favorites;
+using Nemera.DataAccess.Core.Repositories.Libraries;
+using Nemera.DataAccess.Core.Repositories.MediaConsumption;
+using Nemera.DataAccess.Core.Repositories.MediaContributors;
+using Nemera.DataAccess.Core.Repositories.MusicLibrary;
+using Nemera.DataAccess.Core.Repositories.Playlists;
+using Nemera.DataAccess.Core.Repositories.Plugins;
+using Nemera.DataAccess.Core.Repositories.Scheduling;
+using Nemera.DataAccess.Core.Repositories.Themes;
+using Nemera.DataAccess.Core.Repositories.Users;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -35,14 +35,14 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.UoW;
+namespace Nemera.DataAccess.Core.UoW;
 
 /// <summary>
 /// Interaction boundary with the Data Access Layer.
 /// </summary>
 public class UnitOfWork : IUnitOfWork, IDisposable
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
     private readonly IDateTimeProvider _dateTimeProvider;
     private IDbContextTransaction? _transaction;
 
@@ -85,7 +85,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _permissionRepository ??= new PermissionRepository(_luminaDbContext);
+            _permissionRepository ??= new PermissionRepository(_nemeraDbContext);
             return _permissionRepository;
         }
     }
@@ -97,7 +97,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _rolePermissionRepository ??= new RolePermissionRepository(_luminaDbContext);
+            _rolePermissionRepository ??= new RolePermissionRepository(_nemeraDbContext);
             return _rolePermissionRepository;
         }
     }
@@ -109,7 +109,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _roleRepository ??= new RoleRepository(_luminaDbContext);
+            _roleRepository ??= new RoleRepository(_nemeraDbContext);
             return _roleRepository;
         }
     }
@@ -121,7 +121,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _userRoleRepository ??= new UserRoleRepository(_luminaDbContext);
+            _userRoleRepository ??= new UserRoleRepository(_nemeraDbContext);
             return _userRoleRepository;
         }
     }
@@ -133,7 +133,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _bookRepository ??= new BookRepository(_luminaDbContext, _dateTimeProvider);
+            _bookRepository ??= new BookRepository(_nemeraDbContext, _dateTimeProvider);
             return _bookRepository;
         }
     }
@@ -145,7 +145,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _artistRepository ??= new ArtistRepository(_luminaDbContext, AlbumRepository, TrackRepository, _dateTimeProvider);
+            _artistRepository ??= new ArtistRepository(_nemeraDbContext, AlbumRepository, TrackRepository, _dateTimeProvider);
             return _artistRepository;
         }
     }
@@ -157,7 +157,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _albumRepository ??= new AlbumRepository(_luminaDbContext, TrackRepository, _dateTimeProvider);
+            _albumRepository ??= new AlbumRepository(_nemeraDbContext, TrackRepository, _dateTimeProvider);
             return _albumRepository;
         }
     }
@@ -169,7 +169,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _trackRepository ??= new TrackRepository(_luminaDbContext, _dateTimeProvider);
+            _trackRepository ??= new TrackRepository(_nemeraDbContext, _dateTimeProvider);
             return _trackRepository;
         }
     }
@@ -181,7 +181,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _musicArtworkRepository ??= new MusicArtworkRepository(_luminaDbContext);
+            _musicArtworkRepository ??= new MusicArtworkRepository(_nemeraDbContext);
             return _musicArtworkRepository;
         }
     }
@@ -193,7 +193,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _musicLibraryScanItemMetadataRepository ??= new MusicLibraryScanItemMetadataRepository(_luminaDbContext);
+            _musicLibraryScanItemMetadataRepository ??= new MusicLibraryScanItemMetadataRepository(_nemeraDbContext);
             return _musicLibraryScanItemMetadataRepository;
         }
     }
@@ -205,7 +205,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _mediaContributorRepository ??= new MediaContributorRepository(_luminaDbContext);
+            _mediaContributorRepository ??= new MediaContributorRepository(_nemeraDbContext);
             return _mediaContributorRepository;
         }
     }
@@ -217,7 +217,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _directoryScanFingerprintRepository ??= new DirectoryScanFingerprintRepository(_luminaDbContext);
+            _directoryScanFingerprintRepository ??= new DirectoryScanFingerprintRepository(_nemeraDbContext);
             return _directoryScanFingerprintRepository;
         }
     }
@@ -229,7 +229,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _libraryRepository ??= new LibraryRepository(_luminaDbContext);
+            _libraryRepository ??= new LibraryRepository(_nemeraDbContext);
             return _libraryRepository;
         }
     }
@@ -241,7 +241,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _libraryScanRepository ??= new LibraryScanRepository(_luminaDbContext);
+            _libraryScanRepository ??= new LibraryScanRepository(_nemeraDbContext);
             return _libraryScanRepository;
         }
     }
@@ -253,7 +253,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _libraryScanSnapshotRepository ??= new LibraryScanSnapshotRepository(_luminaDbContext);
+            _libraryScanSnapshotRepository ??= new LibraryScanSnapshotRepository(_nemeraDbContext);
             return _libraryScanSnapshotRepository;
         }
     }
@@ -265,7 +265,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _libraryScanStagingResultsRepository ??= new LibraryScanStagingResultsRepository(_luminaDbContext);
+            _libraryScanStagingResultsRepository ??= new LibraryScanStagingResultsRepository(_nemeraDbContext);
             return _libraryScanStagingResultsRepository;
         }
     }
@@ -277,7 +277,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _libraryMetadataProviderConfigurationRepository ??= new LibraryMetadataProviderConfigurationRepository(_luminaDbContext);
+            _libraryMetadataProviderConfigurationRepository ??= new LibraryMetadataProviderConfigurationRepository(_nemeraDbContext);
             return _libraryMetadataProviderConfigurationRepository;
         }
     }
@@ -289,7 +289,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _artworkProviderConfigurationRepository ??= new ArtworkProviderConfigurationRepository(_luminaDbContext);
+            _artworkProviderConfigurationRepository ??= new ArtworkProviderConfigurationRepository(_nemeraDbContext);
             return _artworkProviderConfigurationRepository;
         }
     }
@@ -301,7 +301,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _libraryBookReaderConfigurationRepository ??= new LibraryBookReaderConfigurationRepository(_luminaDbContext);
+            _libraryBookReaderConfigurationRepository ??= new LibraryBookReaderConfigurationRepository(_nemeraDbContext);
             return _libraryBookReaderConfigurationRepository;
         }
     }
@@ -313,7 +313,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _scheduledJobRepository ??= new ScheduledJobRepository(_luminaDbContext);
+            _scheduledJobRepository ??= new ScheduledJobRepository(_nemeraDbContext);
             return _scheduledJobRepository;
         }
     }
@@ -325,7 +325,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _scheduledJobExecutionRepository ??= new ScheduledJobExecutionRepository(_luminaDbContext);
+            _scheduledJobExecutionRepository ??= new ScheduledJobExecutionRepository(_nemeraDbContext);
             return _scheduledJobExecutionRepository;
         }
     }
@@ -337,7 +337,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _schedulerDisplayPreferencesRepository ??= new SchedulerDisplayPreferencesRepository(_luminaDbContext);
+            _schedulerDisplayPreferencesRepository ??= new SchedulerDisplayPreferencesRepository(_nemeraDbContext);
             return _schedulerDisplayPreferencesRepository;
         }
     }
@@ -349,7 +349,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _pluginRepository ??= new PluginRepository(_luminaDbContext);
+            _pluginRepository ??= new PluginRepository(_nemeraDbContext);
             return _pluginRepository;
         }
     }
@@ -361,7 +361,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _themeRepository ??= new ThemeRepository(_luminaDbContext);
+            _themeRepository ??= new ThemeRepository(_nemeraDbContext);
             return _themeRepository;
         }
     }
@@ -373,7 +373,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _userRepository ??= new UserRepository(_luminaDbContext);
+            _userRepository ??= new UserRepository(_nemeraDbContext);
             return _userRepository;
         }
     }
@@ -385,7 +385,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _userSettingsRepository ??= new UserSettingsRepository(_luminaDbContext);
+            _userSettingsRepository ??= new UserSettingsRepository(_nemeraDbContext);
             return _userSettingsRepository;
         }
     }
@@ -397,7 +397,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _playlistRepository ??= new PlaylistRepository(_luminaDbContext);
+            _playlistRepository ??= new PlaylistRepository(_nemeraDbContext);
             return _playlistRepository;
         }
     }
@@ -409,7 +409,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _favoriteRepository ??= new FavoriteRepository(_luminaDbContext);
+            _favoriteRepository ??= new FavoriteRepository(_nemeraDbContext);
             return _favoriteRepository;
         }
     }
@@ -421,7 +421,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _mediaConsumptionRecordRepository ??= new MediaConsumptionRecordRepository(_luminaDbContext);
+            _mediaConsumptionRecordRepository ??= new MediaConsumptionRecordRepository(_nemeraDbContext);
             return _mediaConsumptionRecordRepository;
         }
     }
@@ -433,7 +433,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _mediaResumePointRepository ??= new MediaResumePointRepository(_luminaDbContext);
+            _mediaResumePointRepository ??= new MediaResumePointRepository(_nemeraDbContext);
             return _mediaResumePointRepository;
         }
     }
@@ -445,7 +445,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         get
         {
-            _consumptionStatisticsRepository ??= new ConsumptionStatisticsRepository(_luminaDbContext);
+            _consumptionStatisticsRepository ??= new ConsumptionStatisticsRepository(_nemeraDbContext);
             return _consumptionStatisticsRepository;
         }
     }
@@ -453,11 +453,11 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     /// <summary>
     /// Initializes a new instance of the <see cref="UnitOfWork"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
     /// <param name="dateTimeProvider">Injected provider for the current UTC time, passed to the repositories that stamp their own timestamps.</param>
-    public UnitOfWork(LuminaDbContext luminaDbContext, IDateTimeProvider dateTimeProvider)
+    public UnitOfWork(NemeraDbContext nemeraDbContext, IDateTimeProvider dateTimeProvider)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
         _dateTimeProvider = dateTimeProvider;
     }
 
@@ -479,14 +479,14 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Success>> SaveChangesAsInitializationAsync(CancellationToken cancellationToken)
     {
-        _luminaDbContext.IsInitializationSave = true;
+        _nemeraDbContext.IsInitializationSave = true;
         try
         {
             return await SaveChangesCoreAsync(cancellationToken).ConfigureAwait(false);
         }
         finally
         {
-            _luminaDbContext.IsInitializationSave = false;
+            _nemeraDbContext.IsInitializationSave = false;
         }
     }
 
@@ -499,7 +499,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     {
         try
         {
-            await _luminaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await _nemeraDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return Result.Success;
         }
         // A concurrency conflict means that another request changed the same row after this request read it. It is an expected persistence
@@ -563,7 +563,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     /// </summary>
     public void ClearTrackedEntities()
     {
-        _luminaDbContext.ChangeTracker.Clear();
+        _nemeraDbContext.ChangeTracker.Clear();
     }
 
     /// <summary>
@@ -573,7 +573,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     /// <returns>A task representing the asynchronous operation.</returns>
     public async Task BeginTransactionAsync(CancellationToken cancellationToken)
     {
-        _transaction = await _luminaDbContext.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
+        _transaction = await _nemeraDbContext.Database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -612,6 +612,6 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     public void Dispose()
     {
         _transaction?.Dispose();
-        _luminaDbContext.Dispose();
+        _nemeraDbContext.Dispose();
     }
 }

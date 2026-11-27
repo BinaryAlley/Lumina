@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DTO.MediaLibrary.Management;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DTO.MediaLibrary.Management;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
+namespace Nemera.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
 
 /// <summary>
 /// Command for adding a media library.

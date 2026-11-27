@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Common.Caching;
-using Lumina.Infrastructure.Common.Models.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Infrastructure.Fixtures.Common.Models.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Infrastructure.Common.Caching;
+using Nemera.Infrastructure.Common.Models.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Infrastructure.Fixtures.Common.Models.DTO.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 #endregion
 
-namespace Lumina.Infrastructure.IntegrationTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Infrastructure.IntegrationTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Contains integration tests for the <see cref="TranscodingCacheCoordinator"/> class.
@@ -27,7 +27,7 @@ public class TranscodingCacheCoordinatorTests : IDisposable
     /// </summary>
     public TranscodingCacheCoordinatorTests()
     {
-        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"lumina-transcoding-cache-coordinator-{Guid.NewGuid():N}");
+        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"nemera-transcoding-cache-coordinator-{Guid.NewGuid():N}");
         _cacheRoot = Path.Combine(_temporaryDirectory, "cache");
         Directory.CreateDirectory(_cacheRoot);
         _sut = TranscodingCacheCoordinator.AcquireForRoot(_cacheRoot);

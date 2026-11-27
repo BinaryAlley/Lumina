@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.Common.Models.DTO.Settings;
+namespace Nemera.Plugins.MusicBrainz.Common.Models.DTO.Settings;
 
 /// <summary>
 /// Data transfer object for the settings that configure the MusicBrainz metadata plugin.
@@ -24,7 +24,7 @@ internal sealed class MusicBrainzSettingsDto
     /// <summary>
     /// Gets or sets the user agent sent with every request to the MusicBrainz API.
     /// </summary>
-    public string UserAgent { get; set; } = "Lumina-MusicBrainz/1.0";
+    public string UserAgent { get; set; } = "Nemera-MusicBrainz/1.0";
 
     /// <summary>
     /// Gets or sets the contact email sent with every request to the MusicBrainz API.

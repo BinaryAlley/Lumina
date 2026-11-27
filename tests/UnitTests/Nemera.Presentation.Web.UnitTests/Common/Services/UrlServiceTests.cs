@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Common.Services;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Common.Services;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.Services;
+namespace Nemera.Presentation.Web.UnitTests.Common.Services;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UrlService"/> class.
@@ -90,7 +90,7 @@ public class UrlServiceTests
     {
         // Arrange
         DefaultHttpContext httpContext = TestHttpContextFactory.Create(culture: "de-de");
-        httpContext.Request.PathBase = "/lumina";
+        httpContext.Request.PathBase = "/nemera";
         httpContext.Request.Host = new HostString("localhost:5012");
         httpContext.Request.Scheme = "https";
         _mockHttpContextAccessor.HttpContext.Returns(httpContext);
@@ -99,7 +99,7 @@ public class UrlServiceTests
         string? url = _sut.GetAbsoluteUrl(WebRoutes.Authentication.REGISTER_VIEW);
 
         // Assert
-        Assert.Equal("https://localhost:5012/lumina/de-de/auth/register", url);
+        Assert.Equal("https://localhost:5012/nemera/de-de/auth/register", url);
     }
 
     [Fact]
@@ -202,7 +202,7 @@ public class UrlServiceTests
     {
         // Arrange
         DefaultHttpContext httpContext = TestHttpContextFactory.Create(culture: "de-de");
-        httpContext.Request.PathBase = "/lumina";
+        httpContext.Request.PathBase = "/nemera";
         httpContext.Request.Host = new HostString("localhost:5012");
         httpContext.Request.Scheme = "https";
         _mockHttpContextAccessor.HttpContext.Returns(httpContext);
@@ -211,7 +211,7 @@ public class UrlServiceTests
         string? url = _sut.GetRelativeUrl(WebRoutes.Authentication.REGISTER_VIEW);
 
         // Assert
-        Assert.Equal("/lumina/de-de/auth/register", url);
+        Assert.Equal("/nemera/de-de/auth/register", url);
     }
 
     [Fact]
@@ -276,7 +276,7 @@ public class UrlServiceTests
     {
         // Arrange
         DefaultHttpContext httpContext = TestHttpContextFactory.Create(culture: "de-de");
-        httpContext.Request.PathBase = "/lumina";
+        httpContext.Request.PathBase = "/nemera";
         httpContext.Request.Host = new HostString("localhost:5012");
         httpContext.Request.Scheme = "https";
         _mockHttpContextAccessor.HttpContext.Returns(httpContext);

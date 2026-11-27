@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Infrastructure.Fixtures.Core.Themes;
+namespace Nemera.Infrastructure.Fixtures.Core.Themes;
 
 /// <summary>
 /// Fixture class for generating theme pack ZIP archives used by theme tests.
@@ -100,7 +100,7 @@ public sealed class ThemePackFixture
             id = themeId,
             name = name ?? "Test Theme",
             description = description ?? "A theme used for testing.",
-            author = author ?? "Lumina Tests",
+            author = author ?? "Nemera Tests",
             version = version ?? "1.0.0",
             preview,
             templates = templates ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)

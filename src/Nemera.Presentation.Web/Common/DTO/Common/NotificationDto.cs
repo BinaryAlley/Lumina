@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Notifications;
+using Nemera.Presentation.Web.Common.Enums.Notifications;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Common;
+namespace Nemera.Presentation.Web.Common.DTO.Common;
 
 /// <summary>
 /// Data transfer object for notifications.

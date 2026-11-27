@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Common.Requests.Library.Statistics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.Statistics.GetGenreConsumption;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.Statistics.GetGenreConsumption;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetGenreConsumptionEndpoint"/> endpoint, for OpenAPI.

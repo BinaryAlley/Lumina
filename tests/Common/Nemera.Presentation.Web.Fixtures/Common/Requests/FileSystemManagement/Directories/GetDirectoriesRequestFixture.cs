@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Requests.FileSystemManagement.Directories;
+using Nemera.Presentation.Web.Common.Requests.FileSystemManagement.Directories;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Requests.FileSystemManagement.Directories;
+namespace Nemera.Presentation.Web.Fixtures.Common.Requests.FileSystemManagement.Directories;
 
 /// <summary>
 /// Fixture class for the <see cref="GetDirectoriesRequest"/> record.

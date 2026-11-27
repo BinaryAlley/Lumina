@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.Primitives;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Validation;
+namespace Nemera.Presentation.Web.Common.Validation;
 
 /// <summary>
 /// Interface for validating instances of a specific type.

@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Validation;
+namespace Nemera.Presentation.Web.Fixtures.Common.Validation;
 
 /// <summary>
 /// Test-support placeholder options type used as the validated options in validation options tests.

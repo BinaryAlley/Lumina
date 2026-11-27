@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.Common;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+namespace Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 
 /// <summary>
 /// Repository entity for a directory scan fingerprint, holding the last write time of a directory of a media library, used to skip the scanning of directories that have not changed since the last scan.

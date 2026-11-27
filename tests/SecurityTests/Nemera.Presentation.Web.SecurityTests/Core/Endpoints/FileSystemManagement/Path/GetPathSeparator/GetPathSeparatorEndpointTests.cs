@@ -1,26 +1,26 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.FileSystemManagement.Path.GetPathSeparator;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.FileSystemManagement.Path.GetPathSeparator;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.FileSystemManagement.Path.GetPathSeparator;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.FileSystemManagement.Path.GetPathSeparator;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetPathSeparatorEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetPathSeparatorEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetPathSeparatorEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetPathSeparatorEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetPathSeparatorEndpointTests(LuminaWebFactory apiFactory)
+    public GetPathSeparatorEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

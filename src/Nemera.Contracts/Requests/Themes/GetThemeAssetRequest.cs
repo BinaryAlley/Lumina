@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.Themes;
+namespace Nemera.Contracts.Requests.Themes;
 
 /// <summary>
 /// Represents a request to get an asset file of a theme.

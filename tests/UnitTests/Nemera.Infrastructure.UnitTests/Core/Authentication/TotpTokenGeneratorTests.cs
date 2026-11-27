@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Core.Authentication;
+using Nemera.Infrastructure.Core.Authentication;
 using OtpNet;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Authentication;
+namespace Nemera.Infrastructure.UnitTests.Core.Authentication;
 
 /// <summary>
 /// Contains unit tests for the <see cref="TotpTokenGenerator"/> class.

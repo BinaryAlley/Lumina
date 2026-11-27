@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Reading;
-using Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingManifest;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Reading;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Reading;
+using Nemera.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingManifest;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Reading;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -12,22 +12,22 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingManifest;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.Reading.GetReadingManifest;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetReadingManifestEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetReadingManifestEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetReadingManifestEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly ReadingManifestDtoFixture _readingManifestDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetReadingManifestEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetReadingManifestEndpointTests(LuminaWebFactory apiFactory)
+    public GetReadingManifestEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

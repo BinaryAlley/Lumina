@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
-using Lumina.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.SaveBook;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.WrittenContentLibrary.BookLibrary;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
+using Nemera.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.SaveBook;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.WrittenContentLibrary.BookLibrary;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -16,15 +16,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.SaveBook;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.SaveBook;
 
 /// <summary>
 /// Contains integration tests for the <see cref="SaveBookEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class SaveBookEndpointTests : IClassFixture<LuminaWebFactory>
+public class SaveBookEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly UpdateBookRequestFixture _updateBookRequestFixture = new();
     private readonly BookDetailsDtoFixture _bookDetailsDtoFixture = new();
 
@@ -32,7 +32,7 @@ public class SaveBookEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="SaveBookEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public SaveBookEndpointTests(LuminaWebFactory apiFactory)
+    public SaveBookEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

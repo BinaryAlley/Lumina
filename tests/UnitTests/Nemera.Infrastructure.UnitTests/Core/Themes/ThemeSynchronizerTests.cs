@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Common.DataAccess.Repositories.Themes;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
-using Lumina.Application.Common.Infrastructure.Themes;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.Application.Fixtures.Common.Infrastructure.Models.DTO.Themes;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Themes;
-using Lumina.Infrastructure.Core.Themes;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Common.DataAccess.Repositories.Themes;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Themes;
+using Nemera.Application.Common.Infrastructure.Themes;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Application.Fixtures.Common.Infrastructure.Models.DTO.Themes;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Themes;
+using Nemera.Infrastructure.Core.Themes;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
@@ -24,7 +24,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Themes;
+namespace Nemera.Infrastructure.UnitTests.Core.Themes;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ThemeSynchronizer"/> class.
@@ -55,12 +55,12 @@ public class ThemeSynchronizerTests : IDisposable
         _mockLogger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
         _mockThemeService.GetBundledThemeArchivePaths().Returns([]);
         _mockThemeService.HasThemePack(Arg.Any<string>()).Returns(true);
-        _mockThemeService.DefaultThemeId.Returns("lumina-default");
+        _mockThemeService.DefaultThemeId.Returns("nemera-default");
         _mockThemeRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: [], currentPage: 1, perPage: 0, count: 0, numberOfPages: 1)));
         _mockThemeRepository.InsertAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Created);
         _mockThemeRepository.UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>()).Returns(Result.Updated);
         _mockThemeRepository.DeleteByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(Result.Deleted);
-        _temporaryDirectoryPath = Path.Combine(Path.GetTempPath(), $"lumina-theme-sync-{Guid.NewGuid():N}");
+        _temporaryDirectoryPath = Path.Combine(Path.GetTempPath(), $"nemera-theme-sync-{Guid.NewGuid():N}");
         Directory.CreateDirectory(_temporaryDirectoryPath);
     }
 
@@ -613,7 +613,7 @@ public class ThemeSynchronizerTests : IDisposable
     public async Task EnsureCurrentThemeExistsAsync_WhenNoThemeIsCurrent_ShouldActivateTheDefaultTheme()
     {
         // Arrange
-        ThemeEntity defaultTheme = _themeEntityFixture.Create(themeId: "lumina-default", installSource: ThemeInstallSource.Bundled, isDeleted: false);
+        ThemeEntity defaultTheme = _themeEntityFixture.Create(themeId: "nemera-default", installSource: ThemeInstallSource.Bundled, isDeleted: false);
         ThemeEntity userTheme = _themeEntityFixture.Create(installSource: ThemeInstallSource.Uploaded, isDeleted: false);
         _mockThemeService.HasThemePack(defaultTheme.ThemeId).Returns(true);
         _mockThemeService.HasThemePack(userTheme.ThemeId).Returns(false);
@@ -630,7 +630,7 @@ public class ThemeSynchronizerTests : IDisposable
     public async Task EnsureCurrentThemeExistsAsync_WhenActivatingTheDefaultThemeFails_ShouldLogAndNotThrow()
     {
         // Arrange
-        ThemeEntity defaultTheme = _themeEntityFixture.Create(themeId: "lumina-default", installSource: ThemeInstallSource.Bundled, isDeleted: false);
+        ThemeEntity defaultTheme = _themeEntityFixture.Create(themeId: "nemera-default", installSource: ThemeInstallSource.Bundled, isDeleted: false);
         _mockThemeService.HasThemePack(defaultTheme.ThemeId).Returns(true);
         _mockThemeRepository.UpdateAsync(Arg.Any<ThemeEntity>(), Arg.Any<CancellationToken>())
             .Returns(Error.Failure("Themes.UpdateFailed", "Failed to activate the theme"));

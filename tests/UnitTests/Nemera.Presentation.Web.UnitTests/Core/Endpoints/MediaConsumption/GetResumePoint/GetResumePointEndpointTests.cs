@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Common.Enums.MediaConsumption;
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Core.Endpoints.MediaConsumption.GetResumePoint;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Common.Enums.MediaConsumption;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Core.Endpoints.MediaConsumption.GetResumePoint;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.MediaConsumption.GetResumePoint;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.MediaConsumption.GetResumePoint;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetResumePointEndpoint"/> class.

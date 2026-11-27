@@ -1,27 +1,27 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Library.Management.GetMetadataProviders;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Management.GetMetadataProviders;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.GetMetadataProviders;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Library.Management.GetMetadataProviders;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetMetadataProvidersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetMetadataProvidersEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetMetadataProvidersEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetMetadataProvidersEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetMetadataProvidersEndpointTests(LuminaWebFactory apiFactory)
+    public GetMetadataProvidersEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

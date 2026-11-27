@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.CoverArtArchive.Common.Models.Contracts.Responses;
-using Lumina.Plugins.CoverArtArchive.Core.Mapping;
-using Lumina.Plugins.CoverArtArchive.Fixtures.Common.Models.Contracts.Responses;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.CoverArtArchive.Common.Models.Contracts.Responses;
+using Nemera.Plugins.CoverArtArchive.Core.Mapping;
+using Nemera.Plugins.CoverArtArchive.Fixtures.Common.Models.Contracts.Responses;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.UnitTests.Core.Mapping;
+namespace Nemera.Plugins.CoverArtArchive.UnitTests.Core.Mapping;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CoverArtArchiveMapper"/> class.

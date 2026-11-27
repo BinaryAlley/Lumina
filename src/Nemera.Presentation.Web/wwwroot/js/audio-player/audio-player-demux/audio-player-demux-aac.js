@@ -23,7 +23,7 @@
  * duration of the stream is not stated anywhere in an ADTS header, so it is estimated from the average byte rate of the
  * frames read so far once the stream is past its beginning, and only once the end is reached is it exact.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -132,10 +132,10 @@
     /**
      * Demuxes an AAC stream that is framed as ADTS.
      */
-    class AacDemuxer extends LuminaAudioPlayer.Demuxer {
+    class AacDemuxer extends NemeraAudioPlayer.Demuxer {
         /**
          * Creates an instance of AacDemuxer.
-         * @param {Object} options - The demuxer options, per {@link LuminaAudioPlayer.Demuxer}.
+         * @param {Object} options - The demuxer options, per {@link NemeraAudioPlayer.Demuxer}.
          */
         constructor(options = {}) {
             super(options);
@@ -157,24 +157,24 @@
         /**
          * Skips an ID3v2 tag if the file carries one and positions the read cursor on the first ADTS frame.
          * @returns {Promise<void>} A promise resolving when the stream is ready to be read.
-         * @throws {LuminaAudioPlayer.PlayerError} When the bytes are not an ADTS stream.
+         * @throws {NemeraAudioPlayer.PlayerError} When the bytes are not an ADTS stream.
          */
         async initializeAsync() {
             if (this.isInitialized())
                 return;
             if (this.destroyed)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The demuxer was destroyed.');
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The demuxer was destroyed.');
             try {
                 const dataStart = await this.skipId3v2Async(0);
                 const end = this.reader.getLength();
-                const firstFrame = await LuminaAudioPlayer.scanForFrameAsync(this.reader, dataStart, end, ADTS_SYNC_PREFIX, (offset) => this.isValidFrameAtAsync(offset), { prefixMask: ADTS_SYNC_MASK });
+                const firstFrame = await NemeraAudioPlayer.scanForFrameAsync(this.reader, dataStart, end, ADTS_SYNC_PREFIX, (offset) => this.isValidFrameAtAsync(offset), { prefixMask: ADTS_SYNC_MASK });
                 if (firstFrame < 0)
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The bytes do not contain an ADTS frame.', { reason: 'no-adts-frame' });
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The bytes do not contain an ADTS frame.', { reason: 'no-adts-frame' });
                 const header = await this.parseHeaderAtAsync(firstFrame);
                 if (!header)
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The ADTS frame header could not be parsed.', { reason: 'no-adts-frame' });
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The ADTS frame header could not be parsed.', { reason: 'no-adts-frame' });
                 if (header.channelConfiguration === 0)
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The AAC stream describes its channels in a program configuration this demuxer does not read.', { reason: 'unsupported-channel-config' });
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The AAC stream describes its channels in a program configuration this demuxer does not read.', { reason: 'unsupported-channel-config' });
                 this.dataStart = firstFrame;
                 this.firstFrameOffset = firstFrame;
                 this.offset = firstFrame;
@@ -217,7 +217,7 @@
         /**
          * Reads the next ADTS frame as an encoded packet.
          * @returns {Promise<Object|null>} The packet, or null once the stream ended.
-         * @throws {LuminaAudioPlayer.PlayerError} When the stream can no longer be parsed.
+         * @throws {NemeraAudioPlayer.PlayerError} When the stream can no longer be parsed.
          */
         async readPacketAsync() {
             this.ensureInitialized();
@@ -236,7 +236,7 @@
                 // The duration is kept unrounded while the timeline accumulates it, so that rounding it per packet does not
                 // make the timeline drift; only the packet the decoder receives carries a whole number of microseconds.
                 const duration = ((SAMPLES_PER_BLOCK * header.rawDataBlocks) / header.sampleRate) * 1000000;
-                const packet = LuminaAudioPlayer.createDemuxerPacket(data.slice(), this.timelineMicros, duration);
+                const packet = NemeraAudioPlayer.createDemuxerPacket(data.slice(), this.timelineMicros, duration);
                 this.timelineMicros += duration;
                 this.offset += header.frameLength;
                 this.updateEstimatedDuration();
@@ -249,11 +249,11 @@
         /**
          * Rescans for the next ADTS frame after a byte that is not the start of one.
          * @returns {Promise<Object|null>} The next packet, or null when no further frame is found.
-         * @throws {LuminaAudioPlayer.PlayerError} When the stream can no longer be parsed.
+         * @throws {NemeraAudioPlayer.PlayerError} When the stream can no longer be parsed.
          */
         async resyncAsync() {
             const end = this.reader.getLength();
-            const next = await LuminaAudioPlayer.scanForFrameAsync(this.reader, this.offset + 1, end, ADTS_SYNC_PREFIX, (offset) => this.isValidFrameAtAsync(offset), { prefixMask: ADTS_SYNC_MASK });
+            const next = await NemeraAudioPlayer.scanForFrameAsync(this.reader, this.offset + 1, end, ADTS_SYNC_PREFIX, (offset) => this.isValidFrameAtAsync(offset), { prefixMask: ADTS_SYNC_MASK });
             if (next < 0) {
                 this.reachedEnd = true;
                 this.updateEstimatedDuration();
@@ -270,7 +270,7 @@
          * walked yet, because the first frame is already known from initialization.
          * @param {number} seconds - The target time, in seconds.
          * @returns {Promise<number|null>} The byte offset it repositioned to, or null when the stream cannot be seeked.
-         * @throws {LuminaAudioPlayer.PlayerError} When the scan for a frame gives up on a corrupt or crafted region.
+         * @throws {NemeraAudioPlayer.PlayerError} When the scan for a frame gives up on a corrupt or crafted region.
          */
         async seekToTimeAsync(seconds) {
             this.ensureInitialized();
@@ -290,7 +290,7 @@
             const bytesPerSecond = elapsedBytes / (elapsedMicros / 1000000);
             const estimate = this.firstFrameOffset + Math.floor(seconds * bytesPerSecond);
             const start = Math.max(this.firstFrameOffset, Math.min(end - 1, estimate));
-            const frame = await LuminaAudioPlayer.scanForFrameAsync(this.reader, start, end, ADTS_SYNC_PREFIX, (offset) => this.isValidFrameAtAsync(offset), { prefixMask: ADTS_SYNC_MASK });
+            const frame = await NemeraAudioPlayer.scanForFrameAsync(this.reader, start, end, ADTS_SYNC_PREFIX, (offset) => this.isValidFrameAtAsync(offset), { prefixMask: ADTS_SYNC_MASK });
             if (frame < 0)
                 return null;
             this.offset = frame;
@@ -356,12 +356,12 @@
         }
     }
 
-    LuminaAudioPlayer.AacDemuxer = AacDemuxer;
+    NemeraAudioPlayer.AacDemuxer = AacDemuxer;
 
-    LuminaAudioPlayer.registerDemuxer({
-        container: LuminaAudioPlayer.DemuxerContainer.AAC,
-        codec: LuminaAudioPlayer.DemuxerCodec.AAC,
-        probe: LuminaAudioPlayer.AUDIO_CODEC_PROBES.AAC,
+    NemeraAudioPlayer.registerDemuxer({
+        container: NemeraAudioPlayer.DemuxerContainer.AAC,
+        codec: NemeraAudioPlayer.DemuxerCodec.AAC,
+        probe: NemeraAudioPlayer.AUDIO_CODEC_PROBES.AAC,
         create: (options) => new AacDemuxer(options)
     });
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

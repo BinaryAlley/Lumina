@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Presentation.Web.Common.Enums.Authorization;
-using Lumina.Presentation.Web.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Common.Enums.Authorization;
+using Nemera.Presentation.Web.Common.Responses.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
+namespace Nemera.Presentation.Web.Fixtures.Common.Responses.Authorization;
 
 /// <summary>
 /// Fixture class for the <see cref="GetAuthorizationResponse"/> record.

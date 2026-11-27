@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Core.UsersManagement.Settings.Queries.GetUserSettings;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Core.UsersManagement.Settings.Queries.GetUserSettings;
-using Lumina.Contracts.Responses.UsersManagement.Settings;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Repositories.Users;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Core.UsersManagement.Settings.Queries.GetUserSettings;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Core.UsersManagement.Settings.Queries.GetUserSettings;
+using Nemera.Contracts.Responses.UsersManagement.Settings;
+using Nemera.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.UsersManagement.Settings.Queries.GetUserSettings;
+namespace Nemera.Application.UnitTests.Core.UsersManagement.Settings.Queries.GetUserSettings;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetUserSettingsQueryHandler"/> class.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.Requests.Scheduling;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.Requests.Scheduling;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Admin.Scheduler.StopScheduledJob;
+namespace Nemera.Presentation.Web.Core.Endpoints.Admin.Scheduler.StopScheduledJob;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="StopScheduledJobEndpoint"/> endpoint, for OpenAPI.

@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.MediaLibrary.Management;
-using Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary;
-using Lumina.Application.Fixtures.Common.DTO.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Core.MediaLibrary.Management.Commands.UpdateLibrary;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DTO.MediaLibrary.Management;
+using Nemera.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary;
+using Nemera.Application.Fixtures.Common.DTO.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Core.MediaLibrary.Management.Commands.UpdateLibrary;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.MediaLibrary.Management.Commands.UpdateLibrary;
+namespace Nemera.Application.UnitTests.Core.MediaLibrary.Management.Commands.UpdateLibrary;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdateLibraryCommandValidator"/> class.

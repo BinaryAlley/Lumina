@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Common.DataAccess.Entities.Favorites;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DTO.Favorites;
+namespace Nemera.Application.Common.DTO.Favorites;
 
 /// <summary>
 /// Data transfer object for a stored favorite together with the display data of the media item it references.

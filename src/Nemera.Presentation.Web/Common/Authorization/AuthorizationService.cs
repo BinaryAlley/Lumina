@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.Enums.Authorization;
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Http;
-using Lumina.Presentation.Web.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.Enums.Authorization;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Http;
+using Nemera.Presentation.Web.Common.Responses.Authorization;
 using Microsoft.AspNetCore.Http;
 using Polly.CircuitBreaker;
 using System;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Authorization;
+namespace Nemera.Presentation.Web.Common.Authorization;
 
 /// <summary>
 /// Implements authorization logic for API endpoints by validating user roles, permissions, and policies.

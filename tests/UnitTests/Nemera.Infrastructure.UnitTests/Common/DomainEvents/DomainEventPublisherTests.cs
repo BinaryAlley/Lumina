@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Events;
-using Lumina.Infrastructure.Common.DomainEvents;
+using Nemera.Domain.Common.Events;
+using Nemera.Infrastructure.Common.DomainEvents;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using System;
@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Common.DomainEvents;
+namespace Nemera.Infrastructure.UnitTests.Common.DomainEvents;
 
 /// <summary>
 /// Contains unit tests for the <see cref="DomainEventPublisher"/> class.

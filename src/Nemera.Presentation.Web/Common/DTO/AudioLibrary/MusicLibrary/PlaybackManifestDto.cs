@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.AudioLibrary;
+using Nemera.Presentation.Web.Common.Enums.AudioLibrary;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
+namespace Nemera.Presentation.Web.Common.DTO.AudioLibrary.MusicLibrary;
 
 /// <summary>
 /// Data transfer object for the playback manifest of a track, describing the format of its stored audio, the delivery the server decided on for the requesting player, and the path of its stream.

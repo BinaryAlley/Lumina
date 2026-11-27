@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Library.Management.DeleteLibrary;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Library.Management.DeleteLibrary;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,16 +23,16 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Library.Management.DeleteLibrary;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Library.Management.DeleteLibrary;
 
 /// <summary>
 /// Contains integration tests for the <see cref="DeleteLibraryEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class DeleteLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class DeleteLibraryEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -53,7 +53,7 @@ public class DeleteLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     /// Initializes a new instance of the <see cref="DeleteLibraryEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public DeleteLibraryEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public DeleteLibraryEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -83,7 +83,7 @@ public class DeleteLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(lib => lib.Id == libraryId);
         Assert.Null(storedLibrary);
     }
@@ -103,7 +103,7 @@ public class DeleteLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         // Assert
         response.EnsureSuccessStatusCode();
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.Null(await dbContext.Libraries.FirstOrDefaultAsync(library => library.Id == libraryId));
         Assert.False(await dbContext.LibraryScans.AnyAsync(scan => scan.LibraryId == libraryId));
         Assert.False(await dbContext.LibraryScanResults.AnyAsync(result => result.LibraryScanId == scanId));
@@ -175,7 +175,7 @@ public class DeleteLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     private async Task SeedLibraryWithRelatedDataAsync(Guid libraryId, Guid userId, Guid scanId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         LibraryEntity library = _libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []);
         dbContext.Libraries.Add(library);
         dbContext.LibraryScans.Add(_libraryScanEntityFixture.Create(id: scanId, libraryId: libraryId, userId: userId, libraryEntity: library));
@@ -196,7 +196,7 @@ public class DeleteLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     private async Task<Guid> SeedUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: $"otheruser_{Guid.NewGuid()}", password: "TestPass123!"));
         await dbContext.SaveChangesAsync();
@@ -212,7 +212,7 @@ public class DeleteLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     private async Task SeedLibraryAsync(Guid libraryId, Guid userId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []));
         await dbContext.SaveChangesAsync();
     }
@@ -224,7 +224,7 @@ public class DeleteLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     private Guid GetCurrentUserId()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         UserEntity user = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername);
         return user.Id;
     }

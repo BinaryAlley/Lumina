@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.FileSystemManagement.Paths.Queries.ValidatePath;
-using Lumina.Application.Fixtures.Core.FileSystemManagement.Paths.Queries.ValidatePath;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Core.FileSystemManagement.Paths.Queries.ValidatePath;
+using Nemera.Application.Fixtures.Core.FileSystemManagement.Paths.Queries.ValidatePath;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Paths.Queries.ValidatePath;
+namespace Nemera.Application.UnitTests.Core.FileSystemManagement.Paths.Queries.ValidatePath;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ValidatePathQueryValidator"/> class.

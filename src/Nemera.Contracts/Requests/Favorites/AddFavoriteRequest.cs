@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.Favorites;
+namespace Nemera.Contracts.Requests.Favorites;
 
 /// <summary>
 /// Represents a request for marking a media item as a favorite of the current user.

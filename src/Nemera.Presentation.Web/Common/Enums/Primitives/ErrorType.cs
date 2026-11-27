@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.Enums.Primitives;
+namespace Nemera.Presentation.Web.Common.Enums.Primitives;
 
 /// <summary>
 /// Enumeration for the type of an error.

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Themes;
+using Nemera.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Themes;
+namespace Nemera.Application.Common.Infrastructure.Themes;
 
 /// <summary>
 /// Service for the storage and serving of theme packs.

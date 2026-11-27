@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Responses.MediaLibrary.Management;
+namespace Nemera.Contracts.Fixtures.Core.Responses.MediaLibrary.Management;
 
 /// <summary>
 /// Fixture class for the <see cref="LibraryResponse"/> record.

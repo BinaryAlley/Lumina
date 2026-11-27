@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.ID3.Common.Models.DTO.Tags;
-using Lumina.Plugins.ID3.Core.Tags;
-using Lumina.Plugins.ID3.Fixtures.Core.Tags;
+using Nemera.Plugins.ID3.Common.Models.DTO.Tags;
+using Nemera.Plugins.ID3.Core.Tags;
+using Nemera.Plugins.ID3.Fixtures.Core.Tags;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 #endregion
 
-namespace Lumina.Plugins.ID3.IntegrationTests.Core.Tags;
+namespace Nemera.Plugins.ID3.IntegrationTests.Core.Tags;
 
 /// <summary>
 /// Contains integration tests for the <see cref="Id3TagReader"/> class, reading real audio containers through the tagging library.
@@ -28,7 +28,7 @@ public class Id3TagReaderTests : IDisposable
     /// </summary>
     public Id3TagReaderTests()
     {
-        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"lumina-id3-reader-{Guid.NewGuid():N}");
+        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"nemera-id3-reader-{Guid.NewGuid():N}");
         Directory.CreateDirectory(_temporaryDirectory);
     }
 

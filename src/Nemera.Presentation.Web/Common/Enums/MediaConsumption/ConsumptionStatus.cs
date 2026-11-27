@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.Enums.MediaConsumption;
+namespace Nemera.Presentation.Web.Common.Enums.MediaConsumption;
 
 /// <summary>
 /// Enumeration for the states of a media consumption session.

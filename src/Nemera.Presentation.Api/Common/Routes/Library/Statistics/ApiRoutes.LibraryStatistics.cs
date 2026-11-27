@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Api.Common.Routes.Library.Statistics;
+namespace Nemera.Presentation.Api.Common.Routes.Library.Statistics;
 
 /// <summary>
 /// Class for the collection of the library statistics routes of the API.

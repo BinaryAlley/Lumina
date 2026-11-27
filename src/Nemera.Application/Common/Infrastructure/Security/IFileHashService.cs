@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
+using Nemera.Application.Common.Infrastructure.Models.DTO.MediaLibraryScanJobPayloads;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Security;
+namespace Nemera.Application.Common.Infrastructure.Security;
 
 /// <summary>
 /// Interface for the service for hashing files by sampling chunks from them.

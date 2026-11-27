@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Fixtures.Core.Endpoints.Common;
+namespace Nemera.Presentation.Api.Fixtures.Core.Endpoints.Common;
 
 /// <summary>
 /// Fixture class for the <see cref="BaseEndpoint"/> class.

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
+namespace Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
 
 /// <summary>
 /// Interface for the service for storing the artwork of a music library item, an album or an artist, into the internal media directory and serving its relative path.

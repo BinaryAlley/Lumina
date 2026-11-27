@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.MediaContributors;
-using Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary;
-using Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
-using Lumina.Presentation.Web.Common.Enums.BookLibrary;
+using Nemera.Presentation.Web.Common.DTO.MediaContributors;
+using Nemera.Presentation.Web.Common.DTO.WrittenContentLibrary;
+using Nemera.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
+using Nemera.Presentation.Web.Common.Enums.BookLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
+namespace Nemera.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
 
 /// <summary>
 /// Represents a request to update an existing book.

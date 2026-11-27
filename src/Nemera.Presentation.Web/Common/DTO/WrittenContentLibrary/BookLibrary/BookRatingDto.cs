@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.BookLibrary;
+using Nemera.Presentation.Web.Common.Enums.BookLibrary;
 using System.Diagnostics;
-using Lumina.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Common;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
+namespace Nemera.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
 
 /// <summary>
 /// Data transfer object for a book rating.

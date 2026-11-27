@@ -1,21 +1,21 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
-using Lumina.Contracts.Fixtures.Core.Requests.Scheduling;
-using Lumina.Contracts.Requests.Scheduling;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Scheduling.UpdateSchedulerDisplayPreferences;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
+using Nemera.Contracts.Fixtures.Core.Requests.Scheduling;
+using Nemera.Contracts.Requests.Scheduling;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Scheduling.UpdateSchedulerDisplayPreferences;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Scheduling.UpdateSchedulerDisplayPreferences;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Scheduling.UpdateSchedulerDisplayPreferences;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdateSchedulerDisplayPreferencesEndpoint"/> class.

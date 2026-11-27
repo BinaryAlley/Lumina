@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.MediaConsumption.Queries.GetConsumptionRecord;
-using Lumina.Contracts.Fixtures.Core.Responses.MediaConsumption;
-using Lumina.Contracts.Responses.MediaConsumption;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.MediaConsumption.GetConsumptionRecord;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.MediaConsumption.Queries.GetConsumptionRecord;
+using Nemera.Contracts.Fixtures.Core.Responses.MediaConsumption;
+using Nemera.Contracts.Responses.MediaConsumption;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.MediaConsumption.GetConsumptionRecord;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -12,11 +12,11 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.MediaConsumption.GetConsumptionRecord;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.MediaConsumption.GetConsumptionRecord;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetConsumptionRecordEndpoint"/> class.

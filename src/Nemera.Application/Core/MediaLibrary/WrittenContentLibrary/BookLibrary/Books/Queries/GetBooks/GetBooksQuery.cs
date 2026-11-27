@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooks;
+namespace Nemera.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Queries.GetBooks;
 
 /// <summary>
 /// Query for getting all the books of a media library.

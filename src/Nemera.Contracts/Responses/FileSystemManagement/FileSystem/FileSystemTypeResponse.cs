@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
+namespace Nemera.Contracts.Responses.FileSystemManagement.FileSystem;
 
 /// <summary>
 /// Represents a response containing the file system platform type.

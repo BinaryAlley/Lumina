@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Artists;
+namespace Nemera.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Artists;
 
 /// <summary>
 /// Represents a request for displaying the details of a music artist.

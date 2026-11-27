@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.DTO.MediaContributors;
+using Nemera.Contracts.DTO.MediaContributors;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
+namespace Nemera.Contracts.Fixtures.Core.DTO.MediaContributors;
 
 /// <summary>
 /// Fixture class for the <see cref="MediaContributorNameDto"/> record.

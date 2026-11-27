@@ -1,12 +1,12 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Application.Common.CQRS;
+using Nemera.Contracts.Responses.FileSystemManagement.Path;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathSeparator;
+namespace Nemera.Application.Core.FileSystemManagement.Paths.Queries.GetPathSeparator;
 
 /// <summary>
 /// Handler for the query to get the path separator character of a file system path.

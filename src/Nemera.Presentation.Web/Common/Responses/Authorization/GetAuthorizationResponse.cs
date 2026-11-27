@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Authorization;
+using Nemera.Presentation.Web.Common.Enums.Authorization;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Responses.Authorization;
+namespace Nemera.Presentation.Web.Common.Responses.Authorization;
 
 /// <summary>
 /// Represents the response model for an account authorization request.

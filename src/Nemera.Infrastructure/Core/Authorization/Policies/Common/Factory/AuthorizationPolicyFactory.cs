@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Authorization.Policies.Common.Factory;
+namespace Nemera.Infrastructure.Core.Authorization.Policies.Common.Factory;
 
 /// <summary>
 /// Concrete implementation for the authorization policies factory.

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Presentation.Web.Common.Enums.Playlists;
-using Lumina.Presentation.Web.Common.Requests.Playlists;
+using Nemera.Presentation.Web.Common.Enums.Playlists;
+using Nemera.Presentation.Web.Common.Requests.Playlists;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Playlists;
+namespace Nemera.Presentation.Web.Fixtures.Common.Requests.Playlists;
 
 /// <summary>
 /// Fixture class for the <see cref="CreatePlaylistRequest"/> record.

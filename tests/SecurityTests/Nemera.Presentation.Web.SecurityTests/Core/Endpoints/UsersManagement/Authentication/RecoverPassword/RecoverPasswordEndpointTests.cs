@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Requests.UsersManagement;
-using Lumina.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.RecoverPassword;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Requests.UsersManagement;
+using Nemera.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.RecoverPassword;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.UsersManagement;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
@@ -13,15 +13,15 @@ using System.Net.Http.Json;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.RecoverPassword;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.UsersManagement.Authentication.RecoverPassword;
 
 /// <summary>
 /// Contains security tests for the <see cref="RecoverPasswordEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RecoverPasswordEndpointTests : IClassFixture<LuminaWebFactory>
+public class RecoverPasswordEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly RecoverPasswordRequestFixture _recoverPasswordRequestFixture = new();
     private readonly ProblemDetailsDtoFixture _problemDetailsDtoFixture = new();
 
@@ -29,7 +29,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="RecoverPasswordEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public RecoverPasswordEndpointTests(LuminaWebFactory apiFactory)
+    public RecoverPasswordEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

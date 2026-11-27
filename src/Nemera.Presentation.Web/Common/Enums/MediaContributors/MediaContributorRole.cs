@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.Enums.MediaContributors;
+namespace Nemera.Presentation.Web.Common.Enums.MediaContributors;
 
 /// <summary>
 /// Enumeration for the role of a media contributor in a media item.

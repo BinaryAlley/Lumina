@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Reading;
-using Lumina.Plugins.Pdf.Common.DependencyInjection;
+using Nemera.Plugins.Contracts.Core.Reading;
+using Nemera.Plugins.Pdf.Common.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.Pdf.UnitTests.Common.DependencyInjection;
+namespace Nemera.Plugins.Pdf.UnitTests.Common.DependencyInjection;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PdfServices"/> class.

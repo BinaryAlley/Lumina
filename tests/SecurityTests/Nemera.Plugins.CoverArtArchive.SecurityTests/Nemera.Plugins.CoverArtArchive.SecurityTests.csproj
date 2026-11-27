@@ -38,10 +38,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\plugins\Lumina.Plugins.CoverArtArchive\Lumina.Plugins.CoverArtArchive.csproj" />
-        <ProjectReference Include="..\..\..\src\Lumina.Plugins.Contracts\Lumina.Plugins.Contracts.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Plugins.CoverArtArchive.Fixtures\Lumina.Plugins.CoverArtArchive.Fixtures.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Contracts.Fixtures\Lumina.Contracts.Fixtures.csproj" />
+        <ProjectReference Include="..\..\..\plugins\Nemera.Plugins.CoverArtArchive\Nemera.Plugins.CoverArtArchive.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Plugins.Contracts\Nemera.Plugins.Contracts.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Plugins.CoverArtArchive.Fixtures\Nemera.Plugins.CoverArtArchive.Fixtures.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Contracts.Fixtures\Nemera.Contracts.Fixtures.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.DataAccess.Core.UoW;
+using Nemera.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System;
@@ -7,20 +7,20 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Common.HealthChecks;
+namespace Nemera.Presentation.Api.Common.HealthChecks;
 
 /// <summary>
 /// Health check that verifies the database can be reached.
 /// </summary>
 public class DatabaseHealthCheck : IHealthCheck
 {
-    private readonly LuminaDbContext _dbContext;
+    private readonly NemeraDbContext _dbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DatabaseHealthCheck"/> class.
     /// </summary>
     /// <param name="dbContext">Injected database context.</param>
-    public DatabaseHealthCheck(LuminaDbContext dbContext)
+    public DatabaseHealthCheck(NemeraDbContext dbContext)
     {
         _dbContext = dbContext;
     }

@@ -1,4 +1,4 @@
-namespace Lumina.Application.Common.Infrastructure.Authorization;
+namespace Nemera.Application.Common.Infrastructure.Authorization;
 
 /// <summary>
 /// Class for the names of the authorization roles.

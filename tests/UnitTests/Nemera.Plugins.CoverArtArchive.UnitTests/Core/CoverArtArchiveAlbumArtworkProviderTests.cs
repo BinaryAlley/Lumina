@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.CoverArtArchive.Core;
-using Lumina.Plugins.CoverArtArchive.Core.Api;
-using Lumina.Plugins.CoverArtArchive.Core.Settings;
-using Lumina.Plugins.CoverArtArchive.Fixtures.Common.Models.DTO.Settings;
-using Lumina.Plugins.CoverArtArchive.UnitTests.Common.TestHelpers;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.CoverArtArchive.Core;
+using Nemera.Plugins.CoverArtArchive.Core.Api;
+using Nemera.Plugins.CoverArtArchive.Core.Settings;
+using Nemera.Plugins.CoverArtArchive.Fixtures.Common.Models.DTO.Settings;
+using Nemera.Plugins.CoverArtArchive.UnitTests.Common.TestHelpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.UnitTests.Core;
+namespace Nemera.Plugins.CoverArtArchive.UnitTests.Core;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CoverArtArchiveAlbumArtworkProvider"/> class.
@@ -256,7 +256,7 @@ public class CoverArtArchiveAlbumArtworkProviderTests
     {
         StubHttpMessageHandler handler = new(responseFactory);
         CoverArtArchiveSettingsProvider settingsProvider = new(null, CoverArtArchivePlugin.s_pluginId, _coverArtArchiveSettingsDtoFixture.Create(
-            userAgent: "Lumina-Test/1.0",
+            userAgent: "Nemera-Test/1.0",
             includeContactEmail: false,
             minimumRequestInterval: TimeSpan.Zero));
         CoverArtArchiveHttpClient httpClient = new(new HttpClient(handler), settingsProvider, new CoverArtArchiveRequestThrottle(), new CoverArtArchiveResponseCache());

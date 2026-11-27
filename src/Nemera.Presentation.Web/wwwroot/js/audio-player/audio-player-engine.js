@@ -37,7 +37,7 @@
  * ---------------
  * The factory also receives a host object that the engine uses to talk back to the controller, so
  * that the controller stays the single source of truth:
- *   - host.events: the player event bus, for {@link LuminaAudioPlayer.PlayerEvent} values the engine emits itself. It is
+ *   - host.events: the player event bus, for {@link NemeraAudioPlayer.PlayerEvent} values the engine emits itself. It is
  *     also the inbound channel: an engine and the renderer subscribe to PREFERENCES_CHANGED to follow a gapless or
  *     ReplayGain preference that changes while a track is playing.
  *   - host.getPreferences(): the playback preferences of the user the player currently holds, for example the
@@ -68,7 +68,7 @@
  *     bar shows the same loading state for an engine's own range fetch as it does for a seek. The state it sets
  *     stays until the engine reports it is no longer buffering, and a playhead report never clears it.
  *   - host.reportEnded(): reports that the current track reached its end.
- *   - host.reportError(error): reports an engine failure, wrapped into a {@link LuminaAudioPlayer.PlayerError}. Every sub
+ *   - host.reportError(error): reports an engine failure, wrapped into a {@link NemeraAudioPlayer.PlayerError}. Every sub
  *     component that reports through its own callback must be forwarded here, because such a component only reports to its
  *     own callback and never emits on the event bus, so a failure that is not forwarded stays unobserved. The download
  *     engine must forward its downloader's onError, and an engine that decodes must forward its decoder's onError as well.
@@ -80,14 +80,14 @@
  * pipeline engine when that module loads and selects it, so the running application plays through the pipeline. The
  * singleton is created automatically when the core module loads, so the way to plug a different engine into the running
  * application is the instance seam:
- *   - window.LuminaAudioPlayer.instance.registerEngine(name, factory) registers a factory of the shape (host) => engine.
- *   - window.LuminaAudioPlayer.instance.useEngine(name) selects a registered engine; it takes effect on the next load,
+ *   - window.NemeraAudioPlayer.instance.registerEngine(name, factory) registers a factory of the shape (host) => engine.
+ *   - window.NemeraAudioPlayer.instance.useEngine(name) selects a registered engine; it takes effect on the next load,
  *     and it returns the player to idle when an engine instance is already running.
  * A player can also be created directly with a selected engine and a populated registry through the constructor
- * ({ engineName, engineRegistry }); LuminaAudioPlayer.createDefaultPlayer(options) forwards those options only for the
+ * ({ engineName, engineRegistry }); NemeraAudioPlayer.createDefaultPlayer(options) forwards those options only for the
  * first creation of the singleton, for a composition that creates the player itself, such as a test.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -95,7 +95,7 @@
      * @readonly
      * @type {string}
      */
-    LuminaAudioPlayer.NULL_ENGINE_NAME = 'null';
+    NemeraAudioPlayer.NULL_ENGINE_NAME = 'null';
 
     /**
      * An engine that fulfills the engine interface without producing any audio.
@@ -198,7 +198,7 @@
          * Registers an engine factory.
          * @param {string} name - The name the engine is resolved by.
          * @param {Function} factory - A factory that receives the engine host and returns an engine.
-         * @returns {LuminaAudioPlayer.PlayerEngineRegistry} This registry, for chaining.
+         * @returns {NemeraAudioPlayer.PlayerEngineRegistry} This registry, for chaining.
          */
         register(name, factory) {
             if (typeof factory !== 'function')
@@ -238,12 +238,12 @@
 
     /**
      * Creates a registry holding only the silent engine, the default of the core module.
-     * @returns {LuminaAudioPlayer.PlayerEngineRegistry} The default engine registry.
+     * @returns {NemeraAudioPlayer.PlayerEngineRegistry} The default engine registry.
      */
-    LuminaAudioPlayer.createDefaultEngineRegistry = function () {
-        return new PlayerEngineRegistry().register(LuminaAudioPlayer.NULL_ENGINE_NAME, (host) => new NullPlayerEngine(host));
+    NemeraAudioPlayer.createDefaultEngineRegistry = function () {
+        return new PlayerEngineRegistry().register(NemeraAudioPlayer.NULL_ENGINE_NAME, (host) => new NullPlayerEngine(host));
     };
 
-    LuminaAudioPlayer.NullPlayerEngine = NullPlayerEngine;
-    LuminaAudioPlayer.PlayerEngineRegistry = PlayerEngineRegistry;
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+    NemeraAudioPlayer.NullPlayerEngine = NullPlayerEngine;
+    NemeraAudioPlayer.PlayerEngineRegistry = PlayerEngineRegistry;
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

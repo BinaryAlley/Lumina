@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.Playback;
+namespace Nemera.Domain.SharedKernel.Common.Enums.Playback;
 
 /// <summary>
 /// Enumeration for the ways ReplayGain normalization is applied to the tracks a user plays.

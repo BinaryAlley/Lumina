@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Text.Json.Serialization;
 #endregion
 
-namespace Lumina.Contracts.Requests.FileSystemManagement.Path;
+namespace Nemera.Contracts.Requests.FileSystemManagement.Path;
 
 /// <summary>
 /// Represents a request to split a file system path.

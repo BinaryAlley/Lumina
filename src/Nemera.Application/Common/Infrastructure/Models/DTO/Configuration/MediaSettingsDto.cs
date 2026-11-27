@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
+namespace Nemera.Application.Common.Infrastructure.Models.DTO.Configuration;
 
 /// <summary>
 /// Data transfer object for deserializing media settings.

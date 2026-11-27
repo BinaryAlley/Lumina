@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 #endregion
 
-namespace Lumina.Application.Core.UsersManagement.Authentication.Queries.GetUsers;
+namespace Nemera.Application.Core.UsersManagement.Authentication.Queries.GetUsers;
 
 /// <summary>
 /// Query for retrieving the list of users.

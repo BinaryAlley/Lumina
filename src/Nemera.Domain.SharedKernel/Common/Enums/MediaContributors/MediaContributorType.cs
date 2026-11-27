@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
+namespace Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
 
 /// <summary>
 /// Enumeration for the type of a media contributor, distinguishing whether the contributor is a single person,

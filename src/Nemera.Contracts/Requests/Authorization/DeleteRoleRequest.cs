@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.Authorization;
+namespace Nemera.Contracts.Requests.Authorization;
 
 /// <summary>
 /// Represents a request for deleting an authorization role.

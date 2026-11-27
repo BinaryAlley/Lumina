@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authorization;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authorization;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetUserPermissionsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetUserPermissionsEndpointTests : IClassFixture<LuminaApiFactory>
+public class GetUserPermissionsEndpointTests : IClassFixture<NemeraApiFactory>
 {
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -24,7 +24,7 @@ public class GetUserPermissionsEndpointTests : IClassFixture<LuminaApiFactory>
     /// Initializes a new instance of the <see cref="GetUserPermissionsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetUserPermissionsEndpointTests(LuminaApiFactory apiFactory)
+    public GetUserPermissionsEndpointTests(NemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
     }

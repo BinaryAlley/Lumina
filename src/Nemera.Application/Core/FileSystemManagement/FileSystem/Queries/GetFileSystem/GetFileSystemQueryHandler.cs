@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
+using Nemera.Application.Common.CQRS;
+using Nemera.Contracts.Responses.FileSystemManagement.FileSystem;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
+namespace Nemera.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
 
 /// <summary>
 /// Handler for the query to get the file system type.

@@ -4,7 +4,7 @@ using System;
 using System.Data;
 #endregion
 
-namespace Lumina.DataAccess.Common.Dapper;
+namespace Nemera.DataAccess.Common.Dapper;
 
 /// <summary>
 /// Maps <see cref="Guid"/> values to and from the TEXT representation used by the SQLite provider.

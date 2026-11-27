@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibraries;
-using Lumina.Contracts.Fixtures.Core.Responses.MediaLibrary.Management;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Library.Management.GetLibraries;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.MediaLibrary.Management.Queries.GetLibraries;
+using Nemera.Contracts.Fixtures.Core.Responses.MediaLibrary.Management;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Library.Management.GetLibraries;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Library.Management.GetLibraries;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Library.Management.GetLibraries;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetLibrariesEndpoint"/> class.

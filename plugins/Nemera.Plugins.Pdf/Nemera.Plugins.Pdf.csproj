@@ -25,12 +25,12 @@
         <!-- The native libraries are what make the PDF reader work at runtime, so a build that produced none is a build that would deploy
              a silently broken plugin; failing here makes a missing RuntimeIdentifier visible at build time instead of as a runtime
              DllNotFoundException. -->
-        <Error Condition="'@(_CurrentRidNatives)' == ''" Text="No native libraries were produced under '$(OutDir)runtimes\$(NETCoreSdkRuntimeIdentifier)\native'. Build the Lumina.Plugins.Pdf project with an explicit runtime identifier (for example: dotnet build -r win-x64) so the PDF reader ships its native rendering libraries." />
+        <Error Condition="'@(_CurrentRidNatives)' == ''" Text="No native libraries were produced under '$(OutDir)runtimes\$(NETCoreSdkRuntimeIdentifier)\native'. Build the Nemera.Plugins.Pdf project with an explicit runtime identifier (for example: dotnet build -r win-x64) so the PDF reader ships its native rendering libraries." />
         <Copy SourceFiles="@(_CurrentRidNatives)" DestinationFolder="$(SolutionDir)..\bin\api\$(Configuration)\$(TargetFramework)\plugins\" />
     </Target>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Lumina.Plugins.Contracts\Lumina.Plugins.Contracts.csproj">
+        <ProjectReference Include="..\..\src\Nemera.Plugins.Contracts\Nemera.Plugins.Contracts.csproj">
             <Private>false</Private><!--Do not copy this assembly in the output directory, it's loaded from somewhere else.-->
             <ExcludeAssets>runtime</ExcludeAssets>
         </ProjectReference>

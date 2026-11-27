@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Application.Common.DTO.Pagination;
+namespace Nemera.Application.Common.DTO.Pagination;
 
 /// <summary>
 /// Data transfer object for pagination metadata.

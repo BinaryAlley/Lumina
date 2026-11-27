@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Themes.ThemeAssets;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Themes.ThemeAssets;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -10,22 +10,22 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Themes.ThemeAssets;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Themes.ThemeAssets;
 
 /// <summary>
 /// Contains integration tests for the <see cref="ThemeAssetsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class ThemeAssetsEndpointTests : IClassFixture<LuminaWebFactory>
+public class ThemeAssetsEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly BlobDataDtoFixture _blobDataDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ThemeAssetsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public ThemeAssetsEndpointTests(LuminaWebFactory apiFactory)
+    public ThemeAssetsEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Enums.FileSystem;
-using Lumina.Presentation.Web.Common.Primitives;
-using Lumina.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Enums.FileSystem;
+using Nemera.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Core.Themes;
 using Microsoft.AspNetCore.Mvc;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 #endregion
 
-namespace Lumina.Presentation.Web.Core.ViewComponents;
+namespace Nemera.Presentation.Web.Core.ViewComponents;
 
 /// <summary>
 /// View component for the file system browser.

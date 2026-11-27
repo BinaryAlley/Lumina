@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Configuration;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
+namespace Nemera.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
 
 /// <summary>
 /// Fixture class for the <see cref="PluginsSettingsDto"/> class.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+namespace Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
 
 /// <summary>
 /// Data transfer object for the metadata of a book returned by a metadata provider.

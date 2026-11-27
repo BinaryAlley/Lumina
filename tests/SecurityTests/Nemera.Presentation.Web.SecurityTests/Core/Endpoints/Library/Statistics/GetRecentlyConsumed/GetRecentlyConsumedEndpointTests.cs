@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Common.Requests.Library.Statistics;
-using Lumina.Presentation.Web.Core.Endpoints.Library.Statistics.GetRecentlyConsumed;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.Statistics;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Statistics.GetRecentlyConsumed;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Library.Statistics;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -19,17 +19,17 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.Statistics.GetRecentlyConsumed;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Library.Statistics.GetRecentlyConsumed;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetRecentlyConsumedEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetRecentlyConsumedEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class GetRecentlyConsumedEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string WEB_ROUTE = "/en-us/library/statistics/api-get-recently-consumed";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly GetRecentlyConsumedRequestFixture _getRecentlyConsumedRequestFixture = new();
     private readonly ConsumedItemDtoFixture _consumedItemDtoFixture = new();
     private readonly PaginatedDtoFixture<ConsumedItemDto> _paginatedDtoFixture = new();
@@ -38,7 +38,7 @@ public class GetRecentlyConsumedEndpointTests : IClassFixture<LuminaWebFactory>,
     /// Initializes a new instance of the <see cref="GetRecentlyConsumedEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetRecentlyConsumedEndpointTests(LuminaWebFactory apiFactory)
+    public GetRecentlyConsumedEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -97,7 +97,7 @@ public class GetRecentlyConsumedEndpointTests : IClassFixture<LuminaWebFactory>,
         Assert.Contains("Cookie", response.Headers.Vary);
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     /// <summary>

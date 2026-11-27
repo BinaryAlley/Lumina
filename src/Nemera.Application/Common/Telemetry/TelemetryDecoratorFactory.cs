@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Domain.Common.Events;
+using Nemera.Application.Common.CQRS;
+using Nemera.Domain.Common.Events;
 using System;
 #endregion
 
-namespace Lumina.Application.Common.Telemetry;
+namespace Nemera.Application.Common.Telemetry;
 
 /// <summary>
 /// Resolves the telemetry decorator type that wraps a given application handler contract.

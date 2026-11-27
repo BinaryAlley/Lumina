@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
-using Lumina.Contracts.Fixtures.Core.Responses.UsersManagement;
-using Lumina.Contracts.Responses.UsersManagement;
-using Lumina.Presentation.Api.Core.Endpoints.Maintenance.ApplicationSetup;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
+using Nemera.Contracts.Fixtures.Core.Responses.UsersManagement;
+using Nemera.Contracts.Responses.UsersManagement;
+using Nemera.Presentation.Api.Core.Endpoints.Maintenance.ApplicationSetup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Maintenance.ApplicationSetup;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Maintenance.ApplicationSetup;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CheckInitializationEndpoint"/> class.

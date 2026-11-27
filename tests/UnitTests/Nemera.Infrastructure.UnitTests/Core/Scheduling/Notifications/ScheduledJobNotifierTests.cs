@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Fixtures.Core.Responses.Scheduling;
-using Lumina.Contracts.Responses.Scheduling;
-using Lumina.Infrastructure.Core.Scheduling.Notifications;
+using Nemera.Contracts.Fixtures.Core.Responses.Scheduling;
+using Nemera.Contracts.Responses.Scheduling;
+using Nemera.Infrastructure.Core.Scheduling.Notifications;
 using Microsoft.AspNetCore.SignalR;
 using NSubstitute;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Scheduling.Notifications;
+namespace Nemera.Infrastructure.UnitTests.Core.Scheduling.Notifications;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ScheduledJobNotifier"/> class.

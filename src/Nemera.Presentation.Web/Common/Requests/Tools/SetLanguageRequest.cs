@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.Tools;
+namespace Nemera.Presentation.Web.Common.Requests.Tools;
 
 /// <summary>
 /// Represents a request for setting the culture used by the application.

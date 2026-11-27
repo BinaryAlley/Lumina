@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.Common;
+namespace Nemera.Application.Common.DataAccess.Entities.Common;
 
 /// <summary>
 /// Interface for storage models, enforces Id.

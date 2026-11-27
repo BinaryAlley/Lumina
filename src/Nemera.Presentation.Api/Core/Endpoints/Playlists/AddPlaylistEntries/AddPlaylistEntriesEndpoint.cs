@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.Playlists;
-using Lumina.Application.Core.Playlists.Commands.AddPlaylistEntries;
-using Lumina.Contracts.Requests.Playlists;
-using Lumina.Contracts.Responses.Playlists;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.Playlists;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.Playlists;
+using Nemera.Application.Core.Playlists.Commands.AddPlaylistEntries;
+using Nemera.Contracts.Requests.Playlists;
+using Nemera.Contracts.Responses.Playlists;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.Playlists;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Playlists.AddPlaylistEntries;
+namespace Nemera.Presentation.Api.Core.Endpoints.Playlists.AddPlaylistEntries;
 
 /// <summary>
 /// API endpoint for the <c>/users/me/playlists/{playlistId}/entries-batch</c> route.

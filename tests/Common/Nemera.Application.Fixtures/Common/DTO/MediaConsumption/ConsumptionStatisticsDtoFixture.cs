@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DTO.MediaConsumption;
+using Nemera.Application.Common.DTO.MediaConsumption;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.DTO.MediaConsumption;
+namespace Nemera.Application.Fixtures.Common.DTO.MediaConsumption;
 
 /// <summary>
 /// Fixture class for the <see cref="ConsumptionStatisticsDto"/> record.

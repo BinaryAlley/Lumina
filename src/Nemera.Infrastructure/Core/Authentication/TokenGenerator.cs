@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authentication;
 using System;
 using System.Security.Cryptography;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Authentication;
+namespace Nemera.Infrastructure.Core.Authentication;
 
 /// <summary>
 /// Service for the service for generating secure tokens for accounts confirmation or recovery.

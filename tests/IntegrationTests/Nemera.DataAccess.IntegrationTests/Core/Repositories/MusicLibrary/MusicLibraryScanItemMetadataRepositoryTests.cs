@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.DataAccess.Core.Repositories.MusicLibrary;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.DataAccess.Core.Repositories.MusicLibrary;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.MusicLibrary;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.MusicLibrary;
 
 /// <summary>
 /// Contains integration tests for the <see cref="MusicLibraryScanItemMetadataRepository"/> class, exercising it against a real SQLite database.
@@ -23,7 +23,7 @@ namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.MusicLibrary;
 public class MusicLibraryScanItemMetadataRepositoryTests : IDisposable
 {
     private readonly SqliteConnection _connection;
-    private readonly LuminaDbContext _context;
+    private readonly NemeraDbContext _context;
     private readonly MusicLibraryScanItemMetadataRepository _sut;
     private readonly MusicLibraryScanItemMetadataEntityFixture _musicLibraryScanItemMetadataEntityFixture = new();
 
@@ -35,7 +35,7 @@ public class MusicLibraryScanItemMetadataRepositoryTests : IDisposable
         // The repository deletes in bulk, which translates to SQL, so the tests exercise it against a real SQLite database.
         _connection = new SqliteConnection("Data Source=:memory:");
         _connection.Open();
-        _context = new LuminaDbContext(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(_connection).Options);
+        _context = new NemeraDbContext(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(_connection).Options);
         _context.Database.EnsureCreated();
         _sut = new MusicLibraryScanItemMetadataRepository(_context);
     }

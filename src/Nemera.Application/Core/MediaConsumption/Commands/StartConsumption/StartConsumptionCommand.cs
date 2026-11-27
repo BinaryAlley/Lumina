@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.MediaConsumption.Commands.StartConsumption;
+namespace Nemera.Application.Core.MediaConsumption.Commands.StartConsumption;
 
 /// <summary>
 /// Command for starting a consumption session of a media item by the current user.

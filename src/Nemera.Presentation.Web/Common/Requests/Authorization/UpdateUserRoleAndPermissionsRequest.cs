@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.Authorization;
+namespace Nemera.Presentation.Web.Common.Requests.Authorization;
 
 /// <summary>
 /// Represents a request for updating the authorization role and permissions of a user.

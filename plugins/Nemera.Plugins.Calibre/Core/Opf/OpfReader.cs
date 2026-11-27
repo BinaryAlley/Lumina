@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Calibre.Common.Models.DTO.Opf;
+using Nemera.Plugins.Calibre.Common.Models.DTO.Opf;
 using System;
 using System.Globalization;
 using System.IO;
@@ -8,7 +8,7 @@ using System.Xml;
 using System.Xml.Linq;
 #endregion
 
-namespace Lumina.Plugins.Calibre.Core.Opf;
+namespace Nemera.Plugins.Calibre.Core.Opf;
 
 /// <summary>
 /// Reads the metadata of a book from a Calibre OPF file.

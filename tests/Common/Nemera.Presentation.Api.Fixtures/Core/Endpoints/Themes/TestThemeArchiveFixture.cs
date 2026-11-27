@@ -6,7 +6,7 @@ using System.IO.Compression;
 using System.Text;
 #endregion
 
-namespace Lumina.Presentation.Api.Fixtures.Core.Endpoints.Themes;
+namespace Nemera.Presentation.Api.Fixtures.Core.Endpoints.Themes;
 
 /// <summary>
 /// Fixture class for building theme pack ZIP archives used by the theme integration tests.

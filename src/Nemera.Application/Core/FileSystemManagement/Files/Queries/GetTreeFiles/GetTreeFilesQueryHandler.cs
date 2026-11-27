@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.FileSystemManagement.Files;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Files;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
+namespace Nemera.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
 
 /// <summary>
 /// Handler for the query to get all files.

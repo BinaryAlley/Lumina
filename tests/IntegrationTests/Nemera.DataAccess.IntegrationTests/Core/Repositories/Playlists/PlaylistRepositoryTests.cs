@@ -1,21 +1,21 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Entities.Playlists;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.DTO.Playlists;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Playlists;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Common.Interceptors;
-using Lumina.DataAccess.Core.Repositories.Playlists;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Entities.Playlists;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.DTO.Playlists;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Playlists;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Common.Interceptors;
+using Nemera.DataAccess.Core.Repositories.Playlists;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -26,10 +26,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.Playlists;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.Playlists;
 
 /// <summary>
 /// Contains integration tests for the <see cref="PlaylistRepository"/> class, exercising it against a real SQLite database.
@@ -59,11 +59,11 @@ public class PlaylistRepositoryTests
     public async Task UpdateAsync_WhenNoEditableValueChanged_ShouldNotModifyTheStoredPlaylist()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-update-noop-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-update-noop-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         PlaylistRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         PlaylistEntity playlist = _playlistEntityFixture.Create(userId: userId, type: PlaylistType.Music, entryCount: 7);
@@ -93,11 +93,11 @@ public class PlaylistRepositoryTests
     public async Task UpdateAsync_WhenOnlyTheNameChanged_ShouldIncrementTheVersionAndPreserveTheEntryCount()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-update-name-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-update-name-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         PlaylistRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         PlaylistEntity playlist = _playlistEntityFixture.Create(userId: userId, type: PlaylistType.Music, entryCount: 7);
@@ -131,9 +131,9 @@ public class PlaylistRepositoryTests
     public async Task GetAllForUserAsync_WhenTheUserHasPlaylists_ShouldReturnTheirStoredEntryCounts()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-list-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-list-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -156,9 +156,9 @@ public class PlaylistRepositoryTests
     public async Task AddScopeEntriesAsync_WhenTheWholeLibraryIsAppended_ShouldInsertCatalogueOrderAndUpdateTheEntryCount()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-scope-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-scope-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -223,9 +223,9 @@ public class PlaylistRepositoryTests
     public async Task AddScopeEntriesAsync_WhenAnAlbumIsSpecified_ShouldAppendOnlyThatAlbum()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-scope-album-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-scope-album-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -264,9 +264,9 @@ public class PlaylistRepositoryTests
     public async Task AddEntriesAsync_WhenALaterBatchFails_ShouldLeaveNoPrefixWhenTheAmbientTransactionIsRolledBack()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-batch-rollback-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-batch-rollback-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -296,7 +296,7 @@ public class PlaylistRepositoryTests
 
         // Assert
         // The ambient transaction has been rolled back, so another connection can read the database and sees no partial prefix.
-        using LuminaDbContext verificationContext = CreateContext(anchorConnection);
+        using NemeraDbContext verificationContext = CreateContext(anchorConnection);
         Assert.Equal(0, await verificationContext.PlaylistEntries.CountAsync(entry => entry.PlaylistId == playlist.Id));
         PlaylistEntity storedPlaylist = await verificationContext.Playlists
             .AsNoTracking()
@@ -309,9 +309,9 @@ public class PlaylistRepositoryTests
     public async Task DeleteByIdAsync_WhenThePlaylistExists_ShouldRemoveThePlaylistAndItsEntries()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-delete-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-delete-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -343,9 +343,9 @@ public class PlaylistRepositoryTests
     public async Task DeleteByIdAsync_WhenThePlaylistDoesNotExist_ShouldReturnPlaylistNotFound()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-delete-missing-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-delete-missing-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
 
         // Act
@@ -360,9 +360,9 @@ public class PlaylistRepositoryTests
     public async Task MoveEntryAsync_WhenMovingAnEntry_ShouldUpdateItsPositionWithoutChangingTheEntryCount()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-move-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-move-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -403,9 +403,9 @@ public class PlaylistRepositoryTests
     public async Task RemoveEntryAsync_WhenTheEntryExists_ShouldDecrementTheStoredEntryCount()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-remove-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-remove-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -439,9 +439,9 @@ public class PlaylistRepositoryTests
     public async Task GetDetailsForUserAsync_WhenThePlaylistDoesNotExist_ShouldReturnSuccessWithNull()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-missing-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-details-missing-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
 
         // Act
@@ -456,9 +456,9 @@ public class PlaylistRepositoryTests
     public async Task GetDetailsForUserAsync_WhenThePlaylistBelongsToAnotherUser_ShouldReturnSuccessWithNull()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-other-user-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-details-other-user-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid ownerUserId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: ownerUserId));
@@ -476,9 +476,9 @@ public class PlaylistRepositoryTests
     public async Task GetDetailsForUserAsync_WhenNoPaginationIsRequested_ShouldReturnEveryEntryWithDenseDisplayPositions()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-all-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-details-all-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -502,9 +502,9 @@ public class PlaylistRepositoryTests
     public async Task GetDetailsForUserAsync_WhenAPageIsRequested_ShouldReturnOnlyThatPageWithDenseDisplayPositions()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-page-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-details-page-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -540,9 +540,9 @@ public class PlaylistRepositoryTests
     public async Task GetDetailsForUserAsync_WhenTheRequestedPageExceedsTheLastPage_ShouldClampToTheLastPage()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-clamp-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-details-clamp-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -565,9 +565,9 @@ public class PlaylistRepositoryTests
     public async Task GetDetailsForUserAsync_WhenThePlaylistIsEmptyAndAPageIsRequested_ShouldReturnAnEmptyPage()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-empty-page-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-details-empty-page-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -591,9 +591,9 @@ public class PlaylistRepositoryTests
     public async Task GetDetailsForUserAsync_WhenThePlaylistIsEmptyAndNoPaginationIsRequested_ShouldReturnAnEmptyResultWithOnePage()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-details-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -616,9 +616,9 @@ public class PlaylistRepositoryTests
     public async Task GetDetailsForUserAsync_WhenAnEntryReferencesAMissingTrack_ShouldKeepTheEntryWithoutDisplayData()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-missing-track-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-details-missing-track-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         Guid libraryId = Guid.NewGuid();
@@ -662,9 +662,9 @@ public class PlaylistRepositoryTests
     public async Task GetDetailsForUserAsync_WhenTheEntriesReferenceMusicTracks_ShouldMapTheirDisplayData()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-display-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-details-display-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         Guid libraryId = Guid.NewGuid();
@@ -716,9 +716,9 @@ public class PlaylistRepositoryTests
     public async Task GetDetailsForUserAsync_WhenAnEntryReferencesANonMusicMediaItem_ShouldReturnNoDisplayData()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-video-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-details-video-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         Guid libraryId = Guid.NewGuid();
@@ -755,9 +755,9 @@ public class PlaylistRepositoryTests
     public async Task AddScopeEntriesAsync_WhenTheScopeContainsSoftDeletedItems_ShouldAppendOnlyTheVisibleTracks()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-scope-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-scope-deleted-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -822,9 +822,9 @@ public class PlaylistRepositoryTests
     public async Task GetDetailsForUserAsync_WhenAnEntryReferencesASoftDeletedTrack_ShouldKeepTheEntryWithoutDisplayData(bool isTrackDeleted)
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-playlistrepo-details-deleted-{isTrackDeleted}-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-playlistrepo-details-deleted-{isTrackDeleted}-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         PlaylistRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         Guid libraryId = Guid.NewGuid();
@@ -877,7 +877,7 @@ public class PlaylistRepositoryTests
     /// <param name="userId">The Id of the user that owns the playlist.</param>
     /// <param name="entryCount">The number of entries the playlist receives.</param>
     /// <returns>The seeded playlist and its entries, in position order.</returns>
-    private async Task<(PlaylistEntity Playlist, List<PlaylistEntryEntity> Entries)> SeedOrderedPlaylistAsync(LuminaDbContext context, Guid userId, int entryCount)
+    private async Task<(PlaylistEntity Playlist, List<PlaylistEntryEntity> Entries)> SeedOrderedPlaylistAsync(NemeraDbContext context, Guid userId, int entryCount)
     {
         Guid playlistId = Guid.NewGuid();
         List<PlaylistEntryEntity> entries = [.. Enumerable.Range(0, entryCount).Select(index => _playlistEntryEntityFixture.Create(
@@ -908,7 +908,7 @@ public class PlaylistRepositoryTests
     /// <param name="coverFileName">The file name of the cover artwork of the album.</param>
     /// <returns>The seeded artist, album and track.</returns>
     private async Task<(ArtistEntity Artist, AlbumEntity Album, TrackEntity Track)> SeedTrackAsync(
-        LuminaDbContext context,
+        NemeraDbContext context,
         Guid libraryId,
         string artistName,
         string albumTitle,
@@ -943,13 +943,13 @@ public class PlaylistRepositoryTests
     /// <param name="userId">The Id of the user reported as the current user.</param>
     /// <param name="utcNow">The current UTC time reported by the time provider.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
+    private static NemeraDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
     {
         ICurrentUserService currentUserService = Substitute.For<ICurrentUserService>();
         currentUserService.UserId.Returns(userId);
         IDateTimeProvider dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(utcNow);
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .AddInterceptors(new UpdateAuditableEntitiesInterceptor(currentUserService, dateTimeProvider))
             .Options);
@@ -962,9 +962,9 @@ public class PlaylistRepositoryTests
     /// </summary>
     /// <param name="anchorConnection">The open in-memory SQLite connection that keeps the database alive for the duration of the test.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateContext(SqliteConnection anchorConnection)
+    private static NemeraDbContext CreateContext(SqliteConnection anchorConnection)
     {
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .Options);
         context.Database.EnsureCreated();
@@ -977,7 +977,7 @@ public class PlaylistRepositoryTests
     /// <param name="context">The context to seed.</param>
     /// <param name="libraryId">The Id of the library the catalogue belongs to.</param>
     /// <returns>The tracks in artist, album, disc and track order.</returns>
-    private async Task<List<TrackEntity>> SeedCatalogueAsync(LuminaDbContext context, Guid libraryId)
+    private async Task<List<TrackEntity>> SeedCatalogueAsync(NemeraDbContext context, Guid libraryId)
     {
         ArtistEntity betaArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "Beta Artist", includeAlbums: false, includeContributors: false);
         ArtistEntity alphaArtist = _artistEntityFixture.Create(libraryId: libraryId, name: "Alpha Artist", includeAlbums: false, includeContributors: false);

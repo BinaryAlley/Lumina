@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
+namespace Nemera.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
 
 /// <summary>
 /// Command for splitting a file system path.

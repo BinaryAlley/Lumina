@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.DTO.Common;
+namespace Nemera.Contracts.DTO.Common;
 
 /// <summary>
 /// Data transfer object for a tag.

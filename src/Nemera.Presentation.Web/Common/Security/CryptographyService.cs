@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Configuration;
+using Nemera.Presentation.Web.Common.DTO.Configuration;
 using Microsoft.Extensions.Options;
 using System;
 using System.Security.Cryptography;
 using System.Text;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Security;
+namespace Nemera.Presentation.Web.Common.Security;
 
 /// <summary>
 /// Service for cryptographic concerns.

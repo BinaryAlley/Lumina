@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.Management.Deletion;
+namespace Nemera.Application.Core.MediaLibrary.Management.Deletion;
 
 /// <summary>
 /// Interface defining the strategy used to delete a media library item that is no longer present in the media library scan snapshot, for a specific media library type.

@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Core.Plugins.Queries.GetPlugins;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.Application.Fixtures.Core.Plugins.Queries.GetPlugins;
-using Lumina.Contracts.Responses.Plugins;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Repositories.Plugins;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Core.Plugins.Queries.GetPlugins;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Application.Fixtures.Core.Plugins.Queries.GetPlugins;
+using Nemera.Contracts.Responses.Plugins;
+using Nemera.Domain.Common.Primitives;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Plugins.Queries.GetPlugins;
+namespace Nemera.Application.UnitTests.Core.Plugins.Queries.GetPlugins;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetPluginsQueryHandler"/> class.

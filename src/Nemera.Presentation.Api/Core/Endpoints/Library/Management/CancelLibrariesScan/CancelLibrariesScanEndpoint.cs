@@ -1,29 +1,29 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
+using Nemera.Domain.Common.Primitives;
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
-using Lumina.Presentation.Api.Common.Routes.Library.Management;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.MediaLibrary.Management.Commands.CancelLibrariesScan;
+using Nemera.Presentation.Api.Common.Routes.Library.Management;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.Management.CancelLibrariesScan;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.Management.CancelLibrariesScan;
 
 /// <summary>
 /// API endpoint for the <c>/libraries/scans/cancel</c> route.
 /// </summary>
 public class CancelLibrariesScanEndpoint : BaseEndpoint<EmptyRequest, IResult>
 {
-    private readonly Lumina.Application.Common.CQRS.ICommandHandler<CancelLibrariesScanCommand, Result<Success>> _cancelLibrariesScanCommandHandler;
+    private readonly Nemera.Application.Common.CQRS.ICommandHandler<CancelLibrariesScanCommand, Result<Success>> _cancelLibrariesScanCommandHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CancelLibrariesScanEndpoint"/> class.
     /// </summary>
     /// <param name="cancelLibrariesScanCommandHandler">Injected service for handling cancel libraries scan commands.</param>
-    public CancelLibrariesScanEndpoint(Lumina.Application.Common.CQRS.ICommandHandler<CancelLibrariesScanCommand, Result<Success>> cancelLibrariesScanCommandHandler)
+    public CancelLibrariesScanEndpoint(Nemera.Application.Common.CQRS.ICommandHandler<CancelLibrariesScanCommand, Result<Success>> cancelLibrariesScanCommandHandler)
     {
         _cancelLibrariesScanCommandHandler = cancelLibrariesScanCommandHandler;
     }

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+namespace Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 
 /// <summary>
 /// Fixture class for the <see cref="UserAuthorizationEntity"/> class.

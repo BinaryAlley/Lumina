@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Primitives;
-using Lumina.Presentation.Web.Common.Validation;
+using Nemera.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.Validation;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.Setup;
+namespace Nemera.Presentation.Web.UnitTests.Common.Setup;
 
 /// <summary>
 /// Validator extension methods for <see cref="IValidator{TRequest}"/> for unit tests.

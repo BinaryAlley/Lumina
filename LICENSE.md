@@ -189,7 +189,7 @@ If you develop a new program, and you want it to be of the greatest possible use
 
 To do so, attach the following notices to the program. It is safest to attach them to the start of each source file to most effectively state the exclusion of warranty; and each file should have at least the “copyright” line and a pointer to where the full notice is found.
 
-    Lumina - complete management solution for media libraries of all kinds.
+    Nemera - complete management solution for media libraries of all kinds.
     Copyright (C) 2024  BinaryAlley
 
     This program is free software: you can redistribute it and/or modify

@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Favorites.Commands.RemoveFavorite;
+namespace Nemera.Application.Core.Favorites.Commands.RemoveFavorite;
 
 /// <summary>
 /// Command for removing a media item from the favorites of the current user.

@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Themes;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Themes;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -11,15 +11,15 @@ using System.Net.Http.Json;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Themes.Management.RestoreTheme;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Themes.Management.RestoreTheme;
 
 /// <summary>
 /// Contains security tests for the <see cref="RestoreThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RestoreThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class RestoreThemeEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly string _themeId;
     private readonly ThemeEntityFixture _themeEntityFixture = new();
@@ -32,12 +32,12 @@ public class RestoreThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
     /// Initializes a new instance of the <see cref="RestoreThemeEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public RestoreThemeEndpointTests(LuminaApiFactory apiFactory)
+    public RestoreThemeEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
         _themeId = $"testtheme{Guid.NewGuid():N}";
     }
 
@@ -161,7 +161,7 @@ public class RestoreThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
     private async Task SeedThemeAsync(bool isDeleted)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         dbContext.Themes.Add(_themeEntityFixture.Create(themeId: _themeId, isDeleted: isDeleted));
         await dbContext.SaveChangesAsync();
     }
@@ -172,7 +172,7 @@ public class RestoreThemeEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
     public void Dispose()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         ThemeEntity? theme = dbContext.Themes.FirstOrDefault(candidate => candidate.ThemeId == _themeId);
         if (theme is not null)
         {

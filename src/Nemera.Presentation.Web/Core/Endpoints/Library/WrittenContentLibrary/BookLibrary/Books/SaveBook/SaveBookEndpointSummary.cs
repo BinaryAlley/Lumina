@@ -1,19 +1,19 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.DTO.MediaContributors;
-using Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary;
-using Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
-using Lumina.Presentation.Web.Common.Enums.BookLibrary;
-using Lumina.Presentation.Web.Common.Enums.MediaContributors;
-using Lumina.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Presentation.Web.Common.Enums.Common;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.MediaContributors;
+using Nemera.Presentation.Web.Common.DTO.WrittenContentLibrary;
+using Nemera.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
+using Nemera.Presentation.Web.Common.Enums.BookLibrary;
+using Nemera.Presentation.Web.Common.Enums.MediaContributors;
+using Nemera.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Presentation.Web.Common.Enums.Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.SaveBook;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.SaveBook;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="SaveBookEndpoint"/> endpoint, for OpenAPI.

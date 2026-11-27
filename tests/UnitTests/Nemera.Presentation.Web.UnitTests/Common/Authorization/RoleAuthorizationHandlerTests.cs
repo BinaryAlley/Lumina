@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Authorization;
-using Lumina.Presentation.Web.Common.Http;
+using Nemera.Presentation.Web.Common.Authorization;
+using Nemera.Presentation.Web.Common.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
@@ -9,10 +9,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using IAuthorizationService = Lumina.Presentation.Web.Common.Authorization.IAuthorizationService;
+using IAuthorizationService = Nemera.Presentation.Web.Common.Authorization.IAuthorizationService;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.Authorization;
+namespace Nemera.Presentation.Web.UnitTests.Common.Authorization;
 
 /// <summary>
 /// Contains unit tests for the <see cref="RoleAuthorizationHandler"/> class.

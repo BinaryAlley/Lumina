@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Authorization;
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Enums.Authorization;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Common.Services;
+using Nemera.Presentation.Web.Common.Authorization;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Enums.Authorization;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Common.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using System;
@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Themes;
+namespace Nemera.Presentation.Web.Core.Themes;
 
 /// <summary>
 /// Builds the navigation menu model for the themed navigation template, resolving the authorization conditions and localized labels server side.
@@ -21,8 +21,8 @@ namespace Lumina.Presentation.Web.Core.Themes;
 public sealed class ThemeNavBuilder
 {
     // The resource base name deliberately excludes the "Core.Resources" segment: the localization factory re-roots it with the configured ResourcesPath.
-    private const string VIEW_RESOURCE_BASE_NAME = "Lumina.Presentation.Web.Views.Shared._NavMenu";
-    private const string VIEW_RESOURCE_LOCATION = "Lumina.Presentation.Web";
+    private const string VIEW_RESOURCE_BASE_NAME = "Nemera.Presentation.Web.Views.Shared._NavMenu";
+    private const string VIEW_RESOURCE_LOCATION = "Nemera.Presentation.Web";
 
     private readonly IUrlService _urlService;
     private readonly IStringLocalizerFactory _stringLocalizerFactory;
@@ -84,7 +84,7 @@ public sealed class ThemeNavBuilder
         menubarSections.Add(CreateToolsSection(isAuthenticated, languages));
         menubarSections.Add(CreateHelpSection());
 
-        return new ThemeNavMenuDto("Lumina", mobileSections, menubarSections);
+        return new ThemeNavMenuDto("Nemera", mobileSections, menubarSections);
     }
 
     /// <summary>
@@ -94,7 +94,7 @@ public sealed class ThemeNavBuilder
     private ThemeNavSectionDto CreateSiteSection()
     {
         return new ThemeNavSectionDto(
-            "Lumina",
+            "Nemera",
             [new ThemeNavEntryDto(Localize("Home"), _urlService.GetAbsoluteUrl(WebRoutes.Home.INDEX_CULTURED), "nav-link", [])]);
     }
 

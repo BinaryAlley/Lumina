@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.Enums.MediaLibrary;
+namespace Nemera.Presentation.Web.Common.Enums.MediaLibrary;
 
 /// <summary>
 /// Enumeration for the type of artwork of a media library item.

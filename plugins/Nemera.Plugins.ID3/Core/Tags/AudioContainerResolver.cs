@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Plugins.ID3.Core.Tags;
+namespace Nemera.Plugins.ID3.Core.Tags;
 
 /// <summary>
 /// Resolves the canonical name of the container of an audio file from the concrete type the tagging library parsed it as.

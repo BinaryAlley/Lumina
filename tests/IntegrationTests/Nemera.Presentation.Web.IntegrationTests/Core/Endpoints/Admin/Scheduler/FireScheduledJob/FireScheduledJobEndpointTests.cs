@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Requests.Scheduling;
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Scheduler.FireScheduledJob;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Scheduling;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Requests.Scheduling;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Scheduler.FireScheduledJob;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Scheduling;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
@@ -13,22 +13,22 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Scheduler.FireScheduledJob;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.Scheduler.FireScheduledJob;
 
 /// <summary>
 /// Contains integration tests for the <see cref="FireScheduledJobEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class FireScheduledJobEndpointTests : IClassFixture<LuminaWebFactory>
+public class FireScheduledJobEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly FireScheduledJobRequestFixture _fireScheduledJobRequestFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FireScheduledJobEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public FireScheduledJobEndpointTests(LuminaWebFactory apiFactory)
+    public FireScheduledJobEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

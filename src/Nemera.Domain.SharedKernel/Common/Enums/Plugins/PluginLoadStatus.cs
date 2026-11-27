@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.Plugins;
+namespace Nemera.Domain.SharedKernel.Common.Enums.Plugins;
 
 /// <summary>
 /// Enumeration for the load status of a plugin.

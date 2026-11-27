@@ -18,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Lumina.Infrastructure\Lumina.Infrastructure.csproj" />
-        <ProjectReference Include="..\Lumina.Application.Fixtures\Lumina.Application.Fixtures.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Infrastructure\Nemera.Infrastructure.csproj" />
+        <ProjectReference Include="..\Nemera.Application.Fixtures\Nemera.Application.Fixtures.csproj" />
     </ItemGroup>
 </Project>

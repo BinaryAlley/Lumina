@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Responses.FileSystemManagement.FileSystem;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Nemera.Contracts.Responses.FileSystemManagement.FileSystem;
+using Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.FileSystem.GetType;
+namespace Nemera.Presentation.Api.Core.Endpoints.FileSystemManagement.FileSystem.GetType;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetTypeEndpoint"/> API endpoint, for OpenAPI.

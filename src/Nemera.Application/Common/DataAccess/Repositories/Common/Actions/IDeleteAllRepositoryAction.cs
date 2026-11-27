@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
+using Nemera.Domain.Common.Primitives;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Repositories.Common.Actions;
+namespace Nemera.Application.Common.DataAccess.Repositories.Common.Actions;
 
 /// <summary>
 /// Interface defining the "delete all" action for interacting with a generic persistence medium.

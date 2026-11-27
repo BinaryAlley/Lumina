@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Lumina.Plugins.MusicBrainz.UnitTests")]
-[assembly: InternalsVisibleTo("Lumina.Plugins.MusicBrainz.SecurityTests")]
-[assembly: InternalsVisibleTo("Lumina.Plugins.MusicBrainz.Fixtures")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.MusicBrainz.UnitTests")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.MusicBrainz.SecurityTests")]
+[assembly: InternalsVisibleTo("Nemera.Plugins.MusicBrainz.Fixtures")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

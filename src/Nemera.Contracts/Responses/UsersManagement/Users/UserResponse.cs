@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.UsersManagement.Users;
+namespace Nemera.Contracts.Responses.UsersManagement.Users;
 
 /// <summary>
 /// Represents a user response.

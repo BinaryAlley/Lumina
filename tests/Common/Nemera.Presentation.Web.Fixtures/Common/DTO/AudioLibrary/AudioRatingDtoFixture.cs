@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Presentation.Web.Common.DTO.AudioLibrary;
-using Lumina.Presentation.Web.Common.Enums.AudioLibrary;
+using Nemera.Presentation.Web.Common.DTO.AudioLibrary;
+using Nemera.Presentation.Web.Common.Enums.AudioLibrary;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.DTO.AudioLibrary;
+namespace Nemera.Presentation.Web.Fixtures.Common.DTO.AudioLibrary;
 
 /// <summary>
 /// Fixture class for the <see cref="AudioRatingDto"/> class.

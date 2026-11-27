@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.FileSystemManagement.Paths.Queries.ValidatePath;
+using Nemera.Application.Core.FileSystemManagement.Paths.Queries.ValidatePath;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.FileSystemManagement.Paths.Queries.ValidatePath;
+namespace Nemera.Application.Fixtures.Core.FileSystemManagement.Paths.Queries.ValidatePath;
 
 /// <summary>
 /// Fixture class for the <see cref="ValidatePathQuery"/> class.

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
+using Nemera.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Admin.Authorization.Roles.Commands.DeleteRole;
+namespace Nemera.Application.Fixtures.Core.Admin.Authorization.Roles.Commands.DeleteRole;
 
 /// <summary>
 /// Fixture class for the <see cref="DeleteRoleCommand"/> class.

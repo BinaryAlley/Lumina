@@ -3,8 +3,8 @@
     ?category=...  (optional quick-navigation filter: lists only the libraries of the category)
 *@
 
-@using Lumina.Presentation.Web.Common.DTO.Libraries
-@using Lumina.Presentation.Web.Common.Services
+@using Nemera.Presentation.Web.Common.DTO.Libraries
+@using Nemera.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
 
 @{
@@ -167,8 +167,8 @@
                 event.preventDefault();
                 event.stopImmediatePropagation();
                 closeCardMenus();
-                if (window.LuminaPlaylists)
-                    await window.LuminaPlaylists.showAddScopeDialogAsync({ libraryId: library.id, title: library.title || '', addToPlaylistLabel: jsLocalizedStrings.addToPlaylist, returnFocus: trigger });
+                if (window.NemeraPlaylists)
+                    await window.NemeraPlaylists.showAddScopeDialogAsync({ libraryId: library.id, title: library.title || '', addToPlaylistLabel: jsLocalizedStrings.addToPlaylist, returnFocus: trigger });
             });
             menu.appendChild(addToPlaylistAction);
 

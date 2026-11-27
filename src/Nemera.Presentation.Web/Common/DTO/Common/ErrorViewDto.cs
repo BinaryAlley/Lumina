@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Lumina.Presentation.Web.Common.DTO.Common;
+namespace Nemera.Presentation.Web.Common.DTO.Common;
 
 /// <summary>
 /// Data transfer object for the data shown on the error page.

@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Plugins;
+namespace Nemera.Presentation.Web.Common.DTO.Plugins;
 
 /// <summary>
 /// Data transfer object for a metadata provider configured for a media library.

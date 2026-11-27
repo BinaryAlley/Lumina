@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Plugins.Queries.GetLibraryArtworkProviders;
+using Nemera.Application.Core.Plugins.Queries.GetLibraryArtworkProviders;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Plugins.Queries.GetLibraryArtworkProviders;
+namespace Nemera.Application.Fixtures.Core.Plugins.Queries.GetLibraryArtworkProviders;
 
 /// <summary>
 /// Fixture class for the <see cref="GetLibraryArtworkProvidersQuery"/> class.

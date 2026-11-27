@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Playlists.Commands.AddPlaylistScopeEntries;
+using Nemera.Application.Core.Playlists.Commands.AddPlaylistScopeEntries;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Playlists.Commands.AddPlaylistScopeEntries;
+namespace Nemera.Application.Fixtures.Core.Playlists.Commands.AddPlaylistScopeEntries;
 
 /// <summary>
 /// Fixture class for the <see cref="AddPlaylistScopeEntriesCommand"/> record.

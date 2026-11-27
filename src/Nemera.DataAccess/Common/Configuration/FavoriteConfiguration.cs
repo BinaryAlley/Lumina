@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 #endregion
 
-namespace Lumina.DataAccess.Common.Configuration;
+namespace Nemera.DataAccess.Common.Configuration;
 
 /// <summary>
 /// Configures the entity mapping for the <see cref="FavoriteEntity"/> entity.

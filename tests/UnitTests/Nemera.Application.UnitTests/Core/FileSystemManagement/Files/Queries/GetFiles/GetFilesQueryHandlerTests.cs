@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
-using Lumina.Application.Fixtures.Core.FileSystemManagement.Files.Queries.GetFiles;
-using Lumina.Contracts.Responses.FileSystemManagement.Files;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
+using Nemera.Application.Fixtures.Core.FileSystemManagement.Files.Queries.GetFiles;
+using Nemera.Contracts.Responses.FileSystemManagement.Files;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.GetFiles;
+namespace Nemera.Application.UnitTests.Core.FileSystemManagement.Files.Queries.GetFiles;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetFilesQueryHandler"/> class.

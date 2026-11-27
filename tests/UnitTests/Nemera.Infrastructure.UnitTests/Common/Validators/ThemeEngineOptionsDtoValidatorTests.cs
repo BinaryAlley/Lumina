@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Infrastructure.Common.Errors;
-using Lumina.Infrastructure.Common.Models.DTO.Configuration;
-using Lumina.Infrastructure.Common.Validators;
-using Lumina.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Infrastructure.Common.Errors;
+using Nemera.Infrastructure.Common.Models.DTO.Configuration;
+using Nemera.Infrastructure.Common.Validators;
+using Nemera.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Common.Validators;
+namespace Nemera.Infrastructure.UnitTests.Common.Validators;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ThemeEngineOptionsDtoValidator"/> class.

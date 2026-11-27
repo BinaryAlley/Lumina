@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
+using Nemera.Application.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
+namespace Nemera.Application.Fixtures.Core.FileSystemManagement.FileSystem.Queries.GetFileSystem;
 
 /// <summary>
 /// Fixture class for the <see cref="GetFileSystemQuery"/> class.

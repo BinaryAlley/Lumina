@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibraryScanProgress;
-using Lumina.Contracts.Requests.MediaLibrary.Management;
+using Nemera.Application.Core.MediaLibrary.Management.Queries.GetLibraryScanProgress;
+using Nemera.Contracts.Requests.MediaLibrary.Management;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.MediaLibrary.Management;
+namespace Nemera.Application.Common.Mapping.MediaLibrary.Management;
 
 /// <summary>
 /// Extension methods for converting <see cref="GetLibraryScanProgressRequest"/>.

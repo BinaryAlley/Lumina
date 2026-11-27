@@ -13,11 +13,11 @@ The solution uses FluentValidation to validate commands and queries at the appli
 
 3. **External Dependency Surface**: FluentValidation is a well-maintained library, but the danger of it going commercial, like other open source popular libraries in recent times, and the lack of usage of its advanced features mandates an in-house replacement.
 
-4. **Placement in SharedKernel**: Validation logic is cross-cutting and lives in `Lumina.Application.Common.Infrastructure.Validation`. Owning the abstraction entirely means the validation model stays aligned with the domain's `Error` type without any adapter.
+4. **Placement in SharedKernel**: Validation logic is cross-cutting and lives in `Nemera.Application.Common.Infrastructure.Validation`. Owning the abstraction entirely means the validation model stays aligned with the domain's `Error` type without any adapter.
 
 ## Decision
 
-Replace FluentValidation with a minimal, first-party validation framework placed in `Lumina.Application.Common.Infrastructure.Validation`. The API mirrors FluentValidation's familiar fluent surface (`RuleFor`, `Must`, `When`, `WithError`) to minimize migration friction.
+Replace FluentValidation with a minimal, first-party validation framework placed in `Nemera.Application.Common.Infrastructure.Validation`. The API mirrors FluentValidation's familiar fluent surface (`RuleFor`, `Must`, `When`, `WithError`) to minimize migration friction.
 
 ### Core Abstractions
 
@@ -123,7 +123,7 @@ internal sealed class ValidationRule<TRequest, TProperty>
 
 ### Built-in Extension Methods
 
-Common predicates are provided as extension methods on `IRuleBuilder<TRequest, TProperty>` via `ValidatorUtilities`, placed in `Lumina.Application.Common.Utilities`:
+Common predicates are provided as extension methods on `IRuleBuilder<TRequest, TProperty>` via `ValidatorUtilities`, placed in `Nemera.Application.Common.Utilities`:
 
 | Extension | Overloads | Behaviour |
 |---|---|---|

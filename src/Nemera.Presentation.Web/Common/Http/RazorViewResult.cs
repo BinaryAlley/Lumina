@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Http;
+namespace Nemera.Presentation.Web.Common.Http;
 
 /// <summary>
 /// <see cref="IResult"/> that renders a Razor view through the MVC view engine, enabling FastEndpoints endpoints to serve the Razor views of the application.

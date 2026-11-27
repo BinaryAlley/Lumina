@@ -8,8 +8,8 @@
         <WarningsNotAsErrors>$(WarningsNotAsErrors);EXTEXP0018</WarningsNotAsErrors>
         <UserSecretsId>10a94da9-18ed-4c70-a9da-b461e08958c4</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <ContainerRepository>lumina-web</ContainerRepository>
-        <DockerfileTag>lumina-web</DockerfileTag>
+        <ContainerRepository>nemera-web</ContainerRepository>
+        <DockerfileTag>nemera-web</DockerfileTag>
         <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
     </PropertyGroup>
 

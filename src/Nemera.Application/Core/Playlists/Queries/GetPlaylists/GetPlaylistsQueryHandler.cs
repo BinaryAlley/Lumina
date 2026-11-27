@@ -1,20 +1,20 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Playlists;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Mapping.Playlists;
-using Lumina.Contracts.Responses.Playlists;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Playlists;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Mapping.Playlists;
+using Nemera.Contracts.Responses.Playlists;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.Core.Playlists.Queries.GetPlaylists;
+namespace Nemera.Application.Core.Playlists.Queries.GetPlaylists;
 
 /// <summary>
 /// Handler for the query to get the playlists of the current user.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Domain.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Domain.Common.Errors;
 using System;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Queries.ShuffleTracks;
+namespace Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Tracks.Queries.ShuffleTracks;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="ShuffleTracksQuery"/>.

@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.Fixtures.Core.Themes;
+namespace Nemera.Infrastructure.Fixtures.Core.Themes;
 
 /// <summary>
 /// Describes a single entry of a theme pack ZIP archive built by the <see cref="ThemePackFixture"/>.

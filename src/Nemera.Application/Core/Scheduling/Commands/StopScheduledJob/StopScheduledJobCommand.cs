@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Scheduling.Commands.StopScheduledJob;
+namespace Nemera.Application.Core.Scheduling.Commands.StopScheduledJob;
 
 /// <summary>
 /// Command for stopping the execution cycle of a scheduled job.

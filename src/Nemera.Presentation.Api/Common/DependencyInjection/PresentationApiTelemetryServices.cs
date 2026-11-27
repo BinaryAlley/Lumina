@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Telemetry;
+using Nemera.Application.Common.Telemetry;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Common.DependencyInjection;
+namespace Nemera.Presentation.Api.Common.DependencyInjection;
 
 /// <summary>
 /// Utility class for registering the OpenTelemetry services of the Presentation Api layer into the Dependency Injection container.
@@ -21,7 +21,7 @@ namespace Lumina.Presentation.Api.Common.DependencyInjection;
 [ExcludeFromCodeCoverage]
 public static class PresentationApiTelemetryServices
 {
-    private const string SERVICE_NAME = "Lumina.Api";
+    private const string SERVICE_NAME = "Nemera.Api";
     private const string ENTITY_FRAMEWORK_CORE_METER_NAME = "Microsoft.EntityFrameworkCore";
 
     /// <summary>

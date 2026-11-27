@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.MediaContributors;
+using Nemera.Presentation.Web.Common.Enums.MediaContributors;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.MediaContributors;
+namespace Nemera.Presentation.Web.Common.DTO.MediaContributors;
 
 /// <summary>
 /// Data transfer object for the reference to a media contributor in a media item, carrying the role the contributor played.

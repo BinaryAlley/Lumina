@@ -1,26 +1,26 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Requests.Authorization;
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Authorization.Roles.UpdateRole;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Requests.Authorization;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Authorization.Roles.UpdateRole;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Authorization.Roles.UpdateRole;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Authorization.Roles.UpdateRole;
 
 /// <summary>
 /// Contains security tests for the <see cref="UpdateRoleEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class UpdateRoleEndpointTests : IClassFixture<LuminaWebFactory>
+public class UpdateRoleEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
     private readonly RolePermissionsDtoFixture _rolePermissionsDtoFixture = new();
     private readonly UpdateRoleRequestFixture _updateRoleRequestFixture = new();
@@ -29,7 +29,7 @@ public class UpdateRoleEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="UpdateRoleEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public UpdateRoleEndpointTests(LuminaWebFactory apiFactory)
+    public UpdateRoleEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

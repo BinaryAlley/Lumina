@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibraries;
+using Nemera.Application.Core.MediaLibrary.Management.Queries.GetLibraries;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.MediaLibrary.Management.Queries.GetLibraries;
+namespace Nemera.Application.Fixtures.Core.MediaLibrary.Management.Queries.GetLibraries;
 
 /// <summary>
 /// Fixture class for the <see cref="GetLibrariesQuery"/> class.

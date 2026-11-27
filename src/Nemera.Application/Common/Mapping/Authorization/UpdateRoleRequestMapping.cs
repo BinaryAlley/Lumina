@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
-using Lumina.Contracts.Requests.Authorization;
+using Nemera.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
+using Nemera.Contracts.Requests.Authorization;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Authorization;
+namespace Nemera.Application.Common.Mapping.Authorization;
 
 /// <summary>
 /// Extension methods for converting <see cref="UpdateRoleRequest"/>.

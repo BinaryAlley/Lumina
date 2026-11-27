@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Responses.Favorites;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
-using Lumina.Presentation.Api.Core.Endpoints.Favorites.GetFavoriteStatus;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Responses.Favorites;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Presentation.Api.Core.Endpoints.Favorites.GetFavoriteStatus;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -20,18 +20,18 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Favorites.GetFavoriteStatus;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Favorites.GetFavoriteStatus;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetFavoriteStatusEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetFavoriteStatusEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetFavoriteStatusEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private const string PATH = "/api/v1/users/me/favorites/status";
 
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -46,7 +46,7 @@ public class GetFavoriteStatusEndpointTests : IClassFixture<AuthenticatedLuminaA
     /// Initializes a new instance of the <see cref="GetFavoriteStatusEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetFavoriteStatusEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetFavoriteStatusEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -198,7 +198,7 @@ public class GetFavoriteStatusEndpointTests : IClassFixture<AuthenticatedLuminaA
         string content = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain(favoritedTrackId.ToString(), content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina.", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera.", content, StringComparison.Ordinal);
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -212,7 +212,7 @@ public class GetFavoriteStatusEndpointTests : IClassFixture<AuthenticatedLuminaA
     private async Task<Guid> SeedFavoriteAsync(Guid userId, FavoriteMediaKind mediaKind, Guid mediaItemId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid favoriteId = Guid.NewGuid();
         dbContext.Favorites.Add(_favoriteEntityFixture.Create(
             id: favoriteId,
@@ -234,7 +234,7 @@ public class GetFavoriteStatusEndpointTests : IClassFixture<AuthenticatedLuminaA
     private async Task<Guid> SeedOtherUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         string username = $"otheruser_{Guid.NewGuid()}";
         dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: username, password: "TestPass123!"));
@@ -250,7 +250,7 @@ public class GetFavoriteStatusEndpointTests : IClassFixture<AuthenticatedLuminaA
     private Guid GetCurrentUserId()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         UserEntity user = dbContext.Users.First(candidate => candidate.Username == _apiFactory.TestUsername);
         return user.Id;
     }
@@ -302,7 +302,7 @@ public class GetFavoriteStatusEndpointTests : IClassFixture<AuthenticatedLuminaA
         Assert.NotNull(errors);
         Assert.Contains(expectedErrorCode, errors!["General.Validation"]);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina.", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera.", content, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -312,7 +312,7 @@ public class GetFavoriteStatusEndpointTests : IClassFixture<AuthenticatedLuminaA
     {
         using (IServiceScope scope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             dbContext.Favorites.RemoveRange(dbContext.Favorites.Where(favorite => _seededFavoriteIds.Contains(favorite.Id)));
             dbContext.Users.RemoveRange(dbContext.Users.Where(user => _seededUserIds.Contains(user.Id)));
             await dbContext.SaveChangesAsync();

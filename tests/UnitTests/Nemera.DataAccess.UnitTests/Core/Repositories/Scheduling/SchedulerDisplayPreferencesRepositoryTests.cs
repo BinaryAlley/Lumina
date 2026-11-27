@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
-using Lumina.DataAccess.Core.Repositories.Scheduling;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
+using Nemera.DataAccess.Core.Repositories.Scheduling;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.Scheduling;
+namespace Nemera.DataAccess.UnitTests.Core.Repositories.Scheduling;
 
 /// <summary>
 /// Contains unit tests for the <see cref="SchedulerDisplayPreferencesRepository"/> class.
@@ -23,7 +23,7 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.Scheduling;
 [ExcludeFromCodeCoverage]
 public class SchedulerDisplayPreferencesRepositoryTests
 {
-    private readonly LuminaDbContext _mockContext;
+    private readonly NemeraDbContext _mockContext;
     private readonly SchedulerDisplayPreferencesRepository _sut;
     private readonly SchedulerDisplayPreferencesEntityFixture _schedulerDisplayPreferencesEntityFixture = new();
 
@@ -32,7 +32,7 @@ public class SchedulerDisplayPreferencesRepositoryTests
     /// </summary>
     public SchedulerDisplayPreferencesRepositoryTests()
     {
-        _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
+        _mockContext = Create.MockedDbContextFor<NemeraDbContext>();
         _sut = new SchedulerDisplayPreferencesRepository(_mockContext);
     }
 

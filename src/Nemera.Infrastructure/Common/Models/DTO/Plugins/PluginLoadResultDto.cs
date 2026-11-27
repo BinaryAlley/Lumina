@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Core.Plugins;
-using Lumina.Plugins.Contracts.Core.Plugins;
+using Nemera.Infrastructure.Core.Plugins;
+using Nemera.Plugins.Contracts.Core.Plugins;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Models.DTO.Plugins;
+namespace Nemera.Infrastructure.Common.Models.DTO.Plugins;
 
 /// <summary>
 /// Data transfer object for the result of loading the plugins from the plugins directory.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Responses.Playlists;
+using Nemera.Contracts.Responses.Playlists;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Playlists.RemovePlaylistEntry;
+namespace Nemera.Presentation.Api.Core.Endpoints.Playlists.RemovePlaylistEntry;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="RemovePlaylistEntryEndpoint"/> API endpoint, for OpenAPI.

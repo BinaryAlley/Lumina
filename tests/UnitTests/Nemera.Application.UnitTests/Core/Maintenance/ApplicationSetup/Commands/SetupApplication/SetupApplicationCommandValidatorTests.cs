@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
-using Lumina.Application.Fixtures.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
+using Nemera.Application.Fixtures.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
+namespace Nemera.Application.UnitTests.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
 
 /// <summary>
 /// Contains unit tests for the <see cref="SetupApplicationCommandValidator"/> class.

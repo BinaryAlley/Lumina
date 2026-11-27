@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Common.Models.Core;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.Models.Core;
 
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Domain.Common.ValueObjects.Metadata;
+namespace Nemera.Domain.Common.ValueObjects.Metadata;
 
 /// <summary>
 /// Value Object for the language used in a media element.

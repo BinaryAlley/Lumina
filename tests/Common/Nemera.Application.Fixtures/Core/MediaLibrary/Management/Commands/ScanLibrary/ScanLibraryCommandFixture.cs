@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibrary;
+using Nemera.Application.Core.MediaLibrary.Management.Commands.ScanLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.MediaLibrary.Management.Commands.ScanLibrary;
+namespace Nemera.Application.Fixtures.Core.MediaLibrary.Management.Commands.ScanLibrary;
 
 /// <summary>
 /// Fixture class for the <see cref="ScanLibraryCommand"/> class.

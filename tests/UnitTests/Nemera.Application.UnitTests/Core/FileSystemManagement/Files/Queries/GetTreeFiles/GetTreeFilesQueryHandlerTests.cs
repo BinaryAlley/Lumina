@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
-using Lumina.Application.Fixtures.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
+using Nemera.Application.Fixtures.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
+namespace Nemera.Application.UnitTests.Core.FileSystemManagement.Files.Queries.GetTreeFiles;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetTreeFilesQueryHandler"/> class.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Http;
+using Nemera.Presentation.Web.Common.Http;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Middlewares;
+namespace Nemera.Presentation.Web.Common.Middlewares;
 
 /// <summary>
 /// Middleware that restores the <c>Cache-Control</c> header chosen by an endpoint after any middleware that overwrites it.

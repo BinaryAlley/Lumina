@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
-using Lumina.Plugins.OpenLibrary.Common.Models.DTO.Settings;
-using Lumina.Plugins.OpenLibrary.Core.Api;
-using Lumina.Plugins.OpenLibrary.Core.Settings;
-using Lumina.Plugins.OpenLibrary.Fixtures.Common.Models.DTO.Settings;
-using Lumina.Plugins.OpenLibrary.Fixtures.Common.Setup;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
+using Nemera.Plugins.OpenLibrary.Common.Models.DTO.Settings;
+using Nemera.Plugins.OpenLibrary.Core.Api;
+using Nemera.Plugins.OpenLibrary.Core.Settings;
+using Nemera.Plugins.OpenLibrary.Fixtures.Common.Models.DTO.Settings;
+using Nemera.Plugins.OpenLibrary.Fixtures.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.UnitTests.Core.Api;
+namespace Nemera.Plugins.OpenLibrary.UnitTests.Core.Api;
 
 /// <summary>
 /// Contains unit tests for the <see cref="OpenLibraryHttpClient"/> class.

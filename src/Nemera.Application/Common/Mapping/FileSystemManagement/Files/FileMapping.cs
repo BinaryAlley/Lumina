@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Contracts.Responses.FileSystemManagement.Files;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Contracts.Responses.FileSystemManagement.Files;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.FileSystemManagement.Files;
+namespace Nemera.Application.Common.Mapping.FileSystemManagement.Files;
 
 /// <summary>
 /// Extension methods for converting <see cref="File"/>.

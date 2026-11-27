@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Authorization;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Infrastructure.Authorization;
+namespace Nemera.Application.UnitTests.Common.Infrastructure.Authorization;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AuthorizationRoles"/> class.

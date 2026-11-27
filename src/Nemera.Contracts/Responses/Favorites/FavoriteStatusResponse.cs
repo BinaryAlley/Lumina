@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.Favorites;
+namespace Nemera.Contracts.Responses.Favorites;
 
 /// <summary>
 /// Represents a response that tells which of the checked media items are favorites of the current user.

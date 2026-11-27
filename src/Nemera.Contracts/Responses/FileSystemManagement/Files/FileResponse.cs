@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.FileSystemManagement;
+using Nemera.Contracts.DTO.FileSystemManagement;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.FileSystemManagement.Files;
+namespace Nemera.Contracts.Responses.FileSystemManagement.Files;
 
 /// <summary>
 /// Represents a response containing a file system file.

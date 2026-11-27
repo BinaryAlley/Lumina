@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Api.Common.Routes.Themes;
+namespace Nemera.Presentation.Api.Common.Routes.Themes;
 
 /// <summary>
 /// Class for the collection of the theme routes of the API.

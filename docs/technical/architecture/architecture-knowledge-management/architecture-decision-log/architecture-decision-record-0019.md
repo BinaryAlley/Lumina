@@ -7,7 +7,7 @@
 
 A media library scan performs two kinds of file system reads. Discovery reads directory entries and file metadata, and hashing samples file contents. Their throughput depends on the storage medium. A solid state drive serves concurrent reads with little penalty, while a mechanical hard drive pays a seek for every position change, so concurrent reads can reduce its throughput.
 
-Lumina cannot determine the storage medium reliably. Drive type queries are platform specific, and they are unreliable for network, virtual, and removable volumes. The scan therefore needs an explicit input instead of an automatic guess.
+Nemera cannot determine the storage medium reliably. Drive type queries are platform specific, and they are unreliable for network, virtual, and removable volumes. The scan therefore needs an explicit input instead of an automatic guess.
 
 Not every scan stage performs bulk local reads. Audio metadata extraction parses tag blocks, and metadata and artwork enrichment call remote providers. Those stages have their own constraints, which are part of this decision.
 

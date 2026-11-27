@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.MusicBrainz.Common.Models.DTO.Settings;
-using Lumina.Plugins.MusicBrainz.Core;
-using Lumina.Plugins.MusicBrainz.Core.Api;
-using Lumina.Plugins.MusicBrainz.Core.Settings;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.MusicBrainz.Common.Models.DTO.Settings;
+using Nemera.Plugins.MusicBrainz.Core;
+using Nemera.Plugins.MusicBrainz.Core.Api;
+using Nemera.Plugins.MusicBrainz.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.Common.DependencyInjection;
+namespace Nemera.Plugins.MusicBrainz.Common.DependencyInjection;
 
 /// <summary>
 /// Utility class for registering the services of the MusicBrainz metadata provider into the Dependency Injection container.

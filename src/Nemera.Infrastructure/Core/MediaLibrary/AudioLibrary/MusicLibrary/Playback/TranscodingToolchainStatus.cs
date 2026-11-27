@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Records the outcome of the ffmpeg startup probe, so a missing toolchain or encoder is reported as a retryable unavailability instead of a production failure.

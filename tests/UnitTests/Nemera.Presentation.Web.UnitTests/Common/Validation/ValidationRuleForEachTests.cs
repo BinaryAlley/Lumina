@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Primitives;
-using Lumina.Presentation.Web.Common.Validation;
+using Nemera.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.Validation;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.Validation;
+namespace Nemera.Presentation.Web.UnitTests.Common.Validation;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ValidationRuleForEach{TRequest, TItem}"/> class.

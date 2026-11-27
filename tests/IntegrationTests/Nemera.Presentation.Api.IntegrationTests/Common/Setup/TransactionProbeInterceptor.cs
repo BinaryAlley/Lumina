@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+namespace Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 
 /// <summary>
 /// Database transaction interceptor that reports the rolled back transactions to a <see cref="TransactionProbe"/>.

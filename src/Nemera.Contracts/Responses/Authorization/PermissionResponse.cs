@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
 #endregion
 
-namespace Lumina.Contracts.Responses.Authorization;
+namespace Nemera.Contracts.Responses.Authorization;
 
 /// <summary>
 /// Represents the response model for a request for an of authorization permission.

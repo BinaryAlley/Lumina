@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.VideoLibrary;
+namespace Nemera.Domain.SharedKernel.Common.Enums.VideoLibrary;
 
 /// <summary>
 /// Enumeration for the types of video content libraries.

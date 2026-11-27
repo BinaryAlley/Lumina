@@ -1,4 +1,4 @@
-namespace Lumina.Plugins.CoverArtArchive.Core.Settings;
+namespace Nemera.Plugins.CoverArtArchive.Core.Settings;
 
 /// <summary>
 /// Keys of the settings of the Cover Art Archive artwork plugin, shared by the settings schema and the settings loader.

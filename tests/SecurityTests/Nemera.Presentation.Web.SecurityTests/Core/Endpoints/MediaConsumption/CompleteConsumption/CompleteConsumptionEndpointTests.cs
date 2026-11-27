@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Common.Enums.MediaConsumption;
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Requests.MediaConsumption;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.MediaConsumption.CompleteConsumption;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.MediaConsumption;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Common.Enums.MediaConsumption;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Requests.MediaConsumption;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.MediaConsumption.CompleteConsumption;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.MediaConsumption;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -21,19 +21,19 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.MediaConsumption.CompleteConsumption;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.MediaConsumption.CompleteConsumption;
 
 /// <summary>
 /// Contains security tests for the <see cref="CompleteConsumptionEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class CompleteConsumptionEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class CompleteConsumptionEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string ZERO_GUID = "00000000-0000-0000-0000-000000000000";
 
     private static readonly Guid s_recordId = Guid.Parse("44444444-4444-4444-4444-444444444444");
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly ConsumptionRecordDtoFixture _consumptionRecordDtoFixture = new();
     private readonly CompleteConsumptionRequestFixture _completeConsumptionRequestFixture = new();
 
@@ -41,7 +41,7 @@ public class CompleteConsumptionEndpointTests : IClassFixture<LuminaWebFactory>,
     /// Initializes a new instance of the <see cref="CompleteConsumptionEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public CompleteConsumptionEndpointTests(LuminaWebFactory apiFactory)
+    public CompleteConsumptionEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -120,7 +120,7 @@ public class CompleteConsumptionEndpointTests : IClassFixture<LuminaWebFactory>,
         Assert.Contains("Cookie", response.Headers.Vary);
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     [Theory]
@@ -167,7 +167,7 @@ public class CompleteConsumptionEndpointTests : IClassFixture<LuminaWebFactory>,
         Assert.False(json.RootElement.GetProperty("success").GetBoolean());
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     /// <summary>

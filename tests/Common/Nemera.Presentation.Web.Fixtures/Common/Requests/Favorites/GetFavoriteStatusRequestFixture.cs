@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Presentation.Web.Common.Enums.Favorites;
-using Lumina.Presentation.Web.Common.Requests.Favorites;
+using Nemera.Presentation.Web.Common.Enums.Favorites;
+using Nemera.Presentation.Web.Common.Requests.Favorites;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Favorites;
+namespace Nemera.Presentation.Web.Fixtures.Common.Requests.Favorites;
 
 /// <summary>
 /// Fixture class for the <see cref="GetFavoriteStatusRequest"/> record.

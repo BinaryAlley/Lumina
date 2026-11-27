@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.Favorites;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Contracts.Responses.Common;
-using Lumina.Contracts.Responses.Favorites;
+using Nemera.Application.Common.DTO.Favorites;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Contracts.Responses.Common;
+using Nemera.Contracts.Responses.Favorites;
 using System;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Favorites;
+namespace Nemera.Application.Common.Mapping.Favorites;
 
 /// <summary>
 /// Extension methods for converting <see cref="FavoriteItemDto"/>.

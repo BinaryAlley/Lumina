@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.OpenLibrary.Common.DependencyInjection;
-using Lumina.Plugins.OpenLibrary.Common.Models.DTO.Settings;
-using Lumina.Plugins.OpenLibrary.Core.Api;
-using Lumina.Plugins.OpenLibrary.Core.Settings;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.OpenLibrary.Common.DependencyInjection;
+using Nemera.Plugins.OpenLibrary.Common.Models.DTO.Settings;
+using Nemera.Plugins.OpenLibrary.Core.Api;
+using Nemera.Plugins.OpenLibrary.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using System;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.UnitTests.Common.DependencyInjection;
+namespace Nemera.Plugins.OpenLibrary.UnitTests.Common.DependencyInjection;
 
 /// <summary>
 /// Contains unit tests for the <see cref="OpenLibraryServices"/> class.

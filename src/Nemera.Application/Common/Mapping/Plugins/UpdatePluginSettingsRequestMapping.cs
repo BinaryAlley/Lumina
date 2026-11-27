@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Plugins.Commands.UpdatePluginSettings;
-using Lumina.Contracts.Requests.Plugins;
+using Nemera.Application.Core.Plugins.Commands.UpdatePluginSettings;
+using Nemera.Contracts.Requests.Plugins;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Plugins;
+namespace Nemera.Application.Common.Mapping.Plugins;
 
 /// <summary>
 /// Extension methods for converting <see cref="UpdatePluginSettingsRequest"/>.

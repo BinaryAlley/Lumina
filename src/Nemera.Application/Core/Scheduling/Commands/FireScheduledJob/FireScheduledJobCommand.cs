@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Scheduling.Commands.FireScheduledJob;
+namespace Nemera.Application.Core.Scheduling.Commands.FireScheduledJob;
 
 /// <summary>
 /// Command for firing the task of a scheduled job once, without affecting its execution cycle.

@@ -1,6 +1,6 @@
-# Lumina API
+# Nemera API
 
-- [Lumina API](#lumina-api)
+- [Nemera API](#nemera-api)
   - [Themes](#themes)
     - [Get Themes](#get-themes)
       - [Get Themes Request](#get-themes-request)
@@ -56,7 +56,7 @@ GET api/v1/themes
     "themeId": "default-dark",
     "name": "Default Dark",
     "description": "A dark theme bundled with the application.",
-    "author": "Lumina",
+    "author": "Nemera",
     "version": "1.0.0",
     "previewPath": "preview.png",
     "installSource": "Bundled",

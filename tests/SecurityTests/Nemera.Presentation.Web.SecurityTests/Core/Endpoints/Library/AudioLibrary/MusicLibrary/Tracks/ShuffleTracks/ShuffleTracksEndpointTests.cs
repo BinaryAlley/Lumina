@@ -1,12 +1,12 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.ShuffleTracks;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.ShuffleTracks;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.Library.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -19,7 +19,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.ShuffleTracks;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.ShuffleTracks;
 
 /// <summary>
 /// Contains security tests for the <see cref="ShuffleTracksEndpoint"/> class.
@@ -29,10 +29,10 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibr
 /// layer issues no token for this route, and timing attack resistance does not apply either, because the route performs no credential comparison.
 /// </remarks>
 [ExcludeFromCodeCoverage]
-public class ShuffleTracksEndpointTests : IClassFixture<LuminaWebFactory>
+public class ShuffleTracksEndpointTests : IClassFixture<NemeraWebFactory>
 {
     private const string SHUFFLE_TRACKS_PATH = "/en-us/library/audio-library/music-library/tracks/api-shuffle-tracks";
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly ShuffleTracksRequestFixture _shuffleTracksRequestFixture = new();
     private readonly ProblemDetailsDtoFixture _problemDetailsDtoFixture = new();
 
@@ -40,7 +40,7 @@ public class ShuffleTracksEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="ShuffleTracksEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public ShuffleTracksEndpointTests(LuminaWebFactory apiFactory)
+    public ShuffleTracksEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

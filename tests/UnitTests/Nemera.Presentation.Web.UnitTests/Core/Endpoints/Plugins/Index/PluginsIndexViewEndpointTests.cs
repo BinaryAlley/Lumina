@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Plugins;
-using Lumina.Presentation.Web.Common.Enums.Plugins;
-using Lumina.Presentation.Web.Common.Http;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Plugins.Index;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Plugins;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Plugins;
+using Nemera.Presentation.Web.Common.Enums.Plugins;
+using Nemera.Presentation.Web.Common.Http;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Plugins.Index;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Plugins;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Plugins.Index;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Plugins.Index;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PluginsIndexViewEndpoint"/> class.

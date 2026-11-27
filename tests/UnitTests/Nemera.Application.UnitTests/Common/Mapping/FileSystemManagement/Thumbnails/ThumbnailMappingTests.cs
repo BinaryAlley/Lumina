@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using Lumina.Application.Common.Mapping.FileSystemManagement.Thumbnails;
-using Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Thumbnails;
+using Nemera.Contracts.Responses.FileSystemManagement.Thumbnails;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Thumbnails;
+namespace Nemera.Application.UnitTests.Common.Mapping.FileSystemManagement.Thumbnails;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ThumbnailMapping"/> class.

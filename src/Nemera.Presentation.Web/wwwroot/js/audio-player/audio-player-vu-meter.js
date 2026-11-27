@@ -90,7 +90,7 @@
  *
  * Using it
  * --------
- *   const meter = LuminaAudioPlayer.createVuMeter({
+ *   const meter = NemeraAudioPlayer.createVuMeter({
  *       container: barElement.querySelector('[data-audio-player-vu-meter]'),
  *       settings: player.getPreferences()
  *   });
@@ -102,7 +102,7 @@
  * The meter tolerates a missing analyzer: it still renders, and its levels simply stay at zero. A player engine that
  * cannot expose an analyzer therefore degrades to an empty meter instead of failing.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -228,7 +228,7 @@
      * @readonly
      * @type {Object}
      */
-    LuminaAudioPlayer.VU_METER_DEFAULTS = Object.freeze({
+    NemeraAudioPlayer.VU_METER_DEFAULTS = Object.freeze({
         orientation: 'vertical',
         segmentCount: 12,
         segmentGap: 1,
@@ -245,7 +245,7 @@
      * @readonly
      * @type {number}
      */
-    LuminaAudioPlayer.VU_METER_BAND_COUNT = BAND_COUNT;
+    NemeraAudioPlayer.VU_METER_BAND_COUNT = BAND_COUNT;
 
     /**
      * Clamps a number into an inclusive range, through the shared helper on the namespace. The reference is resolved on
@@ -256,7 +256,7 @@
      * @returns {number} The clamped value.
      */
     function clamp(value, minimum, maximum) {
-        return LuminaAudioPlayer.clamp(value, minimum, maximum);
+        return NemeraAudioPlayer.clamp(value, minimum, maximum);
     }
 
     /**
@@ -266,7 +266,7 @@
      * @returns {number|null} The finite number, or null.
      */
     function toFiniteNumber(value) {
-        return LuminaAudioPlayer.toFiniteNumber(value);
+        return NemeraAudioPlayer.toFiniteNumber(value);
     }
 
     /**
@@ -293,13 +293,13 @@
         const values = settings || {};
         // The counts, the gap and the hold time are whole numbers on the server, so they are rounded here too: half a
         // segment cannot be drawn, and a fractional gap would make the CSS cell sizing produce uneven rows.
-        const segmentCount = Math.round(toFiniteNumber(values.vuMeterSegmentCount) ?? LuminaAudioPlayer.VU_METER_DEFAULTS.segmentCount);
-        const segmentGap = Math.round(toFiniteNumber(values.vuMeterSegmentGap) ?? LuminaAudioPlayer.VU_METER_DEFAULTS.segmentGap);
-        const mediumThreshold = clamp(toFiniteNumber(values.vuMeterMediumThreshold) ?? LuminaAudioPlayer.VU_METER_DEFAULTS.mediumThreshold, 0, 1);
-        const highThreshold = clamp(toFiniteNumber(values.vuMeterHighThreshold) ?? LuminaAudioPlayer.VU_METER_DEFAULTS.highThreshold, 0, 1);
-        const peakHoldDurationInMilliseconds = Math.round(toFiniteNumber(values.vuMeterPeakHoldDurationInMilliseconds) ?? LuminaAudioPlayer.VU_METER_DEFAULTS.peakHoldDurationInMilliseconds);
-        const releasePerSecond = toFiniteNumber(values.vuMeterReleasePerSecond) ?? LuminaAudioPlayer.VU_METER_DEFAULTS.releasePerSecond;
-        const peakReleasePerSecond = toFiniteNumber(values.vuMeterPeakReleasePerSecond) ?? LuminaAudioPlayer.VU_METER_DEFAULTS.peakReleasePerSecond;
+        const segmentCount = Math.round(toFiniteNumber(values.vuMeterSegmentCount) ?? NemeraAudioPlayer.VU_METER_DEFAULTS.segmentCount);
+        const segmentGap = Math.round(toFiniteNumber(values.vuMeterSegmentGap) ?? NemeraAudioPlayer.VU_METER_DEFAULTS.segmentGap);
+        const mediumThreshold = clamp(toFiniteNumber(values.vuMeterMediumThreshold) ?? NemeraAudioPlayer.VU_METER_DEFAULTS.mediumThreshold, 0, 1);
+        const highThreshold = clamp(toFiniteNumber(values.vuMeterHighThreshold) ?? NemeraAudioPlayer.VU_METER_DEFAULTS.highThreshold, 0, 1);
+        const peakHoldDurationInMilliseconds = Math.round(toFiniteNumber(values.vuMeterPeakHoldDurationInMilliseconds) ?? NemeraAudioPlayer.VU_METER_DEFAULTS.peakHoldDurationInMilliseconds);
+        const releasePerSecond = toFiniteNumber(values.vuMeterReleasePerSecond) ?? NemeraAudioPlayer.VU_METER_DEFAULTS.releasePerSecond;
+        const peakReleasePerSecond = toFiniteNumber(values.vuMeterPeakReleasePerSecond) ?? NemeraAudioPlayer.VU_METER_DEFAULTS.peakReleasePerSecond;
         return {
             orientation: normalizeOrientation(values.vuMeterOrientation),
             segmentCount: clamp(segmentCount, SEGMENT_COUNT_RANGE.minimum, SEGMENT_COUNT_RANGE.maximum),
@@ -659,7 +659,7 @@
          * Applies a new settings object. A change of the segment count rebuilds the channels, because the number of
          * segments is part of the markup; every other setting is applied in place, so a change never drops the levels.
          * @param {Object} settings - The user settings of the meter, in the shape the user settings endpoint returns.
-         * @returns {LuminaAudioPlayer.VuMeter} This meter, for chaining.
+         * @returns {NemeraAudioPlayer.VuMeter} This meter, for chaining.
          */
         configure(settings) {
             if (this.isDestroyed)
@@ -694,7 +694,7 @@
          * Binds the analyzer the meter reads from. Passing a different analyzer replaces the previous one and resets the
          * displayed levels, because the levels of another graph do not describe this one.
          * @param {AnalyserNode|null} analyser - The analyzer of the player output, or null to detach.
-         * @returns {LuminaAudioPlayer.VuMeter} This meter, for chaining.
+         * @returns {NemeraAudioPlayer.VuMeter} This meter, for chaining.
          */
         setAnalyser(analyser) {
             if (this.isDestroyed)
@@ -1060,15 +1060,15 @@
         }
     }
 
-    LuminaAudioPlayer.VuMeterSpectrumAnalyzer = VuMeterSpectrumAnalyzer;
-    LuminaAudioPlayer.VuMeter = VuMeter;
+    NemeraAudioPlayer.VuMeterSpectrumAnalyzer = VuMeterSpectrumAnalyzer;
+    NemeraAudioPlayer.VuMeter = VuMeter;
 
     /**
-     * Creates a VU meter. See {@link LuminaAudioPlayer.VuMeter} for the options.
+     * Creates a VU meter. See {@link NemeraAudioPlayer.VuMeter} for the options.
      * @param {Object} options - The meter options.
-     * @returns {LuminaAudioPlayer.VuMeter} The created meter.
+     * @returns {NemeraAudioPlayer.VuMeter} The created meter.
      */
-    LuminaAudioPlayer.createVuMeter = function (options) {
+    NemeraAudioPlayer.createVuMeter = function (options) {
         return new VuMeter(options);
     };
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

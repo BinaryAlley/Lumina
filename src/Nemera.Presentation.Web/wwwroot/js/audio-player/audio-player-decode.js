@@ -85,10 +85,10 @@
  * The decoder is a sub component, like the download engine: it does not throw strings and does not move the player state
  * machine. A failure it cannot recover from, a decoder error, a chunk the decoder refuses, a configuration it rejects, or
  * a scheduler failure other than a scheduled ahead refusal it can recover from, is recorded on the decoder for polling
- * through getError, is reported to the onError callback as a {@link LuminaAudioPlayer.PlayerError}, and stops the decoder
+ * through getError, is reported to the onError callback as a {@link NemeraAudioPlayer.PlayerError}, and stops the decoder
  * cleanly: no chunk is accepted, the queue is dropped and the native decoder is closed. The recorded error carries
- * {@link LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED} when the failure is the decoder's own, and the code of the
- * error when another component already typed it with {@link LuminaAudioPlayer.PlayerError} (for example the renderer's
+ * {@link NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED} when the failure is the decoder's own, and the code of the
+ * error when another component already typed it with {@link NemeraAudioPlayer.PlayerError} (for example the renderer's
  * ENGINE_ERROR), because that code is more specific than the decoder's. The recorded error is always owned by this
  * decoder: a PlayerError raised by another component is copied rather than adopted, so its details are never mutated and
  * getError never returns an object the raising component still holds. An engine must forward the callback to
@@ -102,7 +102,7 @@
  *
  * Using it
  * --------
- *   const decoder = LuminaAudioPlayer.createTrackDecoder({
+ *   const decoder = NemeraAudioPlayer.createTrackDecoder({
  *       scheduler: renderer,
  *       maxQueueSize: 8,
  *       maxDecodeAheadSeconds: 5,
@@ -123,7 +123,7 @@
  *   await decoder.resetAsync();                      // the decoder half of a seek
  *   await decoder.destroyAsync();
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -226,7 +226,7 @@
      * @returns {boolean} True when the refusal is a scheduled ahead limit.
      */
     function isScheduledAheadRefusal(error) {
-        return !!error && !!error.details && error.details.reason === LuminaAudioPlayer.PlayerErrorReason.SCHEDULED_AHEAD_LIMIT;
+        return !!error && !!error.details && error.details.reason === NemeraAudioPlayer.PlayerErrorReason.SCHEDULED_AHEAD_LIMIT;
     }
 
     /**
@@ -278,9 +278,9 @@
          * @param {Object} [options.config] - The initial configuration, of the shape configure accepts; it may also be given to configure later.
          * @param {number} [options.maxQueueSize] - The number of encoded chunks the decoder may hold before a caller is asked to wait. Defaults to eight.
          * @param {number|null} [options.maxDecodeAheadSeconds] - The decoder's own ceiling, in seconds, on how far ahead of the audio clock it decodes and feeds, so that a fast decoder does not retain a whole decoded track. It is distinct from the scheduler's own ceiling, whose option has a different name and the opposite convention, absent meaning disabled there and a default here. Defaults to five seconds; pass null to disable the decoder's own ceiling, which leaves only the scheduler's, if any. An absent key, an explicit undefined, and a value of zero or below all keep the default, the last because a ceiling of zero could never be satisfied. When the scheduler publishes its own ceiling, the decoder uses the smaller of the two.
-         * @param {Function} [options.onError] - Called with a {@link LuminaAudioPlayer.PlayerError} when the decoder fails. An engine must forward it to host.reportError.
+         * @param {Function} [options.onError] - Called with a {@link NemeraAudioPlayer.PlayerError} when the decoder fails. An engine must forward it to host.reportError.
          * @throws {TypeError} When no scheduler with a schedule method and a getScheduledAheadSeconds method is provided.
-         * @throws {LuminaAudioPlayer.PlayerError} When an initial options.config is given and it is invalid or the browser rejects it.
+         * @throws {NemeraAudioPlayer.PlayerError} When an initial options.config is given and it is invalid or the browser rejects it.
          */
         constructor(options = {}) {
             const settings = options || {};
@@ -311,7 +311,7 @@
             this.decoder = null;
             /** @type {Object|null} */
             this.config = null;
-            /** @type {LuminaAudioPlayer.PlayerError|null} */
+            /** @type {NemeraAudioPlayer.PlayerError|null} */
             this.error = null;
             this.configured = false;
             this.destroyed = false;
@@ -350,12 +350,12 @@
          * @param {number} config.sampleRate - The sample rate of the encoded audio, in Hz.
          * @param {number} config.numberOfChannels - The number of channels of the encoded audio.
          * @param {ArrayBuffer|ArrayBufferView} [config.description] - The codec private data the container carries, for a codec that needs one.
-         * @returns {LuminaAudioPlayer.TrackDecoder} This decoder, for chaining.
-         * @throws {LuminaAudioPlayer.PlayerError} When the decoder was destroyed, already failed, or the configuration is missing a required value or is rejected by the browser.
+         * @returns {NemeraAudioPlayer.TrackDecoder} This decoder, for chaining.
+         * @throws {NemeraAudioPlayer.PlayerError} When the decoder was destroyed, already failed, or the configuration is missing a required value or is rejected by the browser.
          */
         configure(config) {
             if (this.destroyed)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The audio decoder was destroyed.');
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The audio decoder was destroyed.');
             if (this.error)
                 throw this.error;
             // The configuration is validated before the native decoder is created, so an invalid configuration never
@@ -371,7 +371,7 @@
                 try {
                     this.decoder.reset();
                 } catch (error) {
-                    throw this.fail(error, LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: 'reset-failed' });
+                    throw this.fail(error, NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: 'reset-failed' });
                 }
             }
             this.applyConfiguration(normalized);
@@ -452,11 +452,11 @@
          * room when the seek arrives is released as a clean stop, because its packet belongs to the stream before the
          * seek. The scheduler half of the seek, renderer.seekTo, is the caller's to perform.
          * @returns {Promise<void>} A promise that resolves once the decoder is configured again.
-         * @throws {LuminaAudioPlayer.PlayerError} When the decoder was destroyed, already failed, or could not be reset.
+         * @throws {NemeraAudioPlayer.PlayerError} When the decoder was destroyed, already failed, or could not be reset.
          */
         async resetAsync() {
             if (this.destroyed)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The audio decoder was destroyed.');
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The audio decoder was destroyed.');
             if (this.error)
                 throw this.error;
             if (!this.decoder)
@@ -473,7 +473,7 @@
             try {
                 this.decoder.reset();
             } catch (error) {
-                throw this.fail(error, LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: 'reset-failed' });
+                throw this.fail(error, NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: 'reset-failed' });
             }
             // A reset returns the decoder to the unconfigured state, so the last configuration is applied again before
             // any new packet is fed; without it the decoder would refuse the first packet of the seek.
@@ -486,24 +486,24 @@
         /**
          * Feeds one encoded packet to the decoder, submitting an EncodedAudioChunk with its microsecond timestamp and
          * duration. The chunk is submitted, not decoded: the decoded frames arrive later, in the output callback.
-         * @param {Object|EncodedAudioChunk} packet - The encoded packet, or a prebuilt EncodedAudioChunk. See {@link LuminaAudioPlayer.TrackDecoder#buildEncodedChunk} for the packet shape.
+         * @param {Object|EncodedAudioChunk} packet - The encoded packet, or a prebuilt EncodedAudioChunk. See {@link NemeraAudioPlayer.TrackDecoder#buildEncodedChunk} for the packet shape.
          * @returns {void}
-         * @throws {LuminaAudioPlayer.PlayerError} With {@link LuminaAudioPlayer.PlayerErrorCode.DECODER_BUSY} and <c>details.reason === 'queue-full'</c> when there is no room right now, which is a transient condition a caller resolves by waiting for {@link LuminaAudioPlayer.TrackDecoder#waitForCapacityAsync}. Otherwise, with {@link LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE} when the decoder is destroyed or not configured, or with a fatal recorded failure when it rejects the packet.
+         * @throws {NemeraAudioPlayer.PlayerError} With {@link NemeraAudioPlayer.PlayerErrorCode.DECODER_BUSY} and <c>details.reason === 'queue-full'</c> when there is no room right now, which is a transient condition a caller resolves by waiting for {@link NemeraAudioPlayer.TrackDecoder#waitForCapacityAsync}. Otherwise, with {@link NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE} when the decoder is destroyed or not configured, or with a fatal recorded failure when it rejects the packet.
          */
         decode(packet) {
             if (this.destroyed)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The audio decoder was destroyed.');
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The audio decoder was destroyed.');
             if (this.error)
                 throw this.error;
             if (!this.configured)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The audio decoder is not configured.');
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The audio decoder is not configured.');
             if (!this.canAccept())
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DECODER_BUSY, 'The audio decoder cannot accept another chunk yet.', { reason: 'queue-full' });
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DECODER_BUSY, 'The audio decoder cannot accept another chunk yet.', { reason: 'queue-full' });
             const chunk = this.buildEncodedChunk(packet);
             try {
                 this.decoder.decode(chunk);
             } catch (error) {
-                throw this.fail(error, LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: 'decode-rejected' });
+                throw this.fail(error, NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: 'decode-rejected' });
             }
             this.chunksFed++;
         }
@@ -511,18 +511,18 @@
         /**
          * Waits for room in the decoder, then feeds one encoded packet. This is the entry point a decode loop uses; a loop
          * that paces itself with canAccept may call decode directly instead.
-         * @param {Object|EncodedAudioChunk} packet - The encoded packet, per {@link LuminaAudioPlayer.TrackDecoder#decode}.
+         * @param {Object|EncodedAudioChunk} packet - The encoded packet, per {@link NemeraAudioPlayer.TrackDecoder#decode}.
          * @returns {Promise<boolean>} True when the packet was submitted, false when the decoder stopped or the stream
          *     changed before there was room, which the caller reads as a clean stop rather than a failure.
-         * @throws {LuminaAudioPlayer.PlayerError} When the decoder is in a state that can never accept the packet, or rejects it.
+         * @throws {NemeraAudioPlayer.PlayerError} When the decoder is in a state that can never accept the packet, or rejects it.
          */
         async decodeAsync(packet) {
             if (this.destroyed)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The audio decoder was destroyed.');
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The audio decoder was destroyed.');
             if (this.error)
                 throw this.error;
             if (!this.configured)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The audio decoder is not configured.');
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The audio decoder is not configured.');
             const generation = this.generation;
             // A single pump releases a batch of waiters at once, and their continuations run one after another, so another
             // caller can take the last slot before this one reaches decode. The wait is therefore repeated until this
@@ -549,11 +549,11 @@
          * lost behind the end of the track. It is a no-op, resolving without touching the native decoder, when the decoder
          * is not configured, so a caller that is unsure whether it ever configured one may call it unconditionally.
          * @returns {Promise<void>} A promise that resolves once the decoder has emitted every pending frame.
-         * @throws {LuminaAudioPlayer.PlayerError} When the decoder was destroyed, already failed, or refused to flush.
+         * @throws {NemeraAudioPlayer.PlayerError} When the decoder was destroyed, already failed, or refused to flush.
          */
         async flushAsync() {
             if (this.destroyed)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The audio decoder was destroyed.');
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The audio decoder was destroyed.');
             if (this.error)
                 throw this.error;
             if (!this.decoder || !this.configured)
@@ -563,9 +563,9 @@
             } catch (error) {
                 // A reset or a close interrupts a pending flush; that is a teardown of the decode pipeline, not a failure
                 // of the track, so it is observed as a clean stop.
-                if (this.destroyed || this.error || LuminaAudioPlayer.isAbortError(error))
+                if (this.destroyed || this.error || NemeraAudioPlayer.isAbortError(error))
                     return;
-                throw this.fail(error, LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: 'flush-failed' });
+                throw this.fail(error, NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: 'flush-failed' });
             }
         }
 
@@ -730,7 +730,7 @@
 
         /**
          * Gets the last failure the decoder recorded, or null when there was none.
-         * @returns {LuminaAudioPlayer.PlayerError|null} The recorded failure.
+         * @returns {NemeraAudioPlayer.PlayerError|null} The recorded failure.
          */
         getError() {
             return this.error;
@@ -780,7 +780,7 @@
         /**
          * Makes sure the native decoder exists, creating it on first use through the decoder factory.
          * @returns {AudioDecoder} The native decoder.
-         * @throws {LuminaAudioPlayer.PlayerError} When the environment provides no decoder, or it could not be created.
+         * @throws {NemeraAudioPlayer.PlayerError} When the environment provides no decoder, or it could not be created.
          */
         ensureDecoder() {
             if (this.decoder)
@@ -792,7 +792,7 @@
                     error: (error) => this.handleError(error)
                 });
             } catch (error) {
-                throw this.fail(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED);
+                throw this.fail(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED);
             }
             if (!decoder || typeof decoder.configure !== 'function' || typeof decoder.decode !== 'function') {
                 // A factory that returns something unusable may still hold native resources, so the object is released
@@ -806,7 +806,7 @@
                         console.debug('Audio player: the unusable audio decoder could not be closed.', closeError);
                     }
                 }
-                throw this.fail(this.createError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'This environment provides no audio decoder for the player.'));
+                throw this.fail(this.createError(NemeraAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'This environment provides no audio decoder for the player.'));
             }
             this.decoder = decoder;
             if (typeof decoder.addEventListener === 'function') {
@@ -825,25 +825,25 @@
          * Validates and normalizes a configuration into the exact shape the browser is given.
          * @param {Object} config - The configuration to normalize.
          * @returns {Object} The normalized configuration.
-         * @throws {LuminaAudioPlayer.PlayerError} When the configuration is missing a required value or carries an invalid one.
+         * @throws {NemeraAudioPlayer.PlayerError} When the configuration is missing a required value or carries an invalid one.
          */
         normalizeConfig(config) {
             if (!config || typeof config !== 'object')
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The audio decoder configuration is missing.', { reason: 'invalid-config' });
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The audio decoder configuration is missing.', { reason: 'invalid-config' });
             const codec = typeof config.codec === 'string' ? config.codec.trim() : '';
             if (codec === '')
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The audio decoder configuration names no codec.', { reason: 'invalid-config' });
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The audio decoder configuration names no codec.', { reason: 'invalid-config' });
             const sampleRate = toPositiveInteger(config.sampleRate);
             if (sampleRate === null)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The audio decoder configuration carries no valid sample rate.', { reason: 'invalid-config' });
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The audio decoder configuration carries no valid sample rate.', { reason: 'invalid-config' });
             const numberOfChannels = toPositiveInteger(config.numberOfChannels);
             if (numberOfChannels === null)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The audio decoder configuration carries no valid channel count.', { reason: 'invalid-config' });
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The audio decoder configuration carries no valid channel count.', { reason: 'invalid-config' });
             const normalized = { codec, sampleRate, numberOfChannels };
             if (config.description !== null && config.description !== undefined) {
                 const description = toBufferSource(config.description);
                 if (description === null)
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The audio decoder configuration carries an invalid codec description.', { reason: 'invalid-config' });
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The audio decoder configuration carries an invalid codec description.', { reason: 'invalid-config' });
                 normalized.description = description;
             }
             return normalized;
@@ -851,15 +851,15 @@
 
         /**
          * Applies a normalized configuration to the native decoder.
-         * @param {Object} normalized - The configuration, per {@link LuminaAudioPlayer.TrackDecoder#normalizeConfig}.
+         * @param {Object} normalized - The configuration, per {@link NemeraAudioPlayer.TrackDecoder#normalizeConfig}.
          * @returns {void}
-         * @throws {LuminaAudioPlayer.PlayerError} When the browser rejects the configuration, for example a codec it cannot decode.
+         * @throws {NemeraAudioPlayer.PlayerError} When the browser rejects the configuration, for example a codec it cannot decode.
          */
         applyConfiguration(normalized) {
             try {
                 this.decoder.configure(normalized);
             } catch (error) {
-                throw this.fail(error, LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: 'configure-failed' });
+                throw this.fail(error, NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: 'configure-failed' });
             }
         }
 
@@ -873,23 +873,23 @@
          * because a decoder cannot place a packet without one; a missing duration is treated as zero.
          * @param {Object|EncodedAudioChunk} packet - The packet to convert.
          * @returns {EncodedAudioChunk} The chunk to feed the decoder.
-         * @throws {LuminaAudioPlayer.PlayerError} When the packet is not a usable encoded chunk.
+         * @throws {NemeraAudioPlayer.PlayerError} When the packet is not a usable encoded chunk.
          */
         buildEncodedChunk(packet) {
             const ChunkConstructor = getEncodedAudioChunkConstructor();
             if (ChunkConstructor && packet instanceof ChunkConstructor)
                 return packet;
             if (!packet || typeof packet !== 'object')
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The demuxer provided no encoded packet to decode.', { reason: 'invalid-packet' });
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The demuxer provided no encoded packet to decode.', { reason: 'invalid-packet' });
             const data = toBufferSource(packet.data);
             if (data === null)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The encoded packet carries no decodable data.', { reason: 'invalid-packet' });
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The encoded packet carries no decodable data.', { reason: 'invalid-packet' });
             const timestamp = toFiniteNumber(packet.timestamp);
             if (timestamp === null)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The encoded packet carries no valid timestamp.', { reason: 'invalid-packet' });
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The encoded packet carries no valid timestamp.', { reason: 'invalid-packet' });
             const duration = toFiniteNumber(packet.duration);
             if (!ChunkConstructor)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'This environment provides no encoded audio chunk type for the player.');
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'This environment provides no encoded audio chunk type for the player.');
             try {
                 return new ChunkConstructor({
                     type: packet.type === 'delta' ? 'delta' : 'key',
@@ -898,7 +898,7 @@
                     data
                 });
             } catch (error) {
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The demuxer provided an encoded packet the decoder cannot use.', { reason: 'invalid-packet' });
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, 'The demuxer provided an encoded packet the decoder cannot use.', { reason: 'invalid-packet' });
             }
         }
 
@@ -928,7 +928,7 @@
                     return;
                 }
                 // The scheduler closes the frame before it throws, so it must not be closed here as well.
-                this.fail(error, LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: 'schedule-failed' });
+                this.fail(error, NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: 'schedule-failed' });
                 return;
             }
             this.framesDecoded++;
@@ -963,7 +963,7 @@
             // one frame plus the scheduling lead, which can never accept anything, so it is a configuration failure. Any
             // other refusal may still be a satisfiable ceiling that simply has to drain further, so it is recoverable.
             if (ahead <= 0) {
-                this.fail(error, LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: LuminaAudioPlayer.PlayerErrorReason.SCHEDULED_AHEAD_UNSATISFIABLE });
+                this.fail(error, NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: NemeraAudioPlayer.PlayerErrorReason.SCHEDULED_AHEAD_UNSATISFIABLE });
                 return;
             }
             const duration = Number.isFinite(frameWallSeconds) ? Math.max(0, frameWallSeconds) : 0;
@@ -986,7 +986,7 @@
         handleError(error) {
             if (this.destroyed || this.error)
                 return;
-            this.fail(error, LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: 'decoder-error' });
+            this.fail(error, NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, { reason: 'decoder-error' });
         }
 
         /**
@@ -1011,14 +1011,14 @@
          * @param {*} error - The failure to record.
          * @param {string} [code] - The code to use when the failure is not already a player error.
          * @param {Object} [details] - Optional structured details about the failure.
-         * @returns {LuminaAudioPlayer.PlayerError} The recorded typed error.
+         * @returns {NemeraAudioPlayer.PlayerError} The recorded typed error.
          */
-        fail(error, code = LuminaAudioPlayer.PlayerErrorCode.DECODE_FAILED, details = null) {
+        fail(error, code = NemeraAudioPlayer.PlayerErrorCode.DECODE_FAILED, details = null) {
             if (this.error)
                 return this.error;
             // The error is owned by this decoder: a PlayerError raised elsewhere is copied rather than adopted, so its
             // details are never mutated and getError never returns an object the raising component still holds.
-            const typed = LuminaAudioPlayer.toOwnedPlayerError(error, code, details);
+            const typed = NemeraAudioPlayer.toOwnedPlayerError(error, code, details);
             this.error = typed;
             this.clearCapacityTimer();
             this.closeDecoder();
@@ -1036,13 +1036,13 @@
         /**
          * Builds a typed error without recording it, for a caller error that does not stop the decoder, such as feeding a
          * packet when the decoder is not configured.
-         * @param {string} code - One of the {@link LuminaAudioPlayer.PlayerErrorCode} values.
+         * @param {string} code - One of the {@link NemeraAudioPlayer.PlayerErrorCode} values.
          * @param {string} message - The developer facing description of the failure.
          * @param {Object} [details] - Optional structured details about the failure.
-         * @returns {LuminaAudioPlayer.PlayerError} The typed error.
+         * @returns {NemeraAudioPlayer.PlayerError} The typed error.
          */
         createError(code, message, details = null) {
-            return new LuminaAudioPlayer.PlayerError(code, message, details);
+            return new NemeraAudioPlayer.PlayerError(code, message, details);
         }
 
         /**
@@ -1104,14 +1104,14 @@
         }
     }
 
-    LuminaAudioPlayer.TrackDecoder = TrackDecoder;
+    NemeraAudioPlayer.TrackDecoder = TrackDecoder;
 
     /**
-     * Creates a WebCodecs track decoder. See {@link LuminaAudioPlayer.TrackDecoder} for the options.
+     * Creates a WebCodecs track decoder. See {@link NemeraAudioPlayer.TrackDecoder} for the options.
      * @param {Object} options - The decoder options.
-     * @returns {LuminaAudioPlayer.TrackDecoder} The created decoder.
+     * @returns {NemeraAudioPlayer.TrackDecoder} The created decoder.
      */
-    LuminaAudioPlayer.createTrackDecoder = function (options) {
+    NemeraAudioPlayer.createTrackDecoder = function (options) {
         return new TrackDecoder(options);
     };
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

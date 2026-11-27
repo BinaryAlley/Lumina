@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.Authorization;
-using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Contracts.Requests.Authorization;
+using Nemera.Contracts.Responses.Authorization;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.GetRolePermissions;
+namespace Nemera.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.GetRolePermissions;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetRolePermissionsEndpoint"/> API endpoint, for OpenAPI.

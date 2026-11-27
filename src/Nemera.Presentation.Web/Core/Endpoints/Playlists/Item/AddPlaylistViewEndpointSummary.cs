@@ -3,7 +3,7 @@ using FastEndpoints;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Playlists.Item;
+namespace Nemera.Presentation.Web.Core.Endpoints.Playlists.Item;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="AddPlaylistViewEndpoint"/> endpoint, for OpenAPI.

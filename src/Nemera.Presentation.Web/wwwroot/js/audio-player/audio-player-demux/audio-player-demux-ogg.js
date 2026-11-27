@@ -45,7 +45,7 @@
  *   - Vorbis: the description is the Xiph extradata format the WebCodecs registration requires: a byte with the count of
  *     lacing values, the lacing values themselves, and then the identification, comment and setup header packets.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -176,7 +176,7 @@
      * @readonly
      * @type {Uint32Array}
      */
-    const OGG_CRC_TABLE = LuminaAudioPlayer.demuxBuildCrcTable(0x04C11DB7, 32);
+    const OGG_CRC_TABLE = NemeraAudioPlayer.demuxBuildCrcTable(0x04C11DB7, 32);
 
     /**
      * Computes the CRC-32 of an OGG page, with the polynomial 0x04C11DB7 and an initial value of zero, over the page
@@ -200,10 +200,10 @@
     /**
      * Demuxes an OGG logical stream, owning the page and packet assembly and leaving the codec specifics to a subclass.
      */
-    class OggDemuxer extends LuminaAudioPlayer.Demuxer {
+    class OggDemuxer extends NemeraAudioPlayer.Demuxer {
         /**
          * Creates an instance of OggDemuxer.
-         * @param {Object} options - The demuxer options, per {@link LuminaAudioPlayer.Demuxer}.
+         * @param {Object} options - The demuxer options, per {@link NemeraAudioPlayer.Demuxer}.
          */
         constructor(options = {}) {
             super(options);
@@ -235,7 +235,7 @@
         /**
          * Reads the next packet of the logical stream, assembling it across pages when it spans them.
          * @returns {Promise<{ data: Uint8Array, granule: number|null }|null>} The packet, or null once the stream ended.
-         * @throws {LuminaAudioPlayer.PlayerError} When the page structure is corrupt.
+         * @throws {NemeraAudioPlayer.PlayerError} When the page structure is corrupt.
          */
         async readRawPacketAsync() {
             while (this.pendingPackets.length === 0) {
@@ -251,7 +251,7 @@
          * meets. Initialization consumes the header packets of a stream once, but a seek may reposition the read cursor
          * onto a page that also carries them, so they are filtered here as well rather than only during initialization.
          * @returns {Promise<Object|null>} The packet, or null once the stream ended.
-         * @throws {LuminaAudioPlayer.PlayerError} When the page structure is corrupt.
+         * @throws {NemeraAudioPlayer.PlayerError} When the page structure is corrupt.
          */
         async readNextAudioPacketAsync() {
             let packet = await this.readRawPacketAsync();
@@ -264,13 +264,13 @@
                 ? Math.max(0, this.granuleToMicros(packet.granule) - duration)
                 : this.timelineMicros;
             this.timelineMicros = timestamp + duration;
-            return LuminaAudioPlayer.createDemuxerPacket(packet.data, timestamp, duration);
+            return NemeraAudioPlayer.createDemuxerPacket(packet.data, timestamp, duration);
         }
 
         /**
          * Reads the next page and turns its lacing values into queued packets, carrying a packet that spans pages over to the next one.
          * @returns {Promise<void>} A promise resolving when the page was consumed.
-         * @throws {LuminaAudioPlayer.PlayerError} When the page structure is corrupt.
+         * @throws {NemeraAudioPlayer.PlayerError} When the page structure is corrupt.
          */
         async readNextPageAsync() {
             const page = await this.readPageAsync(this.pageOffset);
@@ -294,7 +294,7 @@
             }
             const isContinued = (page.headerType & OGG_CONTINUED_FLAG) !== 0;
             if (isContinued !== (this.pendingParts.length > 0))
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The OGG page continuation flags do not line up.', { reason: 'invalid-continuation' });
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The OGG page continuation flags do not line up.', { reason: 'invalid-continuation' });
             const completions = [];
             let dataOffset = 0;
             // The segment table is a list of lacing values. A value of 255 means the packet continues into the next
@@ -306,7 +306,7 @@
                 this.pendingParts.push(slice);
                 this.pendingLength += lace;
                 if (lace < 255) {
-                    completions.push(LuminaAudioPlayer.concatDemuxerBytes(this.pendingParts));
+                    completions.push(NemeraAudioPlayer.concatDemuxerBytes(this.pendingParts));
                     this.pendingParts = [];
                     this.pendingLength = 0;
                 }
@@ -314,7 +314,7 @@
             // A packet can span any number of pages, and its parts are held until it completes, so its size is bounded here
             // rather than left to whatever the stream claims.
             if (this.pendingLength > OGG_MAX_PACKET_BYTES)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The OGG packet being assembled exceeds the size the player accepts.', { reason: 'packet-too-large' });
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The OGG packet being assembled exceeds the size the player accepts.', { reason: 'packet-too-large' });
             const lastCompletion = completions.length - 1;
             for (let index = 0; index < completions.length; index++)
                 this.pendingPackets.push({ data: completions[index], granule: index === lastCompletion ? page.granule : null });
@@ -324,7 +324,7 @@
          * Reads and validates the fixed part of a page header, without reading the segment table or the payload. It is the
          * cheap structural gate a scan runs on every capture pattern: the version and the reserved header type bits reject
          * a false capture before any page sized buffer is allocated or any checksum computed. The page size bound depends
-         * on the lacing values, so it can only be enforced once the segment table is read, in {@link LuminaAudioPlayer.OggDemuxer#finishPageAsync}.
+         * on the lacing values, so it can only be enforced once the segment table is read, in {@link NemeraAudioPlayer.OggDemuxer#finishPageAsync}.
          * @param {number} offset - The offset of the candidate capture pattern.
          * @returns {Promise<Object>} An object with a <c>kind</c> of 'page', 'not-a-page' or 'unsupported-version', and, for a page, the parsed header fields.
          */
@@ -332,7 +332,7 @@
             if (offset < 0)
                 return { kind: 'not-a-page' };
             const header = await this.reader.readAsync(offset, OGG_PAGE_HEADER_BYTES);
-            if (header.length < OGG_PAGE_HEADER_BYTES || !LuminaAudioPlayer.demuxBytesEqualAscii(header, 0, 'OggS'))
+            if (header.length < OGG_PAGE_HEADER_BYTES || !NemeraAudioPlayer.demuxBytesEqualAscii(header, 0, 'OggS'))
                 return { kind: 'not-a-page' };
             if (header[4] !== 0)
                 return { kind: 'unsupported-version' };
@@ -345,9 +345,9 @@
             return {
                 kind: 'page',
                 headerType: header[5],
-                granule: LuminaAudioPlayer.demuxReadInt64LE(header, 6),
-                serial: LuminaAudioPlayer.demuxReadUintLE(header, 14, 4),
-                storedCrc: LuminaAudioPlayer.demuxReadUintLE(header, OGG_CRC_OFFSET, 4),
+                granule: NemeraAudioPlayer.demuxReadInt64LE(header, 6),
+                serial: NemeraAudioPlayer.demuxReadUintLE(header, 14, 4),
+                storedCrc: NemeraAudioPlayer.demuxReadUintLE(header, OGG_CRC_OFFSET, 4),
                 pageSegments: header[26]
             };
         }
@@ -359,7 +359,7 @@
          * @param {boolean} [options.strict] - True to treat a checksum mismatch or an unsupported version as a failure; false to report it as 'not a page'. Defaults to true, and a probe or a scan uses false.
          * @param {number|null} [options.serial] - The serial a page must carry to be accepted, or null to accept any. A scan passes the serial of its logical stream.
          * @returns {Promise<Object|null>} The page, or null at the end of the stream, at a truncated page, or at a page a non strict read refused.
-         * @throws {LuminaAudioPlayer.PlayerError} When a strict read finds an unsupported version or a checksum mismatch.
+         * @throws {NemeraAudioPlayer.PlayerError} When a strict read finds an unsupported version or a checksum mismatch.
          */
         async readPageAsync(offset, options = {}) {
             const strict = options.strict !== false;
@@ -369,7 +369,7 @@
             if (probe.kind === 'unsupported-version') {
                 if (!strict)
                     return null;
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The OGG page uses an unsupported version.', { reason: 'unsupported-ogg-version' });
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The OGG page uses an unsupported version.', { reason: 'unsupported-ogg-version' });
             }
             if (options.serial !== undefined && options.serial !== null && probe.serial !== options.serial)
                 return null;
@@ -381,10 +381,10 @@
          * checksum over the page with its own CRC field read as zero, and returns the page. The data a page carries is
          * exposed as a view of the one buffer that was read, so validating a page allocates a single page sized buffer.
          * @param {number} offset - The offset of the page's capture pattern.
-         * @param {Object} probe - The parsed header, per {@link LuminaAudioPlayer.OggDemuxer#readPageHeaderAsync}.
+         * @param {Object} probe - The parsed header, per {@link NemeraAudioPlayer.OggDemuxer#readPageHeaderAsync}.
          * @param {boolean} strict - True to treat a checksum mismatch as a failure, false to report it as 'not a page'.
          * @returns {Promise<Object|null>} The page, or null when it is truncated or refused.
-         * @throws {LuminaAudioPlayer.PlayerError} When a strict read finds a checksum mismatch.
+         * @throws {NemeraAudioPlayer.PlayerError} When a strict read finds a checksum mismatch.
          */
         async finishPageAsync(offset, probe, strict) {
             const segmentTable = await this.reader.readAsync(offset + OGG_PAGE_HEADER_BYTES, probe.pageSegments);
@@ -401,7 +401,7 @@
             if (computeOggCrc(pageBytes, OGG_CRC_OFFSET, 4) !== (probe.storedCrc >>> 0)) {
                 if (!strict)
                     return null;
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The OGG page checksum does not match.', { reason: 'page-crc-mismatch' });
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The OGG page checksum does not match.', { reason: 'page-crc-mismatch' });
             }
             return Object.freeze({
                 offset,
@@ -423,7 +423,7 @@
          * @param {number|null} [limit] - The exclusive end of the search, or null to search to the end of the stream.
          * @param {{ remaining: number }} [budget] - The shared validation budget, or null for a fresh one.
          * @returns {Promise<Object|null>} The page, or null when there is none before the limit.
-         * @throws {LuminaAudioPlayer.PlayerError} When the scan gives up on a corrupt or crafted region.
+         * @throws {NemeraAudioPlayer.PlayerError} When the scan gives up on a corrupt or crafted region.
          */
         async findPageAtOrAfterAsync(offset, limit, budget) {
             const end = this.reader.getLength();
@@ -440,7 +440,7 @@
             // A capture pattern that turns out not to be a valid page is skipped and the search resumes just past it, so
             // the loop repeats until a page is accepted or the cursor reaches the end of the search limit.
             while (scanLimit === null || cursor < scanLimit) {
-                const found = await LuminaAudioPlayer.scanForFrameAsync(this.reader, cursor, scanLimit, OGG_CAPTURE_PATTERN, async (candidate) => {
+                const found = await NemeraAudioPlayer.scanForFrameAsync(this.reader, cursor, scanLimit, OGG_CAPTURE_PATTERN, async (candidate) => {
                     // A cheap header probe is a unit of work too, so a stream whose body is tiled with capture patterns
                     // that fail the gate cannot make a seek do an unbounded number of probes.
                     if (!consumeBudget(shared))
@@ -477,7 +477,7 @@
                 return null;
             const bytes = await this.reader.copyAsync(start, offset - start);
             for (let index = bytes.length - OGG_CAPTURE_PATTERN.length; index >= 0; index--) {
-                if (!LuminaAudioPlayer.demuxBytesEqualAscii(bytes, index, 'OggS'))
+                if (!NemeraAudioPlayer.demuxBytesEqualAscii(bytes, index, 'OggS'))
                     continue;
                 const candidateOffset = start + index;
                 if (!consumeBudget(shared))
@@ -535,7 +535,7 @@
             const bytes = tail.bytes;
             const budget = { remaining: OGG_MAX_SCAN_VALIDATIONS };
             for (let index = bytes.length - OGG_CAPTURE_PATTERN.length; index >= 0; index--) {
-                if (!LuminaAudioPlayer.demuxBytesEqualAscii(bytes, index, 'OggS'))
+                if (!NemeraAudioPlayer.demuxBytesEqualAscii(bytes, index, 'OggS'))
                     continue;
                 const offset = tail.offset + index;
                 if (!consumeBudget(budget))
@@ -566,7 +566,7 @@
          * bounded span, so the whole seek is bounded even against a stream whose middle is filled with the capture pattern.
          * @param {number} seconds - The target time, in seconds.
          * @returns {Promise<number|null>} The byte offset it repositioned to, or null when the stream cannot be seeked.
-         * @throws {LuminaAudioPlayer.PlayerError} When the scan for a page gives up on a corrupt or crafted region.
+         * @throws {NemeraAudioPlayer.PlayerError} When the scan for a page gives up on a corrupt or crafted region.
          */
         async seekToTimeAsync(seconds) {
             this.ensureInitialized();
@@ -671,10 +671,10 @@
          * would be silent.
          * @param {Uint8Array} data - The packet bytes.
          * @returns {number} The duration in microseconds.
-         * @throws {LuminaAudioPlayer.PlayerError} When the codec does not implement it.
+         * @throws {NemeraAudioPlayer.PlayerError} When the codec does not implement it.
          */
         computePacketDurationMicros(data) {
-            throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'This OGG demuxer does not implement computePacketDurationMicros.');
+            throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'This OGG demuxer does not implement computePacketDurationMicros.');
         }
 
         /**
@@ -683,10 +683,10 @@
          * unchanged would report a wrong timeline for the codec that forgot to override it.
          * @param {number} granule - The granule position.
          * @returns {number} The media time in microseconds.
-         * @throws {LuminaAudioPlayer.PlayerError} When the codec does not implement it.
+         * @throws {NemeraAudioPlayer.PlayerError} When the codec does not implement it.
          */
         granuleToMicros(granule) {
-            throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'This OGG demuxer does not implement granuleToMicros.');
+            throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'This OGG demuxer does not implement granuleToMicros.');
         }
 
         /**
@@ -727,10 +727,10 @@
          * left behind rather than the ones it measured.
          * @param {Array<{ data: Uint8Array, granule: number|null }>} packets - The packets to measure.
          * @returns {number} The total duration in microseconds.
-         * @throws {LuminaAudioPlayer.PlayerError} When the codec does not implement it.
+         * @throws {NemeraAudioPlayer.PlayerError} When the codec does not implement it.
          */
         measurePacketsDurationMicros(packets) {
-            throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'This OGG demuxer does not implement measurePacketsDurationMicros.');
+            throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'This OGG demuxer does not implement measurePacketsDurationMicros.');
         }
     }
 
@@ -803,7 +803,7 @@
     class OggOpusDemuxer extends OggDemuxer {
         /**
          * Creates an instance of OggOpusDemuxer.
-         * @param {Object} options - The demuxer options, per {@link LuminaAudioPlayer.Demuxer}.
+         * @param {Object} options - The demuxer options, per {@link NemeraAudioPlayer.Demuxer}.
          */
         constructor(options = {}) {
             super(options);
@@ -816,13 +816,13 @@
         /**
          * Reads the OpusHead and the OpusTags packets and positions the read cursor on the first audio packet.
          * @returns {Promise<void>} A promise resolving when the stream is ready to be read.
-         * @throws {LuminaAudioPlayer.PlayerError} When the bytes are not an OGG Opus stream.
+         * @throws {NemeraAudioPlayer.PlayerError} When the bytes are not an OGG Opus stream.
          */
         async initializeAsync() {
             if (this.isInitialized())
                 return;
             if (this.destroyed)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The demuxer was destroyed.');
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The demuxer was destroyed.');
             try {
                 this.pageOffset = 0;
                 this.pendingParts = [];
@@ -830,18 +830,18 @@
                 this.pendingPackets = [];
                 this.currentSerial = null;
                 const head = await this.readRawPacketAsync();
-                if (!head || !LuminaAudioPlayer.demuxBytesEqualAscii(head.data, 0, 'OpusHead'))
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The OGG stream is not an Opus stream.', { reason: 'no-opus-head' });
+                if (!head || !NemeraAudioPlayer.demuxBytesEqualAscii(head.data, 0, 'OpusHead'))
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The OGG stream is not an Opus stream.', { reason: 'no-opus-head' });
                 if (head.data.length < 19)
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The OpusHead packet is too short.', { reason: 'invalid-opus-head' });
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The OpusHead packet is too short.', { reason: 'invalid-opus-head' });
                 this.channels = head.data[9];
-                this.preSkip = LuminaAudioPlayer.demuxReadIntLE(head.data, 10, 2) || 0;
+                this.preSkip = NemeraAudioPlayer.demuxReadIntLE(head.data, 10, 2) || 0;
                 if (this.channels <= 0)
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The OpusHead packet names no channels.', { reason: 'invalid-opus-head' });
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The OpusHead packet names no channels.', { reason: 'invalid-opus-head' });
                 this.description = head.data.slice();
                 // The mapping requires the OpusTags comment packet after the identification header; any further packet is audio.
                 const tags = await this.readRawPacketAsync();
-                if (tags && !LuminaAudioPlayer.demuxBytesEqualAscii(tags.data, 0, 'OpusTags'))
+                if (tags && !NemeraAudioPlayer.demuxBytesEqualAscii(tags.data, 0, 'OpusTags'))
                     // A stream that skips its comment packet is malformed, but the packet is kept so it is not lost.
                     this.pendingPackets.unshift(tags);
                 const lastGranule = await this.probeLastGranuleAsync();
@@ -878,14 +878,14 @@
          * @returns {boolean} True when the packet is the identification or the comment header.
          */
         isHeaderPacket(data) {
-            return LuminaAudioPlayer.demuxBytesEqualAscii(data, 0, 'OpusHead')
-                || LuminaAudioPlayer.demuxBytesEqualAscii(data, 0, 'OpusTags');
+            return NemeraAudioPlayer.demuxBytesEqualAscii(data, 0, 'OpusHead')
+                || NemeraAudioPlayer.demuxBytesEqualAscii(data, 0, 'OpusTags');
         }
 
         /**
          * Reads the next Opus audio packet.
          * @returns {Promise<Object|null>} The packet, or null once the stream ended.
-         * @throws {LuminaAudioPlayer.PlayerError} When the stream can no longer be parsed.
+         * @throws {NemeraAudioPlayer.PlayerError} When the stream can no longer be parsed.
          */
         async readPacketAsync() {
             this.ensureInitialized();
@@ -904,7 +904,7 @@
          * @returns {number} The duration in microseconds.
          */
         computePacketDurationMicros(data) {
-            return LuminaAudioPlayer.samplesToMicroseconds(getOpusPacketSamples(data), OPUS_GRANULE_RATE);
+            return NemeraAudioPlayer.samplesToMicroseconds(getOpusPacketSamples(data), OPUS_GRANULE_RATE);
         }
 
         /**
@@ -929,7 +929,7 @@
          * @returns {number} The media time in microseconds.
          */
         granuleToMicros(granule) {
-            return LuminaAudioPlayer.samplesToMicroseconds(Math.max(0, granule - this.preSkip), OPUS_GRANULE_RATE);
+            return NemeraAudioPlayer.samplesToMicroseconds(Math.max(0, granule - this.preSkip), OPUS_GRANULE_RATE);
         }
     }
 
@@ -939,7 +939,7 @@
     class OggVorbisDemuxer extends OggDemuxer {
         /**
          * Creates an instance of OggVorbisDemuxer.
-         * @param {Object} options - The demuxer options, per {@link LuminaAudioPlayer.Demuxer}.
+         * @param {Object} options - The demuxer options, per {@link NemeraAudioPlayer.Demuxer}.
          */
         constructor(options = {}) {
             super(options);
@@ -954,13 +954,13 @@
         /**
          * Reads the identification, comment and setup header packets and positions the read cursor on the first audio packet.
          * @returns {Promise<void>} A promise resolving when the stream is ready to be read.
-         * @throws {LuminaAudioPlayer.PlayerError} When the bytes are not an OGG Vorbis stream.
+         * @throws {NemeraAudioPlayer.PlayerError} When the bytes are not an OGG Vorbis stream.
          */
         async initializeAsync() {
             if (this.isInitialized())
                 return;
             if (this.destroyed)
-                throw this.createError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The demuxer was destroyed.');
+                throw this.createError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The demuxer was destroyed.');
             try {
                 this.pageOffset = 0;
                 this.pendingParts = [];
@@ -970,22 +970,22 @@
                 const identification = await this.readRawPacketAsync();
                 if (!identification || identification.data.length < 30
                     || identification.data[0] !== 0x01
-                    || !LuminaAudioPlayer.demuxBytesEqualAscii(identification.data, 1, 'vorbis'))
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The OGG stream is not a Vorbis stream.', { reason: 'no-vorbis-identification' });
+                    || !NemeraAudioPlayer.demuxBytesEqualAscii(identification.data, 1, 'vorbis'))
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The OGG stream is not a Vorbis stream.', { reason: 'no-vorbis-identification' });
                 this.channels = identification.data[11];
-                this.sampleRate = LuminaAudioPlayer.demuxReadUintLE(identification.data, 12, 4) || 0;
+                this.sampleRate = NemeraAudioPlayer.demuxReadUintLE(identification.data, 12, 4) || 0;
                 // The block size byte of the identification header holds the two base-two exponents of the short and the long block size, one per nibble, so the sizes themselves are powers of two.
                 const blockSizeByte = identification.data[28];
                 this.blockSizes = [1 << (blockSizeByte & 0x0F), 1 << ((blockSizeByte >> 4) & 0x0F)];
                 if (this.channels <= 0 || this.sampleRate <= 0 || this.blockSizes[0] < 16 || this.blockSizes[1] < this.blockSizes[0])
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The Vorbis identification header is invalid.', { reason: 'invalid-vorbis-identification' });
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The Vorbis identification header is invalid.', { reason: 'invalid-vorbis-identification' });
                 const comment = await this.readRawPacketAsync();
                 const setup = await this.readRawPacketAsync();
                 if (!comment || !setup)
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The Vorbis stream is missing its header packets.', { reason: 'missing-vorbis-headers' });
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The Vorbis stream is missing its header packets.', { reason: 'missing-vorbis-headers' });
                 const description = buildXiphExtradata([identification.data, comment.data, setup.data]);
                 if (!description)
-                    throw this.createError(LuminaAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The Vorbis header packets are too large for the codec private data format.', { reason: 'vorbis-headers-too-large' });
+                    throw this.createError(NemeraAudioPlayer.PlayerErrorCode.DEMUX_FAILED, 'The Vorbis header packets are too large for the codec private data format.', { reason: 'vorbis-headers-too-large' });
                 this.description = description;
                 const lastGranule = await this.probeLastGranuleAsync();
                 if (lastGranule !== null) {
@@ -1025,7 +1025,7 @@
             if (!data || data.length < 7)
                 return false;
             const type = data[0];
-            return (type === 0x01 || type === 0x03 || type === 0x05) && LuminaAudioPlayer.demuxBytesEqualAscii(data, 1, 'vorbis');
+            return (type === 0x01 || type === 0x03 || type === 0x05) && NemeraAudioPlayer.demuxBytesEqualAscii(data, 1, 'vorbis');
         }
 
         /**
@@ -1042,7 +1042,7 @@
                     continue;
                 const blockSize = this.blockSizes[(packet.data[0] >> 7) & 0x01];
                 const prior = previous === null ? blockSize : previous;
-                total += LuminaAudioPlayer.samplesToMicroseconds(Math.floor((prior + blockSize) / 4), this.sampleRate);
+                total += NemeraAudioPlayer.samplesToMicroseconds(Math.floor((prior + blockSize) / 4), this.sampleRate);
                 previous = blockSize;
             }
             return total;
@@ -1051,7 +1051,7 @@
         /**
          * Reads the next Vorbis audio packet.
          * @returns {Promise<Object|null>} The packet, or null once the stream ended.
-         * @throws {LuminaAudioPlayer.PlayerError} When the stream can no longer be parsed.
+         * @throws {NemeraAudioPlayer.PlayerError} When the stream can no longer be parsed.
          */
         async readPacketAsync() {
             this.ensureInitialized();
@@ -1079,7 +1079,7 @@
             const previous = this.lastBlockSize === null ? blockSize : this.lastBlockSize;
             this.lastBlockSize = blockSize;
             const samples = Math.floor((previous + blockSize) / 4);
-            return LuminaAudioPlayer.samplesToMicroseconds(samples, this.sampleRate);
+            return NemeraAudioPlayer.samplesToMicroseconds(samples, this.sampleRate);
         }
 
         /**
@@ -1088,26 +1088,26 @@
          * @returns {number} The media time in microseconds.
          */
         granuleToMicros(granule) {
-            return LuminaAudioPlayer.samplesToMicroseconds(Math.max(0, granule), this.sampleRate);
+            return NemeraAudioPlayer.samplesToMicroseconds(Math.max(0, granule), this.sampleRate);
         }
     }
 
-    LuminaAudioPlayer.OggDemuxer = OggDemuxer;
-    LuminaAudioPlayer.OggOpusDemuxer = OggOpusDemuxer;
-    LuminaAudioPlayer.OggVorbisDemuxer = OggVorbisDemuxer;
-    LuminaAudioPlayer.computeOggCrc = computeOggCrc;
+    NemeraAudioPlayer.OggDemuxer = OggDemuxer;
+    NemeraAudioPlayer.OggOpusDemuxer = OggOpusDemuxer;
+    NemeraAudioPlayer.OggVorbisDemuxer = OggVorbisDemuxer;
+    NemeraAudioPlayer.computeOggCrc = computeOggCrc;
 
-    LuminaAudioPlayer.registerDemuxer({
-        container: LuminaAudioPlayer.DemuxerContainer.OGG,
-        codec: LuminaAudioPlayer.DemuxerCodec.OPUS,
-        probe: LuminaAudioPlayer.AUDIO_CODEC_PROBES.OPUS,
+    NemeraAudioPlayer.registerDemuxer({
+        container: NemeraAudioPlayer.DemuxerContainer.OGG,
+        codec: NemeraAudioPlayer.DemuxerCodec.OPUS,
+        probe: NemeraAudioPlayer.AUDIO_CODEC_PROBES.OPUS,
         create: (options) => new OggOpusDemuxer(options)
     });
 
-    LuminaAudioPlayer.registerDemuxer({
-        container: LuminaAudioPlayer.DemuxerContainer.OGG,
-        codec: LuminaAudioPlayer.DemuxerCodec.VORBIS,
-        probe: LuminaAudioPlayer.AUDIO_CODEC_PROBES.VORBIS,
+    NemeraAudioPlayer.registerDemuxer({
+        container: NemeraAudioPlayer.DemuxerContainer.OGG,
+        codec: NemeraAudioPlayer.DemuxerCodec.VORBIS,
+        probe: NemeraAudioPlayer.AUDIO_CODEC_PROBES.VORBIS,
         create: (options) => new OggVorbisDemuxer(options)
     });
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

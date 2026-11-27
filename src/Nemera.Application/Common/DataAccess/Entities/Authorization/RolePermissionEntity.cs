@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.Common;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.Authorization;
+namespace Nemera.Application.Common.DataAccess.Entities.Authorization;
 
 /// <summary>
 /// Represents the association between a role and a permission within the authorization system.

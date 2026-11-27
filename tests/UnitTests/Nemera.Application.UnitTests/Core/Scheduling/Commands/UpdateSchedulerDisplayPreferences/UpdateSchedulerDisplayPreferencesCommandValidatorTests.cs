@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
-using Lumina.Application.Fixtures.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
-using Lumina.Application.Common.Errors;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
+using Nemera.Application.Fixtures.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
+namespace Nemera.Application.UnitTests.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdateSchedulerDisplayPreferencesCommandValidator"/> class.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.Pdf.Core;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.Pdf.Core;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.Pdf.UnitTests.Core;
+namespace Nemera.Plugins.Pdf.UnitTests.Core;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PdfReader"/> class.

@@ -1,26 +1,26 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DTO.Favorites;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Common.Interceptors;
-using Lumina.DataAccess.Core.Repositories.Favorites;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DTO.Favorites;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Common.Interceptors;
+using Nemera.DataAccess.Core.Repositories.Favorites;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -31,10 +31,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.Favorites;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.Favorites;
 
 /// <summary>
 /// Contains integration tests for the <see cref="FavoriteRepository"/> class, exercising it against a real SQLite database.
@@ -61,7 +61,7 @@ public class FavoriteRepositoryTests
         using SqliteConnection anchorConnection = CreateAnchorConnection("insert");
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         FavoriteRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         Guid mediaItemId = Guid.NewGuid();
@@ -104,7 +104,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("delete-tracked");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -134,7 +134,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("delete-stored");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -150,7 +150,7 @@ public class FavoriteRepositoryTests
 
         // Assert
         Assert.False(result.IsFailure);
-        using LuminaDbContext verificationContext = CreateContext(anchorConnection);
+        using NemeraDbContext verificationContext = CreateContext(anchorConnection);
         Assert.False(await verificationContext.Favorites.AsNoTracking().AnyAsync(candidate => candidate.Id == seededFavorite.Id));
     }
 
@@ -159,7 +159,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("delete-missing");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -182,7 +182,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("get-matching");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         Guid otherUserId = Guid.NewGuid();
@@ -211,7 +211,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("get-other-user");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         Guid otherUserId = Guid.NewGuid();
@@ -233,7 +233,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("get-other-kind");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -256,7 +256,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("get-tracked");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -281,7 +281,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("get-untracked");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -304,7 +304,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("get-missing");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
 
         // Act
@@ -324,7 +324,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection($"library-id-{mediaKind}");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid artistLibraryId = Guid.NewGuid();
         Guid albumLibraryId = Guid.NewGuid();
@@ -354,7 +354,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("library-id-deleted-book");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         BookEntity deletedBook = _bookEntityFixture.Create(
             libraryId: Guid.NewGuid(),
@@ -378,7 +378,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("library-id-missing");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
 
         // Act
@@ -397,7 +397,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection($"library-id-planned-{(int)mediaKind}");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = _artistEntityFixture.Create(libraryId: libraryId, includeAlbums: false, includeContributors: false);
@@ -418,7 +418,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-user");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         Guid otherUserId = Guid.NewGuid();
@@ -443,7 +443,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-all-kinds");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -471,7 +471,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-one-kind");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -496,7 +496,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-no-pagination");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -520,7 +520,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-pages");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -561,7 +561,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-page-clamp");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -590,7 +590,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-order");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -620,7 +620,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-empty-page");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -644,7 +644,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-empty");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -667,7 +667,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-display-artist");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         Guid libraryId = Guid.NewGuid();
@@ -713,7 +713,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-display-album");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         Guid libraryId = Guid.NewGuid();
@@ -755,7 +755,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-display-track");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         Guid libraryId = Guid.NewGuid();
@@ -800,7 +800,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-display-book");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         Guid libraryId = Guid.NewGuid();
@@ -860,7 +860,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-missing-item");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -883,7 +883,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-deleted-book");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         Guid libraryId = Guid.NewGuid();
@@ -917,7 +917,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection($"list-planned-{mediaKind}");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -940,7 +940,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-multi-kind");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         Guid libraryId = Guid.NewGuid();
@@ -989,7 +989,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("list-chunk");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         Guid libraryId = Guid.NewGuid();
@@ -1028,7 +1028,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("favorited-ids");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -1057,7 +1057,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("favorited-ids-filters");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         Guid otherUserId = Guid.NewGuid();
@@ -1083,7 +1083,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("favorited-ids-duplicate");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -1105,7 +1105,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection("favorited-ids-empty");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -1130,7 +1130,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection($"library-id-deleted-music-{(int)mediaKind}-{isAncestorDeleted}");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid mediaItemId = await SeedSoftDeletedMusicItemAsync(context, mediaKind, isAncestorDeleted);
 
@@ -1153,7 +1153,7 @@ public class FavoriteRepositoryTests
     {
         // Arrange
         using SqliteConnection anchorConnection = CreateAnchorConnection($"list-deleted-music-{(int)mediaKind}-{isAncestorDeleted}");
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         FavoriteRepository sut = new(context);
         Guid userId = Guid.NewGuid();
         context.Users.Add(_userEntityFixture.Create(id: userId));
@@ -1180,7 +1180,7 @@ public class FavoriteRepositoryTests
     /// <returns>The open anchor connection that keeps the database alive for the duration of the test.</returns>
     private static SqliteConnection CreateAnchorConnection(string testName)
     {
-        SqliteConnection anchorConnection = new($"Data Source=luminadataccess-favoriterepo-{testName}-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-favoriterepo-{testName}-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         return anchorConnection;
     }
@@ -1190,9 +1190,9 @@ public class FavoriteRepositoryTests
     /// </summary>
     /// <param name="anchorConnection">The open in-memory SQLite connection that keeps the database alive for the duration of the test.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateContext(SqliteConnection anchorConnection)
+    private static NemeraDbContext CreateContext(SqliteConnection anchorConnection)
     {
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .Options);
         context.Database.EnsureCreated();
@@ -1206,13 +1206,13 @@ public class FavoriteRepositoryTests
     /// <param name="userId">The Id of the user reported as the current user.</param>
     /// <param name="utcNow">The current UTC time reported by the time provider.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
+    private static NemeraDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
     {
         ICurrentUserService currentUserService = Substitute.For<ICurrentUserService>();
         currentUserService.UserId.Returns(userId);
         IDateTimeProvider dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(utcNow);
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .AddInterceptors(new UpdateAuditableEntitiesInterceptor(currentUserService, dateTimeProvider))
             .Options);
@@ -1254,7 +1254,7 @@ public class FavoriteRepositoryTests
     /// <param name="mediaKind">The kind of the media item that must be hidden from the catalogue.</param>
     /// <param name="isAncestorDeleted">Whether an ancestor of the item is soft deleted instead of the item itself.</param>
     /// <returns>The Id of the hidden media item.</returns>
-    private async Task<Guid> SeedSoftDeletedMusicItemAsync(LuminaDbContext context, FavoriteMediaKind mediaKind, bool isAncestorDeleted)
+    private async Task<Guid> SeedSoftDeletedMusicItemAsync(NemeraDbContext context, FavoriteMediaKind mediaKind, bool isAncestorDeleted)
     {
         Guid libraryId = Guid.NewGuid();
         ArtistEntity artist = _artistEntityFixture.Create(libraryId: libraryId, includeAlbums: false, includeContributors: false);
@@ -1317,7 +1317,7 @@ public class FavoriteRepositoryTests
     /// <param name="bookLibraryId">The Id of the library that owns the book.</param>
     /// <returns>The seeded catalogue entities.</returns>
     private async Task<(ArtistEntity Artist, AlbumEntity Album, TrackEntity Track, BookEntity Book)> SeedCatalogueAsync(
-        LuminaDbContext context,
+        NemeraDbContext context,
         Guid artistLibraryId,
         Guid albumLibraryId,
         Guid trackLibraryId,

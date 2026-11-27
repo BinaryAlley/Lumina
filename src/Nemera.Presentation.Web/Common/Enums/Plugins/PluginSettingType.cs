@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.Enums.Plugins;
+namespace Nemera.Presentation.Web.Common.Enums.Plugins;
 
 /// <summary>
 /// Enumeration for the types of a plugin setting.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+namespace Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
 
 /// <summary>
 /// Fixture class for the <see cref="UserPermissionEntity"/> class.

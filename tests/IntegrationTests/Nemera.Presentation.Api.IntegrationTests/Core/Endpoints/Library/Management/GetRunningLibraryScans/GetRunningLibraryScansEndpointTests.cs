@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Presentation.Api.Core.Endpoints.Library.Management.GetRunningLibraryScans;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Presentation.Api.Core.Endpoints.Library.Management.GetRunningLibraryScans;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -12,16 +12,16 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Library.Management.GetRunningLibraryScans;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Library.Management.GetRunningLibraryScans;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetRunningLibraryScansEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetRunningLibraryScansEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetRunningLibraryScansEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -32,7 +32,7 @@ public class GetRunningLibraryScansEndpointTests : IClassFixture<AuthenticatedLu
     /// Initializes a new instance of the <see cref="GetRunningLibraryScansEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetRunningLibraryScansEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetRunningLibraryScansEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;

@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Themes;
+namespace Nemera.Presentation.Web.Common.DTO.Themes;
 
 /// <summary>
 /// Data transfer object for the page content handed to the layout renderer, which wraps it in the themed shell.

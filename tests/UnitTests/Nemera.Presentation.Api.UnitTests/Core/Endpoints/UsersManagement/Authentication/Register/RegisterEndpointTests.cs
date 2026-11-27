@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
-using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
-using Lumina.Contracts.Fixtures.Core.Responses.Authentication;
-using Lumina.Contracts.Requests.Authentication;
-using Lumina.Contracts.Responses.Authentication;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.Register;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
+using Nemera.Contracts.Fixtures.Core.Requests.Authentication;
+using Nemera.Contracts.Fixtures.Core.Responses.Authentication;
+using Nemera.Contracts.Requests.Authentication;
+using Nemera.Contracts.Responses.Authentication;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.Register;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authentication.Register;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authentication.Register;
 
 /// <summary>
 /// Contains unit tests for the <see cref="RegisterEndpoint"/> class.

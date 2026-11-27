@@ -1,4 +1,4 @@
-namespace Lumina.Application.Common.DTO.MediaLibrary.Management;
+namespace Nemera.Application.Common.DTO.MediaLibrary.Management;
 
 /// <summary>
 /// Data transfer object for one part of the path template of a media library, carried by the commands that create or update a media library.

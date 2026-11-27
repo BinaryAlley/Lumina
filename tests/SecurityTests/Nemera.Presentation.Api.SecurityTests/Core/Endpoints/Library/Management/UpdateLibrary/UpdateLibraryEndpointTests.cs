@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
-using Lumina.Contracts.Requests.MediaLibrary.Management;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaLibrary.Management;
+using Nemera.Contracts.Requests.MediaLibrary.Management;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,16 +17,16 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.Management.UpdateLibrary;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Library.Management.UpdateLibrary;
 
 /// <summary>
 /// Contains security tests for the <see cref="UpdateLibraryEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
+public class UpdateLibraryEndpointTests : IClassFixture<NemeraApiFactory>
 {
     private readonly HttpClient _client;
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -38,7 +38,7 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
     /// Initializes a new instance of the <see cref="UpdateLibraryEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public UpdateLibraryEndpointTests(LuminaApiFactory apiFactory)
+    public UpdateLibraryEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
@@ -116,7 +116,7 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(library => library.Id == libraryId);
         Assert.NotNull(storedLibrary);
         Assert.Equal(maliciousTitle, storedLibrary!.Title);
@@ -159,7 +159,7 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(library => library.Id == libraryId);
         Assert.NotNull(storedLibrary);
         Assert.True(storedLibrary!.ShouldTrackConsumptionProgress);
@@ -202,7 +202,7 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         Assert.DoesNotContain(AppContext.BaseDirectory, content, StringComparison.OrdinalIgnoreCase);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(library => library.Id == libraryId);
         Assert.NotNull(storedLibrary);
         Assert.True(storedLibrary!.ShouldTrackConsumptionProgress);
@@ -261,7 +261,7 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
 
         using (IServiceScope scope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(library => library.Id == libraryId);
             Assert.NotNull(storedLibrary);
             Assert.True(storedLibrary!.ShouldTrackConsumptionProgress);
@@ -302,7 +302,7 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         using (IServiceScope scope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(library => library.Id == libraryId);
             Assert.NotNull(storedLibrary);
             Assert.Equal("Original Title", storedLibrary!.Title);
@@ -342,7 +342,7 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         using (IServiceScope scope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(library => library.Id == libraryId);
             Assert.NotNull(storedLibrary);
             Assert.Equal("Original Title", storedLibrary!.Title);
@@ -385,7 +385,7 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         using (IServiceScope scope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(library => library.Id == libraryId);
             Assert.NotNull(storedLibrary);
             Assert.Equal(ownerId, storedLibrary!.UserId);
@@ -443,7 +443,7 @@ public class UpdateLibraryEndpointTests : IClassFixture<LuminaApiFactory>
         int? completionThresholdPercentage = null)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         dbContext.Libraries.Add(_libraryEntityFixture.Create(
             id: libraryId,
             userId: userId,

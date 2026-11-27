@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Artists;
+using Nemera.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Artists;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.SaveMusicArtist;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.SaveMusicArtist;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="SaveMusicArtistEndpoint"/> endpoint, for OpenAPI.

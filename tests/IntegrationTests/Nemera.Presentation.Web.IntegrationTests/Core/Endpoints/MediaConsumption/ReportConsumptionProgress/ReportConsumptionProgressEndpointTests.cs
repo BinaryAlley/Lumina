@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Common.Enums.MediaConsumption;
-using Lumina.Presentation.Web.Common.Requests.MediaConsumption;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.MediaConsumption.ReportConsumptionProgress;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.MediaConsumption;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Common.Enums.MediaConsumption;
+using Nemera.Presentation.Web.Common.Requests.MediaConsumption;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.MediaConsumption.ReportConsumptionProgress;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.MediaConsumption;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -19,19 +19,19 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.MediaConsumption.ReportConsumptionProgress;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.MediaConsumption.ReportConsumptionProgress;
 
 /// <summary>
 /// Contains integration tests for the <see cref="ReportConsumptionProgressEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class ReportConsumptionProgressEndpointTests : IClassFixture<LuminaWebFactory>
+public class ReportConsumptionProgressEndpointTests : IClassFixture<NemeraWebFactory>
 {
     private const string ZERO_GUID = "00000000-0000-0000-0000-000000000000";
 
     private static readonly Guid s_recordId = Guid.Parse("33333333-3333-3333-3333-333333333333");
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly ConsumptionRecordDtoFixture _consumptionRecordDtoFixture = new();
     private readonly MediaPositionRequestFixture _mediaPositionRequestFixture = new();
     private readonly ReportConsumptionProgressRequestFixture _reportConsumptionProgressRequestFixture = new();
@@ -40,7 +40,7 @@ public class ReportConsumptionProgressEndpointTests : IClassFixture<LuminaWebFac
     /// Initializes a new instance of the <see cref="ReportConsumptionProgressEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public ReportConsumptionProgressEndpointTests(LuminaWebFactory apiFactory)
+    public ReportConsumptionProgressEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

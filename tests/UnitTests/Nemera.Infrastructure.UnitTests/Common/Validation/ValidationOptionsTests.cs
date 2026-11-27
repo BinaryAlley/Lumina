@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Infrastructure.Common.Validation;
-using Lumina.Infrastructure.Fixtures.Common.Validation;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Infrastructure.Common.Validation;
+using Nemera.Infrastructure.Fixtures.Common.Validation;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using System;
@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Common.Validation;
+namespace Nemera.Infrastructure.UnitTests.Common.Validation;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ValidationOptions"/> class.

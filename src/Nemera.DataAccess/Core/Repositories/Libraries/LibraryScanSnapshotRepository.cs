@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using Dapper;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.DataAccess.Core.UoW;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Libraries;
+namespace Nemera.DataAccess.Core.Repositories.Libraries;
 
 /// <summary>
 /// Repository for media library scan snapshots.
@@ -25,15 +25,15 @@ namespace Lumina.DataAccess.Core.Repositories.Libraries;
 /// </remarks>
 internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryScanSnapshotRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext, used to derive the database connection string.</param>
-    public LibraryScanSnapshotRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext, used to derive the database connection string.</param>
+    public LibraryScanSnapshotRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -221,7 +221,7 @@ internal sealed class LibraryScanSnapshotRepository : ILibraryScanSnapshotReposi
     /// <returns>The opened database connection.</returns>
     private async Task<SqliteConnection> OpenConnectionAsync(CancellationToken cancellationToken)
     {
-        SqliteConnection connection = new(_luminaDbContext.Database.GetDbConnection().ConnectionString);
+        SqliteConnection connection = new(_nemeraDbContext.Database.GetDbConnection().ConnectionString);
         await connection.OpenAsync(cancellationToken);
         return connection;
     }

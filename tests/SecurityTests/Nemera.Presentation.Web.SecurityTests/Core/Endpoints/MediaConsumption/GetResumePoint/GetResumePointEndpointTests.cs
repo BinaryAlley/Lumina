@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Common.Enums.MediaConsumption;
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Core.Endpoints.MediaConsumption.GetResumePoint;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Common.Enums.MediaConsumption;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Core.Endpoints.MediaConsumption.GetResumePoint;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -18,18 +18,18 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.MediaConsumption.GetResumePoint;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.MediaConsumption.GetResumePoint;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetResumePointEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetResumePointEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class GetResumePointEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string ZERO_GUID = "00000000-0000-0000-0000-000000000000";
     private const string RESUME_POINT_ENDPOINT_PREFIX = "users/me/media-resume-points/";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly ResumePointDtoFixture _resumePointDtoFixture = new();
     private readonly ProblemDetailsDtoFixture _problemDetailsDtoFixture = new();
 
@@ -37,7 +37,7 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaWebFactory>, IDis
     /// Initializes a new instance of the <see cref="GetResumePointEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetResumePointEndpointTests(LuminaWebFactory apiFactory)
+    public GetResumePointEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -87,7 +87,7 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaWebFactory>, IDis
         Assert.DoesNotContain(payload, string.Join(",", endpointCalls), StringComparison.Ordinal);
         Assert.DoesNotContain(Uri.EscapeDataString(payload), string.Join(",", endpointCalls), StringComparison.Ordinal);
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     [Theory]
@@ -136,7 +136,7 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaWebFactory>, IDis
         Assert.DoesNotContain(CRAFTED_MEDIA_KIND, string.Join(",", GetResumePointCalls()), StringComparison.Ordinal);
         Assert.DoesNotContain(Uri.EscapeDataString(CRAFTED_MEDIA_KIND), string.Join(",", GetResumePointCalls()), StringComparison.Ordinal);
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
         Assert.All(GetResumePointCalls(), endpoint => Assert.Equal(sanitizedEndpoint, endpoint));
     }
 
@@ -208,7 +208,7 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaWebFactory>, IDis
         Assert.Contains("Cookie", response.Headers.Vary);
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
@@ -236,7 +236,7 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaWebFactory>, IDis
         Assert.False(json.RootElement.TryGetProperty("data", out _));
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
         Assert.DoesNotContain("password", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);

@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.Common.Enums.Playlists;
+namespace Nemera.Domain.SharedKernel.Common.Enums.Playlists;
 
 /// <summary>
 /// Enumeration for the kinds of media item an ordered playlist entry can reference.

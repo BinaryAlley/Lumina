@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.Themes;
-using Lumina.Domain.SharedKernel.Common.Enums.Themes;
-using Lumina.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemes;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.Domain.SharedKernel.Common.Enums.Themes;
+using Nemera.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemes;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -15,16 +15,16 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Queries.GetThemes;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Queries.GetThemes;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetThemesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetThemesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetThemesEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -35,7 +35,7 @@ public class GetThemesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactor
     /// Initializes a new instance of the <see cref="GetThemesEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetThemesEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetThemesEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -65,7 +65,7 @@ public class GetThemesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactor
         List<ThemeResponse>? themes = await response.Content.ReadFromJsonAsync<List<ThemeResponse>>(_jsonOptions);
         Assert.NotNull(themes);
 
-        ThemeResponse? bundledTheme = themes!.FirstOrDefault(theme => theme.ThemeId == "lumina-default");
+        ThemeResponse? bundledTheme = themes!.FirstOrDefault(theme => theme.ThemeId == "nemera-default");
         Assert.NotNull(bundledTheme);
         Assert.NotEmpty(bundledTheme!.Name);
         Assert.Equal(ThemeInstallSource.Bundled, bundledTheme.InstallSource);

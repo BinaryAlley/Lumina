@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
-using Lumina.Application.Core.FileSystemManagement.Paths.Queries.ValidatePath;
-using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
-using Lumina.Contracts.Requests.FileSystemManagement.Path;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Paths;
+using Nemera.Application.Core.FileSystemManagement.Paths.Queries.ValidatePath;
+using Nemera.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
+using Nemera.Contracts.Requests.FileSystemManagement.Path;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Paths;
+namespace Nemera.Application.UnitTests.Common.Mapping.FileSystemManagement.Paths;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ValidatePathRequestMapping"/> class.

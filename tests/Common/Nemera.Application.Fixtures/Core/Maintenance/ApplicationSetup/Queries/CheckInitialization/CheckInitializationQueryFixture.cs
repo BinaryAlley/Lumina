@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
+using Nemera.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
+namespace Nemera.Application.Fixtures.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
 
 /// <summary>
 /// Fixture class for the <see cref="CheckInitializationQuery"/> class.

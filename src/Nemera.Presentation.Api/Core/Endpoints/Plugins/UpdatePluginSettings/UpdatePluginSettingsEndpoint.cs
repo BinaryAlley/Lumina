@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.Plugins;
-using Lumina.Application.Core.Plugins.Commands.UpdatePluginSettings;
-using Lumina.Contracts.Requests.Plugins;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.Plugins;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.Plugins;
+using Nemera.Application.Core.Plugins.Commands.UpdatePluginSettings;
+using Nemera.Contracts.Requests.Plugins;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.Plugins;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Plugins.UpdatePluginSettings;
+namespace Nemera.Presentation.Api.Core.Endpoints.Plugins.UpdatePluginSettings;
 
 /// <summary>
 /// API endpoint for the <c>/plugins/{pluginId}/settings</c> route.

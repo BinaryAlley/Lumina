@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Common.ValueObjects.Metadata;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.ValueObjects.Metadata;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Domain.UnitTests.Common.ValueObjects.Metadata;
+namespace Nemera.Domain.UnitTests.Common.ValueObjects.Metadata;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ReleaseInfo"/> class.

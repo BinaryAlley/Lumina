@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Common.Caching;
+using Nemera.Infrastructure.Common.Caching;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -7,7 +7,7 @@ using System.IO;
 using System.Threading;
 #endregion
 
-namespace Lumina.Infrastructure.IntegrationTests.Common.Caching;
+namespace Nemera.Infrastructure.IntegrationTests.Common.Caching;
 
 /// <summary>
 /// Contains integration tests for the <see cref="TranscodingCachePaths"/> class.
@@ -22,7 +22,7 @@ public class TranscodingCachePathsTests : IDisposable
     /// </summary>
     public TranscodingCachePathsTests()
     {
-        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"lumina-transcoding-cache-paths-{Guid.NewGuid():N}");
+        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"nemera-transcoding-cache-paths-{Guid.NewGuid():N}");
         Directory.CreateDirectory(_temporaryDirectory);
     }
 
@@ -105,7 +105,7 @@ public class TranscodingCachePathsTests : IDisposable
         TranscodingCachePaths.WriteCacheMarker(directoryPath);
 
         // Assert
-        Assert.Equal(".lumina-transcoding-cache", TranscodingCachePaths.CACHE_MARKER_FILE_NAME);
+        Assert.Equal(".nemera-transcoding-cache", TranscodingCachePaths.CACHE_MARKER_FILE_NAME);
         Assert.True(TranscodingCachePaths.HasCacheMarker(directoryPath));
         Assert.True(File.Exists(Path.Combine(directoryPath, TranscodingCachePaths.CACHE_MARKER_FILE_NAME)));
     }

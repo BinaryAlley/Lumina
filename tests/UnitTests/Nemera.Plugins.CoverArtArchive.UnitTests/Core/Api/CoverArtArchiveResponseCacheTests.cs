@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.CoverArtArchive.Core.Api;
+using Nemera.Plugins.CoverArtArchive.Core.Api;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.UnitTests.Core.Api;
+namespace Nemera.Plugins.CoverArtArchive.UnitTests.Core.Api;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CoverArtArchiveResponseCache"/> class.

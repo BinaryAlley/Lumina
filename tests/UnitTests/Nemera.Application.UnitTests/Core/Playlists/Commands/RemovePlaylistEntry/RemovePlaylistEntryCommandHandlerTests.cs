@@ -1,22 +1,22 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Repositories.Playlists;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Core.Playlists.Commands.RemovePlaylistEntry;
-using Lumina.Application.Fixtures.Core.Playlists.Commands.RemovePlaylistEntry;
-using Lumina.Contracts.Responses.Playlists;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Repositories.Playlists;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Core.Playlists.Commands.RemovePlaylistEntry;
+using Nemera.Application.Fixtures.Core.Playlists.Commands.RemovePlaylistEntry;
+using Nemera.Contracts.Responses.Playlists;
+using Nemera.Domain.Common.Primitives;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Playlists.Commands.RemovePlaylistEntry;
+namespace Nemera.Application.UnitTests.Core.Playlists.Commands.RemovePlaylistEntry;
 
 /// <summary>
 /// Contains unit tests for the <see cref="RemovePlaylistEntryCommandHandler"/> class.

@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
-using Lumina.DataAccess.Common.DependencyInjection;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.DataAccess.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.DataAccess.Common.DependencyInjection;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.DataAccess.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -21,7 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.UoW;
+namespace Nemera.DataAccess.UnitTests.Core.UoW;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UnitOfWork"/> class.
@@ -38,12 +38,12 @@ public class UnitOfWorkTests
     public UnitOfWorkTests()
     {
         _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-        _fixture.Customize<LuminaDbContext>(composer => composer.FromFactory(() =>
+        _fixture.Customize<NemeraDbContext>(composer => composer.FromFactory(() =>
         {
-            DbContextOptions<LuminaDbContext> options = new DbContextOptionsBuilder<LuminaDbContext>()
+            DbContextOptions<NemeraDbContext> options = new DbContextOptionsBuilder<NemeraDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
-            return Substitute.ForPartsOf<LuminaDbContext>(options);
+            return Substitute.ForPartsOf<NemeraDbContext>(options);
         }));
     }
 
@@ -100,7 +100,7 @@ public class UnitOfWorkTests
     public async Task SaveChangesAsync_WhenCalled_ShouldCallDbContextSaveChangesAsync()
     {
         // Arrange
-        LuminaDbContext dbContext = _fixture.Create<LuminaDbContext>();
+        NemeraDbContext dbContext = _fixture.Create<NemeraDbContext>();
         UnitOfWork unitOfWork = new(dbContext, Substitute.For<IDateTimeProvider>());
         CancellationToken cancellationToken = new();
 
@@ -117,10 +117,10 @@ public class UnitOfWorkTests
     public async Task SaveChangesAsInitializationAsync_WhenCalled_ShouldResetTheFlagAfterTheSave()
     {
         // Arrange
-        DbContextOptions<LuminaDbContext> options = new DbContextOptionsBuilder<LuminaDbContext>()
+        DbContextOptions<NemeraDbContext> options = new DbContextOptionsBuilder<NemeraDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
-        LuminaDbContext dbContext = new(options);
+        NemeraDbContext dbContext = new(options);
         UnitOfWork unitOfWork = new(dbContext, Substitute.For<IDateTimeProvider>());
         dbContext.Roles.Add(_roleEntityFixture.Create(roleName: "TestRole"));
 
@@ -137,10 +137,10 @@ public class UnitOfWorkTests
     public async Task SaveChangesAsInitializationAsync_WhenSaveIsCancelled_ShouldResetTheFlag()
     {
         // Arrange
-        DbContextOptions<LuminaDbContext> options = new DbContextOptionsBuilder<LuminaDbContext>()
+        DbContextOptions<NemeraDbContext> options = new DbContextOptionsBuilder<NemeraDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
-        LuminaDbContext dbContext = new(options);
+        NemeraDbContext dbContext = new(options);
         UnitOfWork unitOfWork = new(dbContext, Substitute.For<IDateTimeProvider>());
         dbContext.Roles.Add(_roleEntityFixture.Create(roleName: "TestRole"));
         CancellationToken cancellationToken = new(canceled: true);
@@ -156,10 +156,10 @@ public class UnitOfWorkTests
     public async Task ClearTrackedEntities_WhenCalled_ShouldDetachAllTrackedEntities()
     {
         // Arrange
-        DbContextOptions<LuminaDbContext> options = new DbContextOptionsBuilder<LuminaDbContext>()
+        DbContextOptions<NemeraDbContext> options = new DbContextOptionsBuilder<NemeraDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
-        LuminaDbContext dbContext = new(options);
+        NemeraDbContext dbContext = new(options);
         UnitOfWork unitOfWork = new(dbContext, Substitute.For<IDateTimeProvider>());
         dbContext.Roles.Add(_roleEntityFixture.Create(id: Guid.NewGuid(), roleName: "TestRole"));
         await dbContext.SaveChangesAsync(CancellationToken.None);
@@ -193,6 +193,6 @@ public class UnitOfWorkTests
 
     private UnitOfWork CreateUnitOfWork()
     {
-        return new(_fixture.Create<LuminaDbContext>(), Substitute.For<IDateTimeProvider>());
+        return new(_fixture.Create<NemeraDbContext>(), Substitute.For<IDateTimeProvider>());
     }
 }

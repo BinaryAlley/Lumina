@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.DataAccess.Core.Repositories.MusicLibrary.Specifications;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.DataAccess.Core.Repositories.MusicLibrary.Specifications;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.MusicLibrary.Specifications;
+namespace Nemera.DataAccess.UnitTests.Core.Repositories.MusicLibrary.Specifications;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ArtistSearchSpecification"/> class.

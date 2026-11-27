@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
-using Lumina.Contracts.Responses.UsersManagement;
-using Lumina.Presentation.Api.Common.Routes.Maintenance;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
+using Nemera.Contracts.Responses.UsersManagement;
+using Nemera.Presentation.Api.Common.Routes.Maintenance;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Maintenance.ApplicationSetup;
+namespace Nemera.Presentation.Api.Core.Endpoints.Maintenance.ApplicationSetup;
 
 /// <summary>
 /// API endpoint for the <c>/initialization</c> route.

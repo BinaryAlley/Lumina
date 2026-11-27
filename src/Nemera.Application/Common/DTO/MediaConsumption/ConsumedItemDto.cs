@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DTO.MediaConsumption;
+namespace Nemera.Application.Common.DTO.MediaConsumption;
 
 /// <summary>
 /// Data transfer object for a media item of the consumption history, together with its aggregated consumption counts and display details.

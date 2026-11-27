@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.Api;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Api;
+namespace Nemera.Presentation.Web.Fixtures.Common.Api;
 
 /// <summary>
 /// Test double for the <see cref="IStreamingApiHttpClient"/> interface, allowing integration and security tests to stub the

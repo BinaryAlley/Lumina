@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Runtime.Loader;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Plugins;
+namespace Nemera.Infrastructure.Core.Plugins;
 
 /// <summary>
 /// Assembly load context of a single plugin, resolving the shared host assemblies from the default context and the plugin local dependencies from the plugin directory.

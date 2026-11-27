@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.ConsumptionActivity;
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
-using Lumina.Application.Fixtures.Common.Infrastructure.Authorization.Policies.ConsumptionActivity;
-using Lumina.Application.Fixtures.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
-using Lumina.Infrastructure.Core.Authorization.Policies.ConsumptionActivity;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.ConsumptionActivity;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Nemera.Application.Fixtures.Common.Infrastructure.Authorization.Policies.ConsumptionActivity;
+using Nemera.Application.Fixtures.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Nemera.Infrastructure.Core.Authorization.Policies.ConsumptionActivity;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Authorization.Policies.ConsumptionActivity;
+namespace Nemera.Infrastructure.UnitTests.Core.Authorization.Policies.ConsumptionActivity;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ConsumptionActivityAccessPolicy"/> class.

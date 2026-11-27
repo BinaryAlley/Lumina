@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
+namespace Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
 
 /// <summary>
 /// Enumeration for the types of file system elements.

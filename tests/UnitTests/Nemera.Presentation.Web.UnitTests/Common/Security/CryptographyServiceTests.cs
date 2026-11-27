@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Configuration;
-using Lumina.Presentation.Web.Common.Security;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Configuration;
+using Nemera.Presentation.Web.Common.DTO.Configuration;
+using Nemera.Presentation.Web.Common.Security;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Configuration;
 using Microsoft.Extensions.Options;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.Security;
+namespace Nemera.Presentation.Web.UnitTests.Common.Security;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CryptographyService"/> class.

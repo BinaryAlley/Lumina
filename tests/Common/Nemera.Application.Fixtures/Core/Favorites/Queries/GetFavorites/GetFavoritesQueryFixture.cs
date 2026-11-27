@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Core.Favorites.Queries.GetFavorites;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Core.Favorites.Queries.GetFavorites;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Favorites.Queries.GetFavorites;
+namespace Nemera.Application.Fixtures.Core.Favorites.Queries.GetFavorites;
 
 /// <summary>
 /// Fixture class for the <see cref="GetFavoritesQuery"/> record.

@@ -1,29 +1,29 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.FileSystemManagement.Path.ValidatePath;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.FileSystemManagement.Path.ValidatePath;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.FileSystemManagement.Path.ValidatePath;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.FileSystemManagement.Path.ValidatePath;
 
 /// <summary>
 /// Contains security tests for the <see cref="ValidatePathEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class ValidatePathEndpointTests : IClassFixture<LuminaWebFactory>
+public class ValidatePathEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly PathValidDtoFixture _pathValidDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidatePathEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public ValidatePathEndpointTests(LuminaWebFactory apiFactory)
+    public ValidatePathEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

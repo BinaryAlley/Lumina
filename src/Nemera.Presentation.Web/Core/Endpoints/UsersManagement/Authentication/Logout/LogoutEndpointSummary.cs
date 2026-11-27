@@ -3,7 +3,7 @@ using FastEndpoints;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Logout;
+namespace Nemera.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Logout;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="LogoutEndpoint"/> endpoint, for OpenAPI.

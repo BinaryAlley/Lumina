@@ -1,4 +1,4 @@
-namespace Lumina.Plugins.LocalMusicArtwork.Common.Models.DTO.Settings;
+namespace Nemera.Plugins.LocalMusicArtwork.Common.Models.DTO.Settings;
 
 /// <summary>
 /// Data transfer object for the settings that configure the local music artwork plugin.

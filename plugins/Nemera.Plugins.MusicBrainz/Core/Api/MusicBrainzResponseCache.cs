@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.Core.Api;
+namespace Nemera.Plugins.MusicBrainz.Core.Api;
 
 /// <summary>
 /// In-memory cache of the responses returned by the MusicBrainz web service, keyed by the requested URL.

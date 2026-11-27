@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.UnitTests.Common.TestHelpers;
+namespace Nemera.Plugins.CoverArtArchive.UnitTests.Common.TestHelpers;
 
 /// <summary>
 /// Test HTTP message handler that answers every request with a canned response produced by a factory, and records the requests that were sent.

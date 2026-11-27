@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Enums.AudioLibrary;
+namespace Nemera.Presentation.Web.Common.Enums.AudioLibrary;
 
 /// <summary>
 /// Enumeration for the quality cap applied to the audio the server normalizes (remuxes or transcodes) for a user.

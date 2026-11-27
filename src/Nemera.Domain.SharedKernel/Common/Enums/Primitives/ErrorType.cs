@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.Primitives;
+namespace Nemera.Domain.SharedKernel.Common.Enums.Primitives;
 
 /// <summary>
 /// Enumeration for the type of an error.

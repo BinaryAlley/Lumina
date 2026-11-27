@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.Calibre.Core.Mapping;
-using Lumina.Plugins.Calibre.Core.Opf;
-using Lumina.Plugins.Contracts.Core.Metadata;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.Calibre.Core.Mapping;
+using Nemera.Plugins.Calibre.Core.Opf;
+using Nemera.Plugins.Contracts.Core.Metadata;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.Calibre.Core;
+namespace Nemera.Plugins.Calibre.Core;
 
 /// <summary>
 /// Provides book metadata from Calibre OPF files by resolving lookups into book metadata DTOs.

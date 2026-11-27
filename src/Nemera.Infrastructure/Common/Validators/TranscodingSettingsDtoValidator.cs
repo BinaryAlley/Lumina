@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Infrastructure.Common.Caching;
-using Lumina.Infrastructure.Common.Models.DTO.Configuration;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Infrastructure.Common.Caching;
+using Nemera.Infrastructure.Common.Models.DTO.Configuration;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.IO;
 using System.Linq;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Validators;
+namespace Nemera.Infrastructure.Common.Validators;
 
 /// <summary>
 /// Validates the needed validation rules for the TranscodingSettings application configuration settings section.

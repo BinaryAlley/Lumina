@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Http;
+using Nemera.Presentation.Web.Common.Http;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Common;
+namespace Nemera.Presentation.Web.Core.Endpoints.Common;
 
 /// <summary>
 /// Base class for Web endpoints.

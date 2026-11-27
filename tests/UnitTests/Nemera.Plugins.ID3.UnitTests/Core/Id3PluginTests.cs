@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.ID3.Core;
-using Lumina.Plugins.ID3.Core.Tags;
+using Nemera.Plugins.Contracts.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.ID3.Core;
+using Nemera.Plugins.ID3.Core.Tags;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Plugins.ID3.UnitTests.Core;
+namespace Nemera.Plugins.ID3.UnitTests.Core;
 
 /// <summary>
 /// Contains unit tests for the <see cref="Id3Plugin"/> class.
@@ -48,7 +48,7 @@ public class Id3PluginTests
         string result = _sut.Author;
 
         // Assert
-        Assert.Equal("Lumina", result);
+        Assert.Equal("Nemera", result);
     }
 
     [Fact]

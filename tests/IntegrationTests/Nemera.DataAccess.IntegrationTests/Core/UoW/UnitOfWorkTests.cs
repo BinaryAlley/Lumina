@@ -1,20 +1,20 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Favorites;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Common.Interceptors;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Repositories.Favorites;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Common.Interceptors;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -23,10 +23,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.UoW;
+namespace Nemera.DataAccess.IntegrationTests.Core.UoW;
 
 /// <summary>
 /// Contains integration tests for the <see cref="UnitOfWork"/> class, exercising its transaction handling against a real SQLite database.
@@ -43,7 +43,7 @@ public class UnitOfWorkTests
     public async Task BeginTransactionAsync_WhenCalled_ShouldBeginTransactionOnTheDatabase()
     {
         // Arrange
-        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateSqliteContext();
+        (SqliteConnection anchorConnection, NemeraDbContext dbContext) = CreateSqliteContext();
         using (anchorConnection)
         {
             using (dbContext)
@@ -63,7 +63,7 @@ public class UnitOfWorkTests
     public async Task CommitTransactionAsync_WhenTransactionIsActive_ShouldPersistChangesAndClearCurrentTransaction()
     {
         // Arrange
-        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateSqliteContext();
+        (SqliteConnection anchorConnection, NemeraDbContext dbContext) = CreateSqliteContext();
         using (anchorConnection)
         {
             using (dbContext)
@@ -91,7 +91,7 @@ public class UnitOfWorkTests
     public async Task CommitTransactionAsync_WhenNoTransactionIsActive_ShouldCompleteWithoutError()
     {
         // Arrange
-        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateSqliteContext();
+        (SqliteConnection anchorConnection, NemeraDbContext dbContext) = CreateSqliteContext();
         using (anchorConnection)
         {
             using (dbContext)
@@ -111,7 +111,7 @@ public class UnitOfWorkTests
     public async Task RollbackTransactionAsync_WhenTransactionIsActive_ShouldDiscardChangesAndClearCurrentTransaction()
     {
         // Arrange
-        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateSqliteContext();
+        (SqliteConnection anchorConnection, NemeraDbContext dbContext) = CreateSqliteContext();
         using (anchorConnection)
         {
             using (dbContext)
@@ -138,7 +138,7 @@ public class UnitOfWorkTests
     public async Task RollbackTransactionAsync_WhenNoTransactionIsActive_ShouldCompleteWithoutError()
     {
         // Arrange
-        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateSqliteContext();
+        (SqliteConnection anchorConnection, NemeraDbContext dbContext) = CreateSqliteContext();
         using (anchorConnection)
         {
             using (dbContext)
@@ -158,7 +158,7 @@ public class UnitOfWorkTests
     public async Task Dispose_WhenTransactionIsActive_ShouldDisposeTheTransactionAndTheDbContext()
     {
         // Arrange
-        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateSqliteContext();
+        (SqliteConnection anchorConnection, NemeraDbContext dbContext) = CreateSqliteContext();
         using (anchorConnection)
         {
             using (dbContext)
@@ -179,7 +179,7 @@ public class UnitOfWorkTests
     public void Dispose_WhenNoTransactionIsActive_ShouldDisposeTheDbContext()
     {
         // Arrange
-        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateSqliteContext();
+        (SqliteConnection anchorConnection, NemeraDbContext dbContext) = CreateSqliteContext();
         using (anchorConnection)
         {
             using (dbContext)
@@ -199,7 +199,7 @@ public class UnitOfWorkTests
     public async Task SaveChangesAsync_WhenInsertingTwoBooksWithTheSameLibraryAndPath_ShouldReturnUniqueConstraintViolationError()
     {
         // Arrange
-        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateSqliteContext();
+        (SqliteConnection anchorConnection, NemeraDbContext dbContext) = CreateSqliteContext();
         using (anchorConnection)
         {
             using (dbContext)
@@ -233,7 +233,7 @@ public class UnitOfWorkTests
     public void FavoriteRepository_WhenAccessedRepeatedly_ShouldReturnTheSameCachedInstance()
     {
         // Arrange
-        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateSqliteContext();
+        (SqliteConnection anchorConnection, NemeraDbContext dbContext) = CreateSqliteContext();
         using (anchorConnection)
         {
             using (dbContext)
@@ -255,7 +255,7 @@ public class UnitOfWorkTests
     public async Task SaveChangesAsync_WhenInsertingTwoFavoritesForTheSameUserKindAndMediaItem_ShouldReturnUniqueConstraintViolationError()
     {
         // Arrange
-        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateSqliteContext();
+        (SqliteConnection anchorConnection, NemeraDbContext dbContext) = CreateSqliteContext();
         using (anchorConnection)
         {
             using (dbContext)
@@ -299,7 +299,7 @@ public class UnitOfWorkTests
     public async Task ClearTrackedEntities_WhenEntitiesAreTracked_ShouldDetachEveryEntity()
     {
         // Arrange
-        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateSqliteContext();
+        (SqliteConnection anchorConnection, NemeraDbContext dbContext) = CreateSqliteContext();
         using (anchorConnection)
         {
             using (dbContext)
@@ -333,7 +333,7 @@ public class UnitOfWorkTests
         // Arrange
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateAuditedSqliteContext(userId, utcNow);
+        (SqliteConnection anchorConnection, NemeraDbContext dbContext) = CreateAuditedSqliteContext(userId, utcNow);
         using (anchorConnection)
         {
             using (dbContext)
@@ -380,7 +380,7 @@ public class UnitOfWorkTests
         Guid userId = Guid.NewGuid();
         DateTime currentUtcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         DateTime initializationUtcNow = new(2025, 1, 2, 12, 0, 0, DateTimeKind.Utc);
-        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateAuditedSqliteContext(userId, currentUtcNow);
+        (SqliteConnection anchorConnection, NemeraDbContext dbContext) = CreateAuditedSqliteContext(userId, currentUtcNow);
         using (anchorConnection)
         {
             using (dbContext)
@@ -425,7 +425,7 @@ public class UnitOfWorkTests
         // Arrange
         Guid userId = Guid.NewGuid();
         DateTime currentUtcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        (SqliteConnection anchorConnection, LuminaDbContext dbContext) = CreateAuditedSqliteContext(userId, currentUtcNow);
+        (SqliteConnection anchorConnection, NemeraDbContext dbContext) = CreateAuditedSqliteContext(userId, currentUtcNow);
         using (anchorConnection)
         {
             using (dbContext)
@@ -466,11 +466,11 @@ public class UnitOfWorkTests
     /// Creates a real SQLite in-memory context, kept alive by an anchor connection, because transactions are not supported by the in-memory provider.
     /// </summary>
     /// <returns>A tuple containing the anchor connection and the database context.</returns>
-    private static (SqliteConnection AnchorConnection, LuminaDbContext Context) CreateSqliteContext()
+    private static (SqliteConnection AnchorConnection, NemeraDbContext Context) CreateSqliteContext()
     {
-        SqliteConnection anchorConnection = new($"Data Source=luminadataccess-unitofwork-tests-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-unitofwork-tests-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        LuminaDbContext dbContext = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        NemeraDbContext dbContext = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         dbContext.Database.EnsureCreated();
         return (anchorConnection, dbContext);
     }
@@ -481,15 +481,15 @@ public class UnitOfWorkTests
     /// <param name="userId">The Id of the user reported as the current user.</param>
     /// <param name="utcNow">The current UTC time reported by the time provider.</param>
     /// <returns>A tuple containing the anchor connection and the database context.</returns>
-    private static (SqliteConnection AnchorConnection, LuminaDbContext Context) CreateAuditedSqliteContext(Guid userId, DateTime utcNow)
+    private static (SqliteConnection AnchorConnection, NemeraDbContext Context) CreateAuditedSqliteContext(Guid userId, DateTime utcNow)
     {
-        SqliteConnection anchorConnection = new($"Data Source=luminadataccess-unitofwork-audit-tests-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-unitofwork-audit-tests-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         ICurrentUserService currentUserService = Substitute.For<ICurrentUserService>();
         currentUserService.UserId.Returns(userId);
         IDateTimeProvider dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(utcNow);
-        LuminaDbContext dbContext = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext dbContext = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .AddInterceptors(new UpdateAuditableEntitiesInterceptor(currentUserService, dateTimeProvider))
             .Options);

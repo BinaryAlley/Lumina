@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Validation;
+using Nemera.Presentation.Web.Common.Validation;
 using System;
 using System.Collections;
 using System.Text.RegularExpressions;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Utilities;
+namespace Nemera.Presentation.Web.Common.Utilities;
 
 /// <summary>
 /// Validator extension methods for the <see cref="IRuleBuilder{TRequest, TProperty}"/> to define common validation rules.

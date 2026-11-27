@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Common.DTO.MediaConsumption;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
+namespace Nemera.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
 
 /// <summary>
 /// Fixture class for the <see cref="AllUsersConsumptionStatisticsDto"/> record.

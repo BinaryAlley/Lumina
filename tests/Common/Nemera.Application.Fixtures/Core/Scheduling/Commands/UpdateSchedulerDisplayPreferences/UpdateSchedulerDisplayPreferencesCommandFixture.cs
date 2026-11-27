@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Application.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
+namespace Nemera.Application.Fixtures.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
 
 /// <summary>
 /// Fixture class for the <see cref="UpdateSchedulerDisplayPreferencesCommand"/> class.

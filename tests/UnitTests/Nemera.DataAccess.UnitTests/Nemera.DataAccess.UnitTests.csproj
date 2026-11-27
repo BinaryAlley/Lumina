@@ -40,7 +40,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Lumina.DataAccess\Lumina.DataAccess.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Application.Fixtures\Lumina.Application.Fixtures.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.DataAccess\Nemera.DataAccess.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Application.Fixtures\Nemera.Application.Fixtures.csproj" />
     </ItemGroup>
 </Project>

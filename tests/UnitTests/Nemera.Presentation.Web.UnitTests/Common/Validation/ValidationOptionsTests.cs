@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Primitives;
-using Lumina.Presentation.Web.Common.Validation;
-using Lumina.Presentation.Web.Fixtures.Common.Validation;
+using Nemera.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.Validation;
+using Nemera.Presentation.Web.Fixtures.Common.Validation;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using System;
@@ -10,7 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.Validation;
+namespace Nemera.Presentation.Web.UnitTests.Common.Validation;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ValidationOptions{TOptions}"/> class.

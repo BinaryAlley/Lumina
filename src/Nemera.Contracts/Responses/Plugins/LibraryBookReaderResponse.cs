@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.Plugins;
+namespace Nemera.Contracts.Responses.Plugins;
 
 /// <summary>
 /// Represents a book reader, either as configured for a media library, or as available for a library type, the way a new library of that type starts.

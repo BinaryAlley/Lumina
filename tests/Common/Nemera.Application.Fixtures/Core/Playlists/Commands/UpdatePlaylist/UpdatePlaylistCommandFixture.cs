@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Playlists.Commands.UpdatePlaylist;
+using Nemera.Application.Core.Playlists.Commands.UpdatePlaylist;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Playlists.Commands.UpdatePlaylist;
+namespace Nemera.Application.Fixtures.Core.Playlists.Commands.UpdatePlaylist;
 
 /// <summary>
 /// Fixture class for the <see cref="UpdatePlaylistCommand"/> record.

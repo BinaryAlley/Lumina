@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Konscious.Security.Cryptography;
-using Lumina.Application.Common.Infrastructure.Security;
+using Nemera.Application.Common.Infrastructure.Security;
 using System;
 using System.Security.Cryptography;
 using System.Text;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Security;
+namespace Nemera.Infrastructure.Core.Security;
 
 /// <summary>
 /// Service for hashing passwords.

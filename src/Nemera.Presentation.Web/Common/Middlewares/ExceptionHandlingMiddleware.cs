@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Exceptions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using Polly.CircuitBreaker;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Middlewares;
+namespace Nemera.Presentation.Web.Common.Middlewares;
 
 /// <summary>
 /// Middleware to handle exceptions thrown when the remote API returns a problem details.

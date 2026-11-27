@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Authorization;
+namespace Nemera.Presentation.Web.Common.Authorization;
 
 /// <summary>
 /// Defines a requirement that the user must belong to at least one of the specified roles.

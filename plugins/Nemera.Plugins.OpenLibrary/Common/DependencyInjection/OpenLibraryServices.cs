@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.OpenLibrary.Common.Models.DTO.Settings;
-using Lumina.Plugins.OpenLibrary.Core;
-using Lumina.Plugins.OpenLibrary.Core.Api;
-using Lumina.Plugins.OpenLibrary.Core.Settings;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.OpenLibrary.Common.Models.DTO.Settings;
+using Nemera.Plugins.OpenLibrary.Core;
+using Nemera.Plugins.OpenLibrary.Core.Api;
+using Nemera.Plugins.OpenLibrary.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.Common.DependencyInjection;
+namespace Nemera.Plugins.OpenLibrary.Common.DependencyInjection;
 
 /// <summary>
 /// Utility class for registering the services of the Open Library metadata provider into the Dependency Injection container.

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.DataAccess.Common.Interceptors;
-using Lumina.DataAccess.Core.UoW;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.DataAccess.Common.Interceptors;
+using Nemera.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using System;
@@ -15,7 +15,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Common.Interceptors;
+namespace Nemera.DataAccess.UnitTests.Common.Interceptors;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdateAuditableEntitiesInterceptor"/> class.
@@ -49,7 +49,7 @@ public class UpdateAuditableEntitiesInterceptorTests
     public async Task SavingChangesAsync_WhenAddingAuditableEntity_ShouldSetCreationProperties()
     {
         // Arrange
-        LuminaDbContext context = CreateContext();
+        NemeraDbContext context = CreateContext();
         BookEntity book = _bookEntityFixture.Create();
 
         // Act
@@ -67,7 +67,7 @@ public class UpdateAuditableEntitiesInterceptorTests
     public async Task SavingChangesAsync_WhenModifyingAuditableEntity_ShouldSetModificationProperties()
     {
         // Arrange
-        LuminaDbContext context = CreateContext();
+        NemeraDbContext context = CreateContext();
         BookEntity book = _bookEntityFixture.Create();
         context.Books.Add(book);
         await context.SaveChangesAsync();
@@ -88,7 +88,7 @@ public class UpdateAuditableEntitiesInterceptorTests
     {
         // Arrange
         _mockCurrentUserService.UserId.Returns((Guid?)null);
-        LuminaDbContext context = CreateContext();
+        NemeraDbContext context = CreateContext();
         BookEntity book = _bookEntityFixture.Create();
         context.Books.Add(book);
         await context.SaveChangesAsync();
@@ -107,7 +107,7 @@ public class UpdateAuditableEntitiesInterceptorTests
     public async Task SavingChangesAsync_WhenInitializationSave_ShouldPreserveTheExplicitAuditValues()
     {
         // Arrange
-        LuminaDbContext context = CreateContext();
+        NemeraDbContext context = CreateContext();
         BookEntity book = _bookEntityFixture.Create();
         DateTime initializationUtcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         book.CreatedOnUtc = initializationUtcNow;
@@ -132,7 +132,7 @@ public class UpdateAuditableEntitiesInterceptorTests
     public void SavingChanges_WhenAddingAuditableEntity_ShouldSetCreationProperties()
     {
         // Arrange
-        LuminaDbContext context = CreateContext();
+        NemeraDbContext context = CreateContext();
         BookEntity book = _bookEntityFixture.Create();
 
         // Act
@@ -150,7 +150,7 @@ public class UpdateAuditableEntitiesInterceptorTests
     public async Task SavingChangesAsync_WhenTrackingNonAuditableEntity_ShouldNotThrow()
     {
         // Arrange
-        LuminaDbContext context = CreateContext();
+        NemeraDbContext context = CreateContext();
         LibraryScanResultEntity scanResult = _libraryScanResultEntityFixture.Create();
 
         // Act
@@ -162,15 +162,15 @@ public class UpdateAuditableEntitiesInterceptorTests
     }
 
     /// <summary>
-    /// Creates a <see cref="LuminaDbContext"/> that uses the interceptor under test.
+    /// Creates a <see cref="NemeraDbContext"/> that uses the interceptor under test.
     /// </summary>
-    /// <returns>A configured <see cref="LuminaDbContext"/> instance.</returns>
-    private LuminaDbContext CreateContext()
+    /// <returns>A configured <see cref="NemeraDbContext"/> instance.</returns>
+    private NemeraDbContext CreateContext()
     {
-        DbContextOptions<LuminaDbContext> options = new DbContextOptionsBuilder<LuminaDbContext>()
+        DbContextOptions<NemeraDbContext> options = new DbContextOptionsBuilder<NemeraDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .AddInterceptors(_sut)
             .Options;
-        return new LuminaDbContext(options);
+        return new NemeraDbContext(options);
     }
 }

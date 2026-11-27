@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Mapping.Themes;
-using Lumina.Contracts.Responses.Themes;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Mapping.Themes;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.Domain.Common.Primitives;
 using System.Threading;
 using System.Threading.Tasks;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.Core.Themes.Management.Queries.GetCurrentTheme;
+namespace Nemera.Application.Core.Themes.Management.Queries.GetCurrentTheme;
 
 /// <summary>
 /// Handler for the query to get the currently active theme.

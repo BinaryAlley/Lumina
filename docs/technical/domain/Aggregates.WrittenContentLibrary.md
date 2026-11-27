@@ -1,8 +1,8 @@
-- [Lumina Domain](#lumina-domain)
+- [Nemera Domain](#nemera-domain)
   - [Written Content Library Aggregate](#written-content-library-aggregate)
     - [Book](#book)
 
-# [Lumina Domain](#lumina-domain)
+# [Nemera Domain](#nemera-domain)
 
 ## [Written Content Library Aggregate](#written-content-library-aggregate)
 

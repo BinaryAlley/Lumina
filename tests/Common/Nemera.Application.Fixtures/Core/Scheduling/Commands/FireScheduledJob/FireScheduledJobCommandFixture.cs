@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Scheduling.Commands.FireScheduledJob;
+using Nemera.Application.Core.Scheduling.Commands.FireScheduledJob;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Scheduling.Commands.FireScheduledJob;
+namespace Nemera.Application.Fixtures.Core.Scheduling.Commands.FireScheduledJob;
 
 /// <summary>
 /// Fixture class for the <see cref="FireScheduledJobCommand"/> class.

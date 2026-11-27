@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Themes;
-using Lumina.DataAccess.Core.Repositories.Themes;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Themes;
+using Nemera.DataAccess.Core.Repositories.Themes;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.Themes;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.Themes;
 
 /// <summary>
 /// Contains integration tests for the <see cref="ThemeRepository"/> class, exercising it against a real SQLite database.
@@ -26,9 +26,9 @@ public class ThemeRepositoryTests
     public async Task UpdateAsync_WhenAnEditableValueChanges_ShouldPreserveTheStoredAuditColumns()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-themerepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-themerepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         ThemeRepository sut = new(context);
 

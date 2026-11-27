@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
 #endregion
 
-namespace Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
+namespace Nemera.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="SetupApplicationCommand"/>.

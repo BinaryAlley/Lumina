@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+namespace Nemera.Application.Fixtures.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 
 /// <summary>
 /// Fixture class for the <see cref="LibraryOwnershipPolicyContext"/> class.

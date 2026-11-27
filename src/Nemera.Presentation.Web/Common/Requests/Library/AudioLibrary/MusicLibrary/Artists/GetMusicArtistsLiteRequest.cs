@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Common;
+using Nemera.Presentation.Web.Common.Enums.Common;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Artists;
+namespace Nemera.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Artists;
 
 /// <summary>
 /// Represents a request to get the lightweight details of the artists of a media library.

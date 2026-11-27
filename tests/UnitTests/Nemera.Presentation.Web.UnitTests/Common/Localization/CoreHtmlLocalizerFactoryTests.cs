@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Localization;
+using Nemera.Presentation.Web.Common.Localization;
 using Microsoft.AspNetCore.Mvc.Localization;
 using Microsoft.Extensions.Localization;
 using NSubstitute;
@@ -7,7 +7,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.Localization;
+namespace Nemera.Presentation.Web.UnitTests.Common.Localization;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CoreHtmlLocalizerFactory"/> class.
@@ -32,22 +32,22 @@ public class CoreHtmlLocalizerFactoryTests
     public void Create_WhenBaseNameStartsWithLocationCorePrefix_ShouldStripCoreSegment()
     {
         // Act
-        IHtmlLocalizer localizer = _sut.Create("Lumina.Presentation.Web.Core.Views.Auth.Login", "Lumina.Presentation.Web");
+        IHtmlLocalizer localizer = _sut.Create("Nemera.Presentation.Web.Core.Views.Auth.Login", "Nemera.Presentation.Web");
 
         // Assert
         Assert.NotNull(localizer);
-        _mockStringLocalizerFactory.Received(1).Create("Lumina.Presentation.Web.Views.Auth.Login", "Lumina.Presentation.Web");
+        _mockStringLocalizerFactory.Received(1).Create("Nemera.Presentation.Web.Views.Auth.Login", "Nemera.Presentation.Web");
     }
 
     [Fact]
     public void Create_WhenBaseNameDoesNotStartWithLocationCorePrefix_ShouldKeepBaseNameUnchanged()
     {
         // Act
-        IHtmlLocalizer localizer = _sut.Create("Lumina.Presentation.Web.Views.Shared.Layout", "Lumina.Presentation.Web");
+        IHtmlLocalizer localizer = _sut.Create("Nemera.Presentation.Web.Views.Shared.Layout", "Nemera.Presentation.Web");
 
         // Assert
         Assert.NotNull(localizer);
-        _mockStringLocalizerFactory.Received(1).Create("Lumina.Presentation.Web.Views.Shared.Layout", "Lumina.Presentation.Web");
+        _mockStringLocalizerFactory.Received(1).Create("Nemera.Presentation.Web.Views.Shared.Layout", "Nemera.Presentation.Web");
     }
 
     [Fact]

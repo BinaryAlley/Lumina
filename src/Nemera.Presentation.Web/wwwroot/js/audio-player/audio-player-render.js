@@ -108,7 +108,7 @@
  *
  * Using it
  * --------
- *   const renderer = LuminaAudioPlayer.createTrackRenderer({
+ *   const renderer = NemeraAudioPlayer.createTrackRenderer({
  *       replayGainMode: host.getPreferences().replayGainMode,
  *       events: host.events,
  *       onTimeUpdate: (time, trackDuration, timelineDuration) => host.reportTime(time, trackDuration),
@@ -126,7 +126,7 @@
  * mute are deliberately not read from the bus: they are driven by the caller through setVolumeAsync and setMutedAsync,
  * which is what the engine interface hands over, so the master gain has a single writer.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -138,19 +138,19 @@
      * @returns {number} The clamped value.
      */
     function clamp(value, minimum, maximum) {
-        return LuminaAudioPlayer.clamp(value, minimum, maximum);
+        return NemeraAudioPlayer.clamp(value, minimum, maximum);
     }
 
     /**
      * The user facing ways ReplayGain normalization is applied to a track.
      *
-     * This list mirrors the ReplayGainMode enumeration of the server (Lumina.Domain.SharedKernel.Common.Enums.Playback).
+     * This list mirrors the ReplayGainMode enumeration of the server (Nemera.Domain.SharedKernel.Common.Enums.Playback).
      * A mode added to the server must be added here too: a value the server sends that is not listed is reported by
      * normalizeReplayGainMode and treated as no normalization, so the two lists cannot drift apart silently.
      * @readonly
      * @enum {string}
      */
-    LuminaAudioPlayer.PlayerReplayGainMode = Object.freeze({
+    NemeraAudioPlayer.PlayerReplayGainMode = Object.freeze({
         // ReplayGain is not applied, and the track plays at the loudness at which it was stored.
         OFF: 'Off',
         // Each track is normalized with its own ReplayGain track gain.
@@ -277,27 +277,27 @@
     }
 
     /**
-     * Normalizes a ReplayGain mode into one of the {@link LuminaAudioPlayer.PlayerReplayGainMode} values, defaulting an absent or unrecognized value to no normalization.
+     * Normalizes a ReplayGain mode into one of the {@link NemeraAudioPlayer.PlayerReplayGainMode} values, defaulting an absent or unrecognized value to no normalization.
      * @param {string} value - The mode to normalize, as the user settings or the manifest spell it.
-     * @returns {string} One of the {@link LuminaAudioPlayer.PlayerReplayGainMode} values.
+     * @returns {string} One of the {@link NemeraAudioPlayer.PlayerReplayGainMode} values.
      */
     function normalizeReplayGainMode(value) {
         // An absent mode, or an empty string, is simply no normalization and is not reported.
         if (value === null || value === undefined || value === '')
-            return LuminaAudioPlayer.PlayerReplayGainMode.OFF;
+            return NemeraAudioPlayer.PlayerReplayGainMode.OFF;
         if (typeof value === 'string') {
             const text = value.trim().toLowerCase();
             if (text === '' || text === 'off')
-                return LuminaAudioPlayer.PlayerReplayGainMode.OFF;
+                return NemeraAudioPlayer.PlayerReplayGainMode.OFF;
             if (text === 'track')
-                return LuminaAudioPlayer.PlayerReplayGainMode.TRACK;
+                return NemeraAudioPlayer.PlayerReplayGainMode.TRACK;
             if (text === 'album')
-                return LuminaAudioPlayer.PlayerReplayGainMode.ALBUM;
+                return NemeraAudioPlayer.PlayerReplayGainMode.ALBUM;
         }
         // A value the renderer does not know is very likely a mode the server added and this list does not carry yet, so it
         // is reported, whatever its type, instead of being dropped silently; the sync of the two lists is documented on the enum.
         console.warn(`Audio player: the ReplayGain mode '${String(value)}' is not known to the renderer, so no normalization is applied.`);
-        return LuminaAudioPlayer.PlayerReplayGainMode.OFF;
+        return NemeraAudioPlayer.PlayerReplayGainMode.OFF;
     }
 
     /**
@@ -334,18 +334,18 @@
      * of the two pairs, and normalizing with the pair that exists is better than not normalizing at all. A peak is never
      * taken from one pair while the gain comes from the other, because the anti-clip ceiling would then be computed from a peak the applied gain does not belong to.
      * @param {Object|null} manifest - The playback manifest of the track.
-     * @param {string} mode - One of the {@link LuminaAudioPlayer.PlayerReplayGainMode} values.
+     * @param {string} mode - One of the {@link NemeraAudioPlayer.PlayerReplayGainMode} values.
      * @returns {{ gainDb: number|null, peak: number|null }} The selected pair, null when nothing is selected.
      */
     function resolveReplayGain(manifest, mode) {
-        if (!manifest || mode === LuminaAudioPlayer.PlayerReplayGainMode.OFF)
+        if (!manifest || mode === NemeraAudioPlayer.PlayerReplayGainMode.OFF)
             return { gainDb: null, peak: null };
         const trackGain = toFiniteNumber(manifest.replayGainTrackGain);
         const trackPeak = toFiniteNumber(manifest.replayGainTrackPeak);
         const albumGain = toFiniteNumber(manifest.replayGainAlbumGain);
         const albumPeak = toFiniteNumber(manifest.replayGainAlbumPeak);
         // The gain decides which pair is used, and the peak of that same pair goes with it.
-        if (mode === LuminaAudioPlayer.PlayerReplayGainMode.ALBUM) {
+        if (mode === NemeraAudioPlayer.PlayerReplayGainMode.ALBUM) {
             if (albumGain !== null)
                 return { gainDb: albumGain, peak: albumPeak };
             return { gainDb: trackGain, peak: trackPeak };
@@ -359,7 +359,7 @@
      * Computes the linear ReplayGain value a manifest and a mode select, through the same resolver and clipping rule the
      * renderer uses, so an engine that applies ReplayGain itself never drifts from the full player.
      * @param {Object|null} manifest - The playback manifest of the track.
-     * @param {string} mode - One of the {@link LuminaAudioPlayer.PlayerReplayGainMode} values.
+     * @param {string} mode - One of the {@link NemeraAudioPlayer.PlayerReplayGainMode} values.
      * @returns {number} The linear gain, one when nothing is selected.
      */
     function computeReplayGainTrackGain(manifest, mode) {
@@ -391,7 +391,7 @@
          * @param {boolean} [options.ownsContext] - True when the renderer owns the audio context and may close it on destroy. Defaults to true; pass false when the context is shared or owned by the caller and must outlive this renderer.
          * @param {number} [options.volume] - The output volume, between 0 and 1. Defaults to 1.
          * @param {boolean} [options.isMuted] - True to mute the output. Defaults to false.
-         * @param {string} [options.replayGainMode] - The user's ReplayGain mode, one of the {@link LuminaAudioPlayer.PlayerReplayGainMode} values. Defaults to no normalization.
+         * @param {string} [options.replayGainMode] - The user's ReplayGain mode, one of the {@link NemeraAudioPlayer.PlayerReplayGainMode} values. Defaults to no normalization.
          * @param {number} [options.playbackRate] - The playback rate, within the accepted playback rate range. Defaults to 1.
          * @param {number} [options.maxScheduledAheadSeconds] - An optional ceiling, in seconds, on how far ahead of the audio clock the schedule may run. Scheduling beyond it is refused with a typed error, so a caller that never paces itself cannot grow the schedule without bound. Leave the option out to disable the ceiling; a value of zero is a real ceiling that refuses every buffer, not a way to disable it.
          * @param {Object} [options.events] - The player event bus. When provided, the renderer follows the player's ReplayGain mode changes.
@@ -484,12 +484,12 @@
          * Prepares the renderer for a track: it makes sure the context and its gain nodes exist, resets the schedule and
          * the playhead, and applies the ReplayGain normalization of the track.
          * @param {Object} manifest - The playback manifest of the track, carrying its duration and ReplayGain values.
-         * @returns {LuminaAudioPlayer.TrackRenderer} This renderer, for chaining.
-         * @throws {LuminaAudioPlayer.PlayerError} When the renderer was destroyed.
+         * @returns {NemeraAudioPlayer.TrackRenderer} This renderer, for chaining.
+         * @throws {NemeraAudioPlayer.PlayerError} When the renderer was destroyed.
          */
         configure(manifest) {
             if (this.destroyed)
-                throw this.raise(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The renderer was destroyed.'));
+                throw this.raise(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The renderer was destroyed.'));
             this.ensureContext();
             // A reconfigure starts a fresh track, so a failure of the previous one is not reported as a failure of this.
             this.error = null;
@@ -521,12 +521,12 @@
          * @param {Object} manifest - The playback manifest of the continuing track.
          * @param {boolean} [isGainAlreadyScheduled=false] - True when scheduleManifestGain already scheduled the ReplayGain
          * change at the boundary, so applying it again with a late ramp is skipped.
-         * @returns {LuminaAudioPlayer.TrackRenderer} This renderer, for chaining.
-         * @throws {LuminaAudioPlayer.PlayerError} When the renderer was destroyed.
+         * @returns {NemeraAudioPlayer.TrackRenderer} This renderer, for chaining.
+         * @throws {NemeraAudioPlayer.PlayerError} When the renderer was destroyed.
          */
         adoptManifest(manifest, isGainAlreadyScheduled = false) {
             if (this.destroyed)
-                throw this.raise(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The renderer was destroyed.'));
+                throw this.raise(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The renderer was destroyed.'));
             this.manifest = manifest || null;
             this.duration = this.manifest && toFiniteNumber(this.manifest.durationInSeconds) !== null
                 ? Math.max(0, Number(this.manifest.durationInSeconds))
@@ -549,11 +549,11 @@
          * @param {Object} manifest - The playback manifest of the next track.
          * @param {number} whenContextTime - The context time, in seconds, at which the next track starts.
          * @returns {boolean} True when the automation was scheduled, false when the parameter cannot automate.
-         * @throws {LuminaAudioPlayer.PlayerError} When the renderer was destroyed.
+         * @throws {NemeraAudioPlayer.PlayerError} When the renderer was destroyed.
          */
         scheduleManifestGain(manifest, whenContextTime) {
             if (this.destroyed)
-                throw this.raise(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The renderer was destroyed.'));
+                throw this.raise(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The renderer was destroyed.'));
             this.ensureContext();
             // A call that cannot schedule anything must not leave a previous handoff change pending.
             this.pendingGainChange = null;
@@ -586,7 +586,7 @@
 
         /**
          * Cancels a scheduled gapless ReplayGain change and restores the gain of the current manifest. It is used when the handoff is abandoned before the next track starts.
-         * @returns {LuminaAudioPlayer.TrackRenderer} This renderer, for chaining.
+         * @returns {NemeraAudioPlayer.TrackRenderer} This renderer, for chaining.
          */
         cancelTrackGainChange() {
             this.pendingGainChange = null;
@@ -608,7 +608,7 @@
          * that is actually scheduled rather than by the duration of the first track of the chain. The duration is only
          * used to bound a seek and to report the timeline length; the end of the audio is detected from the schedule.
          * @param {number} duration - The media duration of the whole timeline, in seconds.
-         * @returns {LuminaAudioPlayer.TrackRenderer} This renderer, for chaining.
+         * @returns {NemeraAudioPlayer.TrackRenderer} This renderer, for chaining.
          */
         setTimelineDuration(duration) {
             const value = toFiniteNumber(duration);
@@ -674,7 +674,7 @@
                     // The context is still live. Its reference is kept rather than dropped, and the failure is recorded, so a
                     // caller can still reach the context through getContext() and close it itself; the renderer itself is
                     // destroyed and never uses it again. Dropping the only reference would lose a context that the browser counts until it is closed.
-                    this.raise(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
+                    this.raise(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
                     console.error('Audio player: the audio context could not be closed.', error);
                     return;
                 }
@@ -689,17 +689,17 @@
         /**
          * Resumes the audio context, which is the call that needs a user gesture, and starts the playhead.
          * @returns {Promise<void>} A promise that completes when the context is running.
-         * @throws {LuminaAudioPlayer.PlayerError} When the renderer was destroyed, or the context could not be resumed.
+         * @throws {NemeraAudioPlayer.PlayerError} When the renderer was destroyed, or the context could not be resumed.
          */
         async playAsync() {
             if (this.destroyed)
-                throw this.raise(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The renderer was destroyed.'));
+                throw this.raise(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The renderer was destroyed.'));
             this.ensureContext();
             try {
                 if (this.context.state === 'suspended' && typeof this.context.resume === 'function')
                     await this.context.resume();
             } catch (error) {
-                throw this.raise(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
+                throw this.raise(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
             }
             if (this.playing)
                 return;
@@ -722,7 +722,7 @@
                 } catch (error) {
                     // A context that refuses to suspend keeps playing, so the player is not paused: nothing is changed,
                     // and the failure is recorded, so isPaused never claims a pause that did not happen.
-                    this.raise(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
+                    this.raise(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
                     return;
                 }
             }
@@ -741,7 +741,7 @@
          * rather than of the state of the renderer.
          * @param {number} rate - The playback rate, within the accepted playback rate range.
          * @returns {number} The applied playback rate.
-         * @throws {LuminaAudioPlayer.PlayerError} When the schedule could not be re-timed.
+         * @throws {NemeraAudioPlayer.PlayerError} When the schedule could not be re-timed.
          */
         setPlaybackRate(rate) {
             if (this.destroyed)
@@ -795,7 +795,7 @@
 
         /**
          * Sets the ReplayGain mode and applies the gain it selects out of the manifest of the current track.
-         * @param {string} mode - One of the {@link LuminaAudioPlayer.PlayerReplayGainMode} values.
+         * @param {string} mode - One of the {@link NemeraAudioPlayer.PlayerReplayGainMode} values.
          * @returns {string} The applied mode.
          */
         setReplayGainMode(mode) {
@@ -825,14 +825,14 @@
          * the current track resumes the playback state, so the playhead and the callbacks continue to run.
          * @param {AudioData} audioData - The decoded audio to schedule. Ownership transfers to the renderer, which closes it.
          * @returns {number} The media position, in seconds, at the end of the scheduled audio.
-         * @throws {LuminaAudioPlayer.PlayerError} When the renderer was destroyed, or the audio could not be converted or scheduled. A refusal caused by the renderer's own <c>maxScheduledAheadSeconds</c> ceiling carries <c>details.reason === {@link LuminaAudioPlayer.PlayerErrorReason}.SCHEDULED_AHEAD_LIMIT</c> and is backpressure rather than corruption: it is thrown without being recorded as the renderer's last error, so a caller can treat it as recoverable. The frame is closed before this call returns or throws, whichever happens, so a caller must never close it and a refusal never leaks. Both properties are load-bearing for a caller, such as the decode pipeline, that classifies the refusal from the thrown value.
+         * @throws {NemeraAudioPlayer.PlayerError} When the renderer was destroyed, or the audio could not be converted or scheduled. A refusal caused by the renderer's own <c>maxScheduledAheadSeconds</c> ceiling carries <c>details.reason === {@link NemeraAudioPlayer.PlayerErrorReason}.SCHEDULED_AHEAD_LIMIT</c> and is backpressure rather than corruption: it is thrown without being recorded as the renderer's last error, so a caller can treat it as recoverable. The frame is closed before this call returns or throws, whichever happens, so a caller must never close it and a refusal never leaks. Both properties are load-bearing for a caller, such as the decode pipeline, that classifies the refusal from the thrown value.
          */
         schedule(audioData) {
             // The decoded audio is consumed by this call whatever happens, so it is released even when the renderer refuses
             // it, which is what keeps a decode loop from leaking native memory when a frame is rejected.
             try {
                 if (this.destroyed)
-                    throw this.raise(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The renderer was destroyed.'));
+                    throw this.raise(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The renderer was destroyed.'));
                 this.ensureContext();
                 const buffer = this.createBufferFromAudioData(audioData);
                 // A decode with no frame carries no media, so it contributes nothing to the timeline and is dropped.
@@ -855,7 +855,7 @@
                     // The refusal is backpressure, not a failure: a caller that paces itself retries once the schedule has
                     // drained, so it is thrown without being recorded as the renderer's last error, which would mark a
                     // renderer that is still healthy as failed, contradicting the reason the shared enum publishes.
-                    throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR, 'The schedule would run further ahead than the renderer allows.', { reason: LuminaAudioPlayer.PlayerErrorReason.SCHEDULED_AHEAD_LIMIT });
+                    throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR, 'The schedule would run further ahead than the renderer allows.', { reason: NemeraAudioPlayer.PlayerErrorReason.SCHEDULED_AHEAD_LIMIT });
                 let when = this.nextStartTime;
                 // The chain is anchored on its first buffer, and re-anchored whenever it fell behind the context clock, which
                 // is an underrun: the buffer starts as soon as it can and the playhead follows the audio that actually plays.
@@ -885,7 +885,7 @@
                             console.debug('Audio player: the failed source could not be disconnected.', disconnectError);
                         }
                     }
-                    throw this.raise(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
+                    throw this.raise(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
                 }
                 this.scheduledSources.push({
                     source,
@@ -942,11 +942,11 @@
          * an offset it is not told about.
          * @param {number} seconds - The media position to move to, in seconds.
          * @returns {number} The applied media position, in seconds.
-         * @throws {LuminaAudioPlayer.PlayerError} When the renderer was destroyed.
+         * @throws {NemeraAudioPlayer.PlayerError} When the renderer was destroyed.
          */
         seekTo(seconds) {
             if (this.destroyed)
-                throw this.raise(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The renderer was destroyed.'));
+                throw this.raise(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_STATE, 'The renderer was destroyed.'));
             const request = toFiniteNumber(seconds);
             // A position that is not a number is not a seek: nothing is reset and the current media frontier is returned,
             // so an accidental NaN never tears down the schedule and drops the audio that is already playing.
@@ -982,7 +982,7 @@
          * Clears the stream-complete state, so a drained schedule is treated as an underrun gap again instead of the end
          * of the track. It is used when a gapless handoff appends the next track after the end of the current decode was
          * already recorded: the schedule then carries more audio, and a slow download of that audio must pause and resume rather than end the second track early.
-         * @returns {LuminaAudioPlayer.TrackRenderer} This renderer, for chaining.
+         * @returns {NemeraAudioPlayer.TrackRenderer} This renderer, for chaining.
          */
         clearStreamComplete() {
             this.streamComplete = false;
@@ -1069,7 +1069,7 @@
 
         /**
          * Gets the ReplayGain mode in effect.
-         * @returns {string} One of the {@link LuminaAudioPlayer.PlayerReplayGainMode} values.
+         * @returns {string} One of the {@link NemeraAudioPlayer.PlayerReplayGainMode} values.
          */
         getReplayGainMode() {
             return this.replayGainMode;
@@ -1184,7 +1184,7 @@
 
         /**
          * Gets the last failure, or null when there was none.
-         * @returns {LuminaAudioPlayer.PlayerError|null} The last failure.
+         * @returns {NemeraAudioPlayer.PlayerError|null} The last failure.
          */
         getError() {
             return this.error;
@@ -1217,7 +1217,7 @@
         /**
          * Makes sure the audio context and its gain nodes exist, creating them on first use.
          * @returns {AudioContext} The audio context.
-         * @throws {LuminaAudioPlayer.PlayerError} When the environment exposes no audio context, or it could not be created.
+         * @throws {NemeraAudioPlayer.PlayerError} When the environment exposes no audio context, or it could not be created.
          */
         ensureContext() {
             if (this.context) {
@@ -1229,10 +1229,10 @@
             try {
                 context = this.contextFactory();
             } catch (error) {
-                throw this.raise(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED);
+                throw this.raise(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED);
             }
             if (!context || typeof context.createGain !== 'function')
-                throw this.raise(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'This environment provides no audio context for the player output.'));
+                throw this.raise(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'This environment provides no audio context for the player output.'));
             this.context = context;
             this.buildGainGraph();
             return context;
@@ -1341,18 +1341,18 @@
          * Converts a decoded AudioData into an AudioBuffer, one channel at a time, handling a sample rate that differs from the context rate.
          * @param {AudioData} audioData - The decoded audio to convert.
          * @returns {AudioBuffer|null} The audio buffer, or null when the decode carries no frame.
-         * @throws {LuminaAudioPlayer.PlayerError} When the decode carries nothing copyable.
+         * @throws {NemeraAudioPlayer.PlayerError} When the decode carries nothing copyable.
          */
         createBufferFromAudioData(audioData) {
             if (!audioData || typeof audioData.copyTo !== 'function')
-                throw this.raise(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR, 'The decoded audio could not be read.'));
+                throw this.raise(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR, 'The decoded audio could not be read.'));
             const frames = Math.floor(toFiniteNumber(audioData.numberOfFrames) || 0);
             const channels = Math.floor(toFiniteNumber(audioData.numberOfChannels) || 0);
             const sampleRate = toFiniteNumber(audioData.sampleRate);
             if (frames <= 0 || channels <= 0 || sampleRate === null || sampleRate <= 0)
                 return null;
             if (!this.isWithinDecodeBudget(frames, channels))
-                throw this.raise(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR, 'The decoded audio carries an implausible frame count or channel count.'));
+                throw this.raise(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR, 'The decoded audio carries an implausible frame count or channel count.'));
             // A buffer created at the decoded rate is resampled to the context rate by the Web Audio graph itself, which is
             // both cheaper and higher quality than a resample in JavaScript. Only a rate a buffer may not carry is resampled here.
             const canUseDecodedRate = sampleRate >= MIN_AUDIO_BUFFER_SAMPLE_RATE && sampleRate <= MAX_AUDIO_BUFFER_SAMPLE_RATE;
@@ -1373,7 +1373,7 @@
                 // the same budget as the decoded chunk. The length is computed once here and handed to the resampler, so the
                 // budget check and the allocation can never disagree.
                 if (!this.isWithinDecodeBudget(resampledFrames, channels))
-                    throw this.raise(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR, 'The resampled audio would be implausibly large.'));
+                    throw this.raise(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR, 'The resampled audio would be implausibly large.'));
                 const buffer = this.context.createBuffer(channels, resampledFrames, targetRate);
                 for (let channel = 0; channel < channels; channel++) {
                     const source = this.copyChannelData(audioData, channel, frames);
@@ -1381,7 +1381,7 @@
                 }
                 return buffer;
             } catch (error) {
-                throw this.raise(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
+                throw this.raise(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
             }
         }
 
@@ -1408,7 +1408,7 @@
          * @param {number} frames - The number of frames of the decode.
          * @param {Float32Array} [destination] - The array to copy into, which must hold at least the frames of the channel. A new array is allocated when it is omitted, which is what the resample path passes; the pass-through path passes the channel data of the AudioBuffer, so the samples are copied once and no scratch array is allocated.
          * @returns {Float32Array} The destination array, holding the channel samples.
-         * @throws {LuminaAudioPlayer.PlayerError} When the channel cannot be copied as planar float samples.
+         * @throws {NemeraAudioPlayer.PlayerError} When the channel cannot be copied as planar float samples.
          */
         copyChannelData(audioData, channel, frames, destination) {
             const target = destination || new Float32Array(frames);
@@ -1419,12 +1419,12 @@
                 // A browser that rejects the explicit planar float format is retried without one, which is safe only when
                 // the decode already carries planar float samples, so the native format is checked first.
                 if (audioData.format !== 'f32-planar')
-                    throw this.raise(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
+                    throw this.raise(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
                 try {
                     audioData.copyTo(target, { planeIndex: channel, frameCount: frames });
                     return target;
                 } catch (fallbackError) {
-                    throw this.raise(fallbackError, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
+                    throw this.raise(fallbackError, NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
                 }
             }
         }
@@ -1524,7 +1524,7 @@
                             console.debug('Audio player: the re-timed source could not be disconnected.', disconnectError);
                         }
                     }
-                    throw this.raise(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
+                    throw this.raise(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
                 }
                 rebuilt.push({
                     source,
@@ -1625,7 +1625,7 @@
          * cancelled and before markStreamComplete(). Truncating behind the playhead would move the media cursor backwards
          * and replay audio that already played, so the caller checks getCurrentTime() first and leaves a handoff that has already begun alone.
          * @param {number} mediaPosition - The absolute media position from which scheduled audio is removed.
-         * @returns {LuminaAudioPlayer.TrackRenderer} This renderer, for chaining.
+         * @returns {NemeraAudioPlayer.TrackRenderer} This renderer, for chaining.
          */
         truncateScheduleAt(mediaPosition) {
             const target = toFiniteNumber(mediaPosition);
@@ -1831,10 +1831,10 @@
          * interface hands over, so the master gain has a single writer.
          */
         subscribeToEvents() {
-            if (!this.events || !LuminaAudioPlayer.PlayerEvent || typeof this.events.on !== 'function')
+            if (!this.events || !NemeraAudioPlayer.PlayerEvent || typeof this.events.on !== 'function')
                 return;
-            if (LuminaAudioPlayer.PlayerEvent.PREFERENCES_CHANGED) {
-                this.unsubscribers.push(this.events.on(LuminaAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, (preferences) => {
+            if (NemeraAudioPlayer.PlayerEvent.PREFERENCES_CHANGED) {
+                this.unsubscribers.push(this.events.on(NemeraAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, (preferences) => {
                     if (preferences && typeof preferences.replayGainMode === 'string')
                         this.setReplayGainMode(preferences.replayGainMode);
                 }));
@@ -1845,24 +1845,24 @@
          * Records and types a failure, so a caller or a poll of getError sees a consistent error.
          * @param {*} error - The failure to record.
          * @param {string} [code] - The code to use when the failure is not already a player error.
-         * @returns {LuminaAudioPlayer.PlayerError} The recorded typed error.
+         * @returns {NemeraAudioPlayer.PlayerError} The recorded typed error.
          */
-        raise(error, code = LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR) {
-            const typed = LuminaAudioPlayer.PlayerError.from(error, code);
+        raise(error, code = NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR) {
+            const typed = NemeraAudioPlayer.PlayerError.from(error, code);
             this.error = typed;
             return typed;
         }
     }
 
-    LuminaAudioPlayer.TrackRenderer = TrackRenderer;
-    LuminaAudioPlayer.computeReplayGainTrackGain = computeReplayGainTrackGain;
+    NemeraAudioPlayer.TrackRenderer = TrackRenderer;
+    NemeraAudioPlayer.computeReplayGainTrackGain = computeReplayGainTrackGain;
 
     /**
-     * Creates a track renderer. See {@link LuminaAudioPlayer.TrackRenderer} for the options.
+     * Creates a track renderer. See {@link NemeraAudioPlayer.TrackRenderer} for the options.
      * @param {Object} options - The renderer options.
-     * @returns {LuminaAudioPlayer.TrackRenderer} The created renderer.
+     * @returns {NemeraAudioPlayer.TrackRenderer} The created renderer.
      */
-    LuminaAudioPlayer.createTrackRenderer = function (options) {
+    NemeraAudioPlayer.createTrackRenderer = function (options) {
         return new TrackRenderer(options);
     };
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

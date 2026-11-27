@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Scheduling.Commands.RemoveScheduledJob;
-using Lumina.Contracts.Fixtures.Core.Requests.Scheduling;
-using Lumina.Contracts.Requests.Scheduling;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Scheduling.RemoveScheduledJob;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Scheduling.Commands.RemoveScheduledJob;
+using Nemera.Contracts.Fixtures.Core.Requests.Scheduling;
+using Nemera.Contracts.Requests.Scheduling;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Scheduling.RemoveScheduledJob;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -13,10 +13,10 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Scheduling.RemoveScheduledJob;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Scheduling.RemoveScheduledJob;
 
 /// <summary>
 /// Contains unit tests for the <see cref="RemoveScheduledJobEndpoint"/> class.

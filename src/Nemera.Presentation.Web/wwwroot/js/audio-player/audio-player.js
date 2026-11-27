@@ -1,5 +1,5 @@
 /**
- * The audio player of Lumina: state machine, play descriptor, lifecycle, bar and the public control API.
+ * The audio player of Nemera: state machine, play descriptor, lifecycle, bar and the public control API.
  *
  * The player is a singleton created once, in the application layout, outside the content area that the
  * in-place navigation manager swaps. Because it is never torn down by a page swap, playback and its
@@ -25,7 +25,7 @@
  * and replace, so a paused and resumed track keeps reporting to the same record. When the library of the track tracks
  * progress, the start response carries the stored resume position and the player seeks to it once playback started.
  *
- * Public control API (window.LuminaAudioPlayer.instance)
+ * Public control API (window.NemeraAudioPlayer.instance)
  * ----------------------------------------
  * Methods:
  *   - playAsync(descriptor, options): starts playback of a track. The descriptor is documented by createPlayDescriptor.
@@ -85,7 +85,7 @@
  * Properties:
  *   - capabilitiesReady: a Promise resolving to the capability report.
  */
-(function (LuminaAudioPlayer) {
+(function (NemeraAudioPlayer) {
     'use strict';
 
     /**
@@ -93,7 +93,7 @@
      * @readonly
      * @enum {string}
      */
-    LuminaAudioPlayer.PlayerState = Object.freeze({
+    NemeraAudioPlayer.PlayerState = Object.freeze({
         // Nothing is loaded. This is also the state a stop returns to.
         IDLE: 'idle',
         // A track is being prepared. The download engine opens its stream here.
@@ -117,18 +117,18 @@
      * @type {Object<string, ReadonlyArray<string>>}
      */
     const STATE_TRANSITIONS = Object.freeze({
-        idle: [LuminaAudioPlayer.PlayerState.LOADING, LuminaAudioPlayer.PlayerState.ERROR],
-        loading: [LuminaAudioPlayer.PlayerState.READY, LuminaAudioPlayer.PlayerState.IDLE, LuminaAudioPlayer.PlayerState.ERROR],
-        ready: [LuminaAudioPlayer.PlayerState.LOADING, LuminaAudioPlayer.PlayerState.PLAYING, LuminaAudioPlayer.PlayerState.IDLE, LuminaAudioPlayer.PlayerState.ERROR],
-        playing: [LuminaAudioPlayer.PlayerState.LOADING, LuminaAudioPlayer.PlayerState.PAUSED, LuminaAudioPlayer.PlayerState.ENDED, LuminaAudioPlayer.PlayerState.IDLE, LuminaAudioPlayer.PlayerState.ERROR],
-        paused: [LuminaAudioPlayer.PlayerState.LOADING, LuminaAudioPlayer.PlayerState.PLAYING, LuminaAudioPlayer.PlayerState.IDLE, LuminaAudioPlayer.PlayerState.ERROR],
-        ended: [LuminaAudioPlayer.PlayerState.LOADING, LuminaAudioPlayer.PlayerState.PLAYING, LuminaAudioPlayer.PlayerState.IDLE, LuminaAudioPlayer.PlayerState.ERROR],
-        error: [LuminaAudioPlayer.PlayerState.LOADING, LuminaAudioPlayer.PlayerState.IDLE, LuminaAudioPlayer.PlayerState.ERROR]
+        idle: [NemeraAudioPlayer.PlayerState.LOADING, NemeraAudioPlayer.PlayerState.ERROR],
+        loading: [NemeraAudioPlayer.PlayerState.READY, NemeraAudioPlayer.PlayerState.IDLE, NemeraAudioPlayer.PlayerState.ERROR],
+        ready: [NemeraAudioPlayer.PlayerState.LOADING, NemeraAudioPlayer.PlayerState.PLAYING, NemeraAudioPlayer.PlayerState.IDLE, NemeraAudioPlayer.PlayerState.ERROR],
+        playing: [NemeraAudioPlayer.PlayerState.LOADING, NemeraAudioPlayer.PlayerState.PAUSED, NemeraAudioPlayer.PlayerState.ENDED, NemeraAudioPlayer.PlayerState.IDLE, NemeraAudioPlayer.PlayerState.ERROR],
+        paused: [NemeraAudioPlayer.PlayerState.LOADING, NemeraAudioPlayer.PlayerState.PLAYING, NemeraAudioPlayer.PlayerState.IDLE, NemeraAudioPlayer.PlayerState.ERROR],
+        ended: [NemeraAudioPlayer.PlayerState.LOADING, NemeraAudioPlayer.PlayerState.PLAYING, NemeraAudioPlayer.PlayerState.IDLE, NemeraAudioPlayer.PlayerState.ERROR],
+        error: [NemeraAudioPlayer.PlayerState.LOADING, NemeraAudioPlayer.PlayerState.IDLE, NemeraAudioPlayer.PlayerState.ERROR]
     });
 
     // The redirect sentinel belongs to the dependency free utils module, so a consumer that is loaded without this
     // controller, such as the manifest client, can still recognize it. The local name keeps the references readable.
-    const REDIRECTED = LuminaAudioPlayer.REDIRECTED;
+    const REDIRECTED = NemeraAudioPlayer.REDIRECTED;
 
     /**
      * Follows a server redirect, but only when the target is an http or https URL on the same origin and protocol as
@@ -208,7 +208,7 @@
      * @readonly
      * @type {string}
      */
-    LuminaAudioPlayer.PLAY_DESCRIPTOR_ATTRIBUTE = 'data-audio-player-play';
+    NemeraAudioPlayer.PLAY_DESCRIPTOR_ATTRIBUTE = 'data-audio-player-play';
 
     /**
      * The attribute that marks an element as a play next trigger the player handles by event delegation. An explicit play
@@ -216,23 +216,23 @@
      * @readonly
      * @type {string}
      */
-    LuminaAudioPlayer.PLAY_NEXT_ATTRIBUTE = 'data-audio-player-play-next';
+    NemeraAudioPlayer.PLAY_NEXT_ATTRIBUTE = 'data-audio-player-play-next';
 
     /**
      * The attribute that marks an element as a shuffled play trigger the player handles by event delegation. The trigger
-     * starts the described context and turns shuffle on for the scope in {@link LuminaAudioPlayer.PLAY_SHUFFLE_SCOPE_ATTRIBUTE}.
+     * starts the described context and turns shuffle on for the scope in {@link NemeraAudioPlayer.PLAY_SHUFFLE_SCOPE_ATTRIBUTE}.
      * @readonly
      * @type {string}
      */
-    LuminaAudioPlayer.PLAY_SHUFFLED_ATTRIBUTE = 'data-audio-player-play-shuffled';
+    NemeraAudioPlayer.PLAY_SHUFFLED_ATTRIBUTE = 'data-audio-player-play-shuffled';
 
     /**
      * The attribute that carries the shuffle scope of a shuffled play trigger. It holds one of the
-     * {@link LuminaAudioPlayer.QueueShuffleScope} values.
+     * {@link NemeraAudioPlayer.QueueShuffleScope} values.
      * @readonly
      * @type {string}
      */
-    LuminaAudioPlayer.PLAY_SHUFFLE_SCOPE_ATTRIBUTE = 'data-audio-player-shuffle-scope';
+    NemeraAudioPlayer.PLAY_SHUFFLE_SCOPE_ATTRIBUTE = 'data-audio-player-shuffle-scope';
 
     /**
      * The attribute that marks an element as a library play trigger the player handles by event delegation. It carries
@@ -240,7 +240,7 @@
      * @readonly
      * @type {string}
      */
-    LuminaAudioPlayer.PLAY_LIBRARY_ATTRIBUTE = 'data-audio-player-play-library';
+    NemeraAudioPlayer.PLAY_LIBRARY_ATTRIBUTE = 'data-audio-player-play-library';
 
     /**
      * The attribute that marks an element as a library shuffle trigger the player handles by event delegation. It carries
@@ -248,7 +248,7 @@
      * @readonly
      * @type {string}
      */
-    LuminaAudioPlayer.PLAY_LIBRARY_SHUFFLED_ATTRIBUTE = 'data-audio-player-play-library-shuffled';
+    NemeraAudioPlayer.PLAY_LIBRARY_SHUFFLED_ATTRIBUTE = 'data-audio-player-play-library-shuffled';
 
     /**
      * Maps each play descriptor field to the data attribute the pages set on a play trigger, so the
@@ -256,7 +256,7 @@
      * @readonly
      * @type {Object<string, string>}
      */
-    LuminaAudioPlayer.PLAY_DESCRIPTOR_DATA_KEYS = Object.freeze({
+    NemeraAudioPlayer.PLAY_DESCRIPTOR_DATA_KEYS = Object.freeze({
         trackId: 'trackId',
         albumId: 'albumId',
         artistId: 'artistId',
@@ -484,7 +484,7 @@
      * @returns {number} The clamped value.
      */
     function clamp(value, minimum, maximum) {
-        return LuminaAudioPlayer.clamp(value, minimum, maximum);
+        return NemeraAudioPlayer.clamp(value, minimum, maximum);
     }
 
     /**
@@ -551,10 +551,10 @@
     function createPlayDescriptor(input) {
         if (!input || typeof input !== 'object')
             return null;
-        const trackId = LuminaAudioPlayer.toIdString(input.trackId);
-        const albumId = LuminaAudioPlayer.toIdString(input.albumId);
-        const artistId = LuminaAudioPlayer.toIdString(input.artistId);
-        const libraryId = LuminaAudioPlayer.toIdString(input.libraryId);
+        const trackId = NemeraAudioPlayer.toIdString(input.trackId);
+        const albumId = NemeraAudioPlayer.toIdString(input.albumId);
+        const artistId = NemeraAudioPlayer.toIdString(input.artistId);
+        const libraryId = NemeraAudioPlayer.toIdString(input.libraryId);
         if (!libraryId)
             return null;
         const queue = Array.isArray(input.queue)
@@ -661,7 +661,7 @@
 
     /**
      * Reads a play descriptor from the data attributes of a play trigger element, per
-     * {@link LuminaAudioPlayer.PLAY_DESCRIPTOR_DATA_KEYS}. A trigger can describe a track, an album context or an artist
+     * {@link NemeraAudioPlayer.PLAY_DESCRIPTOR_DATA_KEYS}. A trigger can describe a track, an album context or an artist
      * context, so the descriptor is valid whenever its context Ids are complete, not only when it names a track.
      * @param {Element} element - The element carrying the descriptor attributes.
      * @returns {Object|null} The normalized descriptor, or null when the element does not describe a valid track, album or artist context.
@@ -669,7 +669,7 @@
     function readPlayDescriptorFromElement(element) {
         if (!element || !element.dataset)
             return null;
-        const keys = LuminaAudioPlayer.PLAY_DESCRIPTOR_DATA_KEYS;
+        const keys = NemeraAudioPlayer.PLAY_DESCRIPTOR_DATA_KEYS;
         return createPlayDescriptor({
             trackId: element.dataset[keys.trackId],
             albumId: element.dataset[keys.albumId],
@@ -680,7 +680,7 @@
             durationInSeconds: element.dataset[keys.durationInSeconds],
             coverArtPath: element.dataset[keys.coverArtPath],
             coverArtUrl: element.dataset[keys.coverArtUrl],
-            isLibraryContext: element.hasAttribute(LuminaAudioPlayer.PLAY_LIBRARY_ATTRIBUTE)
+            isLibraryContext: element.hasAttribute(NemeraAudioPlayer.PLAY_LIBRARY_ATTRIBUTE)
         });
     }
 
@@ -693,18 +693,18 @@
          * @param {Object} [options] - The player options.
          * @param {HTMLElement} [options.container] - The player bar element. Defaults to the first element with the audio-player-container class.
          * @param {HTMLElement} [options.main] - The main content element, whose class tracks the bar visibility. Defaults to the first main element.
-         * @param {LuminaAudioPlayer.PlayerEventBus} [options.events] - The event bus to publish to. A new one is created when omitted.
-         * @param {LuminaAudioPlayer.PlayerCapabilities} [options.capabilities] - The capability detector. A new one is created when omitted.
-         * @param {LuminaAudioPlayer.PlayerEngineRegistry} [options.engineRegistry] - The engine registry. The default registry is created when omitted.
+         * @param {NemeraAudioPlayer.PlayerEventBus} [options.events] - The event bus to publish to. A new one is created when omitted.
+         * @param {NemeraAudioPlayer.PlayerCapabilities} [options.capabilities] - The capability detector. A new one is created when omitted.
+         * @param {NemeraAudioPlayer.PlayerEngineRegistry} [options.engineRegistry] - The engine registry. The default registry is created when omitted.
          * @param {string} [options.engineName] - The name of the engine to run. Defaults to the silent engine.
          * @param {Object} [options.configuration] - The endpoints configuration. Defaults to window.audioPlayerConfiguration.
          */
         constructor(options = {}) {
             this.options = options;
-            this.events = options.events || new LuminaAudioPlayer.PlayerEventBus();
-            this.capabilities = options.capabilities || new LuminaAudioPlayer.PlayerCapabilities();
-            this.engineRegistry = options.engineRegistry || LuminaAudioPlayer.createDefaultEngineRegistry();
-            this.engineName = options.engineName || LuminaAudioPlayer.NULL_ENGINE_NAME;
+            this.events = options.events || new NemeraAudioPlayer.PlayerEventBus();
+            this.capabilities = options.capabilities || new NemeraAudioPlayer.PlayerCapabilities();
+            this.engineRegistry = options.engineRegistry || NemeraAudioPlayer.createDefaultEngineRegistry();
+            this.engineName = options.engineName || NemeraAudioPlayer.NULL_ENGINE_NAME;
             // The fallback is a second registered engine the player selects instead of the primary one when the browser
             // misses a capability the primary engine requires. It is null for a bare composition that provides no fallback.
             this.fallbackEngineName = null;
@@ -714,15 +714,15 @@
             // The one time notice about the degraded fallback is shown only when the bar becomes visible for the first time.
             this.hasShownFallbackNotification = false;
 
-            this.state = LuminaAudioPlayer.PlayerState.IDLE;
+            this.state = NemeraAudioPlayer.PlayerState.IDLE;
             this.descriptor = null;
             // The queue is the single source of truth of what the player may play next: its entries carry an identity per
             // occurrence, so a repeated track is distinguishable from another occurrence of the same track. The model, the
             // play context and the client storage are documented in audio-player-queue.js.
-            this.queue = options.queue || new LuminaAudioPlayer.AudioQueue();
+            this.queue = options.queue || new NemeraAudioPlayer.AudioQueue();
             // The service that builds a queue from a play context through the web endpoints of the music pages, and the
             // source a shuffle draws its batches from. Both are created lazily when a context or a shuffle needs them.
-            this.queueService = options.queueService || new LuminaAudioPlayer.QueueContextService({
+            this.queueService = options.queueService || new NemeraAudioPlayer.QueueContextService({
                 fetchJsonAsync: (url, signal, label) => this.fetchJsonAsync(url, signal, label),
                 postJsonAsync: (url, data, requestOptions) => this.postJsonAsync(url, data, requestOptions),
                 getConfiguration: () => this.getConfiguration(),
@@ -886,7 +886,7 @@
          * The method is idempotent: a second call returns immediately. When the layout does not render
          * a bar (an unauthenticated visitor), the player marks itself unavailable and every control
          * method becomes a no-op.
-         * @returns {LuminaAudioPlayer.AudioPlayer} This player, for chaining.
+         * @returns {NemeraAudioPlayer.AudioPlayer} This player, for chaining.
          */
         initialize() {
             if (this.isInitialized)
@@ -976,7 +976,7 @@
          * The module is optional: a composition that omits it keeps a playable bar with no meter.
          */
         ensureVuMeter() {
-            if (typeof LuminaAudioPlayer.createVuMeter !== 'function')
+            if (typeof NemeraAudioPlayer.createVuMeter !== 'function')
                 return;
             if (!this.dom.vuMeter) {
                 const bar = this.container.querySelector('.audio-player-bar');
@@ -993,12 +993,12 @@
                 bar.insertBefore(meterElement, reference);
                 this.dom.vuMeter = meterElement;
             }
-            this.vuMeter = LuminaAudioPlayer.createVuMeter({
+            this.vuMeter = NemeraAudioPlayer.createVuMeter({
                 container: this.dom.vuMeter,
                 settings: this.preferences
             });
             if (this.events && typeof this.events.on === 'function')
-                this.vuMeterUnsubscribe = this.events.on(LuminaAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, () => this.applyVuMeterSettings());
+                this.vuMeterUnsubscribe = this.events.on(NemeraAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, () => this.applyVuMeterSettings());
         }
 
         /**
@@ -1102,7 +1102,7 @@
             this.vuMeter.setAnalyser(analyser);
             // The state may already be PLAYING when a load replaced the engine under a running player, so a fresh analyzer
             // starts reading immediately instead of waiting for the next state change.
-            if (this.state === LuminaAudioPlayer.PlayerState.PLAYING)
+            if (this.state === NemeraAudioPlayer.PlayerState.PLAYING)
                 this.vuMeter.start();
         }
 
@@ -1110,13 +1110,13 @@
          * Starts or stops the VU meter with the player state. A playing, visible player reads the analyzer, and every
          * other case lets the meter fall to zero, so a pause, a stop, an end, a failure, or a hidden bar never leaves a
          * frozen meter on screen and a hidden meter costs no animation frames.
-         * @param {string} state - One of the {@link LuminaAudioPlayer.PlayerState} values.
+         * @param {string} state - One of the {@link NemeraAudioPlayer.PlayerState} values.
          */
         updateVuMeterState(state) {
             if (!this.vuMeter)
                 return;
             const isVisible = !this.container || !this.container.classList.contains('not-shown');
-            if (state === LuminaAudioPlayer.PlayerState.PLAYING && isVisible)
+            if (state === NemeraAudioPlayer.PlayerState.PLAYING && isVisible)
                 this.vuMeter.start();
             else
                 this.vuMeter.stop();
@@ -1198,7 +1198,7 @@
                     return;
                 if (this.consumptionSession || !this.descriptor)
                     return;
-                if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING && this.state !== LuminaAudioPlayer.PlayerState.PAUSED)
+                if (this.state !== NemeraAudioPlayer.PlayerState.PLAYING && this.state !== NemeraAudioPlayer.PlayerState.PAUSED)
                     return;
                 // The record of the previous page was stopped by the pagehide handler. The track continues from the
                 // position it had, so a new record covers the rest of the listening session.
@@ -1232,42 +1232,42 @@
             this.descriptorClickHandler = (event) => {
                 if (!(event.target instanceof Element))
                     return;
-                const playNextTrigger = event.target.closest(`[${LuminaAudioPlayer.PLAY_NEXT_ATTRIBUTE}]`);
+                const playNextTrigger = event.target.closest(`[${NemeraAudioPlayer.PLAY_NEXT_ATTRIBUTE}]`);
                 if (playNextTrigger) {
                     event.preventDefault();
                     const descriptor = readPlayDescriptorFromElement(playNextTrigger);
-                    this.playNextAsync(descriptor).catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED));
+                    this.playNextAsync(descriptor).catch((error) => this.raiseError(error, NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED));
                     return;
                 }
-                const shuffledTrigger = event.target.closest(`[${LuminaAudioPlayer.PLAY_SHUFFLED_ATTRIBUTE}]`);
+                const shuffledTrigger = event.target.closest(`[${NemeraAudioPlayer.PLAY_SHUFFLED_ATTRIBUTE}]`);
                 if (shuffledTrigger) {
                     event.preventDefault();
                     const descriptor = readPlayDescriptorFromElement(shuffledTrigger);
-                    const scope = shuffledTrigger.getAttribute(LuminaAudioPlayer.PLAY_SHUFFLE_SCOPE_ATTRIBUTE)
-                        || LuminaAudioPlayer.QueueShuffleScope.RELEASE;
-                    this.playShuffledAsync(descriptor, scope).catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED));
+                    const scope = shuffledTrigger.getAttribute(NemeraAudioPlayer.PLAY_SHUFFLE_SCOPE_ATTRIBUTE)
+                        || NemeraAudioPlayer.QueueShuffleScope.RELEASE;
+                    this.playShuffledAsync(descriptor, scope).catch((error) => this.raiseError(error, NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED));
                     return;
                 }
-                const libraryTrigger = event.target.closest(`[${LuminaAudioPlayer.PLAY_LIBRARY_ATTRIBUTE}]`);
+                const libraryTrigger = event.target.closest(`[${NemeraAudioPlayer.PLAY_LIBRARY_ATTRIBUTE}]`);
                 if (libraryTrigger) {
                     event.preventDefault();
                     const descriptor = readPlayDescriptorFromElement(libraryTrigger);
-                    this.playAsync(descriptor).catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR));
+                    this.playAsync(descriptor).catch((error) => this.raiseError(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR));
                     return;
                 }
-                const libraryShuffledTrigger = event.target.closest(`[${LuminaAudioPlayer.PLAY_LIBRARY_SHUFFLED_ATTRIBUTE}]`);
+                const libraryShuffledTrigger = event.target.closest(`[${NemeraAudioPlayer.PLAY_LIBRARY_SHUFFLED_ATTRIBUTE}]`);
                 if (libraryShuffledTrigger) {
                     event.preventDefault();
                     const libraryId = libraryShuffledTrigger.dataset.libraryId || '';
-                    this.playLibraryShuffledAsync(libraryId).catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED));
+                    this.playLibraryShuffledAsync(libraryId).catch((error) => this.raiseError(error, NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED));
                     return;
                 }
-                const trigger = event.target.closest(`[${LuminaAudioPlayer.PLAY_DESCRIPTOR_ATTRIBUTE}]`);
+                const trigger = event.target.closest(`[${NemeraAudioPlayer.PLAY_DESCRIPTOR_ATTRIBUTE}]`);
                 if (!trigger)
                     return;
                 event.preventDefault();
                 const descriptor = readPlayDescriptorFromElement(trigger);
-                this.playAsync(descriptor).catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR));
+                this.playAsync(descriptor).catch((error) => this.raiseError(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR));
             };
             document.addEventListener('click', this.descriptorClickHandler);
         }
@@ -1276,10 +1276,10 @@
          * Starts playback of a track, an album or an artist, and shows the bar.
          *
          * A descriptor that already carries a queue is played as is. A descriptor that names only an album, an artist or a
-         * library is resolved into the ordered tracks of that context through {@link LuminaAudioPlayer.QueueContextService},
+         * library is resolved into the ordered tracks of that context through {@link NemeraAudioPlayer.QueueContextService},
          * which also documents the endpoints and the order it uses. Starting any new context discards the previous queue,
          * its history, its autoplay continuation and its shuffle, because a play now is an explicit choice.
-         * @param {Object} descriptorInput - The play descriptor to play, per {@link LuminaAudioPlayer.createPlayDescriptor}.
+         * @param {Object} descriptorInput - The play descriptor to play, per {@link NemeraAudioPlayer.createPlayDescriptor}.
          * @param {Object} [options] - The play options.
          * @param {boolean} [options.shouldStartRandomTrack] - True to start a random track of the resolved context instead of its first track. Used by the shuffled play actions, so the first track of a shuffle is random too.
          * @returns {Promise<boolean>} True when playback started, false when the request was rejected.
@@ -1290,7 +1290,7 @@
                 return false;
             const descriptor = createPlayDescriptor(descriptorInput);
             if (!descriptor) {
-                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor identifies no library, or no playable context.'));
+                this.raiseError(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor identifies no library, or no playable context.'));
                 return false;
             }
             // The token invalidates this request if a later play, skip or stop takes the player while the context is loading.
@@ -1305,7 +1305,7 @@
             if (requestToken !== this.playRequestToken)
                 return false;
             if (report && !report.isSupported && !this.enableFallbackPlayback(report)) {
-                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
+                this.raiseError(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
                     { missing: report.missing }));
                 return false;
             }
@@ -1350,7 +1350,7 @@
             this.renderDescriptor();
             this.renderProgress();
             this.showBar();
-            this.setState(LuminaAudioPlayer.PlayerState.LOADING);
+            this.setState(NemeraAudioPlayer.PlayerState.LOADING);
 
             let built;
             const buildHandle = this.openPlayContextBuild();
@@ -1362,32 +1362,32 @@
                 if (buildHandle.signal && buildHandle.signal.aborted) {
                     if (requestToken === this.playRequestToken
                         && buildHandle.timedOut
-                        && this.state === LuminaAudioPlayer.PlayerState.LOADING) {
+                        && this.state === NemeraAudioPlayer.PlayerState.LOADING) {
                         // The old timeline may still be playing while the new context never arrived. It is silenced before
                         // the error state makes the play control a recovery action instead of a pause control.
                         await this.pauseEngineQuietlyAsync(this.engine);
                         this.restoreTimelineState(previousTimeline);
-                        this.fail(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The play context could not be loaded in time.'));
+                        this.fail(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The play context could not be loaded in time.'));
                         await this.flushPendingPlayNext(requestToken);
                     }
                     return false;
                 }
                 // A session that expired while the context was loaded already owns the page: it is navigating to the sign in
                 // page, so the failure is not reported as a playback failure.
-                if (error && error.details && error.details.reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
+                if (error && error.details && error.details.reason === NemeraAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
                     return false;
-                if (requestToken !== this.playRequestToken || this.state !== LuminaAudioPlayer.PlayerState.LOADING)
+                if (requestToken !== this.playRequestToken || this.state !== NemeraAudioPlayer.PlayerState.LOADING)
                     return false;
                 await this.pauseEngineQuietlyAsync(this.engine);
                 this.restoreTimelineState(previousTimeline);
-                this.fail(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
+                this.fail(error, NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
                 await this.flushPendingPlayNext(requestToken);
                 return false;
             } finally {
                 this.closePlayContextBuild(buildHandle);
             }
             // A stop or a newer play request while the context was loading owns the player and must not be overwritten by it.
-            if (requestToken !== this.playRequestToken || this.state !== LuminaAudioPlayer.PlayerState.LOADING)
+            if (requestToken !== this.playRequestToken || this.state !== NemeraAudioPlayer.PlayerState.LOADING)
                 return false;
 
             // An empty context is reported before the existing queue is replaced, so a failed play of an empty album or
@@ -1395,7 +1395,7 @@
             if (!built || !Array.isArray(built.descriptors) || built.descriptors.length === 0) {
                 await this.pauseEngineQuietlyAsync(this.engine);
                 this.restoreTimelineState(previousTimeline);
-                this.fail(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The play context holds no playable track.'));
+                this.fail(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The play context holds no playable track.'));
                 await this.flushPendingPlayNext(requestToken);
                 return false;
             }
@@ -1409,7 +1409,7 @@
                 // A whole library is materialized lazily, one artist at a time, so its continuation is part of the explicit
                 // play action rather than an optional autoplay. Album and artist contexts load in full before playback.
                 continuationEnabled: built.continuationEnabled
-                    && (built.context.kind === LuminaAudioPlayer.PlayContextKind.LIBRARY
+                    && (built.context.kind === NemeraAudioPlayer.PlayContextKind.LIBRARY
                         || this.preferences.shouldAutoplay === true)
             });
             // A new context is explicit and ordered, so it starts unshuffled; the model owns that reset together with the
@@ -1419,7 +1419,7 @@
             if (!current) {
                 await this.pauseEngineQuietlyAsync(this.engine);
                 this.restoreTimelineState(previousTimeline);
-                this.fail(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The play context holds no playable track.'));
+                this.fail(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The play context holds no playable track.'));
                 await this.flushPendingPlayNext(requestToken);
                 return false;
             }
@@ -1430,7 +1430,7 @@
             this.renderQueue();
             this.scrollQueueToCurrentEntry();
             this.renderQueueControls();
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.DESCRIPTOR_CHANGED, current.descriptor);
+            this.events.emit(NemeraAudioPlayer.PlayerEvent.DESCRIPTOR_CHANGED, current.descriptor);
             this.emitQueueStateChanged();
             // Play next items that arrived while this context was resolving become the successors of the new current entry.
             await this.flushPendingPlayNext(requestToken);
@@ -1448,14 +1448,14 @@
          * first entry of the shuffle is random too. The ordered context remains the queue that turning shuffle off
          * restores. An unknown or missing scope falls back to the release scope, because a trigger without a scope is
          * asking to shuffle what it just started.
-         * @param {Object} descriptorInput - The play descriptor to play, per {@link LuminaAudioPlayer.createPlayDescriptor}.
-         * @param {string} [scope] - One of the {@link LuminaAudioPlayer.QueueShuffleScope} values.
+         * @param {Object} descriptorInput - The play descriptor to play, per {@link NemeraAudioPlayer.createPlayDescriptor}.
+         * @param {string} [scope] - One of the {@link NemeraAudioPlayer.QueueShuffleScope} values.
          * @returns {Promise<boolean>} True when playback started and the shuffle was applied, false otherwise.
          */
         async playShuffledAsync(descriptorInput, scope) {
-            const targetScope = Object.values(LuminaAudioPlayer.QueueShuffleScope).includes(scope)
+            const targetScope = Object.values(NemeraAudioPlayer.QueueShuffleScope).includes(scope)
                 ? scope
-                : LuminaAudioPlayer.QueueShuffleScope.RELEASE;
+                : NemeraAudioPlayer.QueueShuffleScope.RELEASE;
             const started = await this.playAsync(descriptorInput, { shouldStartRandomTrack: true });
             if (!started)
                 return false;
@@ -1472,7 +1472,7 @@
          * @returns {Promise<boolean>} True when playback started and the shuffle was applied, false otherwise.
          */
         async playLibraryShuffledAsync(libraryId) {
-            if (!this.isAvailable || !LuminaAudioPlayer.isGuid(libraryId))
+            if (!this.isAvailable || !NemeraAudioPlayer.isGuid(libraryId))
                 return false;
             // A newer play, skip or stop supersedes this request while its first random batch is resolved.
             const requestToken = ++this.playRequestToken;
@@ -1480,7 +1480,7 @@
             if (requestToken !== this.playRequestToken)
                 return false;
             if (report && !report.isSupported && !this.enableFallbackPlayback(report)) {
-                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
+                this.raiseError(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
                     { missing: report.missing }));
                 return false;
             }
@@ -1488,7 +1488,7 @@
             let batch;
             try {
                 const source = await this.queueService.createShuffleSourceAsync(
-                    LuminaAudioPlayer.QueueShuffleScope.LIBRARY,
+                    NemeraAudioPlayer.QueueShuffleScope.LIBRARY,
                     null,
                     { libraryId },
                     buildHandle.signal);
@@ -1496,9 +1496,9 @@
             } catch (error) {
                 if (buildHandle.signal && buildHandle.signal.aborted)
                     return false;
-                if (error && error.details && error.details.reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
+                if (error && error.details && error.details.reason === NemeraAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
                     return false;
-                this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
+                this.raiseError(error, NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
                 return false;
             } finally {
                 buildHandle.dispose();
@@ -1506,14 +1506,14 @@
             if (requestToken !== this.playRequestToken)
                 return false;
             if (!Array.isArray(batch) || batch.length === 0) {
-                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The library holds no playable track.'));
+                this.raiseError(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The library holds no playable track.'));
                 return false;
             }
             const start = batch[0];
             const started = await this.playAsync({ ...start });
             if (!started)
                 return false;
-            return this.setShuffleAsync(true, LuminaAudioPlayer.QueueShuffleScope.LIBRARY);
+            return this.setShuffleAsync(true, NemeraAudioPlayer.QueueShuffleScope.LIBRARY);
         }
 
         /**
@@ -1734,26 +1734,26 @@
                 // The load configured the renderer of the engine, which creates its audio context and the output analyzer of
                 // the VU meter. Binding it here, once per load, also covers an engine swap under a running player.
                 this.attachVuMeter(engine);
-                if (this.state !== LuminaAudioPlayer.PlayerState.LOADING) {
+                if (this.state !== NemeraAudioPlayer.PlayerState.LOADING) {
                     // A stop during the load already paused the engine; a newer request owns the player state and must not be touched by this stale continuation.
-                    if (this.state === LuminaAudioPlayer.PlayerState.IDLE)
+                    if (this.state === NemeraAudioPlayer.PlayerState.IDLE)
                         await this.pauseEngineQuietlyAsync(engine);
                     return false;
                 }
-                this.setState(LuminaAudioPlayer.PlayerState.READY);
+                this.setState(NemeraAudioPlayer.PlayerState.READY);
                 await engine.playAsync();
                 if (!isRequestCurrent()) {
                     // Audio has started for a request that a newer one superseded. If the newer request has not started its own
                     // playback yet, the superseded audio must not keep playing while its context builds, or forever when that
                     // build fails. Playback of a newer request is left untouched.
-                    if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
+                    if (this.state !== NemeraAudioPlayer.PlayerState.PLAYING)
                         await this.pauseEngineQuietlyAsync(engine);
                     return false;
                 }
                 // The play control resumed the READY track while this continuation was awaiting engine.playAsync, so the
                 // state is already PLAYING. The engine is producing audio and no other path started the record, so it starts
                 // here instead of being skipped by the READY branch below.
-                if (this.state === LuminaAudioPlayer.PlayerState.PLAYING) {
+                if (this.state === NemeraAudioPlayer.PlayerState.PLAYING) {
                     if (!this.isConsumptionSessionCurrent(this.consumptionSession)) {
                         this.startConsumptionAsync(descriptor).catch((error) => {
                             console.debug('Audio player: the consumption record of the resumed track could not be started.', error);
@@ -1761,12 +1761,12 @@
                     }
                     return true;
                 }
-                if (this.state !== LuminaAudioPlayer.PlayerState.READY) {
-                    if (this.state === LuminaAudioPlayer.PlayerState.IDLE)
+                if (this.state !== NemeraAudioPlayer.PlayerState.READY) {
+                    if (this.state === NemeraAudioPlayer.PlayerState.IDLE)
                         await this.pauseEngineQuietlyAsync(engine);
                     return false;
                 }
-                this.setState(LuminaAudioPlayer.PlayerState.PLAYING);
+                this.setState(NemeraAudioPlayer.PlayerState.PLAYING);
                 this.renderTransportState();
                 // The record starts with actual playback, never with a load that may still fail. Reporting is a background
                 // concern, so the start is deliberately not awaited and a failure never affects the playback that just started.
@@ -1780,11 +1780,11 @@
                 if (!isRequestCurrent())
                     return false;
                 const reason = error && error.details ? error.details.reason : null;
-                if (reason === LuminaAudioPlayer.PlayerErrorReason.LOAD_SUPERSEDED
-                    || reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
+                if (reason === NemeraAudioPlayer.PlayerErrorReason.LOAD_SUPERSEDED
+                    || reason === NemeraAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
                     return false;
                 // A failure before playback starts is a load failure; later failures are reported by the engine through its host.
-                this.fail(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED);
+                this.fail(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED);
                 return false;
             }
             return true;
@@ -1813,7 +1813,7 @@
          */
         async requestNextTrackAsync(reason) {
             // A paused or stopped player has made an explicit choice that the end of a track must not override.
-            if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
+            if (this.state !== NemeraAudioPlayer.PlayerState.PLAYING)
                 return false;
             // The engine asks for the next entry only after the current one ended and its gapless handoff could not be
             // prepared, so the record of the finished track completes before the next one starts its own.
@@ -1821,11 +1821,11 @@
             // The capability gate is part of the player's play path, so an auto advance never starts a track the browser
             // cannot decode.
             const report = await this.capabilitiesReady;
-            if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
+            if (this.state !== NemeraAudioPlayer.PlayerState.PLAYING)
                 return false;
             if (report && !report.isSupported && !this.enableFallbackPlayback(report)) {
-                this.fail(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
-                    { missing: report.missing }), LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING);
+                this.fail(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING, 'The browser is missing a capability the player requires.',
+                    { missing: report.missing }), NemeraAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING);
                 return true;
             }
             // The next entry is re-resolved after the capability await, so a queue that changed in the meantime is respected.
@@ -1836,7 +1836,7 @@
             // reporting an end over a state the player has already set. The loading state is kept across the engine
             // teardown, so the end gap shows that the next track is being prepared.
             const hasStarted = await this.startQueuedEntryAsync(next.entryId, { keepBuffering: true });
-            if (!hasStarted && this.state === LuminaAudioPlayer.PlayerState.IDLE
+            if (!hasStarted && this.state === NemeraAudioPlayer.PlayerState.IDLE
                 && this.engine && typeof this.engine.discardCurrentAsync === 'function') {
                 // A stop during the continuation load owns the outcome. The prepared track is released, so a stopped
                 // player does not keep a track loaded that was started only to continue a queue.
@@ -1883,7 +1883,7 @@
             if (requestToken !== this.playRequestToken)
                 return false;
             if (report && !report.isSupported && !this.enableFallbackPlayback(report)) {
-                const capabilityError = new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING,
+                const capabilityError = new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING,
                     'The browser is missing a capability the player requires.', { missing: report.missing });
                 // A missing capability rejects this transition, not the track that is still playing. Its playback and its
                 // record stay untouched, so the error is raised without moving the player to its error state. A transition
@@ -1891,12 +1891,12 @@
                 if (this.isConsumptionSessionCurrent(this.consumptionSession))
                     this.raiseError(capabilityError);
                 else
-                    this.fail(capabilityError, LuminaAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING);
+                    this.fail(capabilityError, NemeraAudioPlayer.PlayerErrorCode.CAPABILITY_MISSING);
                 return false;
             }
             const target = this.queue.findEntry(entryId);
             if (target && !createPlayDescriptor(target.entry.descriptor)) {
-                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The queue entry does not describe a playable track.'));
+                this.raiseError(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The queue entry does not describe a playable track.'));
                 return false;
             }
             const committed = this.queue.commit(entryId, {
@@ -1913,10 +1913,10 @@
             this.showBar();
             const applied = this.applyCommittedEntry(committed.entry, committed.changed ? committed.previousIndex : null, committed.removedCount);
             if (!applied) {
-                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The queue entry is no longer the current playable entry.'));
+                this.raiseError(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The queue entry is no longer the current playable entry.'));
                 return false;
             }
-            this.setState(LuminaAudioPlayer.PlayerState.LOADING);
+            this.setState(NemeraAudioPlayer.PlayerState.LOADING);
             this.renderTransportState();
             const hasStarted = await this.startLoadedDescriptorAsync(committed.entry.descriptor, {
                 keepBuffering: options.keepBuffering === true,
@@ -1952,7 +1952,7 @@
                 if (this.queueGeneration !== queueGeneration
                     || (this.queue.getCurrentEntry() ? this.queue.getCurrentEntry().entryId : null) !== cursorEntryId
                     || this.playRequestToken !== requestToken
-                    || (stateAtStart !== LuminaAudioPlayer.PlayerState.ERROR && this.state === LuminaAudioPlayer.PlayerState.ERROR))
+                    || (stateAtStart !== NemeraAudioPlayer.PlayerState.ERROR && this.state === NemeraAudioPlayer.PlayerState.ERROR))
                     return false;
                 next = this.queue.getNextEntry({ allowWrap });
             }
@@ -1974,13 +1974,13 @@
             // second press walks back. At the very start it walks back immediately. A finished track is already at a fresh
             // boundary, so previous walks back instead of restarting it. A failed entry is never restarted, because that
             // would only repeat the failure; the history or the previous entry is the recovery path.
-            if (this.state !== LuminaAudioPlayer.PlayerState.ERROR
-                && this.state !== LuminaAudioPlayer.PlayerState.ENDED
+            if (this.state !== NemeraAudioPlayer.PlayerState.ERROR
+                && this.state !== NemeraAudioPlayer.PlayerState.ENDED
                 && this.currentTime > PREVIOUS_RESTART_THRESHOLD_SECONDS)
                 return this.restartCurrentEntryAsync();
             const previous = this.queue.getPreviousEntry();
             if (!previous) {
-                if (this.state === LuminaAudioPlayer.PlayerState.ERROR)
+                if (this.state === NemeraAudioPlayer.PlayerState.ERROR)
                     return false;
                 return this.restartCurrentEntryAsync();
             }
@@ -2000,7 +2000,7 @@
             if (!this.queue)
                 return false;
             const contextKind = this.queue.context ? this.queue.context.kind : '';
-            return this.preferences.shouldAutoplay === true || contextKind === LuminaAudioPlayer.PlayContextKind.LIBRARY;
+            return this.preferences.shouldAutoplay === true || contextKind === NemeraAudioPlayer.PlayContextKind.LIBRARY;
         }
 
         /**
@@ -2010,7 +2010,7 @@
          * @returns {boolean} True when the next action may wrap.
          */
         canWrapToFirstEntry() {
-            if (this.queue.getRepeatMode() !== LuminaAudioPlayer.QueueRepeatMode.ALL)
+            if (this.queue.getRepeatMode() !== NemeraAudioPlayer.QueueRepeatMode.ALL)
                 return false;
             const canContinue = this.queue.isContinuationEnabled()
                 && this.isQueueContinuationAllowed()
@@ -2036,13 +2036,13 @@
          */
         async pauseAsync() {
             // Pausing anything that is not playing is a no-op, so the pause and close controls stay harmless when clicked twice.
-            if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
+            if (this.state !== NemeraAudioPlayer.PlayerState.PLAYING)
                 return;
             if (this.engine)
                 await this.engine.pauseAsync();
             // A pause ends the active playback time of the record but not the record itself, so the session is reported and keeps its identity for the resume.
             this.pauseConsumptionClock();
-            this.setState(LuminaAudioPlayer.PlayerState.PAUSED);
+            this.setState(NemeraAudioPlayer.PlayerState.PAUSED);
             this.renderTransportState();
             this.reportConsumptionProgress();
         }
@@ -2053,13 +2053,13 @@
          */
         async resumeAsync() {
             // A ready track has not started yet, and a paused one keeps its position, so both can resume.
-            if (this.state !== LuminaAudioPlayer.PlayerState.PAUSED && this.state !== LuminaAudioPlayer.PlayerState.READY)
+            if (this.state !== NemeraAudioPlayer.PlayerState.PAUSED && this.state !== NemeraAudioPlayer.PlayerState.READY)
                 return;
             // Without an engine there is nothing to resume; the next play builds one and applies the stored volume.
             if (!this.engine)
                 return;
             await this.engine.playAsync();
-            this.setState(LuminaAudioPlayer.PlayerState.PLAYING);
+            this.setState(NemeraAudioPlayer.PlayerState.PLAYING);
             this.renderTransportState();
             // A resume continues the record of the track that was paused, so it only restarts the active playback clock and the periodic report; it never starts a second record.
             this.resumeConsumptionClock();
@@ -2070,18 +2070,18 @@
          * @returns {Promise<void>} A promise that completes when the toggle was applied.
          */
         async toggleAsync() {
-            if (this.state === LuminaAudioPlayer.PlayerState.PLAYING)
+            if (this.state === NemeraAudioPlayer.PlayerState.PLAYING)
                 await this.pauseAsync();
-            else if (this.state === LuminaAudioPlayer.PlayerState.PAUSED || this.state === LuminaAudioPlayer.PlayerState.READY)
+            else if (this.state === NemeraAudioPlayer.PlayerState.PAUSED || this.state === NemeraAudioPlayer.PlayerState.READY)
                 await this.resumeAsync();
-            else if (this.state === LuminaAudioPlayer.PlayerState.ERROR) {
+            else if (this.state === NemeraAudioPlayer.PlayerState.ERROR) {
                 // The current entry already failed, so the play control tries the next entry and falls back to the previous
                 // one. It never wraps back to the same dead entry, even with repeat all and a single entry queue.
                 const started = await this.nextAsync({ allowWrap: false });
                 if (!started)
                     await this.previousAsync();
             }
-            else if (this.state === LuminaAudioPlayer.PlayerState.IDLE || this.state === LuminaAudioPlayer.PlayerState.ENDED) {
+            else if (this.state === NemeraAudioPlayer.PlayerState.IDLE || this.state === NemeraAudioPlayer.PlayerState.ENDED) {
                 // A stopped or finished queue is replayed from its current entry, so it resumes without rebuilding from a
                 // context descriptor that would discard the rest of the queue.
                 const current = this.queue.getCurrentEntry();
@@ -2125,7 +2125,7 @@
             this.endVolumeAdjust();
             this.clearBuffering();
             this.renderProgress();
-            this.setState(LuminaAudioPlayer.PlayerState.IDLE);
+            this.setState(NemeraAudioPlayer.PlayerState.IDLE);
             this.renderTransportState();
             // A condensed bar slides out when playback stops, while an expanded one stays so the user keeps the track and its queue in view.
             if (!this.isExpanded())
@@ -2149,10 +2149,10 @@
             // seekable either: its pipeline is either released or not yet the one the seek would address. Seeking a
             // finished track is deliberately a no-op rather than a replay, and no resume is reported for it; a new play starts the next timeline.
             if (!this.descriptor
-                || this.state === LuminaAudioPlayer.PlayerState.IDLE
-                || this.state === LuminaAudioPlayer.PlayerState.ENDED
-                || this.state === LuminaAudioPlayer.PlayerState.ERROR
-                || this.state === LuminaAudioPlayer.PlayerState.LOADING) {
+                || this.state === NemeraAudioPlayer.PlayerState.IDLE
+                || this.state === NemeraAudioPlayer.PlayerState.ENDED
+                || this.state === NemeraAudioPlayer.PlayerState.ERROR
+                || this.state === NemeraAudioPlayer.PlayerState.LOADING) {
                 this.clearSeekPending();
                 return;
             }
@@ -2186,7 +2186,7 @@
                     // Otherwise the pending target would reject every later playhead report and freeze the record on a position that playback never reached.
                     this.revertFailedConsumptionSeek(consumptionSession, consumptionSeekSequence, position, fromPosition);
                     this.clearSeekPending();
-                    this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
+                    this.raiseError(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
                 }
             }
             // The engine reports the new playhead itself, so the render is coalesced with that report instead of racing it.
@@ -2249,7 +2249,7 @@
             const value = clamp(Number(volume), 0, 1);
             this.volume = value;
             await this.applyVolumeAsync();
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.VOLUME_CHANGED, this.buildVolumePayload());
+            this.events.emit(NemeraAudioPlayer.PlayerEvent.VOLUME_CHANGED, this.buildVolumePayload());
             // The volume is written to the stored playback state of the user, so it survives a reload and never has to
             // be a field of the user settings page.
             if (shouldPersist)
@@ -2266,7 +2266,7 @@
         async applyMuteValueAsync(muted, shouldPersist) {
             this.muted = muted === true;
             await this.applyVolumeAsync();
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.MUTE_CHANGED, this.buildVolumePayload());
+            this.events.emit(NemeraAudioPlayer.PlayerEvent.MUTE_CHANGED, this.buildVolumePayload());
             if (shouldPersist)
                 this.schedulePlaybackStatePersist();
         }
@@ -2340,7 +2340,7 @@
             if (this.main)
                 this.main.classList.remove('audio-player-not-shown');
             if (wasHidden)
-                this.events.emit(LuminaAudioPlayer.PlayerEvent.VISIBILITY_CHANGED, { isVisible: true });
+                this.events.emit(NemeraAudioPlayer.PlayerEvent.VISIBILITY_CHANGED, { isVisible: true });
             // A bar that becomes visible while a track plays starts the VU meter, which was stopped while the bar was out of sight.
             this.updateVuMeterState(this.state);
         }
@@ -2360,7 +2360,7 @@
             this.setBarInert(true);
             if (this.main)
                 this.main.classList.add('audio-player-not-shown');
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.VISIBILITY_CHANGED, { isVisible: false });
+            this.events.emit(NemeraAudioPlayer.PlayerEvent.VISIBILITY_CHANGED, { isVisible: false });
             // A bar that is out of sight stops reading the analyzer, so a hidden meter costs no animation frames.
             this.updateVuMeterState(this.state);
         }
@@ -2388,7 +2388,7 @@
 
         /**
          * Gets the current state of the state machine.
-         * @returns {string} One of the {@link LuminaAudioPlayer.PlayerState} values.
+         * @returns {string} One of the {@link NemeraAudioPlayer.PlayerState} values.
          */
         getState() {
             return this.state;
@@ -2432,16 +2432,16 @@
         emitQueueStateChanged() {
             const canCheckListeners = typeof this.events.hasListeners === 'function';
             // The deprecated event keeps its original descriptor array payload, but only pays for the mapping when a legacy consumer is actually subscribed.
-            if (!canCheckListeners || this.events.hasListeners(LuminaAudioPlayer.PlayerEvent.QUEUE_CHANGED))
-                this.events.emit(LuminaAudioPlayer.PlayerEvent.QUEUE_CHANGED, this.getQueue());
-            if (canCheckListeners && !this.events.hasListeners(LuminaAudioPlayer.PlayerEvent.QUEUE_STATE_CHANGED))
+            if (!canCheckListeners || this.events.hasListeners(NemeraAudioPlayer.PlayerEvent.QUEUE_CHANGED))
+                this.events.emit(NemeraAudioPlayer.PlayerEvent.QUEUE_CHANGED, this.getQueue());
+            if (canCheckListeners && !this.events.hasListeners(NemeraAudioPlayer.PlayerEvent.QUEUE_STATE_CHANGED))
                 return;
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.QUEUE_STATE_CHANGED, this.queue.getStateSummary());
+            this.events.emit(NemeraAudioPlayer.PlayerEvent.QUEUE_STATE_CHANGED, this.queue.getStateSummary());
         }
 
         /**
          * Gets the current repeat mode.
-         * @returns {string} One of the {@link LuminaAudioPlayer.QueueRepeatMode} values.
+         * @returns {string} One of the {@link NemeraAudioPlayer.QueueRepeatMode} values.
          */
         getRepeatMode() {
             return this.queue.getRepeatMode();
@@ -2449,7 +2449,7 @@
 
         /**
          * Applies a repeat mode and publishes it. It is the shared body of the synchronous and asynchronous repeat controls.
-         * @param {string} mode - One of the {@link LuminaAudioPlayer.QueueRepeatMode} values.
+         * @param {string} mode - One of the {@link NemeraAudioPlayer.QueueRepeatMode} values.
          * @returns {{ changed: boolean, shouldCancelUpcoming: boolean }} Whether the mode changed and whether the gapless
          * handoff must be cancelled because the mode crossed the repeat-one boundary.
          */
@@ -2463,14 +2463,14 @@
             // so a handoff cached before the change must be released.
             return {
                 changed: true,
-                shouldCancelUpcoming: previous === LuminaAudioPlayer.QueueRepeatMode.ONE
-                    || mode === LuminaAudioPlayer.QueueRepeatMode.ONE
+                shouldCancelUpcoming: previous === NemeraAudioPlayer.QueueRepeatMode.ONE
+                    || mode === NemeraAudioPlayer.QueueRepeatMode.ONE
             };
         }
 
         /**
          * Sets the repeat mode.
-         * @param {string} mode - One of the {@link LuminaAudioPlayer.QueueRepeatMode} values.
+         * @param {string} mode - One of the {@link NemeraAudioPlayer.QueueRepeatMode} values.
          * @returns {boolean} True when the mode changed.
          */
         setRepeatMode(mode) {
@@ -2482,7 +2482,7 @@
 
         /**
          * Sets the repeat mode through the asynchronous face of the control API.
-         * @param {string} mode - One of the {@link LuminaAudioPlayer.QueueRepeatMode} values.
+         * @param {string} mode - One of the {@link NemeraAudioPlayer.QueueRepeatMode} values.
          * @returns {Promise<boolean>} True when the mode changed.
          */
         async setRepeatModeAsync(mode) {
@@ -2498,9 +2498,9 @@
          */
         cycleRepeatMode() {
             const modes = [
-                LuminaAudioPlayer.QueueRepeatMode.OFF,
-                LuminaAudioPlayer.QueueRepeatMode.ALL,
-                LuminaAudioPlayer.QueueRepeatMode.ONE
+                NemeraAudioPlayer.QueueRepeatMode.OFF,
+                NemeraAudioPlayer.QueueRepeatMode.ALL,
+                NemeraAudioPlayer.QueueRepeatMode.ONE
             ];
             const index = modes.indexOf(this.queue.getRepeatMode());
             const mode = modes[(index + 1) % modes.length];
@@ -2516,9 +2516,9 @@
          */
         async cycleRepeatModeAsync() {
             const modes = [
-                LuminaAudioPlayer.QueueRepeatMode.OFF,
-                LuminaAudioPlayer.QueueRepeatMode.ALL,
-                LuminaAudioPlayer.QueueRepeatMode.ONE
+                NemeraAudioPlayer.QueueRepeatMode.OFF,
+                NemeraAudioPlayer.QueueRepeatMode.ALL,
+                NemeraAudioPlayer.QueueRepeatMode.ONE
             ];
             const index = modes.indexOf(this.queue.getRepeatMode());
             const mode = modes[(index + 1) % modes.length];
@@ -2560,13 +2560,13 @@
          * the tracks already queued, so artists and albums are interleaved instead of being played one after another.
          * Turning shuffle off restores the queue the shuffle replaced.
          * @param {boolean} enabled - True to enable shuffle, false to disable it.
-         * @param {string} [scope] - One of the {@link LuminaAudioPlayer.QueueShuffleScope} values. Kept when omitted.
+         * @param {string} [scope] - One of the {@link NemeraAudioPlayer.QueueShuffleScope} values. Kept when omitted.
          * @returns {Promise<boolean>} True when the shuffle state was applied.
          */
         async setShuffleAsync(enabled, scope) {
             if (!this.isAvailable)
                 return false;
-            const targetScope = Object.values(LuminaAudioPlayer.QueueShuffleScope).includes(scope)
+            const targetScope = Object.values(NemeraAudioPlayer.QueueShuffleScope).includes(scope)
                 ? scope
                 : this.queue.getShuffleScope();
             if (!enabled) {
@@ -2629,7 +2629,7 @@
                 const identity = descriptor.trackId ? descriptor.trackId.toLowerCase() : '';
                 if (identity)
                     excluded.add(identity);
-                const batch = await source.nextBatchAsync(excluded, LuminaAudioPlayer.SHUFFLE_BATCH_SIZE, buildHandle.signal);
+                const batch = await source.nextBatchAsync(excluded, NemeraAudioPlayer.SHUFFLE_BATCH_SIZE, buildHandle.signal);
                 // A queue item click, next or previous does not bump the generation, so the cursor and the context are compared
                 // as well: a shuffle resolved for the track or context the user already left must not fill the new queue.
                 if (generation !== this.queueGeneration
@@ -2658,12 +2658,12 @@
                     if (buildHandle.timedOut
                         && generation === this.queueGeneration
                         && (this.queue.getCurrentEntry() ? this.queue.getCurrentEntry().entryId : null) === cursorEntryId)
-                        this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The shuffle scope could not be loaded in time.'));
+                        this.raiseError(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The shuffle scope could not be loaded in time.'));
                     return false;
                 }
-                if (error && error.details && error.details.reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
+                if (error && error.details && error.details.reason === NemeraAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
                     return false;
-                this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
+                this.raiseError(error, NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
                 return false;
             } finally {
                 this.closeQueueBatchBuild(buildHandle);
@@ -2674,7 +2674,7 @@
 
         /**
          * Turns shuffle on with a scope, or off again when it is already on.
-         * @param {string} [scope] - One of the {@link LuminaAudioPlayer.QueueShuffleScope} values.
+         * @param {string} [scope] - One of the {@link NemeraAudioPlayer.QueueShuffleScope} values.
          * @returns {Promise<boolean>} True when the shuffle state was applied.
          */
         async toggleShuffleAsync(scope) {
@@ -2689,7 +2689,7 @@
          *
          * The pending autoplay continuation is discarded, because an explicit play next is a manual queue: the user chose
          * what comes after the current track, so autopicking more of the album or artist would override that choice.
-         * @param {Object} descriptorInput - The play descriptor to queue, per {@link LuminaAudioPlayer.createPlayDescriptor}.
+         * @param {Object} descriptorInput - The play descriptor to queue, per {@link NemeraAudioPlayer.createPlayDescriptor}.
          * @returns {Promise<boolean>} True when at least one entry was queued.
          */
         async playNextAsync(descriptorInput) {
@@ -2697,7 +2697,7 @@
                 return false;
             const descriptor = createPlayDescriptor(descriptorInput);
             if (!descriptor) {
-                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor identifies no library, or no playable context.'));
+                this.raiseError(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor identifies no library, or no playable context.'));
                 return false;
             }
             // When nothing is current there is no "next" to queue after, so the request starts a new context instead and reports whether playback actually started.
@@ -2713,7 +2713,7 @@
             const generation = this.queueGeneration;
             // A context build that still owns the player is the play request the manual item belongs to. If it is still
             // resolving when the item is ready, the item waits for it instead of being inserted into the queue it replaces.
-            const pendingContextToken = this.state === LuminaAudioPlayer.PlayerState.LOADING && this.playContextBuildHandle !== null
+            const pendingContextToken = this.state === NemeraAudioPlayer.PlayerState.LOADING && this.playContextBuildHandle !== null
                 ? this.playRequestToken
                 : null;
             const buildHandle = this.openPlayNextBuild();
@@ -2723,12 +2723,12 @@
             } catch (error) {
                 if (buildHandle.signal && buildHandle.signal.aborted) {
                     if (buildHandle.timedOut)
-                        this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The play next item could not be loaded in time.'));
+                        this.raiseError(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The play next item could not be loaded in time.'));
                     return false;
                 }
-                if (error && error.details && error.details.reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
+                if (error && error.details && error.details.reason === NemeraAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
                     return false;
-                this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
+                this.raiseError(error, NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
                 return false;
             } finally {
                 this.closePlayNextBuild(buildHandle);
@@ -2768,8 +2768,8 @@
             this.renderQueueControls();
             this.emitQueueStateChanged();
             // The track that was playing ended while the item was queued, so the item is the next content and is started now.
-            if (stateAtStart !== LuminaAudioPlayer.PlayerState.ENDED
-                && this.state === LuminaAudioPlayer.PlayerState.ENDED) {
+            if (stateAtStart !== NemeraAudioPlayer.PlayerState.ENDED
+                && this.state === NemeraAudioPlayer.PlayerState.ENDED) {
                 const next = this.queue.getNextEntry({ allowWrap: false });
                 if (next)
                     await this.startQueuedEntryAsync(next.entryId);
@@ -2786,7 +2786,7 @@
          *
          * Unlike playNextAsync, which reserves the slot right after the current entry, this appends after everything the user
          * already queued. Both are explicit manual queue actions, so both discard the pending autoplay continuation.
-         * @param {Object} descriptorInput - The play descriptor to append, per {@link LuminaAudioPlayer.createPlayDescriptor}.
+         * @param {Object} descriptorInput - The play descriptor to append, per {@link NemeraAudioPlayer.createPlayDescriptor}.
          * @returns {Promise<boolean>} True when at least one entry was appended, or when playback started because the queue was empty.
          */
         async appendToQueueAsync(descriptorInput) {
@@ -2794,7 +2794,7 @@
                 return false;
             const descriptor = createPlayDescriptor(descriptorInput);
             if (!descriptor) {
-                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor identifies no library, or no playable context.'));
+                this.raiseError(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.INVALID_DESCRIPTOR, 'The play descriptor identifies no library, or no playable context.'));
                 return false;
             }
             // The queue is empty, so there is nothing to append to. Starting the descriptor is the only useful outcome.
@@ -2805,7 +2805,7 @@
             const generation = this.queueGeneration;
             // A context build that still owns the player is the play request the manual item belongs to. Appending to the
             // queue it is about to replace would lose the item, so it is refused while that build owns the player.
-            const pendingContextToken = this.state === LuminaAudioPlayer.PlayerState.LOADING && this.playContextBuildHandle !== null
+            const pendingContextToken = this.state === NemeraAudioPlayer.PlayerState.LOADING && this.playContextBuildHandle !== null
                 ? this.playRequestToken
                 : null;
             const buildHandle = this.openPlayNextBuild();
@@ -2817,12 +2817,12 @@
             } catch (error) {
                 if (buildHandle.signal && buildHandle.signal.aborted) {
                     if (buildHandle.timedOut)
-                        this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The track to append could not be loaded in time.'));
+                        this.raiseError(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED, 'The track to append could not be loaded in time.'));
                     return false;
                 }
-                if (error && error.details && error.details.reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
+                if (error && error.details && error.details.reason === NemeraAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
                     return false;
-                this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
+                this.raiseError(error, NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
                 return false;
             } finally {
                 this.closePlayNextBuild(buildHandle);
@@ -2897,7 +2897,7 @@
         getNextDescriptor() {
             // Repeat one replays the current entry at the end, so there is no next entry for a gapless handoff to prefetch:
             // prefetching the next queue entry would hand off to another track instead of repeating the current one.
-            if (this.queue.getRepeatMode() === LuminaAudioPlayer.QueueRepeatMode.ONE)
+            if (this.queue.getRepeatMode() === NemeraAudioPlayer.QueueRepeatMode.ONE)
                 return null;
             const entry = this.queue.getNextEntry({ allowWrap: this.canWrapToFirstEntry() });
             return entry ? { entryId: entry.entryId, descriptor: entry.descriptor } : null;
@@ -2914,7 +2914,7 @@
         advanceQueueTo(entryId) {
             // A gapless boundary or a continuation only exists while the player is playing. In another state, for example
             // while a new play request is loading, the queue cursor belongs to that request and must not be moved by the old timeline.
-            if (!entryId || this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
+            if (!entryId || this.state !== NemeraAudioPlayer.PlayerState.PLAYING)
                 return null;
             // The entry is validated before the cursor moves, so a malformed entry can never leave the queue committed to a
             // descriptor the bar and the engine cannot play.
@@ -2998,7 +2998,7 @@
                 // queue anchored to playback, so a listener never has to search for the current track after an advance.
                 this.scrollQueueToCurrentEntry();
             }
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.DESCRIPTOR_CHANGED, descriptor);
+            this.events.emit(NemeraAudioPlayer.PlayerEvent.DESCRIPTOR_CHANGED, descriptor);
             this.emitQueueStateChanged();
             return descriptor;
         }
@@ -3107,7 +3107,7 @@
 
         /**
          * Gets the last typed error the player raised.
-         * @returns {LuminaAudioPlayer.PlayerError|null} The last error, or null.
+         * @returns {NemeraAudioPlayer.PlayerError|null} The last error, or null.
          */
         getLastError() {
             return this.lastError;
@@ -3115,7 +3115,7 @@
 
         /**
          * Subscribes to a player event.
-         * @param {string} event - One of the {@link LuminaAudioPlayer.PlayerEvent} values.
+         * @param {string} event - One of the {@link NemeraAudioPlayer.PlayerEvent} values.
          * @param {Function} handler - The handler invoked with the event payload.
          * @returns {Function} A function that unsubscribes the handler.
          */
@@ -3125,7 +3125,7 @@
 
         /**
          * Subscribes to a player event once.
-         * @param {string} event - One of the {@link LuminaAudioPlayer.PlayerEvent} values.
+         * @param {string} event - One of the {@link NemeraAudioPlayer.PlayerEvent} values.
          * @param {Function} handler - The handler invoked once with the event payload.
          * @returns {Function} A function that unsubscribes the handler.
          */
@@ -3135,7 +3135,7 @@
 
         /**
          * Unsubscribes a handler from a player event.
-         * @param {string} event - One of the {@link LuminaAudioPlayer.PlayerEvent} values.
+         * @param {string} event - One of the {@link NemeraAudioPlayer.PlayerEvent} values.
          * @param {Function} handler - The handler to remove.
          */
         off(event, handler) {
@@ -3196,10 +3196,10 @@
             // progress on the server while the player no longer exists to complete or stop it.
             this.stopConsumptionSession();
             this.events.clear();
-            this.setState(LuminaAudioPlayer.PlayerState.IDLE);
+            this.setState(NemeraAudioPlayer.PlayerState.IDLE);
             // The singleton is no longer usable, so it is cleared, and a later createDefaultPlayer builds a fresh one.
-            if (LuminaAudioPlayer.instance === this)
-                LuminaAudioPlayer.instance = null;
+            if (NemeraAudioPlayer.instance === this)
+                NemeraAudioPlayer.instance = null;
         }
 
         //+======================================================================================+
@@ -3208,7 +3208,7 @@
 
         /**
          * Moves the state machine to another state and publishes the change.
-         * @param {string} nextState - One of the {@link LuminaAudioPlayer.PlayerState} values.
+         * @param {string} nextState - One of the {@link NemeraAudioPlayer.PlayerState} values.
          */
         setState(nextState) {
             if (this.state === nextState)
@@ -3218,21 +3218,21 @@
             if (!allowed.includes(nextState))
                 console.warn(`Audio player: the transition '${previousState}' -> '${nextState}' is not part of the state machine.`);
             this.state = nextState;
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.STATE_CHANGED, { previousState, state: nextState });
+            this.events.emit(NemeraAudioPlayer.PlayerEvent.STATE_CHANGED, { previousState, state: nextState });
             this.updateVuMeterState(nextState);
         }
 
         /**
          * Raises a typed error without moving the state machine.
-         * @param {*} error - The error to raise, wrapped into a {@link LuminaAudioPlayer.PlayerError}.
+         * @param {*} error - The error to raise, wrapped into a {@link NemeraAudioPlayer.PlayerError}.
          * @param {string} [code] - The code to use when the error is not already typed.
-         * @returns {LuminaAudioPlayer.PlayerError} The raised typed error.
+         * @returns {NemeraAudioPlayer.PlayerError} The raised typed error.
          */
-        raiseError(error, code = LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR) {
-            const typed = LuminaAudioPlayer.PlayerError.from(error, code);
+        raiseError(error, code = NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR) {
+            const typed = NemeraAudioPlayer.PlayerError.from(error, code);
             this.lastError = typed;
             console.error(`Audio player: ${typed.code}.`, typed.message);
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.ERROR, typed);
+            this.events.emit(NemeraAudioPlayer.PlayerEvent.ERROR, typed);
             return typed;
         }
 
@@ -3243,15 +3243,15 @@
          * engine reported. Keeping it open would count the idle error state as active playback time at the next report.
          * @param {*} error - The error to raise.
          * @param {string} [code] - The code to use when the error is not already typed.
-         * @returns {LuminaAudioPlayer.PlayerError} The raised typed error.
+         * @returns {NemeraAudioPlayer.PlayerError} The raised typed error.
          */
-        fail(error, code = LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR) {
+        fail(error, code = NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR) {
             // A failed playback no longer produces sound, so its record stops at the last position it actually reached.
             // Leaving it open would keep the active playback clock running and turn the whole idle error state into consumed duration of the next stop report.
             this.stopConsumptionSession();
             const typed = this.raiseError(error, code);
             this.clearBuffering();
-            this.setState(LuminaAudioPlayer.PlayerState.ERROR);
+            this.setState(NemeraAudioPlayer.PlayerState.ERROR);
             // The error state still offers recovery: the play control retries the entry, next skips it and previous walks back
             // when there is somewhere to go. The controls are rendered now so that recovery is available immediately.
             this.renderTransportState();
@@ -3263,9 +3263,9 @@
          *
          * This is the documented seam through which the download, decode and render engine is plugged into the player,
          * without reaching into its internals.
-         * @param {string} name - The name the engine is selected by, later passed to {@link LuminaAudioPlayer.AudioPlayer#useEngine}.
+         * @param {string} name - The name the engine is selected by, later passed to {@link NemeraAudioPlayer.AudioPlayer#useEngine}.
          * @param {Function} factory - A factory that receives the engine host and returns an engine.
-         * @returns {LuminaAudioPlayer.AudioPlayer} This player, for chaining.
+         * @returns {NemeraAudioPlayer.AudioPlayer} This player, for chaining.
          */
         registerEngine(name, factory) {
             this.engineRegistry.register(name, factory);
@@ -3279,12 +3279,12 @@
          * default of a fully capable browser. It is registered separately instead of replacing the primary engine so that a
          * consumer can inspect both names and a test can compose either one.
          * @param {string} name - The name of an engine that is already registered on this player.
-         * @returns {LuminaAudioPlayer.AudioPlayer} This player, for chaining.
-         * @throws {LuminaAudioPlayer.PlayerError} When no engine with that name is registered.
+         * @returns {NemeraAudioPlayer.AudioPlayer} This player, for chaining.
+         * @throws {NemeraAudioPlayer.PlayerError} When no engine with that name is registered.
          */
         registerFallbackEngine(name) {
             if (typeof name !== 'string' || !this.engineRegistry.hasEngine(name))
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, `No player engine named '${name}' is registered.`);
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, `No player engine named '${name}' is registered.`);
             this.fallbackEngineName = name;
             return this;
         }
@@ -3336,23 +3336,23 @@
          * newly selected engine. Selecting an engine while a track plays therefore stops that track and returns the
          * player to its idle state, so it is meant to be called during setup, before playback starts.
          * @param {string} name - The name of a registered engine.
-         * @returns {LuminaAudioPlayer.AudioPlayer} This player, for chaining.
-         * @throws {LuminaAudioPlayer.PlayerError} When no engine with that name is registered.
+         * @returns {NemeraAudioPlayer.AudioPlayer} This player, for chaining.
+         * @throws {NemeraAudioPlayer.PlayerError} When no engine with that name is registered.
          */
         useEngine(name) {
             if (name === this.engineName)
                 return this;
             if (!this.engineRegistry.hasEngine(name))
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, `No player engine named '${name}' is registered.`);
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, `No player engine named '${name}' is registered.`);
             this.engineName = name;
             if (this.engine) {
                 const previous = this.engine;
                 this.engine = null;
                 // The engine that was playing is gone, so the player returns to idle instead of claiming it is still playing.
                 // The listening session of that engine stops with it, because no later control can report its final position.
-                if (this.state !== LuminaAudioPlayer.PlayerState.IDLE) {
+                if (this.state !== NemeraAudioPlayer.PlayerState.IDLE) {
                     this.stopConsumptionSession();
-                    this.setState(LuminaAudioPlayer.PlayerState.IDLE);
+                    this.setState(NemeraAudioPlayer.PlayerState.IDLE);
                     this.renderTransportState();
                 }
                 try {
@@ -3382,7 +3382,7 @@
             const engineName = this.getEffectiveEngineName();
             this.engine = this.engineRegistry.create(engineName, this.createEngineHost());
             if (!this.engine)
-                throw new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, `No player engine named '${engineName}' is registered.`);
+                throw new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.ENGINE_LOAD_FAILED, `No player engine named '${engineName}' is registered.`);
             // The stored volume is applied at creation, so the very first track starts at the volume the user last chose.
             await this.applyVolumeAsync();
             return this.engine;
@@ -3415,7 +3415,7 @@
                 reportProgress: (fraction) => this.handleEngineProgress(fraction),
                 reportBuffering: (isBuffering) => this.handleEngineBuffering(isBuffering),
                 reportEnded: () => this.handleEngineEnded(),
-                reportError: (error) => this.fail(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR)
+                reportError: (error) => this.fail(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR)
             };
         }
 
@@ -3475,7 +3475,7 @@
             this.setEngineBuffering(isWaitingForData);
             if (isWaitingForData) 
                 this.pauseConsumptionClock();
-            else if (this.state === LuminaAudioPlayer.PlayerState.PLAYING) 
+            else if (this.state === NemeraAudioPlayer.PlayerState.PLAYING) 
                 this.resumeConsumptionClock();
         }
 
@@ -3495,7 +3495,7 @@
             this.trackConsumptionDuration(this.duration);
             // The total time is written by the coalesced progress render, so it is not written twice for one report.
             this.scheduleProgressRender();
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.DURATION_CHANGED, { duration: this.duration });
+            this.events.emit(NemeraAudioPlayer.PlayerEvent.DURATION_CHANGED, { duration: this.duration });
         }
 
         /**
@@ -3510,7 +3510,7 @@
             if (this.pendingSeekTime !== null && this.isPositionBuffered(this.pendingSeekTime))
                 this.clearSeekPending();
             this.scheduleProgressRender();
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.PROGRESS, { downloadedFraction: value });
+            this.events.emit(NemeraAudioPlayer.PlayerEvent.PROGRESS, { downloadedFraction: value });
         }
 
         /**
@@ -3524,7 +3524,7 @@
             const render = () => {
                 this.isProgressRenderScheduled = false;
                 this.renderProgress();
-                this.events.emit(LuminaAudioPlayer.PlayerEvent.TIME_UPDATE, { currentTime: this.currentTime, duration: this.duration });
+                this.events.emit(NemeraAudioPlayer.PlayerEvent.TIME_UPDATE, { currentTime: this.currentTime, duration: this.duration });
             };
             if (typeof requestAnimationFrame === 'function')
                 requestAnimationFrame(render);
@@ -3539,10 +3539,10 @@
         handleEngineEnded() {
             // Only a playing player may continue its queue. A pause, a stop, a failure or a load in progress is an explicit
             // state that an end report of the old timeline must never override by starting the next entry.
-            if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
+            if (this.state !== NemeraAudioPlayer.PlayerState.PLAYING)
                 return;
             this.handleEndedAsync().catch((error) => {
-                this.fail(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
+                this.fail(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
             });
         }
 
@@ -3564,7 +3564,7 @@
                 const requestToken = this.playRequestToken;
                 // Repeat one replays the entry that just ended, through the player's own play path, so the queue cursor
                 // stays where it is and the bar keeps describing the same track.
-                if (this.queue.getRepeatMode() === LuminaAudioPlayer.QueueRepeatMode.ONE) {
+                if (this.queue.getRepeatMode() === NemeraAudioPlayer.QueueRepeatMode.ONE) {
                     await this.restartCurrentEntryAsync();
                     return;
                 }
@@ -3576,7 +3576,7 @@
                     if (this.queueGeneration !== queueGeneration
                         || (this.queue.getCurrentEntry() ? this.queue.getCurrentEntry().entryId : null) !== endedEntryId
                         || this.playRequestToken !== requestToken
-                        || this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
+                        || this.state !== NemeraAudioPlayer.PlayerState.PLAYING)
                         return;
                     next = this.queue.getNextEntry({ allowWrap: this.canWrapToFirstEntry() });
                 }
@@ -3584,11 +3584,11 @@
                     await this.startQueuedEntryAsync(next.entryId);
                     return;
                 }
-                if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
+                if (this.state !== NemeraAudioPlayer.PlayerState.PLAYING)
                     return;
-                this.setState(LuminaAudioPlayer.PlayerState.ENDED);
+                this.setState(NemeraAudioPlayer.PlayerState.ENDED);
                 this.renderTransportState();
-                this.events.emit(LuminaAudioPlayer.PlayerEvent.ENDED);
+                this.events.emit(NemeraAudioPlayer.PlayerEvent.ENDED);
             } finally {
                 this.isHandlingEnded = false;
             }
@@ -3615,10 +3615,10 @@
             if (this.queue.isShuffleEnabled()) {
                 if (this.queue.isShuffleSourceExhausted())
                     return;
-                if (!force && this.queue.getRemainingCount() > LuminaAudioPlayer.SHUFFLE_LOOKAHEAD)
+                if (!force && this.queue.getRemainingCount() > NemeraAudioPlayer.SHUFFLE_LOOKAHEAD)
                     return;
             } else {
-                if (this.queue.getRepeatMode() === LuminaAudioPlayer.QueueRepeatMode.ONE)
+                if (this.queue.getRepeatMode() === NemeraAudioPlayer.QueueRepeatMode.ONE)
                     return;
                 if (!this.queue.isContinuationEnabled() || !this.isQueueContinuationAllowed() || this.queue.isContinuationExhausted())
                     return;
@@ -3660,7 +3660,7 @@
                             return;
                     }
                     const excluded = this.queue.getQueuedTrackIdentities();
-                    const batch = await this.shuffleSource.nextBatchAsync(excluded, LuminaAudioPlayer.SHUFFLE_BATCH_SIZE, buildHandle.signal);
+                    const batch = await this.shuffleSource.nextBatchAsync(excluded, NemeraAudioPlayer.SHUFFLE_BATCH_SIZE, buildHandle.signal);
                     // A queue that was replaced or turned unshuffled while the batch was requested must not receive it.
                     if (generation !== this.queueGeneration || !this.queue.isShuffleEnabled())
                         return;
@@ -3714,9 +3714,9 @@
                 }
                 // A failed extension must never stop the current track. The session expiry is already navigating away, and
                 // any other failure leaves the queue at its current end, so the player can still be stopped or restarted.
-                if (error && error.details && error.details.reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
+                if (error && error.details && error.details.reason === NemeraAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
                     return;
-                this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
+                this.raiseError(error, NemeraAudioPlayer.PlayerErrorCode.QUEUE_LOAD_FAILED);
             } finally {
                 this.closeQueueBatchBuild(buildHandle);
             }
@@ -3744,7 +3744,7 @@
                 const entryId = item.getAttribute('data-audio-player-queue-entry-id');
                 if (!entryId || !this.queue.findEntry(entryId))
                     return;
-                this.startQueuedEntryAsync(entryId).catch((error) => this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR));
+                this.startQueuedEntryAsync(entryId).catch((error) => this.raiseError(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR));
             };
             this.addControlHandler(this.dom.queue, 'click', (event) => {
                 if (!(event.target instanceof Element))
@@ -3779,7 +3779,7 @@
         async detectCapabilitiesAsync() {
             const report = await this.capabilities.detectAsync();
             this.capabilityReport = report;
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.CAPABILITIES_CHANGED, report);
+            this.events.emit(NemeraAudioPlayer.PlayerEvent.CAPABILITIES_CHANGED, report);
             if (!report.isSupported)
                 console.warn('Audio player: the browser is missing a capability the player requires.', { missing: report.missing });
             return report;
@@ -3801,7 +3801,7 @@
             if (settings === REDIRECTED || playbackState === REDIRECTED)
                 return;
             if (settings === undefined || playbackState === undefined)
-                this.raiseError(new LuminaAudioPlayer.PlayerError(LuminaAudioPlayer.PlayerErrorCode.PREFERENCES_LOAD_FAILED, 'The stored playback preferences of the user could not be read.'));
+                this.raiseError(new NemeraAudioPlayer.PlayerError(NemeraAudioPlayer.PlayerErrorCode.PREFERENCES_LOAD_FAILED, 'The stored playback preferences of the user could not be read.'));
             if (settings) {
                 this.preferences = {
                     shouldKeepDownloadingWhilePaused: settings.shouldKeepDownloadingWhilePaused === true,
@@ -3811,17 +3811,17 @@
                     streamingQuality: settings.streamingQuality || 'Auto',
                     shouldIgnoreThePrefixForAlphaPicker: settings.shouldIgnoreThePrefixForAlphaPicker === true,
                     vuMeterOrientation: settings.vuMeterOrientation || 'Vertical',
-                    vuMeterSegmentCount: LuminaAudioPlayer.toFiniteNumber(settings.vuMeterSegmentCount) ?? 12,
-                    vuMeterSegmentGap: LuminaAudioPlayer.toFiniteNumber(settings.vuMeterSegmentGap) ?? 1,
-                    vuMeterMediumThreshold: LuminaAudioPlayer.toFiniteNumber(settings.vuMeterMediumThreshold) ?? 0.6,
-                    vuMeterHighThreshold: LuminaAudioPlayer.toFiniteNumber(settings.vuMeterHighThreshold) ?? 0.8,
+                    vuMeterSegmentCount: NemeraAudioPlayer.toFiniteNumber(settings.vuMeterSegmentCount) ?? 12,
+                    vuMeterSegmentGap: NemeraAudioPlayer.toFiniteNumber(settings.vuMeterSegmentGap) ?? 1,
+                    vuMeterMediumThreshold: NemeraAudioPlayer.toFiniteNumber(settings.vuMeterMediumThreshold) ?? 0.6,
+                    vuMeterHighThreshold: NemeraAudioPlayer.toFiniteNumber(settings.vuMeterHighThreshold) ?? 0.8,
                     vuMeterShowPeak: settings.vuMeterShowPeak !== false,
-                    vuMeterPeakHoldDurationInMilliseconds: LuminaAudioPlayer.toFiniteNumber(settings.vuMeterPeakHoldDurationInMilliseconds) ?? 650,
-                    vuMeterReleasePerSecond: LuminaAudioPlayer.toFiniteNumber(settings.vuMeterReleasePerSecond) ?? 3,
-                    vuMeterPeakReleasePerSecond: LuminaAudioPlayer.toFiniteNumber(settings.vuMeterPeakReleasePerSecond) ?? 0.65
+                    vuMeterPeakHoldDurationInMilliseconds: NemeraAudioPlayer.toFiniteNumber(settings.vuMeterPeakHoldDurationInMilliseconds) ?? 650,
+                    vuMeterReleasePerSecond: NemeraAudioPlayer.toFiniteNumber(settings.vuMeterReleasePerSecond) ?? 3,
+                    vuMeterPeakReleasePerSecond: NemeraAudioPlayer.toFiniteNumber(settings.vuMeterPeakReleasePerSecond) ?? 0.65
                 };
                 // The payload is a frozen copy, so a subscriber that mutates it cannot change the preferences the player uses.
-                this.events.emit(LuminaAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, Object.freeze({ ...this.preferences }));
+                this.events.emit(NemeraAudioPlayer.PlayerEvent.PREFERENCES_CHANGED, Object.freeze({ ...this.preferences }));
                 // The autoplay continuation is enabled by the preference, so a queue that was built before the preferences
                 // arrived follows the stored value instead of the default of the player. A library context always keeps its
                 // continuation, because it holds only the first artist until that continuation appends the next ones. A
@@ -3830,10 +3830,10 @@
                 if (this.queue.entries.length > 0) {
                     if (this.queue.isShuffleEnabled()) {
                         this.maybeExtendQueueAsync();
-                    } else if (contextKind === LuminaAudioPlayer.PlayContextKind.ALBUM
-                        || contextKind === LuminaAudioPlayer.PlayContextKind.ARTIST
-                        || contextKind === LuminaAudioPlayer.PlayContextKind.LIBRARY) {
-                        const isLibrary = contextKind === LuminaAudioPlayer.PlayContextKind.LIBRARY;
+                    } else if (contextKind === NemeraAudioPlayer.PlayContextKind.ALBUM
+                        || contextKind === NemeraAudioPlayer.PlayContextKind.ARTIST
+                        || contextKind === NemeraAudioPlayer.PlayContextKind.LIBRARY) {
+                        const isLibrary = contextKind === NemeraAudioPlayer.PlayContextKind.LIBRARY;
                         this.queue.setContinuationEnabled(isLibrary || this.preferences.shouldAutoplay === true);
                         if (isLibrary || this.preferences.shouldAutoplay === true)
                             this.maybeExtendQueueAsync();
@@ -3939,7 +3939,7 @@
             } catch (error) {
                 // A request that a cancelled prefetch, a superseded load or a timeout aborted is an expected stop, not a
                 // failed request, so it is reported with the same undefined result but without a console error.
-                if (LuminaAudioPlayer.isAbortError(error))
+                if (NemeraAudioPlayer.isAbortError(error))
                     return undefined;
                 console.error(`Audio player: ${label} failed.`, error);
                 return undefined;
@@ -3996,7 +3996,7 @@
                 return payload && payload.success === true ? payload.data : null;
             } catch (error) {
                 // A request a superseded play, stop or timeout aborted is an expected stop, not a failed request.
-                if (LuminaAudioPlayer.isAbortError(error))
+                if (NemeraAudioPlayer.isAbortError(error))
                     return undefined;
                 console.error(`Audio player: ${options.label || 'a playback state request'} failed.`, error);
                 return undefined;
@@ -4095,7 +4095,7 @@
             }
             // The start response arrives after playback already began, so a pause, a stop or a failure that happened in that
             // window is respected instead of being overwritten by a session that assumes the player is still playing.
-            if (this.state !== LuminaAudioPlayer.PlayerState.PLAYING && this.state !== LuminaAudioPlayer.PlayerState.PAUSED) {
+            if (this.state !== NemeraAudioPlayer.PlayerState.PLAYING && this.state !== NemeraAudioPlayer.PlayerState.PAUSED) {
                 this.finishConsumptionSession('stop');
                 return;
             }
@@ -4115,7 +4115,7 @@
             // A pause before the response leaves the engine on the position it paused at, so the session keeps the returned
             // resume position as its own position until the resume seek runs. A late pre-seek report is ignored until that
             // seek reaches it, and a stop while still paused therefore keeps the resume position instead of the paused one.
-            if (this.state === LuminaAudioPlayer.PlayerState.PAUSED
+            if (this.state === NemeraAudioPlayer.PlayerState.PAUSED
                 && session.pendingResumeSeconds > 0
                 && !session.hasUserSeeked
                 && this.currentTime <= CONSUMPTION_RESUME_APPLY_WINDOW_SECONDS) {
@@ -4125,13 +4125,13 @@
                 session.pendingSeekSeconds = session.pendingResumeSeconds;
                 session.pendingSeekFromSeconds = this.currentTime;
             }
-            if (this.state === LuminaAudioPlayer.PlayerState.PLAYING && this.engineBuffering) {
+            if (this.state === NemeraAudioPlayer.PlayerState.PLAYING && this.engineBuffering) {
                 // The engine was already waiting for data while this session was being created, so the clock stays paused
                 // until it reports that it can play again. Starting it here would count the buffer wait as listened time.
                 session.playingSinceMs = null;
                 this.clearConsumptionReportTimer(session);
                 this.clearConsumptionSeekReportTimer(session);
-            } else if (this.state === LuminaAudioPlayer.PlayerState.PLAYING) {
+            } else if (this.state === NemeraAudioPlayer.PlayerState.PLAYING) {
                 // A pause and a resume that both happened while the request was in flight may have left the clock running, so the interval is only opened when it is not already open.
                 if (session.playingSinceMs === null)
                     session.playingSinceMs = Date.now();
@@ -4151,7 +4151,7 @@
             // Only a library that tracks progress stores a resume point, so a position returned by the start response is the
             // position the listener left the track at. It is applied now when playback is running, and on the next resume
             // when the listener already paused, so the paused record keeps the returned position until then.
-            if (this.state === LuminaAudioPlayer.PlayerState.PLAYING)
+            if (this.state === NemeraAudioPlayer.PlayerState.PLAYING)
                 await this.applyConsumptionResumeAsync(session);
         }
 
@@ -4169,7 +4169,7 @@
             const resumeSeconds = session.pendingResumeSeconds;
             if (resumeSeconds <= 0 || session.hasUserSeeked || !this.isConsumptionSessionCurrent(session))
                 return;
-            if (this.consumptionSession !== session || this.state !== LuminaAudioPlayer.PlayerState.PLAYING)
+            if (this.consumptionSession !== session || this.state !== NemeraAudioPlayer.PlayerState.PLAYING)
                 return;
             // The start response arrived after the listener already listened past the beginning, so the resume position is
             // no longer useful and must not pull the playhead backwards later. A target left by the paused start response
@@ -4319,7 +4319,7 @@
                 if (this.consumptionSession !== session || session.isFinished)
                     return;
                 // Re-arm first, then report, so a report that hangs until its timeout cannot leave the track without a periodic report for the rest of its playback.
-                if (this.state === LuminaAudioPlayer.PlayerState.PLAYING)
+                if (this.state === NemeraAudioPlayer.PlayerState.PLAYING)
                     this.scheduleConsumptionReport();
                 this.reportConsumptionProgress();
             }, CONSUMPTION_REPORT_INTERVAL_MS);
@@ -4644,7 +4644,7 @@
             try {
                 await this.engine.setVolumeAsync(this.getEffectiveVolume());
             } catch (error) {
-                this.raiseError(error, LuminaAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
+                this.raiseError(error, NemeraAudioPlayer.PlayerErrorCode.ENGINE_ERROR);
             }
         }
 
@@ -5026,7 +5026,7 @@
             if (!hasChanged)
                 return;
             this.announcedPendingSeekTime = this.pendingSeekTime;
-            this.events.emit(LuminaAudioPlayer.PlayerEvent.BUFFERING_CHANGED, {
+            this.events.emit(NemeraAudioPlayer.PlayerEvent.BUFFERING_CHANGED, {
                 isBuffering: this.buffering,
                 pendingSeekTime: this.pendingSeekTime
             });
@@ -5299,9 +5299,9 @@
             } catch (error) {
                 if (token !== this.nowPlayingDetailsToken)
                     return;
-                if (error && error.details && error.details.reason === LuminaAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
+                if (error && error.details && error.details.reason === NemeraAudioPlayer.PlayerErrorReason.SESSION_EXPIRED)
                     return;
-                if ((controller && controller.signal.aborted) || LuminaAudioPlayer.isAbortError(error))
+                if ((controller && controller.signal.aborted) || NemeraAudioPlayer.isAbortError(error))
                     return;
                 // The album details are decorative. A failure leaves the descriptor fallback labels in place and does not interrupt playback with a notification.
                 console.debug('Audio player: the now playing album details could not be loaded.', error);
@@ -5554,7 +5554,7 @@
          * Renders the play or pause affordance of the transport control, and its accessible label.
          */
         renderTransportState() {
-            const isPlaying = this.state === LuminaAudioPlayer.PlayerState.PLAYING;
+            const isPlaying = this.state === NemeraAudioPlayer.PlayerState.PLAYING;
             const strings = this.getStrings();
             if (this.dom.playPause) {
                 this.dom.playPause.classList.toggle('is-playing', isPlaying);
@@ -5579,13 +5579,13 @@
             // current track. A failed entry is not restarted, so after an error the control is only enabled when there is a real previous entry to recover to.
             if (this.dom.previous) {
                 const hasPrevious = this.queue.entries.length > 0
-                    && (this.state !== LuminaAudioPlayer.PlayerState.ERROR || this.queue.getPreviousEntry() !== null);
+                    && (this.state !== NemeraAudioPlayer.PlayerState.ERROR || this.queue.getPreviousEntry() !== null);
                 this.dom.previous.disabled = !hasPrevious;
                 this.dom.previous.classList.toggle('is-disabled', this.dom.previous.disabled);
             }
             if (this.dom.next) {
                 const repeatMode = this.queue.getRepeatMode();
-                const isRepeatOne = repeatMode === LuminaAudioPlayer.QueueRepeatMode.ONE;
+                const isRepeatOne = repeatMode === NemeraAudioPlayer.QueueRepeatMode.ONE;
                 // Repeat one makes the continuation a no-op, so a continuation at the end of the queue must not advertise a next action that cannot start.
                 const canContinue = !isRepeatOne
                     && this.queue.isContinuationEnabled()
@@ -5593,7 +5593,7 @@
                     && this.queue.isContinuationExhausted() !== true;
                 const hasNext = this.queue.entries.length > 0
                     && (this.queue.currentIndex + 1 < this.queue.entries.length
-                        || repeatMode === LuminaAudioPlayer.QueueRepeatMode.ALL
+                        || repeatMode === NemeraAudioPlayer.QueueRepeatMode.ALL
                         || canContinue
                         || (this.queue.isShuffleEnabled() && this.queue.isShuffleSourceExhausted() !== true));
                 this.dom.next.disabled = !hasNext;
@@ -5607,9 +5607,9 @@
                     one: strings.repeatOne
                 };
                 this.dom.repeat.dataset.audioPlayerRepeatMode = mode;
-                this.dom.repeat.setAttribute('aria-pressed', mode === LuminaAudioPlayer.QueueRepeatMode.OFF ? 'false' : 'true');
-                this.dom.repeat.classList.toggle('is-active', mode !== LuminaAudioPlayer.QueueRepeatMode.OFF);
-                this.dom.repeat.classList.toggle('is-one', mode === LuminaAudioPlayer.QueueRepeatMode.ONE);
+                this.dom.repeat.setAttribute('aria-pressed', mode === NemeraAudioPlayer.QueueRepeatMode.OFF ? 'false' : 'true');
+                this.dom.repeat.classList.toggle('is-active', mode !== NemeraAudioPlayer.QueueRepeatMode.OFF);
+                this.dom.repeat.classList.toggle('is-one', mode === NemeraAudioPlayer.QueueRepeatMode.ONE);
                 const label = labels[mode] || strings.repeat;
                 if (label)
                     this.dom.repeat.setAttribute('aria-label', label);
@@ -5911,7 +5911,7 @@
             // CustomEvent and document are absent in some non-browser test hosts; the announcement is optional there.
             if (!addedEntries || typeof document === 'undefined' || typeof CustomEvent !== 'function')
                 return;
-            document.dispatchEvent(new CustomEvent('lumina:playlist-updated', { detail: addedEntries }));
+            document.dispatchEvent(new CustomEvent('nemera:playlist-updated', { detail: addedEntries }));
         }
 
         /**
@@ -5950,7 +5950,7 @@
             const configuration = this.getConfiguration();
             const strings = configuration && configuration.strings ? configuration.strings : {};
             const message = strings.fallbackNotification
-                || 'Your browser does not provide the audio capabilities the full player needs, so Lumina switched to a degraded HTML audio player. Some features are unavailable. See the manual for details.';
+                || 'Your browser does not provide the audio capabilities the full player needs, so Nemera switched to a degraded HTML audio player. Some features are unavailable. See the manual for details.';
             if (typeof notificationService !== 'undefined' && typeof NotificationType !== 'undefined') {
                 notificationService.show(message, NotificationType.WARNING);
                 return;
@@ -6209,7 +6209,7 @@
 
         /**
          * Builds one queue item with the built-in markup, used when the theme provides no queue item sub template.
-         * @param {Object} viewModel - The queue item model, per {@link LuminaAudioPlayer.AudioPlayer#renderQueueItem}.
+         * @param {Object} viewModel - The queue item model, per {@link NemeraAudioPlayer.AudioPlayer#renderQueueItem}.
          * @returns {HTMLElement} The built-in queue item.
          */
         buildDefaultQueueItem(viewModel) {
@@ -6248,7 +6248,7 @@
          * Every queue entry that references a track can be favorited without starting it. The control is built through the
          * DOM, so the track title cannot break out of an attribute, and it carries the same attributes a theme sub template
          * renders, so both paths use the global favorites script.
-         * @param {Object} viewModel - The queue item model, per {@link LuminaAudioPlayer.AudioPlayer#renderQueueItem}.
+         * @param {Object} viewModel - The queue item model, per {@link NemeraAudioPlayer.AudioPlayer#renderQueueItem}.
          * @returns {HTMLElement} The favorite container of the item.
          */
         buildQueueItemFavorite(viewModel) {
@@ -6267,40 +6267,40 @@
         }
     }
 
-    LuminaAudioPlayer.AudioPlayer = AudioPlayer;
+    NemeraAudioPlayer.AudioPlayer = AudioPlayer;
 
     // Expose the descriptor helpers on the namespace, so that a page or a test builds a descriptor the same way the player does.
-    LuminaAudioPlayer.createPlayDescriptor = createPlayDescriptor;
-    LuminaAudioPlayer.resolveCoverArtUrl = resolveCoverArtUrl;
-    LuminaAudioPlayer.readPlayDescriptorFromElement = readPlayDescriptorFromElement;
-    LuminaAudioPlayer.formatPlayerTime = formatTime;
-    LuminaAudioPlayer.formatPlayerDuration = formatDuration;
-    LuminaAudioPlayer.UNKNOWN_TIME = UNKNOWN_TIME;
+    NemeraAudioPlayer.createPlayDescriptor = createPlayDescriptor;
+    NemeraAudioPlayer.resolveCoverArtUrl = resolveCoverArtUrl;
+    NemeraAudioPlayer.readPlayDescriptorFromElement = readPlayDescriptorFromElement;
+    NemeraAudioPlayer.formatPlayerTime = formatTime;
+    NemeraAudioPlayer.formatPlayerDuration = formatDuration;
+    NemeraAudioPlayer.UNKNOWN_TIME = UNKNOWN_TIME;
 
     /**
      * Creates the singleton player of the application, binds it to the layout bar, and exposes it as
-     * <code>window.LuminaAudioPlayer.instance</code>. The player is created exactly once: the in-place navigation
+     * <code>window.NemeraAudioPlayer.instance</code>. The player is created exactly once: the in-place navigation
      * manager swaps the content area only, so the player and its playback survive every navigation.
      *
      * This function is invoked automatically when the module loads, so the singleton is already created before any
      * other script runs. The instance seam is therefore the way to configure it afterwards:
-     * <code>window.LuminaAudioPlayer.instance.registerEngine(name, factory).useEngine(name)</code>. The optional
+     * <code>window.NemeraAudioPlayer.instance.registerEngine(name, factory).useEngine(name)</code>. The optional
      * options are honored only when this is the first creation of the player, for a composition that creates the
      * player itself, such as a test.
-     * @param {Object} [options] - The player options, per the {@link LuminaAudioPlayer.AudioPlayer} constructor. Honored only on the first creation.
-     * @returns {LuminaAudioPlayer.AudioPlayer} The singleton player.
+     * @param {Object} [options] - The player options, per the {@link NemeraAudioPlayer.AudioPlayer} constructor. Honored only on the first creation.
+     * @returns {NemeraAudioPlayer.AudioPlayer} The singleton player.
      */
-    LuminaAudioPlayer.createDefaultPlayer = function (options) {
-        if (LuminaAudioPlayer.instance)
-            return LuminaAudioPlayer.instance;
+    NemeraAudioPlayer.createDefaultPlayer = function (options) {
+        if (NemeraAudioPlayer.instance)
+            return NemeraAudioPlayer.instance;
         const player = new AudioPlayer(options);
         player.initialize();
-        LuminaAudioPlayer.instance = player;
+        NemeraAudioPlayer.instance = player;
         return player;
     };
 
     if (document.readyState === 'loading')
-        document.addEventListener('DOMContentLoaded', () => LuminaAudioPlayer.createDefaultPlayer());
+        document.addEventListener('DOMContentLoaded', () => NemeraAudioPlayer.createDefaultPlayer());
     else
-        LuminaAudioPlayer.createDefaultPlayer();
-})(window.LuminaAudioPlayer = window.LuminaAudioPlayer || {});
+        NemeraAudioPlayer.createDefaultPlayer();
+})(window.NemeraAudioPlayer = window.NemeraAudioPlayer || {});

@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.FileSystemManagement.Drives.Queries.GetDrives;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.FileSystemManagement;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Drives.GetDrives;
+namespace Nemera.Presentation.Api.Core.Endpoints.FileSystemManagement.Drives.GetDrives;
 
 /// <summary>
 /// API endpoint for the <c>/drives/get-drives</c> route.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using EntityFrameworkCore.Testing.NSubstitute;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.DataAccess.Core.Repositories.Libraries;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.DataAccess.Core.Repositories.Libraries;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Core.Repositories.Libraries;
+namespace Nemera.DataAccess.UnitTests.Core.Repositories.Libraries;
 
 /// <summary>
 /// Contains unit tests for the <see cref="LibraryScanRepository"/> class.
@@ -25,7 +25,7 @@ namespace Lumina.DataAccess.UnitTests.Core.Repositories.Libraries;
 [ExcludeFromCodeCoverage]
 public class LibraryScanRepositoryTests
 {
-    private readonly LuminaDbContext _mockContext;
+    private readonly NemeraDbContext _mockContext;
     private readonly LibraryScanRepository _sut;
     private readonly LibraryScanEntityFixture _libraryScanEntityFixture = new();
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
@@ -35,7 +35,7 @@ public class LibraryScanRepositoryTests
     /// </summary>
     public LibraryScanRepositoryTests()
     {
-        _mockContext = Create.MockedDbContextFor<LuminaDbContext>();
+        _mockContext = Create.MockedDbContextFor<NemeraDbContext>();
         _sut = new LibraryScanRepository(_mockContext);
     }
 

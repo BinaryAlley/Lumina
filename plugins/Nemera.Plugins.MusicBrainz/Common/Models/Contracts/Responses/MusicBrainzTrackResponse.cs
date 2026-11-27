@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
+namespace Nemera.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
 
 /// <summary>
 /// Represents a response for a track of a medium of a MusicBrainz release, including the recording it is a performance of.

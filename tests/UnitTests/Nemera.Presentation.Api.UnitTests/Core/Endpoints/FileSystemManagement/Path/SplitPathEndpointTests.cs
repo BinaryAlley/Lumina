@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
-using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
-using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Path;
-using Lumina.Contracts.Requests.FileSystemManagement.Path;
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.SplitPath;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
+using Nemera.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
+using Nemera.Contracts.Fixtures.Core.Responses.FileSystemManagement.Path;
+using Nemera.Contracts.Requests.FileSystemManagement.Path;
+using Nemera.Contracts.Responses.FileSystemManagement.Path;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.SplitPath;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Path;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Path;
 
 /// <summary>
 /// Contains unit tests for the <see cref="SplitPathEndpoint"/> class.

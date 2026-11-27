@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Filtering;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Common.DTO.Filtering;
+namespace Nemera.Application.Fixtures.Common.DTO.Filtering;
 
 /// <summary>
 /// Fixture class for the <see cref="LibraryFilterDto"/> record.

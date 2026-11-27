@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Playlists.DeletePlaylist;
+namespace Nemera.Presentation.Api.Core.Endpoints.Playlists.DeletePlaylist;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="DeletePlaylistEndpoint"/> API endpoint, for OpenAPI.

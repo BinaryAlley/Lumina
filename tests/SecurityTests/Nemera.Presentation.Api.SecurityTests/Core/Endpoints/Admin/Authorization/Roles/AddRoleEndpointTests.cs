@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,16 +13,16 @@ using System.Text;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Admin.Authorization.Roles;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Admin.Authorization.Roles;
 
 /// <summary>
 /// Contains security tests for the <see cref="AddRoleEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AddRoleEndpointTests : IClassFixture<LuminaApiFactory>, IAsyncDisposable
+public class AddRoleEndpointTests : IClassFixture<NemeraApiFactory>, IAsyncDisposable
 {
     private readonly HttpClient _client;
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -36,7 +36,7 @@ public class AddRoleEndpointTests : IClassFixture<LuminaApiFactory>, IAsyncDispo
     /// Initializes a new instance of the <see cref="AddRoleEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public AddRoleEndpointTests(LuminaApiFactory apiFactory)
+    public AddRoleEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
@@ -81,7 +81,7 @@ public class AddRoleEndpointTests : IClassFixture<LuminaApiFactory>, IAsyncDispo
         _seededPermissionId = Guid.NewGuid();
         using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             seedDbContext.Permissions.Add(_permissionEntityFixture.Create(id: _seededPermissionId, permissionName: AuthorizationPermission.CanDeleteUsers));
             await seedDbContext.SaveChangesAsync();
         }
@@ -103,7 +103,7 @@ public class AddRoleEndpointTests : IClassFixture<LuminaApiFactory>, IAsyncDispo
         Assert.DoesNotContain("SqliteException", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.NotNull(await dbContext.Roles.FirstOrDefaultAsync(role => role.RoleName == maliciousRoleName));
     }
 
@@ -113,7 +113,7 @@ public class AddRoleEndpointTests : IClassFixture<LuminaApiFactory>, IAsyncDispo
     public async ValueTask DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         if (_seededPermissionId != Guid.Empty)
         {

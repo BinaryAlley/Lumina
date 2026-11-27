@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Plugins.ID3.Common.Models.DTO.Tags;
+using Nemera.Plugins.ID3.Common.Models.DTO.Tags;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Plugins.ID3.Fixtures.Common.Models.DTO.Tags;
+namespace Nemera.Plugins.ID3.Fixtures.Common.Models.DTO.Tags;
 
 /// <summary>
 /// Fixture class for the <see cref="Id3TagDto"/> class.

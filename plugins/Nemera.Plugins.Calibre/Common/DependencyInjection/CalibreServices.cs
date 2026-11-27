@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Calibre.Core;
-using Lumina.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.Calibre.Core;
+using Nemera.Plugins.Contracts.Core.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 #endregion
 
-namespace Lumina.Plugins.Calibre.Common.DependencyInjection;
+namespace Nemera.Plugins.Calibre.Common.DependencyInjection;
 
 /// <summary>
 /// Utility class for registering the services of the Calibre metadata and artwork providers into the Dependency Injection container.

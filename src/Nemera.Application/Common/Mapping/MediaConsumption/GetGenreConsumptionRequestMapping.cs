@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaConsumption.Queries.GetGenreConsumption;
-using Lumina.Contracts.Requests.MediaConsumption;
+using Nemera.Application.Core.MediaConsumption.Queries.GetGenreConsumption;
+using Nemera.Contracts.Requests.MediaConsumption;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.MediaConsumption;
+namespace Nemera.Application.Common.Mapping.MediaConsumption;
 
 /// <summary>
 /// Extension methods for converting <see cref="GetGenreConsumptionRequest"/>.

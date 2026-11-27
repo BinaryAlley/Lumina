@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.FileSystemManagement.Path.GetPathSeparator;
+namespace Nemera.Presentation.Web.Core.Endpoints.FileSystemManagement.Path.GetPathSeparator;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetPathSeparatorEndpoint"/> endpoint, for OpenAPI.

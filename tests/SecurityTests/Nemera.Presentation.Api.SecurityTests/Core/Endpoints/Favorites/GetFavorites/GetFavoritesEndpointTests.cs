@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Responses.Common;
-using Lumina.Contracts.Responses.Favorites;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
-using Lumina.Presentation.Api.Core.Endpoints.Favorites.GetFavorites;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Responses.Common;
+using Nemera.Contracts.Responses.Favorites;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Presentation.Api.Core.Endpoints.Favorites.GetFavorites;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,18 +23,18 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Favorites.GetFavorites;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Favorites.GetFavorites;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetFavoritesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetFavoritesEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class GetFavoritesEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
     private const string JWT_SECRET = "test-key-thats-at-least-32-chars-long-for-jwt";
     private const string PATH = "/api/v1/users/me/favorites";
 
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -49,12 +49,12 @@ public class GetFavoritesEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
     /// Initializes a new instance of the <see cref="GetFavoritesEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetFavoritesEndpointTests(LuminaApiFactory apiFactory)
+    public GetFavoritesEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
     }
 
     [Fact]
@@ -186,7 +186,7 @@ public class GetFavoritesEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
     private async Task<(Guid UserId, string Username)> SeedOtherUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         string username = $"otheruser_{Guid.NewGuid()}";
         dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: username, password: "TestPass123!"));
@@ -204,7 +204,7 @@ public class GetFavoritesEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
     private async Task<Guid> SeedFavoriteAsync(Guid userId, FavoriteMediaKind mediaKind)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid mediaItemId = Guid.NewGuid();
         dbContext.Favorites.Add(_favoriteEntityFixture.Create(
             userId: userId,
@@ -225,7 +225,7 @@ public class GetFavoritesEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
     private async Task AssertFavoriteCountAsync(Guid userId, int expectedCount)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.Equal(expectedCount, await dbContext.Favorites.CountAsync(favorite => favorite.UserId == userId));
     }
 
@@ -287,7 +287,7 @@ public class GetFavoritesEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina.", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera.", content, StringComparison.Ordinal);
         Assert.DoesNotContain("SQL", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(JWT_SECRET, content, StringComparison.Ordinal);
         Assert.DoesNotContain("Data Source", content, StringComparison.OrdinalIgnoreCase);

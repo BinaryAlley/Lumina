@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.MediaConsumption;
+using Nemera.Contracts.Requests.MediaConsumption;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.Statistics.DeleteConsumptionItemHistory;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.Statistics.DeleteConsumptionItemHistory;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="DeleteConsumptionItemHistoryEndpoint"/> API endpoint, for OpenAPI.

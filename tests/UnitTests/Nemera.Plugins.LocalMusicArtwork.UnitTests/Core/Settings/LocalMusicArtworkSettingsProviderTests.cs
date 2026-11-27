@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.LocalMusicArtwork.Common.Models.DTO.Settings;
-using Lumina.Plugins.LocalMusicArtwork.Core.Settings;
-using Lumina.Plugins.LocalMusicArtwork.Fixtures.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.LocalMusicArtwork.Common.Models.DTO.Settings;
+using Nemera.Plugins.LocalMusicArtwork.Core.Settings;
+using Nemera.Plugins.LocalMusicArtwork.Fixtures.Common.Models.DTO.Settings;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.LocalMusicArtwork.UnitTests.Core.Settings;
+namespace Nemera.Plugins.LocalMusicArtwork.UnitTests.Core.Settings;
 
 /// <summary>
 /// Contains unit tests for the <see cref="LocalMusicArtworkSettingsProvider"/> class.

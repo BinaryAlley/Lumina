@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Core.Themes;
+using Nemera.Infrastructure.Core.Themes;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Themes;
+namespace Nemera.Infrastructure.UnitTests.Core.Themes;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ThemeMimeTypes"/> class.

@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Common.Interceptors;
-using Lumina.DataAccess.Core.Repositories.MediaConsumption;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Common.Interceptors;
+using Nemera.DataAccess.Core.Repositories.MediaConsumption;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -22,7 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.MediaConsumption;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.MediaConsumption;
 
 /// <summary>
 /// Contains integration tests for the <see cref="MediaResumePointRepository"/> class, exercising it against a real SQLite database.
@@ -37,11 +37,11 @@ public class MediaResumePointRepositoryTests
     public async Task UpsertForUserAsync_WhenTheResumePointDoesNotExist_ShouldInsertItWithTheAuthoritativeOwner()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaresumerepo-insert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaresumerepo-insert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         MediaResumePointRepository sut = new(context);
         // The owner carried by the incoming resume point is deliberately different from the authoritative owner argument.
         MediaResumePointEntity incoming = _mediaResumePointEntityFixture.Create(
@@ -63,7 +63,7 @@ public class MediaResumePointRepositoryTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(Result.Updated, result.Value);
-        using LuminaDbContext verificationContext = CreateContext(anchorConnection);
+        using NemeraDbContext verificationContext = CreateContext(anchorConnection);
         MediaResumePointEntity storedResumePoint = await verificationContext.MediaResumePoints
             .AsNoTracking()
             .SingleAsync();
@@ -86,7 +86,7 @@ public class MediaResumePointRepositoryTests
     public async Task UpsertForUserAsync_WhenCalledTwiceForTheSameMediaItem_ShouldUpdateTheExistingRow()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaresumerepo-upsert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaresumerepo-upsert-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
@@ -95,7 +95,7 @@ public class MediaResumePointRepositoryTests
         Guid resumePointId;
         long firstVersion;
         Guid libraryId;
-        using (LuminaDbContext seedContext = CreateAuditedContext(anchorConnection, userId, utcNow))
+        using (NemeraDbContext seedContext = CreateAuditedContext(anchorConnection, userId, utcNow))
         {
             MediaResumePointRepository seedSut = new(seedContext);
             seedContext.Users.Add(_userEntityFixture.Create(id: userId));
@@ -116,7 +116,7 @@ public class MediaResumePointRepositoryTests
             firstVersion = firstIncoming.Version;
             libraryId = firstIncoming.LibraryId;
         }
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, laterUtcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, laterUtcNow);
         MediaResumePointRepository sut = new(context);
         MediaResumePointEntity secondIncoming = _mediaResumePointEntityFixture.Create(
             id: Guid.NewGuid(),
@@ -137,7 +137,7 @@ public class MediaResumePointRepositoryTests
         // Assert
         Assert.False(result.IsFailure);
         Assert.Equal(Result.Updated, result.Value);
-        using LuminaDbContext verificationContext = CreateContext(anchorConnection);
+        using NemeraDbContext verificationContext = CreateContext(anchorConnection);
         MediaResumePointEntity storedResumePoint = await verificationContext.MediaResumePoints
             .AsNoTracking()
             .SingleAsync();
@@ -162,11 +162,11 @@ public class MediaResumePointRepositoryTests
     public async Task UpsertForUserAsync_WhenADuplicateIsInsertedDirectly_ShouldBeRejectedByTheUniqueIndex()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaresumerepo-duplicate-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaresumerepo-duplicate-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         Guid mediaItemId = Guid.NewGuid();
         MediaResumePointEntity storedResumePoint = _mediaResumePointEntityFixture.Create(
@@ -186,7 +186,7 @@ public class MediaResumePointRepositoryTests
 
         // Assert
         Assert.NotNull(exception);
-        using LuminaDbContext verificationContext = CreateContext(anchorConnection);
+        using NemeraDbContext verificationContext = CreateContext(anchorConnection);
         Assert.Equal(1, await verificationContext.MediaResumePoints.AsNoTracking().CountAsync(resumePoint => resumePoint.UserId == userId && resumePoint.MediaItemId == mediaItemId));
     }
 
@@ -194,14 +194,14 @@ public class MediaResumePointRepositoryTests
     public async Task UpsertForUserAsync_WhenNothingChanged_ShouldNotBumpTheVersionOrStampTheAudit()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaresumerepo-noop-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaresumerepo-noop-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         DateTime laterUtcNow = new(2025, 1, 1, 13, 0, 0, DateTimeKind.Utc);
         Guid mediaItemId = Guid.NewGuid();
         long storedVersion;
-        using (LuminaDbContext seedContext = CreateAuditedContext(anchorConnection, userId, utcNow))
+        using (NemeraDbContext seedContext = CreateAuditedContext(anchorConnection, userId, utcNow))
         {
             seedContext.Users.Add(_userEntityFixture.Create(id: userId));
             MediaResumePointEntity storedResumePoint = _mediaResumePointEntityFixture.Create(
@@ -217,7 +217,7 @@ public class MediaResumePointRepositoryTests
             await seedContext.SaveChangesAsync();
             storedVersion = storedResumePoint.Version;
         }
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, laterUtcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, laterUtcNow);
         MediaResumePointRepository sut = new(context);
         // A detached copy is the shape the command mapping produces for a save, so this is a real no-op round-trip.
         MediaResumePointEntity incoming = await context.MediaResumePoints
@@ -246,11 +246,11 @@ public class MediaResumePointRepositoryTests
     public async Task GetForUserAndMediaItemAsync_WhenTheResumePointMatchesUserKindAndItem_ShouldReturnTheStoredResumePoint()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaresumerepo-get-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaresumerepo-get-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         MediaResumePointRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         Guid mediaItemId = Guid.NewGuid();
@@ -279,11 +279,11 @@ public class MediaResumePointRepositoryTests
     public async Task GetForUserAndMediaItemAsync_WhenTheUserKindOrItemDoesNotMatch_ShouldReturnNull()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaresumerepo-get-miss-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaresumerepo-get-miss-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         MediaResumePointRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         Guid mediaItemId = Guid.NewGuid();
@@ -312,11 +312,11 @@ public class MediaResumePointRepositoryTests
     public async Task GetForUserAndMediaItemAsync_WhenEntitiesShouldNotBeTracked_ShouldReturnADetachedInstance()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaresumerepo-get-detached-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaresumerepo-get-detached-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         MediaResumePointRepository sut = new(context);
         context.Users.Add(_userEntityFixture.Create(id: userId));
         Guid mediaItemId = Guid.NewGuid();
@@ -342,12 +342,12 @@ public class MediaResumePointRepositoryTests
     public async Task DeleteForUserAndMediaItemAsync_WhenTheResumePointMatches_ShouldDeleteOnlyThatRow()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaresumerepo-delete-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaresumerepo-delete-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         Guid otherUserId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         MediaResumePointRepository sut = new(context);
         context.Users.AddRange(_userEntityFixture.Create(id: userId), _userEntityFixture.Create(id: otherUserId));
         Guid mediaItemId = Guid.NewGuid();
@@ -375,7 +375,7 @@ public class MediaResumePointRepositoryTests
         Assert.Equal(Result.Deleted, result.Value);
 
         await context.SaveChangesAsync();
-        using LuminaDbContext verificationContext = CreateContext(anchorConnection);
+        using NemeraDbContext verificationContext = CreateContext(anchorConnection);
         List<Guid> remainingResumePointIds = await verificationContext.MediaResumePoints
             .AsNoTracking()
             .Select(candidate => candidate.Id)
@@ -389,12 +389,12 @@ public class MediaResumePointRepositoryTests
     public async Task DeleteAllForUserAsync_WhenTheUserHasResumePoints_ShouldRemoveOnlyTheirResumePoints()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaresumerepo-delete-user-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaresumerepo-delete-user-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         Guid otherUserId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         MediaResumePointRepository sut = new(context);
         context.Users.AddRange(_userEntityFixture.Create(id: userId), _userEntityFixture.Create(id: otherUserId));
         MediaResumePointEntity firstResumePoint = _mediaResumePointEntityFixture.Create(userId: userId, libraryId: Guid.NewGuid());
@@ -411,7 +411,7 @@ public class MediaResumePointRepositoryTests
         Assert.Equal(Result.Deleted, result.Value);
 
         await context.SaveChangesAsync();
-        using LuminaDbContext verificationContext = CreateContext(anchorConnection);
+        using NemeraDbContext verificationContext = CreateContext(anchorConnection);
         List<Guid> remainingResumePointIds = await verificationContext.MediaResumePoints
             .AsNoTracking()
             .Select(candidate => candidate.Id)
@@ -423,12 +423,12 @@ public class MediaResumePointRepositoryTests
     public async Task DeleteAllForUserInLibraryAsync_WhenTheUserHasResumePointsInTheLibrary_ShouldRemoveOnlyThoseResumePoints()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaresumerepo-delete-library-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaresumerepo-delete-library-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         Guid otherUserId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         MediaResumePointRepository sut = new(context);
         context.Users.AddRange(_userEntityFixture.Create(id: userId), _userEntityFixture.Create(id: otherUserId));
         Guid libraryId = Guid.NewGuid();
@@ -446,7 +446,7 @@ public class MediaResumePointRepositoryTests
         Assert.Equal(Result.Deleted, result.Value);
 
         await context.SaveChangesAsync();
-        using LuminaDbContext verificationContext = CreateContext(anchorConnection);
+        using NemeraDbContext verificationContext = CreateContext(anchorConnection);
         List<Guid> remainingResumePointIds = await verificationContext.MediaResumePoints
             .AsNoTracking()
             .Select(candidate => candidate.Id)
@@ -460,13 +460,13 @@ public class MediaResumePointRepositoryTests
     public async Task UpsertForUserAsync_WhenAnotherContextAlreadyBumpedTheVersion_ShouldThrowDbUpdateConcurrencyException()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaresumerepo-concurrency-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaresumerepo-concurrency-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
         DateTime laterUtcNow = new(2025, 1, 1, 13, 0, 0, DateTimeKind.Utc);
         Guid mediaItemId = Guid.NewGuid();
-        using (LuminaDbContext seedContext = CreateAuditedContext(anchorConnection, userId, utcNow))
+        using (NemeraDbContext seedContext = CreateAuditedContext(anchorConnection, userId, utcNow))
         {
             seedContext.Users.Add(_userEntityFixture.Create(id: userId));
             MediaResumePointEntity storedResumePoint = _mediaResumePointEntityFixture.Create(
@@ -478,12 +478,12 @@ public class MediaResumePointRepositoryTests
             seedContext.MediaResumePoints.Add(storedResumePoint);
             await seedContext.SaveChangesAsync();
         }
-        using LuminaDbContext firstContext = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext firstContext = CreateAuditedContext(anchorConnection, userId, utcNow);
         MediaResumePointRepository firstSut = new(firstContext);
         Result<MediaResumePointEntity?> readResult = await firstSut.GetForUserAndMediaItemAsync(userId, MediaKind.Movie, mediaItemId, cancellationToken: CancellationToken.None);
         Assert.False(readResult.IsFailure);
         Assert.NotNull(readResult.Value);
-        using LuminaDbContext secondContext = CreateAuditedContext(anchorConnection, userId, laterUtcNow);
+        using NemeraDbContext secondContext = CreateAuditedContext(anchorConnection, userId, laterUtcNow);
         MediaResumePointRepository secondSut = new(secondContext);
         MediaResumePointEntity secondIncoming = _mediaResumePointEntityFixture.Create(
             userId: userId,
@@ -522,11 +522,11 @@ public class MediaResumePointRepositoryTests
     public async Task UserDeletion_WhenTheUserOwnsResumePoints_ShouldCascadeToTheResumePoints()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediaresumerepo-cascade-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediaresumerepo-cascade-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         Guid userId = Guid.NewGuid();
         DateTime utcNow = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using LuminaDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
+        using NemeraDbContext context = CreateAuditedContext(anchorConnection, userId, utcNow);
         UserEntity user = _userEntityFixture.Create(id: userId);
         context.Users.Add(user);
         MediaResumePointEntity firstResumePoint = _mediaResumePointEntityFixture.Create(userId: userId);
@@ -542,7 +542,7 @@ public class MediaResumePointRepositoryTests
         await context.SaveChangesAsync();
 
         // Assert
-        using LuminaDbContext verificationContext = CreateContext(anchorConnection);
+        using NemeraDbContext verificationContext = CreateContext(anchorConnection);
         Assert.False(await verificationContext.MediaResumePoints.AsNoTracking().AnyAsync(resumePoint => resumePoint.UserId == userId));
     }
 
@@ -553,13 +553,13 @@ public class MediaResumePointRepositoryTests
     /// <param name="userId">The Id of the user reported as the current user.</param>
     /// <param name="utcNow">The current UTC time reported by the time provider.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
+    private static NemeraDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
     {
         ICurrentUserService currentUserService = Substitute.For<ICurrentUserService>();
         currentUserService.UserId.Returns(userId);
         IDateTimeProvider dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(utcNow);
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .AddInterceptors(new UpdateAuditableEntitiesInterceptor(currentUserService, dateTimeProvider))
             .Options);
@@ -572,9 +572,9 @@ public class MediaResumePointRepositoryTests
     /// </summary>
     /// <param name="anchorConnection">The open in-memory SQLite connection that keeps the database alive for the duration of the test.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateContext(SqliteConnection anchorConnection)
+    private static NemeraDbContext CreateContext(SqliteConnection anchorConnection)
     {
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .Options);
         context.Database.EnsureCreated();

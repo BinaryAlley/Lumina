@@ -1,4 +1,4 @@
-namespace Lumina.Application.Common.DTO.Filtering;
+namespace Nemera.Application.Common.DTO.Filtering;
 
 /// <summary>
 /// Data transfer object that defines common filter properties used when querying paginated data. Implementations may add additional properties specific to their module or domain.

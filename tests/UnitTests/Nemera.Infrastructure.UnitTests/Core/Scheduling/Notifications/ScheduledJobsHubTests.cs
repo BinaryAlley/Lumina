@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authorization;
-using Lumina.Infrastructure.Core.Scheduling.Notifications;
+using Nemera.Application.Common.Infrastructure.Authorization;
+using Nemera.Infrastructure.Core.Scheduling.Notifications;
 using Microsoft.AspNetCore.SignalR;
 using NSubstitute;
 using System;
@@ -9,7 +9,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Scheduling.Notifications;
+namespace Nemera.Infrastructure.UnitTests.Core.Scheduling.Notifications;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ScheduledJobsHub"/> class.

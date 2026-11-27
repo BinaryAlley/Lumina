@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Common;
-using Lumina.Presentation.Api.Fixtures.Core.Endpoints.FileSystemManagement;
+using Nemera.Contracts.Fixtures.Core.Responses.FileSystemManagement.Common;
+using Nemera.Presentation.Api.Fixtures.Core.Endpoints.FileSystemManagement;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Xunit;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+namespace Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 
 /// <summary>
 /// Marks a test to be skipped when the file system does not support the <see cref="FileAttributes.Hidden"/> attribute.

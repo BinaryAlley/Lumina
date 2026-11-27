@@ -12,9 +12,9 @@
     </ItemGroup>
     
     <ItemGroup>
-        <ProjectReference Include="..\Lumina.Contracts\Lumina.Contracts.csproj" />
-        <ProjectReference Include="..\Lumina.Domain\Lumina.Domain.csproj" />
-        <ProjectReference Include="..\Lumina.Plugins.Contracts\Lumina.Plugins.Contracts.csproj" />
+        <ProjectReference Include="..\Nemera.Contracts\Nemera.Contracts.csproj" />
+        <ProjectReference Include="..\Nemera.Domain\Nemera.Domain.csproj" />
+        <ProjectReference Include="..\Nemera.Plugins.Contracts\Nemera.Plugins.Contracts.csproj" />
     </ItemGroup>
 
     <ItemGroup>

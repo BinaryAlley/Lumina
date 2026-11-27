@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Library.Statistics.Index;
-using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Statistics.Index;
+using Nemera.Presentation.Web.Fixtures.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -10,24 +10,24 @@ using System.Net.Http;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Statistics.Index;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Statistics.Index;
 
 /// <summary>
 /// Contains integration tests for the <see cref="StatisticsIndexViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class StatisticsIndexViewEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class StatisticsIndexViewEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string WEB_ROUTE = "/en-us/library/statistics";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StatisticsIndexViewEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public StatisticsIndexViewEndpointTests(LuminaWebFactory apiFactory)
+    public StatisticsIndexViewEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

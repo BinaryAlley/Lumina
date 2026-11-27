@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.Enums.Scheduling;
+namespace Nemera.Presentation.Web.Common.Enums.Scheduling;
 
 /// <summary>
 /// Enumeration for the types of tasks a scheduled job can execute.

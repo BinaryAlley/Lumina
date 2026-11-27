@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.GetThemes;
-using Lumina.Presentation.Web.Core.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Themes.GetThemes;
+using Nemera.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Admin.Themes.GetThemes;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Admin.Themes.GetThemes;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetThemesEndpoint"/> class.
@@ -45,9 +45,9 @@ public class GetThemesEndpointTests
         ThemeResponseDto[] themes =
         [
             _themeResponseDtoFixture.Create(themeId: "editorial-paper"),
-            _themeResponseDtoFixture.Create(themeId: "lumina-default")
+            _themeResponseDtoFixture.Create(themeId: "nemera-default")
         ];
-        ThemeResponseDto currentTheme = _themeResponseDtoFixture.Create(themeId: "lumina-default");
+        ThemeResponseDto currentTheme = _themeResponseDtoFixture.Create(themeId: "nemera-default");
         _mockApiHttpClient.GetAsync<ThemeResponseDto[]>(ApiRoutes.Themes.GET_THEMES, Arg.Any<CancellationToken>())
             .Returns(themes);
         _mockApiHttpClient.GetAsync<ThemeResponseDto>(ApiRoutes.Themes.GET_CURRENT_THEME, Arg.Any<CancellationToken>())
@@ -66,7 +66,7 @@ public class GetThemesEndpointTests
             JsonElement data = jsonDocument.RootElement.GetProperty("data");
             Assert.Equal(2, data.GetProperty("themes").GetArrayLength());
             Assert.Equal("editorial-paper", data.GetProperty("themes")[0].GetProperty("id").GetString());
-            Assert.Equal("lumina-default", data.GetProperty("currentThemeId").GetString());
+            Assert.Equal("nemera-default", data.GetProperty("currentThemeId").GetString());
             Assert.Equal(10 * 1024 * 1024, data.GetProperty("maxArchiveBytes").GetInt64());
             Assert.Equal(10.0, data.GetProperty("maxArchiveMegabytes").GetDouble());
         }

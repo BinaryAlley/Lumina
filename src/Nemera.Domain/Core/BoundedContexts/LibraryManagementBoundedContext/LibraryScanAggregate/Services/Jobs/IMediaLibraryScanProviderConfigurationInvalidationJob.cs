@@ -1,4 +1,4 @@
-namespace Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
+namespace Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryScanAggregate.Services.Jobs;
 
 /// <summary>
 /// Interface for the media library scan job for invalidating the enrichment state of the media library items

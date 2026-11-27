@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Plugins.Epub.Core;
-using Lumina.Plugins.Epub.Fixtures.Core.Epub;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Plugins.Epub.Core;
+using Nemera.Plugins.Epub.Fixtures.Core.Epub;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.Epub.IntegrationTests.Core;
+namespace Nemera.Plugins.Epub.IntegrationTests.Core;
 
 /// <summary>
 /// Contains integration tests for the <see cref="EpubReader"/> class.
@@ -18,7 +18,7 @@ namespace Lumina.Plugins.Epub.IntegrationTests.Core;
 [ExcludeFromCodeCoverage]
 public class EpubReaderTests : IDisposable
 {
-    private readonly string _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"lumina-epub-reader-{Guid.NewGuid():N}");
+    private readonly string _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"nemera-epub-reader-{Guid.NewGuid():N}");
     private readonly string _epubPath;
     private readonly EpubReader _sut = new();
 

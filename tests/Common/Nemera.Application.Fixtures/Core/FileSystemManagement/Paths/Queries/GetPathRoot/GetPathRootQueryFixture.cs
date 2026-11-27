@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
+using Nemera.Application.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
+namespace Nemera.Application.Fixtures.Core.FileSystemManagement.Paths.Queries.GetPathRoot;
 
 /// <summary>
 /// Fixture class for the <see cref="GetPathRootQuery"/> class.

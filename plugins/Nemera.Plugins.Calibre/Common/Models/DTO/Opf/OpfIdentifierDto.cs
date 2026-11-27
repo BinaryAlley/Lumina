@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Plugins.Calibre.Common.Models.DTO.Opf;
+namespace Nemera.Plugins.Calibre.Common.Models.DTO.Opf;
 
 /// <summary>
 /// Data transfer object for an identifier of a book read from an OPF file, with its scheme.

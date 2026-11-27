@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Api.Common.Routes.Plugins;
+namespace Nemera.Presentation.Api.Common.Routes.Plugins;
 
 /// <summary>
 /// Class for the collection of routes defined in this API.

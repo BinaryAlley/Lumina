@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
-using Lumina.Domain.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
+using Nemera.Domain.Common.Errors;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
+namespace Nemera.Application.Core.FileSystemManagement.Paths.Queries.CheckPathExists;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="CheckPathExistsQuery"/>.

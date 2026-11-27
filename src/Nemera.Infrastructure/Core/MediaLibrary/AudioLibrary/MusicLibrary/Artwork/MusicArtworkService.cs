@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
-using Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
-using Lumina.Contracts.DTO.Common;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
-using Lumina.Infrastructure.Common.Utilities;
-using Lumina.Infrastructure.Common.Networking;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Nemera.Infrastructure.Common.Utilities;
+using Nemera.Infrastructure.Common.Networking;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
+namespace Nemera.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artwork;
 
 /// <summary>
 /// Stores the artwork of an album into the internal media directory, under a per-album directory, and returns its relative path.
@@ -153,7 +153,7 @@ internal sealed class MusicArtworkService : IMusicArtworkService
         string extension = Path.GetExtension(fileName);
         if (string.IsNullOrWhiteSpace(extension))
             extension = ".img";
-        return Path.Combine(Path.GetTempPath(), $"lumina-upload-{Guid.NewGuid():N}{extension}");
+        return Path.Combine(Path.GetTempPath(), $"nemera-upload-{Guid.NewGuid():N}{extension}");
     }
 
     /// <summary>
@@ -433,7 +433,7 @@ internal sealed class MusicArtworkService : IMusicArtworkService
 
         // Download the remote artwork into a temporary file, aborting when it exceeds the allowed size.
         using HttpClient httpClient = _httpClientFactory.CreateClient(NamedHttpClients.ARTWORK_DOWNLOAD);
-        string tempPath = Path.Combine(Path.GetTempPath(), $"lumina-artwork-{Guid.NewGuid():N}");
+        string tempPath = Path.Combine(Path.GetTempPath(), $"nemera-artwork-{Guid.NewGuid():N}");
         bool downloaded = false;
         try
         {

@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Contracts.DTO.Common.Filtering;
+namespace Nemera.Contracts.DTO.Common.Filtering;
 
 /// <summary>
 /// Data transfer object that represents the parameters required to filter by library data.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Playlists.Commands.AddPlaylistEntries;
+namespace Nemera.Application.Core.Playlists.Commands.AddPlaylistEntries;
 
 /// <summary>
 /// Command for adding several tracks to a playlist of the current user, in order.

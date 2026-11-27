@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
-using Lumina.Contracts.Requests.FileSystemManagement.Path;
+using Nemera.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
+using Nemera.Contracts.Requests.FileSystemManagement.Path;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
+namespace Nemera.Application.Common.Mapping.FileSystemManagement.Paths;
 
 /// <summary>
 /// Extension methods for converting <see cref="SplitPathRequest"/>.

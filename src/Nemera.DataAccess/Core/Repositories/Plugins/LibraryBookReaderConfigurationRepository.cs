@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Repositories.Plugins;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,22 +11,22 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Plugins;
+namespace Nemera.DataAccess.Core.Repositories.Plugins;
 
 /// <summary>
 /// Repository for the book reader configurations of media libraries.
 /// </summary>
 internal sealed class LibraryBookReaderConfigurationRepository : ILibraryBookReaderConfigurationRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryBookReaderConfigurationRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public LibraryBookReaderConfigurationRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public LibraryBookReaderConfigurationRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -37,7 +37,7 @@ internal sealed class LibraryBookReaderConfigurationRepository : ILibraryBookRea
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryBookReaderConfigurationEntity"/>, or an error.</returns>
     public async Task<Result<IReadOnlyList<LibraryBookReaderConfigurationEntity>>> GetByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.LibraryBookReaderConfigurations
+        return await _nemeraDbContext.LibraryBookReaderConfigurations
             .Where(configuration => configuration.LibraryId == libraryId)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -51,7 +51,7 @@ internal sealed class LibraryBookReaderConfigurationRepository : ILibraryBookRea
     /// <returns>An <see cref="Result{TValue}"/> containing either the <see cref="LibraryBookReaderConfigurationEntity"/>, or an error.</returns>
     public async Task<Result<LibraryBookReaderConfigurationEntity?>> GetByLibraryAndPluginIdAsync(Guid libraryId, Guid pluginId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.LibraryBookReaderConfigurations
+        return await _nemeraDbContext.LibraryBookReaderConfigurations
             .FirstOrDefaultAsync(configuration => configuration.LibraryId == libraryId && configuration.PluginId == pluginId, cancellationToken).ConfigureAwait(false);
     }
 
@@ -63,10 +63,10 @@ internal sealed class LibraryBookReaderConfigurationRepository : ILibraryBookRea
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpsertAsync(LibraryBookReaderConfigurationEntity configuration, CancellationToken cancellationToken)
     {
-        LibraryBookReaderConfigurationEntity? existingConfiguration = await _luminaDbContext.LibraryBookReaderConfigurations
+        LibraryBookReaderConfigurationEntity? existingConfiguration = await _nemeraDbContext.LibraryBookReaderConfigurations
             .FirstOrDefaultAsync(repositoryConfiguration => repositoryConfiguration.LibraryId == configuration.LibraryId && repositoryConfiguration.PluginId == configuration.PluginId, cancellationToken).ConfigureAwait(false);
         if (existingConfiguration is null)
-            _luminaDbContext.LibraryBookReaderConfigurations.Add(configuration);
+            _nemeraDbContext.LibraryBookReaderConfigurations.Add(configuration);
         else
         {
             // Update only the mutable fields, preserving the Id of the existing configuration.
@@ -85,11 +85,11 @@ internal sealed class LibraryBookReaderConfigurationRepository : ILibraryBookRea
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
     {
-        List<LibraryBookReaderConfigurationEntity> configurations = await _luminaDbContext.LibraryBookReaderConfigurations
+        List<LibraryBookReaderConfigurationEntity> configurations = await _nemeraDbContext.LibraryBookReaderConfigurations
             .Where(configuration => configuration.LibraryId == libraryId)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
         if (configurations.Count > 0)
-            _luminaDbContext.LibraryBookReaderConfigurations.RemoveRange(configurations);
+            _nemeraDbContext.LibraryBookReaderConfigurations.RemoveRange(configurations);
         return Result.Deleted;
     }
 
@@ -101,11 +101,11 @@ internal sealed class LibraryBookReaderConfigurationRepository : ILibraryBookRea
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Deleted>> DeleteByPluginIdAsync(Guid pluginId, CancellationToken cancellationToken)
     {
-        List<LibraryBookReaderConfigurationEntity> configurations = await _luminaDbContext.LibraryBookReaderConfigurations
+        List<LibraryBookReaderConfigurationEntity> configurations = await _nemeraDbContext.LibraryBookReaderConfigurations
             .Where(configuration => configuration.PluginId == pluginId)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
         if (configurations.Count > 0)
-            _luminaDbContext.LibraryBookReaderConfigurations.RemoveRange(configurations);
+            _nemeraDbContext.LibraryBookReaderConfigurations.RemoveRange(configurations);
         return Result.Deleted;
     }
 
@@ -120,11 +120,11 @@ internal sealed class LibraryBookReaderConfigurationRepository : ILibraryBookRea
     public async Task<Result<Deleted>> DeleteByLibraryIdAndPluginIdsAsync(Guid libraryId, IEnumerable<Guid> pluginIds, CancellationToken cancellationToken)
     {
         List<Guid> pluginIdList = [.. pluginIds];
-        List<LibraryBookReaderConfigurationEntity> configurations = await _luminaDbContext.LibraryBookReaderConfigurations
+        List<LibraryBookReaderConfigurationEntity> configurations = await _nemeraDbContext.LibraryBookReaderConfigurations
             .Where(configuration => configuration.LibraryId == libraryId && pluginIdList.Contains(configuration.PluginId))
             .ToListAsync(cancellationToken).ConfigureAwait(false);
         if (configurations.Count > 0)
-            _luminaDbContext.LibraryBookReaderConfigurations.RemoveRange(configurations);
+            _nemeraDbContext.LibraryBookReaderConfigurations.RemoveRange(configurations);
         return Result.Deleted;
     }
 }

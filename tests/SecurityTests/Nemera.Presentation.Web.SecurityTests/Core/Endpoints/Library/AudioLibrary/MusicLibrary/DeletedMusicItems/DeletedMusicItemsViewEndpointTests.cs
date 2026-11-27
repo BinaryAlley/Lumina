@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.DeletedMusicItems;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.DeletedMusicItems;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -9,21 +9,21 @@ using System.Net.Http;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.DeletedMusicItems;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.DeletedMusicItems;
 
 /// <summary>
 /// Contains security tests for the <see cref="DeletedMusicItemsViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class DeletedMusicItemsViewEndpointTests : IClassFixture<LuminaWebFactory>
+public class DeletedMusicItemsViewEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeletedMusicItemsViewEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public DeletedMusicItemsViewEndpointTests(LuminaWebFactory apiFactory)
+    public DeletedMusicItemsViewEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -60,7 +60,7 @@ public class DeletedMusicItemsViewEndpointTests : IClassFixture<LuminaWebFactory
         Assert.NotEqual(HttpStatusCode.InternalServerError, response.StatusCode);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("at Lumina", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("at Nemera", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(maliciousLibraryId, string.Join(",", _apiFactory.ApiClientStub.GetEndpointsCalled), StringComparison.Ordinal);
     }
 }

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Time;
+using Nemera.Application.Common.Infrastructure.Time;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Common.Setup;
+namespace Nemera.DataAccess.UnitTests.Common.Setup;
 
 /// <summary>
 /// Service for time related concerns.

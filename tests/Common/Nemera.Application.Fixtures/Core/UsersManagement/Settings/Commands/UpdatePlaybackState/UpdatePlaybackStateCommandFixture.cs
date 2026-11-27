@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
+using Nemera.Application.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
+namespace Nemera.Application.Fixtures.Core.UsersManagement.Settings.Commands.UpdatePlaybackState;
 
 /// <summary>
 /// Fixture class for the <see cref="UpdatePlaybackStateCommand"/> record.

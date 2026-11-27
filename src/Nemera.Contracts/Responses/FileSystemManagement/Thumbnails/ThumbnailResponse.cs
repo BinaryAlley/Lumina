@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.FileSystemManagement.Thumbnails;
+namespace Nemera.Contracts.Responses.FileSystemManagement.Thumbnails;
 
 /// <summary>
 /// Data transfer object for thumbnails.

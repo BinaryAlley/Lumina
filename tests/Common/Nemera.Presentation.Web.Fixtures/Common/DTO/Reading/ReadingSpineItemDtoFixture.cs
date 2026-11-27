@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Reading;
+using Nemera.Presentation.Web.Common.DTO.Reading;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.DTO.Reading;
+namespace Nemera.Presentation.Web.Fixtures.Common.DTO.Reading;
 
 /// <summary>
 /// Fixture class for the <see cref="ReadingSpineItemDto"/> class.

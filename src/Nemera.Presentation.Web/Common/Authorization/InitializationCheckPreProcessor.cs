@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Authorization;
+namespace Nemera.Presentation.Web.Common.Authorization;
 
 /// <summary>
 /// FastEndpoints pre-processor that runs the application initialization check before the endpoint handler executes.

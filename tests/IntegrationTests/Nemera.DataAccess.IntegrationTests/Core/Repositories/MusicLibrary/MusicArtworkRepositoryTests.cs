@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.DataAccess.Common.Interceptors;
-using Lumina.DataAccess.Core.Repositories.MusicLibrary;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.DataAccess.Common.Interceptors;
+using Nemera.DataAccess.Core.Repositories.MusicLibrary;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -20,7 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.MusicLibrary;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.MusicLibrary;
 
 /// <summary>
 /// Contains integration tests for the <see cref="MusicArtworkRepository"/> class, exercising it against a real SQLite database.
@@ -29,7 +29,7 @@ namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.MusicLibrary;
 public class MusicArtworkRepositoryTests : IDisposable
 {
     private readonly SqliteConnection _connection;
-    private readonly LuminaDbContext _context;
+    private readonly NemeraDbContext _context;
     private readonly MusicArtworkRepository _sut;
     private readonly MusicArtworkEntityFixture _musicArtworkEntityFixture = new();
     private readonly ArtistEntityFixture _artistEntityFixture = new();
@@ -44,7 +44,7 @@ public class MusicArtworkRepositoryTests : IDisposable
         // The repository deletes and updates in bulk, which translates to SQL, so the tests exercise it against a real SQLite database.
         _connection = new SqliteConnection("Data Source=:memory:");
         _connection.Open();
-        _context = new LuminaDbContext(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(_connection).Options);
+        _context = new NemeraDbContext(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(_connection).Options);
         _context.Database.EnsureCreated();
         _sut = new MusicArtworkRepository(_context);
     }
@@ -233,10 +233,10 @@ public class MusicArtworkRepositoryTests : IDisposable
         Guid ownerId = Guid.NewGuid();
         Guid actingUserId = Guid.NewGuid();
         DateTime insertedOnUtc = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-musicartworkrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-musicartworkrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         // The context is built with the auditing interceptor attached, so the cover insert is stamped exactly like in production.
-        using LuminaDbContext auditedContext = CreateAuditedContext(anchorConnection, actingUserId, insertedOnUtc);
+        using NemeraDbContext auditedContext = CreateAuditedContext(anchorConnection, actingUserId, insertedOnUtc);
         MusicArtworkRepository sut = new(auditedContext);
 
         // Act
@@ -323,9 +323,9 @@ public class MusicArtworkRepositoryTests : IDisposable
     public async Task GetByOwnersAsync_WhenCalled_ShouldReturnOnlyTheArtworkOfTheRequestedOwnerTypeAndOwnerIds()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-musicartworkrepo-getbyowners-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-musicartworkrepo-getbyowners-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         MusicArtworkRepository sut = new(context);
         MusicArtworkOwnerType ownerType = MusicArtworkOwnerType.Album;
         Guid firstOwnerId = Guid.NewGuid();
@@ -361,9 +361,9 @@ public class MusicArtworkRepositoryTests : IDisposable
     public async Task GetByOwnersAsync_WhenOwnerIdsIsEmpty_ShouldReturnAnEmptyList()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-musicartworkrepo-getbyowners-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-musicartworkrepo-getbyowners-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         MusicArtworkRepository sut = new(context);
         context.MusicArtwork.Add(_musicArtworkEntityFixture.Create(ownerType: MusicArtworkOwnerType.Album));
         await context.SaveChangesAsync();
@@ -381,9 +381,9 @@ public class MusicArtworkRepositoryTests : IDisposable
     public async Task GetByOwnersAsync_WhenCalled_ShouldOrderTheArtworkByTypeThenOrdinal()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-musicartworkrepo-getbyowners-order-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-musicartworkrepo-getbyowners-order-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         MusicArtworkRepository sut = new(context);
         MusicArtworkOwnerType ownerType = MusicArtworkOwnerType.Album;
         Guid ownerId = Guid.NewGuid();
@@ -408,9 +408,9 @@ public class MusicArtworkRepositoryTests : IDisposable
     public async Task GetByOwnersAsync_WhenMoreThanFiveHundredOwnerIdsAreRequested_ShouldReturnTheArtworkOfEveryOwner()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-musicartworkrepo-getbyowners-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-musicartworkrepo-getbyowners-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         MusicArtworkRepository sut = new(context);
         const int OWNER_COUNT = 501;
         List<Guid> ownerIds = [.. Enumerable.Range(0, OWNER_COUNT).Select(_ => Guid.NewGuid())];
@@ -436,9 +436,9 @@ public class MusicArtworkRepositoryTests : IDisposable
     public async Task GetByOwnersAsync_WhenCalled_ShouldReturnDetachedArtwork()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-musicartworkrepo-getbyowners-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-musicartworkrepo-getbyowners-notracking-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         MusicArtworkRepository sut = new(context);
         MusicArtworkOwnerType ownerType = MusicArtworkOwnerType.Album;
         Guid ownerId = Guid.NewGuid();
@@ -470,9 +470,9 @@ public class MusicArtworkRepositoryTests : IDisposable
     /// </summary>
     /// <param name="anchorConnection">The open in-memory SQLite connection that keeps the database alive for the duration of the test.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateContext(SqliteConnection anchorConnection)
+    private static NemeraDbContext CreateContext(SqliteConnection anchorConnection)
     {
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .Options);
         context.Database.EnsureCreated();
@@ -486,13 +486,13 @@ public class MusicArtworkRepositoryTests : IDisposable
     /// <param name="userId">The Id of the user reported as the current user.</param>
     /// <param name="utcNow">The current UTC time reported by the time provider.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
+    private static NemeraDbContext CreateAuditedContext(SqliteConnection anchorConnection, Guid userId, DateTime utcNow)
     {
         ICurrentUserService currentUserService = Substitute.For<ICurrentUserService>();
         currentUserService.UserId.Returns(userId);
         IDateTimeProvider dateTimeProvider = Substitute.For<IDateTimeProvider>();
         dateTimeProvider.UtcNow.Returns(utcNow);
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .AddInterceptors(new UpdateAuditableEntitiesInterceptor(currentUserService, dateTimeProvider))
             .Options);

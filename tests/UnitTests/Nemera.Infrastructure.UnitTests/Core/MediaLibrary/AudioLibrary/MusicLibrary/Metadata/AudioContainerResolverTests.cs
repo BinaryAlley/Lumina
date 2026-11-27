@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Metadata;
+using Nemera.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Metadata;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Metadata;
+namespace Nemera.Infrastructure.UnitTests.Core.MediaLibrary.AudioLibrary.MusicLibrary.Metadata;
 
 /// <summary>
 /// Contains unit tests for the <see cref="AudioContainerResolver"/> class.

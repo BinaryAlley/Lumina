@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
-using Lumina.Presentation.Api.Core.Endpoints.Plugins.GetPluginSettings;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Presentation.Api.Core.Endpoints.Plugins.GetPluginSettings;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -17,16 +17,16 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Plugins.GetPluginSettings;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Plugins.GetPluginSettings;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetPluginSettingsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetPluginSettingsEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetPluginSettingsEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -38,7 +38,7 @@ public class GetPluginSettingsEndpointTests : IClassFixture<AuthenticatedLuminaA
     /// Initializes a new instance of the <see cref="GetPluginSettingsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetPluginSettingsEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetPluginSettingsEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -65,7 +65,7 @@ public class GetPluginSettingsEndpointTests : IClassFixture<AuthenticatedLuminaA
         // Assert
         response.EnsureSuccessStatusCode();
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Lumina.Contracts.Responses.Plugins.PluginSettingsResponse? settings = await response.Content.ReadFromJsonAsync<Lumina.Contracts.Responses.Plugins.PluginSettingsResponse>(_jsonOptions);
+        Nemera.Contracts.Responses.Plugins.PluginSettingsResponse? settings = await response.Content.ReadFromJsonAsync<Nemera.Contracts.Responses.Plugins.PluginSettingsResponse>(_jsonOptions);
         Assert.NotNull(settings);
         Assert.Equal(pluginId, settings!.PluginId);
     }
@@ -103,7 +103,7 @@ public class GetPluginSettingsEndpointTests : IClassFixture<AuthenticatedLuminaA
     private async Task SeedPluginAsync(Guid pluginId, string name)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         dbContext.Plugins.Add(_pluginEntityFixture.Create(id: pluginId, name: name, loadStatus: PluginLoadStatus.Loaded, includeSettingsJson: false));
         await dbContext.SaveChangesAsync();
     }

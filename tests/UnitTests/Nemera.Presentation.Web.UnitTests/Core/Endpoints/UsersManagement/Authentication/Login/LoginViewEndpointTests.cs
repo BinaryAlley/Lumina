@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Http;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Common.Services;
-using Lumina.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Login;
-using Lumina.Presentation.Web.Fixtures.Common.Requests.UsersManagement.Authentication;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Http;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Common.Services;
+using Nemera.Presentation.Web.Core.Endpoints.UsersManagement.Authentication.Login;
+using Nemera.Presentation.Web.Fixtures.Common.Requests.UsersManagement.Authentication;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.UsersManagement.Authentication.Login;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.UsersManagement.Authentication.Login;
 
 /// <summary>
 /// Contains unit tests for the <see cref="LoginViewEndpoint"/> class.

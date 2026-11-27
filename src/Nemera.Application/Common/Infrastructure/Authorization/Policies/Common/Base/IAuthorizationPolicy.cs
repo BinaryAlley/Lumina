@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
+namespace Nemera.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
 
 /// <summary>
 /// Defines a contract for policy evaluation in the application.

@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.UsersManagement.Authentication.Queries.GetUsers;
-using Lumina.Contracts.Responses.UsersManagement.Users;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.UsersManagement;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.UsersManagement.Authentication.Queries.GetUsers;
+using Nemera.Contracts.Responses.UsersManagement.Users;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.UsersManagement;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.GetUsers;
+namespace Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.GetUsers;
 
 /// <summary>
 /// API endpoint for the <c>/auth/users</c> route.

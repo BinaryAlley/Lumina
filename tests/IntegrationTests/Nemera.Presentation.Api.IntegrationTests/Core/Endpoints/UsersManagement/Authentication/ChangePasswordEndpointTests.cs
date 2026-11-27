@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
-using Lumina.Contracts.Requests.Authentication;
-using Lumina.Contracts.Responses.Authentication;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.Authentication;
+using Nemera.Contracts.Requests.Authentication;
+using Nemera.Contracts.Responses.Authentication;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -20,16 +20,16 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagement.Authentication;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagement.Authentication;
 
 /// <summary>
 /// Contains integration tests for the <see cref="ChangePasswordEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly ChangePasswordRequestFixture _changePasswordRequestFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -41,7 +41,7 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     /// Initializes a new instance of the <see cref="ChangePasswordEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public ChangePasswordEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public ChangePasswordEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -231,7 +231,7 @@ public class ChangePasswordEndpointTests : IClassFixture<AuthenticatedLuminaApiF
     public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == _apiFactory.TestUsername!);
         if (user is not null)

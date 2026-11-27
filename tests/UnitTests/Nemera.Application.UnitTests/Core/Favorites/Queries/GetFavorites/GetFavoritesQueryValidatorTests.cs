@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Favorites.Queries.GetFavorites;
-using Lumina.Application.Fixtures.Core.Favorites.Queries.GetFavorites;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Application.Core.Favorites.Queries.GetFavorites;
+using Nemera.Application.Fixtures.Core.Favorites.Queries.GetFavorites;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Favorites.Queries.GetFavorites;
+namespace Nemera.Application.UnitTests.Core.Favorites.Queries.GetFavorites;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetFavoritesQueryValidator"/> class.

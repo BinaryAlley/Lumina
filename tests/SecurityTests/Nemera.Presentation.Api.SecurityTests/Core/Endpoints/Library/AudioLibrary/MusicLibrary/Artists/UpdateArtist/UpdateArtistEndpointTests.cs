@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
-using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.UpdateArtist;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+using Nemera.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Artists;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.UpdateArtist;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,15 +23,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.UpdateArtist;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Artists.UpdateArtist;
 
 /// <summary>
 /// Contains security tests for the <see cref="UpdateArtistEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class UpdateArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class UpdateArtistEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly UpdateArtistRequestFixture _updateArtistRequestFixture = new();
     private readonly MusicArtistMetadataDtoFixture _musicArtistMetadataDtoFixture = new();
     private readonly UpdateArtistAlbumRequestFixture _updateArtistAlbumRequestFixture = new();
@@ -45,7 +45,7 @@ public class UpdateArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
     /// Initializes a new instance of the <see cref="UpdateArtistEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public UpdateArtistEndpointTests(LuminaApiFactory apiFactory)
+    public UpdateArtistEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -55,7 +55,7 @@ public class UpdateArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
     {
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
-        client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
         Guid libraryId = Guid.NewGuid();
         Guid artistId = Guid.NewGuid();
         UpdateArtistRequest request = _updateArtistRequestFixture.Create();
@@ -80,7 +80,7 @@ public class UpdateArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
     {
         // Arrange
         HttpClient client = _apiFactory.CreateClient();
-        client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
         UpdateArtistRequest request = _updateArtistRequestFixture.Create();
 
         // Act
@@ -124,7 +124,7 @@ public class UpdateArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
         Assert.DoesNotContain("SqliteException", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         ArtistEntity? storedArtist = await dbContext.Artists.FirstOrDefaultAsync(artist => artist.Id == artistId);
         Assert.NotNull(storedArtist);
         Assert.Equal(maliciousName, storedArtist!.Name);
@@ -258,7 +258,7 @@ public class UpdateArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
 
         // The other user's artist is untouched.
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         ArtistEntity? storedArtist = await dbContext.Artists.FirstOrDefaultAsync(artist => artist.Id == victimArtistId);
         Assert.NotNull(storedArtist);
         Assert.Equal("Queen", storedArtist.Name);
@@ -291,7 +291,7 @@ public class UpdateArtistEndpointTests : IClassFixture<LuminaApiFactory>, IDispo
     private async Task<(Guid artistId, Guid albumId)> SeedArtistAsync(Guid libraryId, Guid userId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid artistId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         AlbumEntity album = _albumEntityFixture.Create(id: albumId, artistId: artistId, libraryId: libraryId, title: "A Night at the Opera", includeTracks: false, includeMetadata: false, includeBarcode: false, includeOriginalReleaseDate: false, includeOriginalReleaseYear: false, includeReReleaseDate: false, includeReReleaseYear: false);

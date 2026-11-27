@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
-using Lumina.Infrastructure.Core.Scheduling.Execution.TaskExecutors;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Infrastructure.Core.Scheduling.Execution.TaskExecutors;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Scheduling.Execution;
+namespace Nemera.Infrastructure.Core.Scheduling.Execution;
 
 /// <summary>
 /// Factory that creates the executor of the task of a scheduled job, based on the type of its task.

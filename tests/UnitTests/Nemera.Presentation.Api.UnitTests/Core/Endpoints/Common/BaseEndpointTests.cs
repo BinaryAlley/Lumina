@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Primitives;
-using Lumina.Presentation.Api.Fixtures.Core.Endpoints.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Primitives;
+using Nemera.Presentation.Api.Fixtures.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Common;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Common;
 
 /// <summary>
 /// Contains unit tests for the <see cref="BaseEndpoint"/> class.

@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Utilities;
+using Nemera.Application.Common.Utilities;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Utilities;
+namespace Nemera.Application.UnitTests.Common.Utilities;
 
 /// <summary>
 /// Contains unit tests for the <see cref="TaskUtilities"/> class.

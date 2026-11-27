@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Authorization;
+using Nemera.Presentation.Web.Common.Enums.Authorization;
 using Microsoft.AspNetCore.Authorization;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Authorization;
+namespace Nemera.Presentation.Web.Common.Authorization;
 
 /// <summary>
 /// Defines a requirement that the user must hold at least one of the specified permissions.

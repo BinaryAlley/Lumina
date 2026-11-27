@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Common.Converters;
+namespace Nemera.Presentation.Api.IntegrationTests.Common.Converters;
 
 /// <summary>
 /// Custom JSON converter for readonly collections.

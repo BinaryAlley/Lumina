@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibraryPathTemplateParts;
+using Nemera.Application.Core.MediaLibrary.Management.Queries.GetLibraryPathTemplateParts;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.MediaLibrary.Management.Queries.GetLibraryPathTemplateParts;
+namespace Nemera.Application.Fixtures.Core.MediaLibrary.Management.Queries.GetLibraryPathTemplateParts;
 
 /// <summary>
 /// Fixture class for the <see cref="GetLibraryPathTemplatePartsQuery"/> record.

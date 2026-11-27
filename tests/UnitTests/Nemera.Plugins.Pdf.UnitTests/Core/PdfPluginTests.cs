@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
-using Lumina.Plugins.Contracts.Core.Reading;
-using Lumina.Plugins.Pdf.Core;
+using Nemera.Plugins.Contracts.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Reading;
+using Nemera.Plugins.Pdf.Core;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.Pdf.UnitTests.Core;
+namespace Nemera.Plugins.Pdf.UnitTests.Core;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PdfPlugin"/> class.
@@ -46,7 +46,7 @@ public class PdfPluginTests
         string result = _sut.Author;
 
         // Assert
-        Assert.Equal("Lumina", result);
+        Assert.Equal("Nemera", result);
     }
 
     [Fact]

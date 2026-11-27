@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.DTO.Common.Pagination;
+using Nemera.Contracts.DTO.Common.Pagination;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.DTO.Common.Pagination;
+namespace Nemera.Contracts.Fixtures.Core.DTO.Common.Pagination;
 
 /// <summary>
 /// Fixture class for the <see cref="PaginationDataDto"/> record.

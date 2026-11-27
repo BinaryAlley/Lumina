@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Contracts.DTO.Authentication;
-using Lumina.Contracts.Responses.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Contracts.DTO.Authentication;
+using Nemera.Contracts.Responses.Authorization;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Authorization;
+namespace Nemera.Application.Common.Mapping.Authorization;
 
 /// <summary>
 /// Extension methods for converting <see cref="RoleEntity"/>.

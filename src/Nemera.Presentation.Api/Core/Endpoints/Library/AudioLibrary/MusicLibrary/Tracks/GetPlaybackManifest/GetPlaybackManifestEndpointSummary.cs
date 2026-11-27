@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetPlaybackManifest;
+namespace Nemera.Presentation.Api.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.GetPlaybackManifest;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetPlaybackManifestEndpoint"/> API endpoint, for OpenAPI.

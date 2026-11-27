@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Contracts.Responses.Plugins;
+namespace Nemera.Contracts.Responses.Plugins;
 
 /// <summary>
 /// Represents the settings of a plugin and their schema.

@@ -3,7 +3,7 @@ using System;
 using System.IO;
 #endregion
 
-namespace Lumina.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
+namespace Nemera.Infrastructure.Core.MediaLibrary.AudioLibrary.MusicLibrary.Playback;
 
 /// <summary>
 /// Tracks the size of the temporary output of a running normalization job without walking the growing directory on every monitor tick.

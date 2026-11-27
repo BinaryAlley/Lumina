@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Plugins.Epub.Common.Models.DTO.Opf;
+namespace Nemera.Plugins.Epub.Common.Models.DTO.Opf;
 
 /// <summary>
 /// Data transfer object for the parsed OPF package document of an EPUB.

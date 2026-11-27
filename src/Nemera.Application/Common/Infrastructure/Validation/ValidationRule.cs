@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Validation;
+namespace Nemera.Application.Common.Infrastructure.Validation;
 
 /// <summary>
 /// Defines a validation rule for commands and queries that evaluates a specific property of a request.

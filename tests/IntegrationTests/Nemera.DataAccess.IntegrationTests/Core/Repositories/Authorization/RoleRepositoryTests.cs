@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
-using Lumina.DataAccess.Core.Repositories.Authorization;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.DataAccess.Core.Repositories.Authorization;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.Authorization;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.Authorization;
 
 /// <summary>
 /// Contains integration tests for the <see cref="RoleRepository"/> class, exercising it against a real SQLite database.
@@ -28,9 +28,9 @@ public class RoleRepositoryTests
     public async Task UpdateAsync_WhenAnEditableValueChanges_ShouldPreserveTheStoredAuditColumns()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-rolerepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-rolerepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         RoleRepository sut = new(context);
 
@@ -65,9 +65,9 @@ public class RoleRepositoryTests
     public async Task UpdateAsync_WhenNothingChanged_ShouldNotDuplicateThePermissions()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-rolerepo-permissions-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-rolerepo-permissions-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         RoleRepository sut = new(context);
 

@@ -22,35 +22,35 @@ WORKDIR /src
 
 # Restore NuGet packages (keeping this section separate from the rest of the project files allows Docker to cache the restored packages).
 COPY ["AssemblyInfo_Shared.cs", "."]
-COPY ["Lumina.Presentation.Api/Lumina.Presentation.Api.csproj", "Lumina.Presentation.Api/"]
-COPY ["Lumina.Application/Lumina.Application.csproj", "Lumina.Application/"]
-COPY ["Lumina.Contracts/Lumina.Contracts.csproj", "Lumina.Contracts/"]
-COPY ["Lumina.Domain/Lumina.Domain.csproj", "Lumina.Domain/"]
-COPY ["Lumina.Domain.SharedKernel/Lumina.Domain.SharedKernel.csproj", "Lumina.Domain.SharedKernel/"]
-COPY ["Lumina.Infrastructure/Lumina.Infrastructure.csproj", "Lumina.Infrastructure/"]
-COPY ["Lumina.DataAccess/Lumina.DataAccess.csproj", "Lumina.DataAccess/"]
-COPY ["Lumina.Plugins.Contracts/Lumina.Plugins.Contracts.csproj", "Lumina.Plugins.Contracts/"]
+COPY ["Nemera.Presentation.Api/Nemera.Presentation.Api.csproj", "Nemera.Presentation.Api/"]
+COPY ["Nemera.Application/Nemera.Application.csproj", "Nemera.Application/"]
+COPY ["Nemera.Contracts/Nemera.Contracts.csproj", "Nemera.Contracts/"]
+COPY ["Nemera.Domain/Nemera.Domain.csproj", "Nemera.Domain/"]
+COPY ["Nemera.Domain.SharedKernel/Nemera.Domain.SharedKernel.csproj", "Nemera.Domain.SharedKernel/"]
+COPY ["Nemera.Infrastructure/Nemera.Infrastructure.csproj", "Nemera.Infrastructure/"]
+COPY ["Nemera.DataAccess/Nemera.DataAccess.csproj", "Nemera.DataAccess/"]
+COPY ["Nemera.Plugins.Contracts/Nemera.Plugins.Contracts.csproj", "Nemera.Plugins.Contracts/"]
 
-RUN dotnet restore "./Lumina.Presentation.Api/Lumina.Presentation.Api.csproj" /p:BaseOutputPath=/app/publish/
+RUN dotnet restore "./Nemera.Presentation.Api/Nemera.Presentation.Api.csproj" /p:BaseOutputPath=/app/publish/
 
 # Build the project.
-COPY ["Lumina.Presentation.Api/", "Lumina.Presentation.Api/"]
-COPY ["Lumina.Application/", "Lumina.Application/"]
-COPY ["Lumina.Contracts/", "Lumina.Contracts/"]
-COPY ["Lumina.Domain/", "Lumina.Domain/"]
-COPY ["Lumina.Infrastructure/", "Lumina.Infrastructure/"]
-COPY ["Lumina.DataAccess/", "Lumina.DataAccess/"]
+COPY ["Nemera.Presentation.Api/", "Nemera.Presentation.Api/"]
+COPY ["Nemera.Application/", "Nemera.Application/"]
+COPY ["Nemera.Contracts/", "Nemera.Contracts/"]
+COPY ["Nemera.Domain/", "Nemera.Domain/"]
+COPY ["Nemera.Infrastructure/", "Nemera.Infrastructure/"]
+COPY ["Nemera.DataAccess/", "Nemera.DataAccess/"]
 COPY . .
-WORKDIR /src/Lumina.Presentation.Api
+WORKDIR /src/Nemera.Presentation.Api
 
-RUN dotnet build "./Lumina.Presentation.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build /p:BaseOutputPath=/app/publish/
+RUN dotnet build "./Nemera.Presentation.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build /p:BaseOutputPath=/app/publish/
 
 # ==== Stage 2: Publish stage
 FROM build AS publish
 
 ARG BUILD_CONFIGURATION=Release
 
-RUN dotnet publish "./Lumina.Presentation.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false /p:BaseOutputPath=/app/publish/
+RUN dotnet publish "./Nemera.Presentation.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false /p:BaseOutputPath=/app/publish/
 
 # ==== Stage 3: Run stage
 #FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
@@ -63,7 +63,7 @@ COPY --from=publish /app/publish .
 # Docker, and for a published DLL run directly on a host, ASPNETCORE_URLS (or ASPNETCORE_HTTP_PORTS) must be set.
 ENV ASPNETCORE_HTTP_PORTS=5214
 EXPOSE 5214
-ENTRYPOINT ["dotnet", "Lumina.Presentation.Api.dll"]
+ENTRYPOINT ["dotnet", "Nemera.Presentation.Api.dll"]
 
 # To build this Docker image, run the following command from the root of the project (location of the .slnx solution file):
-# docker build --no-cache -t lumina-api -f Lumina.Presentation.Api/Dockerfile .
+# docker build --no-cache -t nemera-api -f Nemera.Presentation.Api/Dockerfile .

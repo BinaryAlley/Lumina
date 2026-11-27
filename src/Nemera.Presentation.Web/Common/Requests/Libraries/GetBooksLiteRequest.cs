@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Common;
+using Nemera.Presentation.Web.Common.Enums.Common;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.Libraries;
+namespace Nemera.Presentation.Web.Common.Requests.Libraries;
 
 /// <summary>
 /// Represents a request to get the lightweight details of the books of a media library.

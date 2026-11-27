@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Favorites.Commands.AddFavorite;
-using Lumina.Contracts.Requests.Favorites;
+using Nemera.Application.Core.Favorites.Commands.AddFavorite;
+using Nemera.Contracts.Requests.Favorites;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Favorites;
+namespace Nemera.Application.Common.Mapping.Favorites;
 
 /// <summary>
 /// Extension methods for converting <see cref="AddFavoriteRequest"/>.

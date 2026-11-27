@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Libraries;
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Library.Management.EditLibrary;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Libraries;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Management.EditLibrary;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -15,15 +15,15 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.EditLibrary;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.EditLibrary;
 
 /// <summary>
 /// Contains integration tests for the <see cref="EditLibraryViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class EditLibraryViewEndpointTests : IClassFixture<LuminaWebFactory>
+public class EditLibraryViewEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly LibraryDtoFixture _libraryDtoFixture = new();
     private readonly ThemeResponseDtoFixture _themeResponseDtoFixture = new();
     private readonly ThemeTemplateResponseDtoFixture _themeTemplateResponseDtoFixture = new();
@@ -32,7 +32,7 @@ public class EditLibraryViewEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="EditLibraryViewEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public EditLibraryViewEndpointTests(LuminaWebFactory apiFactory)
+    public EditLibraryViewEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -95,7 +95,7 @@ public class EditLibraryViewEndpointTests : IClassFixture<LuminaWebFactory>
         Guid libraryId = Guid.NewGuid();
         LibraryDto expectedLibrary = _libraryDtoFixture.Create(id: libraryId, title: "Books", libraryType: "Book");
         _apiFactory.ApiClientStub.RegisterGetResponse($"libraries/{libraryId}", expectedLibrary);
-        ThemeResponseDto theme = _themeResponseDtoFixture.Create(themeId: "lumina-default");
+        ThemeResponseDto theme = _themeResponseDtoFixture.Create(themeId: "nemera-default");
         _apiFactory.ApiClientStub.RegisterGetResponse(ApiRoutes.Themes.GET_CURRENT_THEME, theme);
         RegisterThemeTemplate(theme, "shared/file-system-browser", "<script type=\"text/plain\" id=\"fsb-template-tree-node\">{{{treeNodeTemplate}}}</script><div id=\"file-system-browser-dialog\">themed</div>");
         RegisterThemeTemplate(theme, "shared/file-system-browser/tree-node", "<div class=\"tree-node\">{{name}}</div>");

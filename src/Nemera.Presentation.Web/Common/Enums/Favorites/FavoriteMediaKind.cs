@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Enums.Favorites;
+namespace Nemera.Presentation.Web.Common.Enums.Favorites;
 
 /// <summary>
 /// Enumeration for the kinds of media item that can be marked as a favorite.

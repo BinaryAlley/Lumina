@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Core.Endpoints.Playlists.DeletePlaylist;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Core.Endpoints.Playlists.DeletePlaylist;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -15,23 +15,23 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Playlists.DeletePlaylist;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Playlists.DeletePlaylist;
 
 /// <summary>
 /// Contains integration tests for the <see cref="DeletePlaylistEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class DeletePlaylistEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class DeletePlaylistEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string ZERO_GUID = "00000000-0000-0000-0000-000000000000";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeletePlaylistEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public DeletePlaylistEndpointTests(LuminaWebFactory apiFactory)
+    public DeletePlaylistEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

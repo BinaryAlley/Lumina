@@ -784,7 +784,7 @@ function getElementOffset(id) {
  * Expands the audio player, or collapses it back, by routing to the audio player that owns the bar.
  */
 function toggleAudioPlayerExpanded() {
-    const player = window.LuminaAudioPlayer && window.LuminaAudioPlayer.instance;
+    const player = window.NemeraAudioPlayer && window.NemeraAudioPlayer.instance;
     if (player && typeof player.toggleExpanded === 'function')
         player.toggleExpanded();
 }

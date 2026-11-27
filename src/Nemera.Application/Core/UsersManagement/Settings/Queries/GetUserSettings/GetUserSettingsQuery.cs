@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 #endregion
 
-namespace Lumina.Application.Core.UsersManagement.Settings.Queries.GetUserSettings;
+namespace Nemera.Application.Core.UsersManagement.Settings.Queries.GetUserSettings;
 
 /// <summary>
 /// Query for getting the settings of the current user.

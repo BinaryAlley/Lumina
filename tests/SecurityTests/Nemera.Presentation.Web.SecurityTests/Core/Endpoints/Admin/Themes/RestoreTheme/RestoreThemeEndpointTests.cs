@@ -1,31 +1,31 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Authorization;
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.RestoreTheme;
-using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Enums.Authorization;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Themes.RestoreTheme;
+using Nemera.Presentation.Web.Fixtures.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Themes.RestoreTheme;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Themes.RestoreTheme;
 
 /// <summary>
 /// Contains security tests for the <see cref="RestoreThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RestoreThemeEndpointTests : IClassFixture<LuminaWebFactory>
+public class RestoreThemeEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RestoreThemeEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public RestoreThemeEndpointTests(LuminaWebFactory apiFactory)
+    public RestoreThemeEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Playlists;
+using Nemera.Application.Common.DataAccess.Entities.Playlists;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DTO.Playlists;
+namespace Nemera.Application.Common.DTO.Playlists;
 
 /// <summary>
 /// Data transfer object for a stored playlist entry together with the display data of the media item it references and its dense display position.

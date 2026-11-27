@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.UnitTests.Common.Enums.Playback;
+namespace Nemera.Domain.SharedKernel.UnitTests.Common.Enums.Playback;
 
 /// <summary>
 /// Contains unit tests for the <see cref="VuMeterOrientation"/> enumeration.

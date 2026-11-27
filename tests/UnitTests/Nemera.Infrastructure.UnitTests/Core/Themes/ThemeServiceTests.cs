@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
-using Lumina.Infrastructure.Common.Models.DTO.Configuration;
-using Lumina.Infrastructure.Core.Themes;
-using Lumina.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Themes;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Infrastructure.Common.Models.DTO.Configuration;
+using Nemera.Infrastructure.Core.Themes;
+using Nemera.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Themes;
+namespace Nemera.Infrastructure.UnitTests.Core.Themes;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ThemeService"/> class.
@@ -33,11 +33,11 @@ public class ThemeServiceTests
     /// </summary>
     public ThemeServiceTests()
     {
-        _storageRootPath = Path.Combine(Path.GetTempPath(), $"lumina-themes-{Guid.NewGuid():N}");
+        _storageRootPath = Path.Combine(Path.GetTempPath(), $"nemera-themes-{Guid.NewGuid():N}");
         _options = _themeEngineOptionsDtoFixture.Create(
             storagePath: Path.Combine(_storageRootPath, "themes"),
             bundledThemesPath: Path.Combine(_storageRootPath, "bundled"),
-            defaultThemeId: "lumina-default",
+            defaultThemeId: "nemera-default",
             maxArchiveBytes: 8 * 1024 * 1024,
             maxExpandedBytes: 24 * 1024 * 1024,
             maxSingleFileBytes: 6 * 1024 * 1024,
@@ -51,7 +51,7 @@ public class ThemeServiceTests
         ThemeEngineOptionsDto options = _themeEngineOptionsDtoFixture.Create(
             storagePath: Path.Combine(_storageRootPath, "themes"),
             bundledThemesPath: Path.Combine(_storageRootPath, "bundled"),
-            defaultThemeId: "lumina-default",
+            defaultThemeId: "nemera-default",
             maxArchiveBytes: 8 * 1024 * 1024,
             maxExpandedBytes: 24 * 1024 * 1024,
             maxSingleFileBytes: 6 * 1024 * 1024,
@@ -73,7 +73,7 @@ public class ThemeServiceTests
         ThemeEngineOptionsDto options = _themeEngineOptionsDtoFixture.Create(
             storagePath: Path.Combine(_storageRootPath, "themes"),
             bundledThemesPath: Path.Combine(_storageRootPath, "bundled"),
-            defaultThemeId: "lumina-default",
+            defaultThemeId: "nemera-default",
             maxArchiveBytes: 8 * 1024 * 1024,
             maxExpandedBytes: 24 * 1024 * 1024,
             maxSingleFileBytes: 6 * 1024 * 1024,

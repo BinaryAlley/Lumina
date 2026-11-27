@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
+using Nemera.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.UsersManagement.Authentication.Commands.RegisterUser;
+namespace Nemera.Application.Fixtures.Core.UsersManagement.Authentication.Commands.RegisterUser;
 
 /// <summary>
 /// Fixture class for the <see cref="RegisterUserCommand"/> class.

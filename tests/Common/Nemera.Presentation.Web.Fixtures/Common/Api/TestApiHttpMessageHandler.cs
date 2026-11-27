@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Api;
+namespace Nemera.Presentation.Web.Fixtures.Common.Api;
 
 /// <summary>
 /// <see cref="HttpMessageHandler"/> test double that returns a configurable response for every request sent through it.

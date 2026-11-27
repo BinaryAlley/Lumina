@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Albums;
+using Nemera.Presentation.Web.Common.Requests.Library.AudioLibrary.MusicLibrary.Albums;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.GetArtistAlbums;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.GetArtistAlbums;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetArtistAlbumsEndpoint"/> endpoint, for OpenAPI.

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Presentation.Api.Common.HealthChecks;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Presentation.Api.Common.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Health;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Health;
 
 /// <summary>
 /// Database health check that always reports an unhealthy state.
@@ -19,7 +19,7 @@ internal sealed class FailingDatabaseHealthCheck : DatabaseHealthCheck
     /// Initializes a new instance of the <see cref="FailingDatabaseHealthCheck"/> class.
     /// </summary>
     /// <param name="dbContext">Injected database context.</param>
-    public FailingDatabaseHealthCheck(LuminaDbContext dbContext) : base(dbContext)
+    public FailingDatabaseHealthCheck(NemeraDbContext dbContext) : base(dbContext)
     {
     }
 

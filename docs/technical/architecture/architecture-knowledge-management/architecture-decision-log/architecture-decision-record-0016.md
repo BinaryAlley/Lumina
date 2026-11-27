@@ -5,7 +5,7 @@
 
 ## Context
 
-Lumina's music player is implemented from scratch, on WebCodecs for decoding and the Web Audio API for output, with no `HTMLMediaElement` and no Media Source Extensions. That player can only demux a curated set of containers and decode a curated set of codecs, so the server has to tell it, before it fetches any audio, whether a track can be played as stored or whether the server has to change the container or the codec first.
+Nemera's music player is implemented from scratch, on WebCodecs for decoding and the Web Audio API for output, with no `HTMLMediaElement` and no Media Source Extensions. That player can only demux a curated set of containers and decode a curated set of codecs, so the server has to tell it, before it fetches any audio, whether a track can be played as stored or whether the server has to change the container or the codec first.
 
 The server already has each track's stored probe result (the container and the codec, plus the sample rate, the channels, the bit depth, the duration and the ReplayGain values) and a stream endpoint with HTTP range support that serves the original file. What is missing is the decision itself and a way for the player to state what it can play.
 

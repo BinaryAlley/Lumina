@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Playlists.Commands.AddPlaylistEntries;
+using Nemera.Application.Core.Playlists.Commands.AddPlaylistEntries;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Playlists.Commands.AddPlaylistEntries;
+namespace Nemera.Application.Fixtures.Core.Playlists.Commands.AddPlaylistEntries;
 
 /// <summary>
 /// Fixture class for the <see cref="AddPlaylistEntriesCommand"/> record.

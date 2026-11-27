@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Plugins.Queries.GetLibraryTypeArtworkProviders;
+using Nemera.Application.Core.Plugins.Queries.GetLibraryTypeArtworkProviders;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Plugins.Queries.GetLibraryTypeArtworkProviders;
+namespace Nemera.Application.Fixtures.Core.Plugins.Queries.GetLibraryTypeArtworkProviders;
 
 /// <summary>
 /// Fixture class for the <see cref="GetLibraryTypeArtworkProvidersQuery"/> record.

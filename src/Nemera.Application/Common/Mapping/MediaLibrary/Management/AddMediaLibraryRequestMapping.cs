@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.MediaLibrary.Management;
-using Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
-using Lumina.Contracts.Requests.MediaLibrary.Management;
+using Nemera.Application.Common.DTO.MediaLibrary.Management;
+using Nemera.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
+using Nemera.Contracts.Requests.MediaLibrary.Management;
 using System;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.MediaLibrary.Management;
+namespace Nemera.Application.Common.Mapping.MediaLibrary.Management;
 
 /// <summary>
 /// Extension methods for converting <see cref="AddLibraryRequest"/>.

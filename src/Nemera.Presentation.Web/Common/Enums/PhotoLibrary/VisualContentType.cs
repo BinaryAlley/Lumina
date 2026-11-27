@@ -1,4 +1,4 @@
-﻿namespace Lumina.Presentation.Web.Common.Enums.PhotoLibrary;
+﻿namespace Nemera.Presentation.Web.Common.Enums.PhotoLibrary;
 
 /// <summary>
 /// Enumeration for the types of visual content libraries.

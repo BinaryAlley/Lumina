@@ -1,21 +1,21 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
-using Lumina.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
-using Lumina.Plugins.MusicBrainz.Core.Mapping;
-using Lumina.Plugins.MusicBrainz.Fixtures.Common.Models.Contracts.Responses;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
+using Nemera.Plugins.MusicBrainz.Core.Mapping;
+using Nemera.Plugins.MusicBrainz.Fixtures.Common.Models.Contracts.Responses;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.UnitTests.Core.Mapping;
+namespace Nemera.Plugins.MusicBrainz.UnitTests.Core.Mapping;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MusicBrainzMapper"/> class.

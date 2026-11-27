@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.DTO.Scheduling;
-using Lumina.Presentation.Web.Common.Enums.Scheduling;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Scheduling;
+using Nemera.Presentation.Web.Common.Enums.Scheduling;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Admin.Scheduler.GetSchedulerDisplayPreferences;
+namespace Nemera.Presentation.Web.Core.Endpoints.Admin.Scheduler.GetSchedulerDisplayPreferences;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetSchedulerDisplayPreferencesEndpoint"/> endpoint, for OpenAPI.

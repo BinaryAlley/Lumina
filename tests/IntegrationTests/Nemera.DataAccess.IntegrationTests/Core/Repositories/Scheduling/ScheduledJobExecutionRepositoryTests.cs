@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
-using Lumina.DataAccess.Common.Interceptors;
-using Lumina.DataAccess.Core.Repositories.Scheduling;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
+using Nemera.DataAccess.Common.Interceptors;
+using Nemera.DataAccess.Core.Repositories.Scheduling;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.Scheduling;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.Scheduling;
 
 /// <summary>
 /// Contains integration tests for the <see cref="ScheduledJobExecutionRepository"/> class, exercising it against a real SQLite database.
@@ -32,9 +32,9 @@ public class ScheduledJobExecutionRepositoryTests
     {
         // Arrange
         // The deletion uses ExecuteDeleteAsync, which is not supported by the in-memory provider, so a real SQLite database is used.
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-scheduledjobexecutionrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-scheduledjobexecutionrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         ScheduledJobExecutionRepository sut = new(context);
 
@@ -59,9 +59,9 @@ public class ScheduledJobExecutionRepositoryTests
     public async Task DeleteOlderThanAsync_WhenNoExecutionStartedBeforeTheCutoff_ShouldNotDeleteAnything()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-scheduledjobexecutionrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-scheduledjobexecutionrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         ScheduledJobExecutionRepository sut = new(context);
 
@@ -82,7 +82,7 @@ public class ScheduledJobExecutionRepositoryTests
     public async Task UpdateAsync_WhenAnEditableValueChanges_ShouldPreserveTheCreationColumnsAndStampTheModificationColumns()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-scheduledjobexecutionrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-scheduledjobexecutionrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
         ICurrentUserService currentUserService = Substitute.For<ICurrentUserService>();
         Guid actingUserId = Guid.NewGuid();
@@ -91,7 +91,7 @@ public class ScheduledJobExecutionRepositoryTests
         DateTime insertTimeUtc = new(2020, 3, 4, 5, 6, 7, DateTimeKind.Utc);
         dateTimeProvider.UtcNow.Returns(insertTimeUtc);
         // The context is built with the auditing interceptor attached, so an interceptor regression is caught instead of being masked by its absence.
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .AddInterceptors(new UpdateAuditableEntitiesInterceptor(currentUserService, dateTimeProvider))
             .Options);

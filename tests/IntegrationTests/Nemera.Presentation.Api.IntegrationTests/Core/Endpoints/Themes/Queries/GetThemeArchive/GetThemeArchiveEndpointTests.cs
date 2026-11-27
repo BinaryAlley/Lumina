@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemeArchive;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemeArchive;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -11,16 +11,16 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Queries.GetThemeArchive;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Queries.GetThemeArchive;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetThemeArchiveEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetThemeArchiveEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetThemeArchiveEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -31,7 +31,7 @@ public class GetThemeArchiveEndpointTests : IClassFixture<AuthenticatedLuminaApi
     /// Initializes a new instance of the <see cref="GetThemeArchiveEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetThemeArchiveEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetThemeArchiveEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;

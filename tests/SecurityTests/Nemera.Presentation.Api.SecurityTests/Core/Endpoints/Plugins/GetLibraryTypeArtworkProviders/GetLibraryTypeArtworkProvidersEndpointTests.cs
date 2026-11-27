@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.Core.Endpoints.Plugins.GetLibraryTypeArtworkProviders;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Presentation.Api.Core.Endpoints.Plugins.GetLibraryTypeArtworkProviders;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -8,15 +8,15 @@ using System.Net;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.GetLibraryTypeArtworkProviders;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.GetLibraryTypeArtworkProviders;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetLibraryTypeArtworkProvidersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetLibraryTypeArtworkProvidersEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class GetLibraryTypeArtworkProvidersEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -27,12 +27,12 @@ public class GetLibraryTypeArtworkProvidersEndpointTests : IClassFixture<LuminaA
     /// Initializes a new instance of the <see cref="GetLibraryTypeArtworkProvidersEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetLibraryTypeArtworkProvidersEndpointTests(LuminaApiFactory apiFactory)
+    public GetLibraryTypeArtworkProvidersEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
     }
 
     [Fact]

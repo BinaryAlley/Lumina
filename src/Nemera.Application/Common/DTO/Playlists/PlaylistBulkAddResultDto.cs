@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DTO.Playlists;
+namespace Nemera.Application.Common.DTO.Playlists;
 
 /// <summary>
 /// Data transfer object for the result of appending entries to a playlist in one bulk operation.

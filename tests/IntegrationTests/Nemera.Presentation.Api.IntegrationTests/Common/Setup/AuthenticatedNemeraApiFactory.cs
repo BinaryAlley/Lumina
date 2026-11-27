@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Seed;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
-using Lumina.Contracts.Requests.Authentication;
-using Lumina.Contracts.Responses.Authentication;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
-using Lumina.Infrastructure.Core.Security;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Seed;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.Authentication;
+using Nemera.Contracts.Requests.Authentication;
+using Nemera.Contracts.Responses.Authentication;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Infrastructure.Core.Security;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -21,13 +21,13 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+namespace Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 
 // <summary>
-/// Factory that extends <see cref="LuminaApiFactory"/> to provide authenticated HTTP clients for testing.
+/// Factory that extends <see cref="NemeraApiFactory"/> to provide authenticated HTTP clients for testing.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
+public class AuthenticatedNemeraApiFactory : NemeraApiFactory, IDisposable
 {
     private readonly PasswordHashService _hashService = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -72,7 +72,7 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
     private async Task<UserEntity> CreateAndAuthenticateUser(HttpClient client, AuthorizationPermission[] permissions)
     {
         using IServiceScope scope = Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         // Create test user, with the permissions granted directly to it.
         UserEntity user = _userEntityFixture.Create(username: TestUsername!, password: _hashService.HashString("TestPass123!"));
@@ -127,7 +127,7 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
     private async Task<UserEntity> CreateAndAuthenticateAdminUser(HttpClient client)
     {
         using IServiceScope scope = Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         IDataSeedService dataSeedService = scope.ServiceProvider.GetRequiredService<IDataSeedService>();
 
         // Create test user.
@@ -176,7 +176,7 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
     public async Task RemoveTestUserAsync()
     {
         using IServiceScope scope = Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == TestUsername);
         if (user is not null)
@@ -196,7 +196,7 @@ public class AuthenticatedLuminaApiFactory : LuminaApiFactory, IDisposable
     public new void Dispose()
     {
         using IServiceScope scope = Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == TestUsername);
         if (user is not null)

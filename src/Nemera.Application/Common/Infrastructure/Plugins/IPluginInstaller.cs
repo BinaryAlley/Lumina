@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
+using Nemera.Domain.Common.Primitives;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Plugins;
+namespace Nemera.Application.Common.Infrastructure.Plugins;
 
 /// <summary>
 /// Service for installing plugins from an uploaded archive into the plugin storage directory.

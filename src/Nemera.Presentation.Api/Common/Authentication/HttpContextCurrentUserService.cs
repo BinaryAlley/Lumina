@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Security.Claims;
 #endregion
 
-namespace Lumina.Presentation.Api.Common.Authentication;
+namespace Nemera.Presentation.Api.Common.Authentication;
 
 /// <summary>
 /// Service for retrieving the current user's information from the HTTP context.

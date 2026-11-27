@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Favorites.Index;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Favorites.Index;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -9,23 +9,23 @@ using System.Net.Http;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Favorites.Index;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Favorites.Index;
 
 /// <summary>
 /// Contains security tests for the <see cref="FavoritesIndexViewEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class FavoritesIndexViewEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class FavoritesIndexViewEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string WEB_ROUTE = "/en-us/favorites";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FavoritesIndexViewEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public FavoritesIndexViewEndpointTests(LuminaWebFactory apiFactory)
+    public FavoritesIndexViewEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -68,7 +68,7 @@ public class FavoritesIndexViewEndpointTests : IClassFixture<LuminaWebFactory>, 
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
         Assert.DoesNotContain("StackTrace", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("PasswordHash", content, StringComparison.OrdinalIgnoreCase);
     }

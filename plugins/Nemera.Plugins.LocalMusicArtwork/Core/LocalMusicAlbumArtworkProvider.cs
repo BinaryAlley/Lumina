@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.LocalMusicArtwork.Common.Models.DTO.Settings;
-using Lumina.Plugins.LocalMusicArtwork.Core.Settings;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.LocalMusicArtwork.Common.Models.DTO.Settings;
+using Nemera.Plugins.LocalMusicArtwork.Core.Settings;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.LocalMusicArtwork.Core;
+namespace Nemera.Plugins.LocalMusicArtwork.Core;
 
 /// <summary>
 /// Provides the artwork of an album from the images stored in the folders of the local music library of the user.

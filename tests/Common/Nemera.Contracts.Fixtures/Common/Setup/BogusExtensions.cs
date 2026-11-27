@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Common.Setup;
+namespace Nemera.Contracts.Fixtures.Common.Setup;
 
 /// <summary>
 /// Contains extension methods for the <see cref="Faker"/> class.

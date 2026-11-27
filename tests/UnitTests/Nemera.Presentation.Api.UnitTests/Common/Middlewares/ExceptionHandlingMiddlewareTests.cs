@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.Common.Middlewares;
+using Nemera.Presentation.Api.Common.Middlewares;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +14,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Common.Middlewares;
+namespace Nemera.Presentation.Api.UnitTests.Common.Middlewares;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ExceptionHandlingMiddleware"/> class.

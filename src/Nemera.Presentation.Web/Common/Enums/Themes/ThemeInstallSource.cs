@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.Enums.Themes;
+namespace Nemera.Presentation.Web.Common.Enums.Themes;
 
 /// <summary>
 /// Enumeration for the source a theme was installed from.

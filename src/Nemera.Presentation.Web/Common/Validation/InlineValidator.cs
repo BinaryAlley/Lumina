@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Validation;
+namespace Nemera.Presentation.Web.Common.Validation;
 
 /// <summary>
 /// Concrete <see cref="AbstractValidator{TRequest}"/> used to declare validation rules inline for nested complex properties.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.UsersManagement.Settings.Queries.GetPlaybackState;
+using Nemera.Application.Core.UsersManagement.Settings.Queries.GetPlaybackState;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.UsersManagement.Settings.Queries.GetPlaybackState;
+namespace Nemera.Application.Fixtures.Core.UsersManagement.Settings.Queries.GetPlaybackState;
 
 /// <summary>
 /// Fixture class for the <see cref="GetPlaybackStateQuery"/> record.

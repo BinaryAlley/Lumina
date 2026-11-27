@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Requests.Plugins;
+using Nemera.Contracts.Requests.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Requests.Plugins;
+namespace Nemera.Contracts.Fixtures.Core.Requests.Plugins;
 
 /// <summary>
 /// Fixture class for the <see cref="GetLibraryBookReadersRequest"/> record.

@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Tools.Settings;
+namespace Nemera.Presentation.Web.Core.Endpoints.Tools.Settings;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="SettingsViewEndpoint"/> endpoint, for OpenAPI.

@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Plugins.Pdf.Core;
-using Lumina.Plugins.Pdf.Fixtures.Core.Pdf;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Plugins.Pdf.Core;
+using Nemera.Plugins.Pdf.Fixtures.Core.Pdf;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.Pdf.IntegrationTests.Core;
+namespace Nemera.Plugins.Pdf.IntegrationTests.Core;
 
 /// <summary>
 /// Contains integration tests for the <see cref="PdfReader"/> class.
@@ -18,7 +18,7 @@ namespace Lumina.Plugins.Pdf.IntegrationTests.Core;
 [ExcludeFromCodeCoverage]
 public class PdfReaderTests : IDisposable
 {
-    private readonly string _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"lumina-pdf-reader-{Guid.NewGuid():N}");
+    private readonly string _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"nemera-pdf-reader-{Guid.NewGuid():N}");
     private readonly string _pdfPath;
     private readonly PdfReader _sut = new();
 

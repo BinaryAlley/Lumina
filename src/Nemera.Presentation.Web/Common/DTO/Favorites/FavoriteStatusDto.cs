@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Favorites;
+namespace Nemera.Presentation.Web.Common.DTO.Favorites;
 
 /// <summary>
 /// Data transfer object that tells which of the checked media items are favorites of the current user.

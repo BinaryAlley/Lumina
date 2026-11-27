@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
+using Nemera.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.Fixtures.Common.Models.Contracts.Responses;
+namespace Nemera.Plugins.MusicBrainz.Fixtures.Common.Models.Contracts.Responses;
 
 /// <summary>
 /// Fixture class for the <see cref="MusicBrainzRecordingListResponse"/> record.

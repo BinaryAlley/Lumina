@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Scheduling.Commands.FireScheduledJob;
-using Lumina.Contracts.Requests.Scheduling;
+using Nemera.Application.Core.Scheduling.Commands.FireScheduledJob;
+using Nemera.Contracts.Requests.Scheduling;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Scheduling;
+namespace Nemera.Application.Common.Mapping.Scheduling;
 
 /// <summary>
 /// Extension methods for converting <see cref="FireScheduledJobRequest"/>.

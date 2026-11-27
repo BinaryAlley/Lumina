@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Plugins.Commands.InstallPlugin;
-using Lumina.Application.Fixtures.Core.Plugins.Commands.InstallPlugin;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Core.Plugins.Commands.InstallPlugin;
+using Nemera.Application.Fixtures.Core.Plugins.Commands.InstallPlugin;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Plugins.Commands.InstallPlugin;
+namespace Nemera.Application.UnitTests.Core.Plugins.Commands.InstallPlugin;
 
 /// <summary>
 /// Contains unit tests for the <see cref="InstallPluginCommandValidator"/> class.

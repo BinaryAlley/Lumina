@@ -7,8 +7,8 @@
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <UserSecretsId>37d55c87-4374-4971-82e9-012fcaad1853</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <ContainerRepository>lumina-api</ContainerRepository>
-        <DockerfileTag>lumina-api</DockerfileTag>
+        <ContainerRepository>nemera-api</ContainerRepository>
+        <DockerfileTag>nemera-api</DockerfileTag>
         <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
     </PropertyGroup>
     <PropertyGroup>
@@ -64,9 +64,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Lumina.Contracts\Lumina.Contracts.csproj" />
-        <ProjectReference Include="..\Lumina.Application\Lumina.Application.csproj" />
-        <ProjectReference Include="..\Lumina.Infrastructure\Lumina.Infrastructure.csproj" />
-        <ProjectReference Include="..\Lumina.DataAccess\Lumina.DataAccess.csproj" />
+        <ProjectReference Include="..\Nemera.Contracts\Nemera.Contracts.csproj" />
+        <ProjectReference Include="..\Nemera.Application\Nemera.Application.csproj" />
+        <ProjectReference Include="..\Nemera.Infrastructure\Nemera.Infrastructure.csproj" />
+        <ProjectReference Include="..\Nemera.DataAccess\Nemera.DataAccess.csproj" />
     </ItemGroup>
 </Project>

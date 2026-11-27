@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
 using System;
 #endregion
 
-namespace Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
+namespace Nemera.Application.Core.UsersManagement.Authorization.Queries.GetUserPermissions;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="GetUserPermissionsQuery"/>.

@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.MediaConsumption.Commands.StopConsumption;
+namespace Nemera.Application.Core.MediaConsumption.Commands.StopConsumption;
 
 /// <summary>
 /// Command for reporting that a consumption session of the current user stopped before it completed.

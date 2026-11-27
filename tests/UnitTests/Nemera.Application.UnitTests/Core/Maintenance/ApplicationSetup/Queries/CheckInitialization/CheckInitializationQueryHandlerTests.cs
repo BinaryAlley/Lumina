@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.DataAccess.Repositories.Users;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.Application.Fixtures.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
-using Lumina.Contracts.Responses.UsersManagement;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.DataAccess.Repositories.Users;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Application.Fixtures.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
+using Nemera.Contracts.Responses.UsersManagement;
+using Nemera.Domain.Common.Primitives;
 using NSubstitute;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
+namespace Nemera.Application.UnitTests.Core.Maintenance.ApplicationSetup.Queries.CheckInitialization;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CheckInitializationQueryHandler"/> class.

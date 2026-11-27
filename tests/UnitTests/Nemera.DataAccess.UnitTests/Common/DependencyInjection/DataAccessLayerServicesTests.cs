@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Authentication;
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.DataAccess.Common.DependencyInjection;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.DataAccess.UnitTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.DataAccess.Common.DependencyInjection;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.DataAccess.UnitTests.Common.Setup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -12,7 +12,7 @@ using System.IO;
 using System.Linq;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Common.DependencyInjection;
+namespace Nemera.DataAccess.UnitTests.Common.DependencyInjection;
 
 /// <summary>
 /// Contains unit tests for the <see cref="DataAccessLayerServices"/> class.
@@ -31,7 +31,7 @@ public class DataAccessLayerServicesTests
         DataAccessLayerServices.AddDataAccessLayerServices(services);
 
         // Assert
-        Assert.Contains(services, sd => sd.ServiceType == typeof(LuminaDbContext));
+        Assert.Contains(services, sd => sd.ServiceType == typeof(NemeraDbContext));
         Assert.Contains(services, sd => sd.ServiceType == typeof(IUnitOfWork) && sd.ImplementationType == typeof(UnitOfWork));
     }
 
@@ -47,13 +47,13 @@ public class DataAccessLayerServicesTests
         services.AddTransient<IDateTimeProvider, TestDateTimeProvider>();
 
         // Assert
-        ServiceDescriptor? descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<LuminaDbContext>));
+        ServiceDescriptor? descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<NemeraDbContext>));
         Assert.NotNull(descriptor);
         ServiceProvider serviceProvider = services.BuildServiceProvider();
-        LuminaDbContext? context = serviceProvider.GetService<LuminaDbContext>();
+        NemeraDbContext? context = serviceProvider.GetService<NemeraDbContext>();
 
         Assert.NotNull(context);
-        Assert.Contains("Lumina.db", context.Database.GetDbConnection().ConnectionString);
+        Assert.Contains("Nemera.db", context.Database.GetDbConnection().ConnectionString);
     }
 
     [Fact]

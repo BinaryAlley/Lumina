@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Fixtures.Core.Responses.MediaLibrary.Management;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Presentation.Api.Core.Endpoints.Library.Management.GetLibraryPathTemplateParts;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Contracts.Fixtures.Core.Responses.MediaLibrary.Management;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Presentation.Api.Core.Endpoints.Library.Management.GetLibraryPathTemplateParts;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -15,16 +15,16 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Library.Management.GetLibraryPathTemplateParts;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Library.Management.GetLibraryPathTemplateParts;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetLibraryPathTemplatePartsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetLibraryPathTemplatePartsEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetLibraryPathTemplatePartsEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly LibraryPathPartDefinitionResponseFixture _libraryPathPartDefinitionResponseFixture = new();
     private readonly LibraryPathTemplatePartResponseFixture _libraryPathTemplatePartResponseFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -37,7 +37,7 @@ public class GetLibraryPathTemplatePartsEndpointTests : IClassFixture<Authentica
     /// Initializes a new instance of the <see cref="GetLibraryPathTemplatePartsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetLibraryPathTemplatePartsEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetLibraryPathTemplatePartsEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;

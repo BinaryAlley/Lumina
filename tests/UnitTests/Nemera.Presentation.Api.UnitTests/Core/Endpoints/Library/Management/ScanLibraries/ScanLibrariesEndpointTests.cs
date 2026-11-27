@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.MediaLibrary.Management.Commands.ScanLibraries;
-using Lumina.Contracts.Fixtures.Core.Responses.MediaLibrary.Management;
-using Lumina.Contracts.Responses.MediaLibrary.Management;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Library.Management.ScanLibraries;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.MediaLibrary.Management.Commands.ScanLibraries;
+using Nemera.Contracts.Fixtures.Core.Responses.MediaLibrary.Management;
+using Nemera.Contracts.Responses.MediaLibrary.Management;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Library.Management.ScanLibraries;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Library.Management.ScanLibraries;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Library.Management.ScanLibraries;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ScanLibrariesEndpoint"/> class.

@@ -1,4 +1,4 @@
-﻿namespace Lumina.Presentation.Web.Common.Enums.FileSystem;
+﻿namespace Nemera.Presentation.Web.Common.Enums.FileSystem;
 
 /// <summary>
 /// Specifies the size options for file system icons.

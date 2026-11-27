@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.StreamMusicTrackSegment;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.StreamMusicTrackSegment;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.StreamMusicTrackSegment;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.StreamMusicTrackSegment;
 
 /// <summary>
 /// Contains security tests for the <see cref="StreamMusicTrackSegmentEndpoint"/> class.
@@ -24,15 +24,15 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Library.AudioLibr
 /// normalization pipeline and ffmpeg, neither of which is available in the test environment.
 /// </remarks>
 [ExcludeFromCodeCoverage]
-public class StreamMusicTrackSegmentEndpointTests : IClassFixture<LuminaWebFactory>
+public class StreamMusicTrackSegmentEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StreamMusicTrackSegmentEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public StreamMusicTrackSegmentEndpointTests(LuminaWebFactory apiFactory)
+    public StreamMusicTrackSegmentEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -120,7 +120,7 @@ public class StreamMusicTrackSegmentEndpointTests : IClassFixture<LuminaWebFacto
         Assert.Equal(contentBytes, responseBytes);
         Assert.DoesNotContain("SQL", System.Text.Encoding.UTF8.GetString(responseBytes), StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", System.Text.Encoding.UTF8.GetString(responseBytes), StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("at Lumina", System.Text.Encoding.UTF8.GetString(responseBytes), StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("at Nemera", System.Text.Encoding.UTF8.GetString(responseBytes), StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(PAYLOAD, System.Text.Encoding.UTF8.GetString(responseBytes), StringComparison.Ordinal);
         Assert.Single(_apiFactory.StreamingApiClientStub.GetEndpointsCalled);
         Assert.Equal(expectedEndpoint, _apiFactory.StreamingApiClientStub.GetEndpointsCalled[0]);

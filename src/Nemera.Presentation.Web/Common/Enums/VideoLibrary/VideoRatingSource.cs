@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Web.Common.Enums.VideoLibrary;
+namespace Nemera.Presentation.Web.Common.Enums.VideoLibrary;
 
 /// <summary>
 /// Enumeration for the various sources of video ratings.
@@ -6,7 +6,7 @@ namespace Lumina.Presentation.Web.Common.Enums.VideoLibrary;
 public enum VideoRatingSource
 {
     /// <summary>
-    /// Ratings provided by users of the Lumina media library.
+    /// Ratings provided by users of the Nemera media library.
     /// </summary>
     User,
 

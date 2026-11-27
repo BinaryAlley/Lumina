@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
-using Lumina.Contracts.Requests.Authorization;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.Authorization;
+using Nemera.Contracts.Requests.Authorization;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,16 +22,16 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authorization;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authorization;
 
 /// <summary>
 /// Contains security tests for the <see cref="UpdateUserRoleAndPermissionsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<LuminaApiFactory>, IAsyncDisposable
+public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<NemeraApiFactory>, IAsyncDisposable
 {
     private readonly HttpClient _client;
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -49,7 +49,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<LuminaApi
     /// Initializes a new instance of the <see cref="UpdateUserRoleAndPermissionsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public UpdateUserRoleAndPermissionsEndpointTests(LuminaApiFactory apiFactory)
+    public UpdateUserRoleAndPermissionsEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
@@ -133,7 +133,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<LuminaApi
         Assert.Equal("Editor", authorizationResponse.RootElement.GetProperty("role").GetString());
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         UserEntity? updatedUser = await dbContext.Users
             .Include(user => user.UserRole).ThenInclude(userRole => userRole!.Role)
             .Include(user => user.UserPermissions)
@@ -210,7 +210,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<LuminaApi
     private async Task<UserEntity> SeedTargetUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         string username = $"targetuser_{Guid.NewGuid()}";
         UserEntity user = _userEntityFixture.Create(id: Guid.NewGuid(), username: username, password: "HashedPassword");
         user.TotpSecret = null;
@@ -228,7 +228,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<LuminaApi
     private async Task<RoleEntity> SeedRoleAsync(string roleName)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         _seededRoleId = Guid.NewGuid();
         RoleEntity role = _roleEntityFixture.Create(id: _seededRoleId, roleName: roleName);
         dbContext.Roles.Add(role);
@@ -244,7 +244,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<LuminaApi
     private async Task<PermissionEntity> SeedPermissionAsync(AuthorizationPermission permissionName)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         _seededPermissionId = Guid.NewGuid();
         PermissionEntity permission = _permissionEntityFixture.Create(id: _seededPermissionId, permissionName: permissionName);
         dbContext.Permissions.Add(permission);
@@ -262,7 +262,7 @@ public class UpdateUserRoleAndPermissionsEndpointTests : IClassFixture<LuminaApi
             await _apiFactory.RemoveTestUserAsync(username).ConfigureAwait(false);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         if (_seededRoleId != Guid.Empty)
         {
             RoleEntity? role = await dbContext.Roles.FirstOrDefaultAsync(candidate => candidate.Id == _seededRoleId);

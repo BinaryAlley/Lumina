@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Common.Models.DTO.Plugins;
-using Lumina.Plugins.Contracts.Core.Plugins;
+using Nemera.Infrastructure.Common.Models.DTO.Plugins;
+using Nemera.Plugins.Contracts.Core.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Reflection;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Plugins;
+namespace Nemera.Infrastructure.Core.Plugins;
 
 /// <summary>
 /// Loads the plugins from the plugins directory, discovers their descriptors and registers their services.
@@ -42,7 +42,7 @@ internal static class PluginLoader
                 // plugin assemblies and must not be reflected over here. Only an assembly that references the plugin contracts can implement IPlugin, so the
                 // dependency assemblies are filtered out before their types are ever loaded, which would otherwise surface spurious failures (for example a
                 // ReflectionTypeLoadException on platform type forwarders) that the catch blocks below would report as broken plugins.
-                if (assembly.GetReferencedAssemblies().Any(assemblyReference => assemblyReference.Name == "Lumina.Plugins.Contracts"))
+                if (assembly.GetReferencedAssemblies().Any(assemblyReference => assemblyReference.Name == "Nemera.Plugins.Contracts"))
                 {
                     foreach (Type type in assembly.GetTypes())
                     {

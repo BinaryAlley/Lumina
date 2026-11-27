@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Playlists.Commands.UpdatePlaylist;
+namespace Nemera.Application.Core.Playlists.Commands.UpdatePlaylist;
 
 /// <summary>
 /// Command for updating the details of a playlist of the current user.

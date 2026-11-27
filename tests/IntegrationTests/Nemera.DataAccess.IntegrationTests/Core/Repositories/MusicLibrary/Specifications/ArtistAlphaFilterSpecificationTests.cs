@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.DataAccess.Core.Repositories.MusicLibrary.Specifications;
-using Lumina.DataAccess.Core.UoW;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.DataAccess.Core.Repositories.MusicLibrary.Specifications;
+using Nemera.DataAccess.Core.UoW;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.MusicLibrary.Specifications;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.MusicLibrary.Specifications;
 
 /// <summary>
 /// Contains integration tests for the <see cref="ArtistAlphaFilterSpecification"/> class, exercising it against a real SQLite database.
@@ -21,7 +21,7 @@ namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.MusicLibrary.Spec
 public class ArtistAlphaFilterSpecificationTests : IDisposable
 {
     private readonly SqliteConnection _connection;
-    private readonly LuminaDbContext _context;
+    private readonly NemeraDbContext _context;
     private readonly ArtistEntityFixture _artistEntityFixture = new();
 
     /// <summary>
@@ -32,7 +32,7 @@ public class ArtistAlphaFilterSpecificationTests : IDisposable
         // The specification translates to the SQLite glob() function, so it can only be exercised against a real SQLite database.
         _connection = new SqliteConnection("Data Source=:memory:");
         _connection.Open();
-        _context = new LuminaDbContext(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(_connection).Options);
+        _context = new NemeraDbContext(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(_connection).Options);
         _context.Database.EnsureCreated();
     }
 

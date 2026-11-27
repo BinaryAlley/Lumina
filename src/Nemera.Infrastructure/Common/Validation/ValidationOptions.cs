@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.Infrastructure.Validation;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.Infrastructure.Validation;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Validation;
+namespace Nemera.Infrastructure.Common.Validation;
 
 /// <summary>
 /// Provides options validation for a specific options type using the application validation framework.

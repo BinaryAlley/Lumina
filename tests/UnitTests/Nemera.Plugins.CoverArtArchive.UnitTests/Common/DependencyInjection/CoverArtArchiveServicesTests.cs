@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.CoverArtArchive.Common.DependencyInjection;
-using Lumina.Plugins.CoverArtArchive.Common.Models.DTO.Settings;
-using Lumina.Plugins.CoverArtArchive.Core.Api;
-using Lumina.Plugins.CoverArtArchive.Core.Settings;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.CoverArtArchive.Common.DependencyInjection;
+using Nemera.Plugins.CoverArtArchive.Common.Models.DTO.Settings;
+using Nemera.Plugins.CoverArtArchive.Core.Api;
+using Nemera.Plugins.CoverArtArchive.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.UnitTests.Common.DependencyInjection;
+namespace Nemera.Plugins.CoverArtArchive.UnitTests.Common.DependencyInjection;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CoverArtArchiveServices"/> class.

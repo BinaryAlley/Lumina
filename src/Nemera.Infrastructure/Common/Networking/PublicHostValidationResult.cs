@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Networking;
+using Nemera.Domain.SharedKernel.Common.Enums.Networking;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Networking;
+namespace Nemera.Infrastructure.Common.Networking;
 
 /// <summary>
 /// Represents the outcome of validating a host against the outbound address policy.

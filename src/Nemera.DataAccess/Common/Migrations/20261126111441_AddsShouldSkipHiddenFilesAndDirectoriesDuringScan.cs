@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Lumina.DataAccess.Common.Migrations
+namespace Nemera.DataAccess.Common.Migrations
 {
     /// <inheritdoc />
     public partial class AddsShouldSkipHiddenFilesAndDirectoriesDuringScan : Migration

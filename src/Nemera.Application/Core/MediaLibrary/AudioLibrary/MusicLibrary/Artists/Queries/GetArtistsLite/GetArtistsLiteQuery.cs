@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Queries.GetArtistsLite;
+namespace Nemera.Application.Core.MediaLibrary.AudioLibrary.MusicLibrary.Artists.Queries.GetArtistsLite;
 
 /// <summary>
 /// Query for getting the lightweight read models of all the artists of a media library.

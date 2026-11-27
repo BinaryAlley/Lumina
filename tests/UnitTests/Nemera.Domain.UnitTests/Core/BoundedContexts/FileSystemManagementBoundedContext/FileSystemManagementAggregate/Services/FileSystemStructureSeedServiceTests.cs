@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Environment;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.ValueObjects;
 using NSubstitute;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -11,7 +11,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 #endregion
 
-namespace Lumina.Domain.UnitTests.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+namespace Nemera.Domain.UnitTests.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
 
 /// <summary>
 /// Contains unit tests for the <see cref="FileSystemStructureSeedService"/> class.
@@ -24,7 +24,7 @@ public class FileSystemStructureSeedServiceTests
     private readonly IPathService _mockPathService;
     private readonly FileSystemStructureSeedService _sut;
     private static readonly bool s_isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-    private readonly string _rootPath = s_isUnix ? "/Lumina" : @"C:\Lumina";
+    private readonly string _rootPath = s_isUnix ? "/Nemera" : @"C:\Nemera";
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileSystemStructureSeedServiceTests"/> class.

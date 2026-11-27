@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.MediaConsumption.Commands.StartConsumption;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Core.MediaConsumption.Commands.StartConsumption;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.MediaConsumption.Commands.StartConsumption;
+namespace Nemera.Application.Fixtures.Core.MediaConsumption.Commands.StartConsumption;
 
 /// <summary>
 /// Fixture class for the <see cref="StartConsumptionCommand"/> class.

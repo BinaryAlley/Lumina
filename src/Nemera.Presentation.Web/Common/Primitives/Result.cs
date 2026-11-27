@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Primitives;
+namespace Nemera.Presentation.Web.Common.Primitives;
 
 /// <summary>
 /// Primitive struct for explicitly handling success and failure cases in a functional manner.

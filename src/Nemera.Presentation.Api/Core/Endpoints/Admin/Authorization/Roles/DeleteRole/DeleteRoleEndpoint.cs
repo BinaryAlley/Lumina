@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.Authorization;
-using Lumina.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
-using Lumina.Contracts.Requests.Authorization;
-using Lumina.Presentation.Api.Common.Routes.UsersManagement;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.Authorization;
+using Nemera.Application.Core.Admin.Authorization.Roles.Commands.DeleteRole;
+using Nemera.Contracts.Requests.Authorization;
+using Nemera.Presentation.Api.Common.Routes.UsersManagement;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.DeleteRole;
+namespace Nemera.Presentation.Api.Core.Endpoints.Admin.Authorization.Roles.DeleteRole;
 
 /// <summary>
 /// API endpoint for the <c>/auth/roles/{roleId}</c> route.

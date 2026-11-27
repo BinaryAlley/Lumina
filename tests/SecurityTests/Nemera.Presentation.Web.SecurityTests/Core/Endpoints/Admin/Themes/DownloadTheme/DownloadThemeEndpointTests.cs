@@ -1,24 +1,24 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Authorization;
-using Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.DownloadTheme;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
-using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Enums.Authorization;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.Themes.DownloadTheme;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.FileSystemManagement;
+using Nemera.Presentation.Web.Fixtures.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Themes.DownloadTheme;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Admin.Themes.DownloadTheme;
 
 /// <summary>
 /// Contains security tests for the <see cref="DownloadThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class DownloadThemeEndpointTests : IClassFixture<LuminaWebFactory>
+public class DownloadThemeEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
     private readonly BlobDataDtoFixture _blobDataDtoFixture = new();
 
@@ -26,7 +26,7 @@ public class DownloadThemeEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="DownloadThemeEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public DownloadThemeEndpointTests(LuminaWebFactory apiFactory)
+    public DownloadThemeEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

@@ -1,4 +1,4 @@
-namespace Lumina.Presentation.Api.Common.Routes.MediaConsumption;
+namespace Nemera.Presentation.Api.Common.Routes.MediaConsumption;
 
 /// <summary>
 /// Class for the collection of the media consumption routes of the API.

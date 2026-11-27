@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Themes.Management.Commands.SetCurrentTheme;
+namespace Nemera.Application.Core.Themes.Management.Commands.SetCurrentTheme;
 
 /// <summary>
 /// Command for setting the currently active theme.

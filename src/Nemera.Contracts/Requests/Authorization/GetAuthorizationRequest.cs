@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Contracts.Requests.Authorization;
+namespace Nemera.Contracts.Requests.Authorization;
 
 /// <summary>
 /// Represents the request model for retrieving account authorization information.

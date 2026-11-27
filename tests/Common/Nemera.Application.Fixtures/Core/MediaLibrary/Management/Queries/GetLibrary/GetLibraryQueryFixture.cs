@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.MediaLibrary.Management.Queries.GetLibrary;
+using Nemera.Application.Core.MediaLibrary.Management.Queries.GetLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.MediaLibrary.Management.Queries.GetLibrary;
+namespace Nemera.Application.Fixtures.Core.MediaLibrary.Management.Queries.GetLibrary;
 
 /// <summary>
 /// Fixture class for the <see cref="GetLibraryQuery"/> class.

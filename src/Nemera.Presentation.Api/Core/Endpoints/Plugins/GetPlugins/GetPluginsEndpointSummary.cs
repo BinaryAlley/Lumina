@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Responses.Plugins;
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Contracts.Responses.Plugins;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Plugins.GetPlugins;
+namespace Nemera.Presentation.Api.Core.Endpoints.Plugins.GetPlugins;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetPluginsEndpoint"/> API endpoint, for OpenAPI.
@@ -37,7 +37,7 @@ public class GetPluginsEndpointSummary : Summary<GetPluginsEndpoint, EmptyReques
                 new(
                     Id: Guid.NewGuid(),
                     Name: "Goodreads",
-                    Author: "Lumina",
+                    Author: "Nemera",
                     Version: "1.0.0",
                     Description: "Provides book metadata from Goodreads.",
                     LoadStatus: PluginLoadStatus.Loaded,

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Requests.Tools;
+using Nemera.Presentation.Web.Common.Requests.Tools;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Tools.Language.SetLanguage;
+namespace Nemera.Presentation.Web.Core.Endpoints.Tools.Language.SetLanguage;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="SetLanguageEndpoint"/> endpoint, for OpenAPI.

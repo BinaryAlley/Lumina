@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.Scheduling;
+using Nemera.Contracts.Requests.Scheduling;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Scheduling.RemoveScheduledJob;
+namespace Nemera.Presentation.Api.Core.Endpoints.Scheduling.RemoveScheduledJob;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="RemoveScheduledJobEndpoint"/> API endpoint, for OpenAPI.

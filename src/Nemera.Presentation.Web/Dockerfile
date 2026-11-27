@@ -19,23 +19,23 @@ WORKDIR /src
 
 # Restore NuGet packages (keeping this section separate from the rest of the project files allows Docker to cache the restored packages).
 COPY ["AssemblyInfo_Shared.cs", "."]
-COPY ["Lumina.Presentation.Web/Lumina.Presentation.Web.csproj", "Lumina.Presentation.Web/"]
+COPY ["Nemera.Presentation.Web/Nemera.Presentation.Web.csproj", "Nemera.Presentation.Web/"]
 
-RUN dotnet restore "./Lumina.Presentation.Web/Lumina.Presentation.Web.csproj" /p:BaseOutputPath=/app/publish/
+RUN dotnet restore "./Nemera.Presentation.Web/Nemera.Presentation.Web.csproj" /p:BaseOutputPath=/app/publish/
 
 # Build the project.
-COPY ["Lumina.Presentation.Web/", "Lumina.Presentation.Web/"]
+COPY ["Nemera.Presentation.Web/", "Nemera.Presentation.Web/"]
 COPY . .
-WORKDIR /src/Lumina.Presentation.Web
+WORKDIR /src/Nemera.Presentation.Web
 
-RUN dotnet build "./Lumina.Presentation.Web.csproj" -c $BUILD_CONFIGURATION -o /app/build /p:BaseOutputPath=/app/publish/
+RUN dotnet build "./Nemera.Presentation.Web.csproj" -c $BUILD_CONFIGURATION -o /app/build /p:BaseOutputPath=/app/publish/
 
 # ==== Stage 2: Publish stage
 FROM build AS publish
 
 ARG BUILD_CONFIGURATION=Release
 
-RUN dotnet publish "./Lumina.Presentation.Web.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false /p:BaseOutputPath=/app/publish/
+RUN dotnet publish "./Nemera.Presentation.Web.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false /p:BaseOutputPath=/app/publish/
 
 # ==== Stage 3: Run stage
 #FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
@@ -48,7 +48,7 @@ COPY --from=publish /app/publish .
 # Docker, and for a published DLL run directly on a host, ASPNETCORE_URLS (or ASPNETCORE_HTTP_PORTS) must be set.
 ENV ASPNETCORE_HTTP_PORTS=5012
 EXPOSE 5012
-ENTRYPOINT ["dotnet", "Lumina.Presentation.Web.dll"]
+ENTRYPOINT ["dotnet", "Nemera.Presentation.Web.dll"]
 
 # To build this Docker image, run the following command from the root of the project (location of the .slnx solution file):
-# docker build --no-cache -t lumina-web -f Lumina.Presentation.Web/Dockerfile .
+# docker build --no-cache -t nemera-web -f Nemera.Presentation.Web/Dockerfile .

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.ID3.Core;
-using Lumina.Plugins.ID3.Core.Tags;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.ID3.Core;
+using Nemera.Plugins.ID3.Core.Tags;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 #endregion
 
-namespace Lumina.Plugins.ID3.Common.DependencyInjection;
+namespace Nemera.Plugins.ID3.Common.DependencyInjection;
 
 /// <summary>
 /// Utility class for registering the services of the ID3 metadata provider into the Dependency Injection container.

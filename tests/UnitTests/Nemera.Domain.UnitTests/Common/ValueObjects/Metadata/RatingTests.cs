@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Common.ValueObjects.Metadata;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.ValueObjects.Metadata;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Domain.UnitTests.Common.ValueObjects.Metadata;
+namespace Nemera.Domain.UnitTests.Common.ValueObjects.Metadata;
 
 /// <summary>
 /// Contains unit tests for the <see cref="Rating"/> class.

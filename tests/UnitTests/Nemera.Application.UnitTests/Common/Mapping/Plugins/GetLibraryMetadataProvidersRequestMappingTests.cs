@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.Plugins;
-using Lumina.Application.Core.Plugins.Queries.GetLibraryMetadataProviders;
-using Lumina.Contracts.Fixtures.Core.Requests.Plugins;
-using Lumina.Contracts.Requests.Plugins;
+using Nemera.Application.Common.Mapping.Plugins;
+using Nemera.Application.Core.Plugins.Queries.GetLibraryMetadataProviders;
+using Nemera.Contracts.Fixtures.Core.Requests.Plugins;
+using Nemera.Contracts.Requests.Plugins;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.Plugins;
+namespace Nemera.Application.UnitTests.Common.Mapping.Plugins;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetLibraryMetadataProvidersRequestMapping"/> class.

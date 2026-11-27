@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+namespace Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 
 /// <summary>
 /// Enumeration for the units in which the display time span of the scheduler page is expressed.

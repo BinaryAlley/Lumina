@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Playlists;
-using Lumina.Application.Common.DTO.Pagination;
+using Nemera.Application.Common.DataAccess.Entities.Playlists;
+using Nemera.Application.Common.DTO.Pagination;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DTO.Playlists;
+namespace Nemera.Application.Common.DTO.Playlists;
 
 /// <summary>
 /// Data transfer object for a stored playlist together with a page of its entries and their display data.

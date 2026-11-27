@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Themes;
+namespace Nemera.Infrastructure.Core.Themes;
 
 /// <summary>
 /// Resolves the MIME content type of theme files based on their file extension.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Application.Common.CQRS;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
+namespace Nemera.Application.Core.Scheduling.Commands.UpdateSchedulerDisplayPreferences;
 
 /// <summary>
 /// Command for updating the display preferences of the scheduler page of the current user.

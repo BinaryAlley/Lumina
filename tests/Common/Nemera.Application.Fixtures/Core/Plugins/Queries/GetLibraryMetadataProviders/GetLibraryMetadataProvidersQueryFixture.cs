@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Plugins.Queries.GetLibraryMetadataProviders;
+using Nemera.Application.Core.Plugins.Queries.GetLibraryMetadataProviders;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Plugins.Queries.GetLibraryMetadataProviders;
+namespace Nemera.Application.Fixtures.Core.Plugins.Queries.GetLibraryMetadataProviders;
 
 /// <summary>
 /// Fixture class for the <see cref="GetLibraryMetadataProvidersQuery"/> class.

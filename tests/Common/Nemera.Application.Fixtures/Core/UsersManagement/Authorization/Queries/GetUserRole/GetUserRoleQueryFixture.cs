@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserRole;
+using Nemera.Application.Core.UsersManagement.Authorization.Queries.GetUserRole;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetUserRole;
+namespace Nemera.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetUserRole;
 
 /// <summary>
 /// Fixture class for the <see cref="GetUserRoleQuery"/> class.

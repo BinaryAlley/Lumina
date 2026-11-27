@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Requests.Library.Management;
+using Nemera.Presentation.Web.Common.Requests.Library.Management;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Requests.Library.Management;
+namespace Nemera.Presentation.Web.Fixtures.Common.Requests.Library.Management;
 
 /// <summary>
 /// Fixture class for the <see cref="GetLibraryTypeArtworkProvidersRequest"/> record.

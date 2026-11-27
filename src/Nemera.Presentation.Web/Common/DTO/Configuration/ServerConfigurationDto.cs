@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Configuration;
+namespace Nemera.Presentation.Web.Common.DTO.Configuration;
 
 /// <summary>
 /// Data transfer object for deserializing server configuration settings.

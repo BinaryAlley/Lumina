@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+namespace Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 
 /// <summary>
 /// Enumeration for the statuses of the jobs ran on media libraries scan.

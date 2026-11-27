@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Telemetry;
-using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
-using Lumina.Application.Fixtures.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
-using Lumina.Contracts.Fixtures.Core.Responses.Authorization;
-using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Telemetry;
+using Nemera.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
+using Nemera.Application.Fixtures.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
+using Nemera.Contracts.Fixtures.Core.Responses.Authorization;
+using Nemera.Contracts.Responses.Authorization;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Telemetry;
+namespace Nemera.Application.UnitTests.Common.Telemetry;
 
 /// <summary>
 /// Contains unit tests for the <see cref="TelemetryQueryHandlerDecorator{TQuery,TResult}"/> class.
@@ -64,10 +64,10 @@ public class TelemetryQueryHandlerDecoratorTests
         await _mockInnerHandler.Received(1).HandleAsync(query, CancellationToken.None);
         Activity activity = Assert.Single(capturedActivities);
         Assert.Equal($"Handle {_mockInnerHandler.GetType().Name}", activity.OperationName);
-        Assert.Equal("query", activity.GetTagItem("lumina.handler.type"));
+        Assert.Equal("query", activity.GetTagItem("nemera.handler.type"));
         Assert.Equal(ActivityStatusCode.Ok, activity.Status);
-        Assert.Contains(metricMeasurements, measurement => measurement.InstrumentName == "lumina.application.handler.duration" && measurement.Outcome == "success");
-        Assert.Contains(metricMeasurements, measurement => measurement.InstrumentName == "lumina.application.handler.invocations" && measurement.Outcome == "success");
+        Assert.Contains(metricMeasurements, measurement => measurement.InstrumentName == "nemera.application.handler.duration" && measurement.Outcome == "success");
+        Assert.Contains(metricMeasurements, measurement => measurement.InstrumentName == "nemera.application.handler.invocations" && measurement.Outcome == "success");
     }
 
     [Fact]
@@ -90,8 +90,8 @@ public class TelemetryQueryHandlerDecoratorTests
         Assert.Equal(failedResult, result);
         Activity activity = Assert.Single(capturedActivities);
         Assert.Equal(ActivityStatusCode.Error, activity.Status);
-        Assert.Contains(metricMeasurements, measurement => measurement.InstrumentName == "lumina.application.handler.duration" && measurement.Outcome == "failure");
-        Assert.Contains(metricMeasurements, measurement => measurement.InstrumentName == "lumina.application.handler.invocations" && measurement.Outcome == "failure");
+        Assert.Contains(metricMeasurements, measurement => measurement.InstrumentName == "nemera.application.handler.duration" && measurement.Outcome == "failure");
+        Assert.Contains(metricMeasurements, measurement => measurement.InstrumentName == "nemera.application.handler.invocations" && measurement.Outcome == "failure");
     }
 
     [Fact]
@@ -113,6 +113,6 @@ public class TelemetryQueryHandlerDecoratorTests
         // Assert
         Activity activity = Assert.Single(capturedActivities);
         Assert.Equal(ActivityStatusCode.Error, activity.Status);
-        Assert.Contains(metricMeasurements, measurement => measurement.InstrumentName == "lumina.application.handler.duration" && measurement.Outcome == "failure");
+        Assert.Contains(metricMeasurements, measurement => measurement.InstrumentName == "nemera.application.handler.duration" && measurement.Outcome == "failure");
     }
 }

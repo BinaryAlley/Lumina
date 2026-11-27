@@ -44,7 +44,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Lumina.Application\Lumina.Application.csproj" />
-        <ProjectReference Include="..\Lumina.Plugins.Contracts\Lumina.Plugins.Contracts.csproj" />
+        <ProjectReference Include="..\Nemera.Application\Nemera.Application.csproj" />
+        <ProjectReference Include="..\Nemera.Plugins.Contracts\Nemera.Plugins.Contracts.csproj" />
     </ItemGroup>
 </Project>

@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
-using Lumina.Application.Fixtures.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Application.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
+using Nemera.Application.Fixtures.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
+namespace Nemera.Application.UnitTests.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdateUserSettingsCommandValidator"/> class.

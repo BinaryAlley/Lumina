@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.MediaConsumption;
-using Lumina.Application.Common.Mapping.MediaConsumption;
-using Lumina.Application.Fixtures.Common.DTO.MediaConsumption;
-using Lumina.Contracts.Responses.MediaConsumption;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DTO.MediaConsumption;
+using Nemera.Application.Common.Mapping.MediaConsumption;
+using Nemera.Application.Fixtures.Common.DTO.MediaConsumption;
+using Nemera.Contracts.Responses.MediaConsumption;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.MediaConsumption;
+namespace Nemera.Application.UnitTests.Common.Mapping.MediaConsumption;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ConsumptionTotalsDtoMapping"/> class.

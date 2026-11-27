@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Responses.UsersManagement.Settings;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Responses.UsersManagement.Settings;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -17,16 +17,16 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagement.Settings.GetUserSettings;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.UsersManagement.Settings.GetUserSettings;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetUserSettingsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetUserSettingsEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetUserSettingsEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly UserSettingsEntityFixture _userSettingsEntityFixture = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -38,7 +38,7 @@ public class GetUserSettingsEndpointTests : IClassFixture<AuthenticatedLuminaApi
     /// Initializes a new instance of the <see cref="GetUserSettingsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetUserSettingsEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetUserSettingsEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -128,7 +128,7 @@ public class GetUserSettingsEndpointTests : IClassFixture<AuthenticatedLuminaApi
     private async Task<UserSettingsEntity> CreateTestUserSettings()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         Guid userId = dbContext.Users.First(user => user.Username == _apiFactory.TestUsername).Id;
         UserSettingsEntity settings = _userSettingsEntityFixture.Create(
@@ -157,7 +157,7 @@ public class GetUserSettingsEndpointTests : IClassFixture<AuthenticatedLuminaApi
     public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         await dbContext.Set<UserSettingsEntity>().ExecuteDeleteAsync();
         await dbContext.Set<UserEntity>().ExecuteDeleteAsync();

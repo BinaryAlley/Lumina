@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.DataAccess.Common.Dapper;
+using Nemera.DataAccess.Common.Dapper;
 using NSubstitute;
 using System;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Common.Dapper;
+namespace Nemera.DataAccess.UnitTests.Common.Dapper;
 
 /// <summary>
 /// Contains unit tests for the <see cref="SqliteGuidTypeHandler"/> class.

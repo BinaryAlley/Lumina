@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.Primitives;
 using System;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Validation;
+namespace Nemera.Presentation.Web.Common.Validation;
 
 /// <summary>
 /// Provides a fluent API for building validation rules for a specific type.

@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.CoverArtArchive.Common.Models.Contracts.Responses;
-using Lumina.Plugins.CoverArtArchive.Core.Api;
-using Lumina.Plugins.CoverArtArchive.Core.Mapping;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.CoverArtArchive.Common.Models.Contracts.Responses;
+using Nemera.Plugins.CoverArtArchive.Core.Api;
+using Nemera.Plugins.CoverArtArchive.Core.Mapping;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.Core;
+namespace Nemera.Plugins.CoverArtArchive.Core;
 
 /// <summary>
 /// Provides the artwork of an album from the Cover Art Archive, by resolving the MusicBrainz identifiers of the album into artwork DTOs.

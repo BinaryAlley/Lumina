@@ -1,7 +1,7 @@
 using System.Reflection;
 
-[assembly: AssemblyCompany("Lumina")]
-[assembly: AssemblyCopyright("Copyright © Lumina 2024")]
+[assembly: AssemblyCompany("Nemera")]
+[assembly: AssemblyCopyright("Copyright © Nemera 2024")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyTrademark("")]

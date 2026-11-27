@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DTO.Favorites;
+namespace Nemera.Application.Common.DTO.Favorites;
 
 /// <summary>
 /// Data transfer object for the generic display data of a favorited media item.

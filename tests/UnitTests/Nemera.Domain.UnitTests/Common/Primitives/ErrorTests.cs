@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Primitives;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Primitives;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Domain.UnitTests.Common.Primitives;
+namespace Nemera.Domain.UnitTests.Common.Primitives;
 
 /// <summary>
 /// Contains unit tests for the <see cref="Error"/> class and its derived error records.

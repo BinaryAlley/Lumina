@@ -2,7 +2,7 @@
 using Dapper;
 #endregion
 
-namespace Lumina.DataAccess.Common.Dapper;
+namespace Nemera.DataAccess.Common.Dapper;
 
 /// <summary>
 /// Registers the Dapper type handlers used by the DataAccess layer.

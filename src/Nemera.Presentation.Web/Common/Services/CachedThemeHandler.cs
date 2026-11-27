@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Services;
+namespace Nemera.Presentation.Web.Common.Services;
 
 /// <summary>
 /// Delegating handler that intercepts the HTTP requests to the theme endpoints of the remote API and caches their responses,

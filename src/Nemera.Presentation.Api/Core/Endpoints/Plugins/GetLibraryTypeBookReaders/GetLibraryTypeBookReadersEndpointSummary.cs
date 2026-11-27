@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.Plugins;
-using Lumina.Contracts.Responses.Plugins;
+using Nemera.Contracts.Requests.Plugins;
+using Nemera.Contracts.Responses.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Plugins.GetLibraryTypeBookReaders;
+namespace Nemera.Presentation.Api.Core.Endpoints.Plugins.GetLibraryTypeBookReaders;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetLibraryTypeBookReadersEndpoint"/> API endpoint, for OpenAPI.

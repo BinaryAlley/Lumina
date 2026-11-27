@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
-using Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetAuthorization;
-using Lumina.Application.Common.Errors;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
+using Nemera.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetAuthorization;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetAuthorization;
+namespace Nemera.Application.UnitTests.Core.UsersManagement.Authorization.Queries.GetAuthorization;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetAuthorizationQueryValidator"/> class.

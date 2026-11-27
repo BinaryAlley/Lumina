@@ -1,27 +1,27 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Core.Endpoints.Tools.Settings.GetUserSettings;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Core.Endpoints.Tools.Settings.GetUserSettings;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Tools.Settings.GetUserSettings;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Tools.Settings.GetUserSettings;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetUserSettingsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetUserSettingsEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetUserSettingsEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetUserSettingsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetUserSettingsEndpointTests(LuminaWebFactory apiFactory)
+    public GetUserSettingsEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

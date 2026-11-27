@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
-using Lumina.Contracts.Requests.Authentication;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Infrastructure.Core.Security;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.Authentication;
+using Nemera.Contracts.Requests.Authentication;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Infrastructure.Core.Security;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,15 +21,15 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authentication;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Authentication;
 
 /// <summary>
 /// Contains security tests for the <see cref="RecoverPasswordEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class RecoverPasswordEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly HttpClient _client;
     private readonly PasswordHashService _hashService = new();
     private readonly UserEntityFixture _userEntityFixture = new();
@@ -45,7 +45,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     /// Initializes a new instance of the <see cref="RecoverPasswordEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public RecoverPasswordEndpointTests(LuminaApiFactory apiFactory)
+    public RecoverPasswordEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
@@ -97,7 +97,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         // cannot run first and 429 this test; the NotEqual(TooManyRequests) assertion below guards against any collision.
         HttpClient client = _apiFactory.CreateClient();
         client.DefaultRequestHeaders.Clear();
-        client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
         UserEntity legitimateUser = await CreateTestUser();
         RecoverPasswordRequest request = _recoverPasswordRequestFixture.Create(
             username: maliciousUsername,
@@ -113,7 +113,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
         Assert.DoesNotContain("SqliteException", await response.Content.ReadAsStringAsync(), StringComparison.OrdinalIgnoreCase);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.NotNull(await dbContext.Users.FirstOrDefaultAsync(user => user.Id == legitimateUser.Id));
     }
 
@@ -124,7 +124,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     private async Task<UserEntity> CreateTestUser()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         UserEntity user = _userEntityFixture.Create(username: _testUsername, password: _hashService.HashString("TestPass123!"));
 
@@ -136,7 +136,7 @@ public class RecoverPasswordEndpointTests : IClassFixture<LuminaApiFactory>, IDi
     public void Dispose()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         UserEntity? user = dbContext.Users.FirstOrDefault(u => u.Username == _testUsername);
         if (user is not null)

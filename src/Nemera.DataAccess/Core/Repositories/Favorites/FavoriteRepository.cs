@@ -1,24 +1,24 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Favorites;
-using Lumina.Application.Common.DataAccess.Repositories.Favorites;
-using Lumina.Application.Common.DTO.Favorites;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.Favorites;
+using Nemera.Application.Common.DataAccess.Repositories.Favorites;
+using Nemera.Application.Common.DTO.Favorites;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Favorites;
+namespace Nemera.DataAccess.Core.Repositories.Favorites;
 
 /// <summary>
 /// Repository for favorites.
@@ -31,15 +31,15 @@ namespace Lumina.DataAccess.Core.Repositories.Favorites;
 /// </remarks>
 internal sealed class FavoriteRepository : IFavoriteRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FavoriteRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public FavoriteRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public FavoriteRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -53,7 +53,7 @@ internal sealed class FavoriteRepository : IFavoriteRepository
         // The handler checks whether the user already favorited the item and creates a new favorite with a new Id, so this always adds a
         // row. A retried or concurrent add that passed the handler's check is rejected by the unique (UserId, MediaKind, MediaItemId)
         // index when the changes are saved, which is the only check that can observe another request's write.
-        _luminaDbContext.Favorites.Add(data);
+        _nemeraDbContext.Favorites.Add(data);
         return Task.FromResult<Result<Created>>(Result.Created);
     }
 
@@ -66,12 +66,12 @@ internal sealed class FavoriteRepository : IFavoriteRepository
     public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         // A handler may already have loaded the same favorite in this unit of work, so the tracked instance is preferred over materializing a second copy.
-        FavoriteEntity? favorite = _luminaDbContext.Favorites.Local.FirstOrDefault(trackedFavorite => trackedFavorite.Id == id);
-        favorite ??= await _luminaDbContext.Favorites.FirstOrDefaultAsync(foundFavorite => foundFavorite.Id == id, cancellationToken).ConfigureAwait(false);
+        FavoriteEntity? favorite = _nemeraDbContext.Favorites.Local.FirstOrDefault(trackedFavorite => trackedFavorite.Id == id);
+        favorite ??= await _nemeraDbContext.Favorites.FirstOrDefaultAsync(foundFavorite => foundFavorite.Id == id, cancellationToken).ConfigureAwait(false);
         if (favorite is null)
             return DomainErrors.Favorites.FavoriteNotFound;
 
-        _luminaDbContext.Favorites.Remove(favorite);
+        _nemeraDbContext.Favorites.Remove(favorite);
         return Result.Deleted;
     }
 
@@ -89,7 +89,7 @@ internal sealed class FavoriteRepository : IFavoriteRepository
     public async Task<Result<FavoriteEntity?>> GetByMediaItemIdForUserAsync(Guid userId, FavoriteMediaKind mediaKind, Guid mediaItemId, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
         // The user is part of the filter rather than a check performed after the read, so the storage medium never returns a favorite that belongs to another user in the first place.
-        IQueryable<FavoriteEntity> query = _luminaDbContext.Favorites;
+        IQueryable<FavoriteEntity> query = _nemeraDbContext.Favorites;
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         return await query
@@ -111,22 +111,22 @@ internal sealed class FavoriteRepository : IFavoriteRepository
         // Only the library Id is projected, so the check never materializes the media item. The planned kinds have no catalogue table yet, so they have no library.
         Guid? libraryId = mediaKind switch
         {
-            FavoriteMediaKind.MusicArtist => await _luminaDbContext.Artists
+            FavoriteMediaKind.MusicArtist => await _nemeraDbContext.Artists
                 .AsNoTracking()
                 .Where(artist => artist.Id == mediaItemId && !artist.IsDeleted)
                 .Select(artist => (Guid?)artist.LibraryId)
                 .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false),
-            FavoriteMediaKind.MusicAlbum => await _luminaDbContext.Albums
+            FavoriteMediaKind.MusicAlbum => await _nemeraDbContext.Albums
                 .AsNoTracking()
                 .Where(album => album.Id == mediaItemId && !album.IsDeleted && !album.Artist!.IsDeleted)
                 .Select(album => (Guid?)album.LibraryId)
                 .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false),
-            FavoriteMediaKind.MusicTrack => await _luminaDbContext.Tracks
+            FavoriteMediaKind.MusicTrack => await _nemeraDbContext.Tracks
                 .AsNoTracking()
                 .Where(track => track.Id == mediaItemId && !track.IsDeleted && !track.Album!.IsDeleted && !track.Album!.Artist!.IsDeleted)
                 .Select(track => (Guid?)track.LibraryId)
                 .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false),
-            FavoriteMediaKind.Book => await _luminaDbContext.Books
+            FavoriteMediaKind.Book => await _nemeraDbContext.Books
                 .AsNoTracking()
                 .Where(book => book.Id == mediaItemId && !book.IsDeleted)
                 .Select(book => (Guid?)book.LibraryId)
@@ -149,7 +149,7 @@ internal sealed class FavoriteRepository : IFavoriteRepository
     public async Task<Result<PaginatedResultDto<FavoriteItemDto>>> GetAllForUserAsync(Guid userId, FavoriteMediaKind? mediaKind, PaginationDataDto? paginationData = null, bool shouldTrackEntities = false, CancellationToken cancellationToken = default)
     {
         // The user is part of the filter rather than a check performed after the read, so the storage medium never returns a favorite that belongs to another user in the first place.
-        IQueryable<FavoriteEntity> favoritesQuery = _luminaDbContext.Favorites;
+        IQueryable<FavoriteEntity> favoritesQuery = _nemeraDbContext.Favorites;
         if (!shouldTrackEntities)
             favoritesQuery = favoritesQuery.AsNoTracking();
         favoritesQuery = favoritesQuery.Where(favorite => favorite.UserId == userId);
@@ -239,7 +239,7 @@ internal sealed class FavoriteRepository : IFavoriteRepository
     {
         Guid[] requestedIds = [.. mediaItemIds];
         // The unique (UserId, MediaKind, MediaItemId) index serves this lookup, and the caller bounds the number of requested Ids.
-        IReadOnlyList<Guid> favoritedIds = await _luminaDbContext.Favorites
+        IReadOnlyList<Guid> favoritedIds = await _nemeraDbContext.Favorites
             .AsNoTracking()
             .Where(favorite => favorite.UserId == userId && favorite.MediaKind == mediaKind && requestedIds.Contains(favorite.MediaItemId))
             .Select(favorite => favorite.MediaItemId)
@@ -291,7 +291,7 @@ internal sealed class FavoriteRepository : IFavoriteRepository
         {
             case FavoriteMediaKind.MusicArtist:
                 // The cover of the artist is the cover artwork stored for it, if any, the same one the artist listing exposes.
-                rows = await _luminaDbContext.Artists
+                rows = await _nemeraDbContext.Artists
                     .AsNoTracking()
                     .Where(artist => requestedIds.Contains(artist.Id) && !artist.IsDeleted)
                     .Select(artist => new DisplayRow(
@@ -302,15 +302,15 @@ internal sealed class FavoriteRepository : IFavoriteRepository
                         null,
                         null,
                         null,
-                        _luminaDbContext.MusicArtwork
+                        _nemeraDbContext.MusicArtwork
                             .Where(artwork => artwork.OwnerType == MusicArtworkOwnerType.Artist && artwork.OwnerId == artist.Id && artwork.ArtworkType == ArtworkType.Cover)
                             .Select(artwork => artwork.FileName)
                             .FirstOrDefault()))
                     .ToListAsync(cancellationToken).ConfigureAwait(false);
                 break;
             case FavoriteMediaKind.MusicAlbum:
-                rows = await (from album in _luminaDbContext.Albums.AsNoTracking()
-                              join artist in _luminaDbContext.Artists on album.ArtistId equals artist.Id
+                rows = await (from album in _nemeraDbContext.Albums.AsNoTracking()
+                              join artist in _nemeraDbContext.Artists on album.ArtistId equals artist.Id
                               where requestedIds.Contains(album.Id) && !album.IsDeleted && !artist.IsDeleted
                               select new DisplayRow(
                                   album.Id,
@@ -320,7 +320,7 @@ internal sealed class FavoriteRepository : IFavoriteRepository
                                   null,
                                   artist.Id,
                                   artist.Name,
-                                  _luminaDbContext.MusicArtwork
+                                  _nemeraDbContext.MusicArtwork
                                       .Where(artwork => artwork.OwnerType == MusicArtworkOwnerType.Album && artwork.OwnerId == album.Id && artwork.ArtworkType == ArtworkType.Cover)
                                       .Select(artwork => artwork.FileName)
                                       .FirstOrDefault()))
@@ -328,9 +328,9 @@ internal sealed class FavoriteRepository : IFavoriteRepository
                 break;
             case FavoriteMediaKind.MusicTrack:
                 // The cover of a track is the one stored for its album, like in the playlist entries.
-                rows = await (from track in _luminaDbContext.Tracks.AsNoTracking()
-                              join album in _luminaDbContext.Albums on track.AlbumId equals album.Id
-                              join artist in _luminaDbContext.Artists on album.ArtistId equals artist.Id
+                rows = await (from track in _nemeraDbContext.Tracks.AsNoTracking()
+                              join album in _nemeraDbContext.Albums on track.AlbumId equals album.Id
+                              join artist in _nemeraDbContext.Artists on album.ArtistId equals artist.Id
                               where requestedIds.Contains(track.Id) && !track.IsDeleted && !album.IsDeleted && !artist.IsDeleted
                               select new DisplayRow(
                                   track.Id,
@@ -340,7 +340,7 @@ internal sealed class FavoriteRepository : IFavoriteRepository
                                   album.Title,
                                   artist.Id,
                                   artist.Name,
-                                  _luminaDbContext.MusicArtwork
+                                  _nemeraDbContext.MusicArtwork
                                       .Where(artwork => artwork.OwnerType == MusicArtworkOwnerType.Album && artwork.OwnerId == album.Id && artwork.ArtworkType == ArtworkType.Cover)
                                       .Select(artwork => artwork.FileName)
                                       .FirstOrDefault()))
@@ -349,7 +349,7 @@ internal sealed class FavoriteRepository : IFavoriteRepository
             case FavoriteMediaKind.Book:
                 // The book catalogue does not persist series yet, so a book has no collection. The creator is the first author by display name,
                 // the same author the book listing shows, and the Id is the tiebreaker between authors that share a display name.
-                rows = await _luminaDbContext.Books
+                rows = await _nemeraDbContext.Books
                     .AsNoTracking()
                     .Where(book => requestedIds.Contains(book.Id) && !book.IsDeleted)
                     .Select(book => new DisplayRow(
@@ -358,13 +358,13 @@ internal sealed class FavoriteRepository : IFavoriteRepository
                         book.Title,
                         null,
                         null,
-                        (from bookContributor in _luminaDbContext.BookContributors
-                         join contributor in _luminaDbContext.MediaContributors on bookContributor.MediaContributorId equals contributor.Id
+                        (from bookContributor in _nemeraDbContext.BookContributors
+                         join contributor in _nemeraDbContext.MediaContributors on bookContributor.MediaContributorId equals contributor.Id
                          where bookContributor.BookId == book.Id && bookContributor.Role == MediaContributorRole.Author
                          orderby contributor.DisplayName, contributor.Id
                          select (Guid?)contributor.Id).FirstOrDefault(),
-                        (from bookContributor in _luminaDbContext.BookContributors
-                         join contributor in _luminaDbContext.MediaContributors on bookContributor.MediaContributorId equals contributor.Id
+                        (from bookContributor in _nemeraDbContext.BookContributors
+                         join contributor in _nemeraDbContext.MediaContributors on bookContributor.MediaContributorId equals contributor.Id
                          where bookContributor.BookId == book.Id && bookContributor.Role == MediaContributorRole.Author
                          orderby contributor.DisplayName, contributor.Id
                          select contributor.DisplayName).FirstOrDefault(),

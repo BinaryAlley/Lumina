@@ -1,6 +1,6 @@
-# Lumina API
+# Nemera API
 
-- [Lumina API](#lumina-api)
+- [Nemera API](#nemera-api)
   - [File System Management](#file-system-management)
     - [File System](#file-system)
       - [Get File System Type](#get-file-system-type)

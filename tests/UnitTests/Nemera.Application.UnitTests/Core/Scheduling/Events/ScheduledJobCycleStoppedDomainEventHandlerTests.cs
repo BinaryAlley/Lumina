@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Core.Scheduling.Events;
-using Lumina.Application.Core.Scheduling.Notifications;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Fixtures.Common.DTO.Pagination;
-using Lumina.Contracts.Responses.Scheduling;
-using Lumina.Domain.Common.Exceptions;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
-using Lumina.Domain.Fixtures.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.DataAccess.Repositories.Scheduling;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Core.Scheduling.Events;
+using Nemera.Application.Core.Scheduling.Notifications;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Fixtures.Common.DTO.Pagination;
+using Nemera.Contracts.Responses.Scheduling;
+using Nemera.Domain.Common.Exceptions;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
+using Nemera.Domain.Fixtures.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.Events;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -21,7 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Scheduling.Events;
+namespace Nemera.Application.UnitTests.Core.Scheduling.Events;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ScheduledJobCycleStoppedDomainEventHandler"/> class.
@@ -58,7 +58,7 @@ public class ScheduledJobCycleStoppedDomainEventHandlerTests
     {
         // Arrange
         ScheduledJobCycleStoppedDomainEvent domainEvent = _scheduledJobCycleStoppedDomainEventFixture.Create();
-        ScheduledJobEntity stoppedJob = _scheduledJobEntityFixture.Create(name: "Stopped job", status: Lumina.Domain.SharedKernel.Common.Enums.Scheduling.ScheduledJobStatus.Added);
+        ScheduledJobEntity stoppedJob = _scheduledJobEntityFixture.Create(name: "Stopped job", status: Nemera.Domain.SharedKernel.Common.Enums.Scheduling.ScheduledJobStatus.Added);
         _mockScheduledJobRepository.GetAllAsync<BaseFilterDto>(cancellationToken: Arg.Any<CancellationToken>()).Returns(Result.From(_paginatedResultDtoFixture.Create(data: [stoppedJob], currentPage: 1, perPage: 1, count: 1, numberOfPages: 1)));
 
         // Act

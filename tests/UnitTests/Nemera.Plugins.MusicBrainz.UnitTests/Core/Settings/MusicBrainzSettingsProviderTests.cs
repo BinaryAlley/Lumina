@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.MusicBrainz.Common.Models.DTO.Settings;
-using Lumina.Plugins.MusicBrainz.Core.Settings;
-using Lumina.Plugins.MusicBrainz.Fixtures.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.MusicBrainz.Common.Models.DTO.Settings;
+using Nemera.Plugins.MusicBrainz.Core.Settings;
+using Nemera.Plugins.MusicBrainz.Fixtures.Common.Models.DTO.Settings;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.UnitTests.Core.Settings;
+namespace Nemera.Plugins.MusicBrainz.UnitTests.Core.Settings;
 
 /// <summary>
 /// Contains unit tests for the <see cref="MusicBrainzSettingsProvider"/> class.
@@ -36,7 +36,7 @@ public class MusicBrainzSettingsProviderTests
         Assert.NotSame(defaults, result);
         Assert.Equal("https://musicbrainz.org/ws/2/", result.BaseUrl);
         Assert.False(result.DoesAllowPrivateBaseUrl);
-        Assert.Equal("Lumina-MusicBrainz/1.0", result.UserAgent);
+        Assert.Equal("Nemera-MusicBrainz/1.0", result.UserAgent);
         Assert.Equal("default@example.com", result.ContactEmail);
         Assert.Equal(10, result.SearchResultLimit);
         Assert.Equal(25, result.ReleaseLookupLimit);
@@ -381,7 +381,7 @@ public class MusicBrainzSettingsProviderTests
         return _musicBrainzSettingsDtoFixture.Create(
             baseUrl: "https://musicbrainz.org/ws/2/",
             doesAllowPrivateBaseUrl: false,
-            userAgent: "Lumina-MusicBrainz/1.0",
+            userAgent: "Nemera-MusicBrainz/1.0",
             contactEmail: "default@example.com",
             searchResultLimit: 10,
             releaseLookupLimit: 25,

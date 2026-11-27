@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.Themes;
-using Lumina.Contracts.Responses.Themes;
+using Nemera.Contracts.Requests.Themes;
+using Nemera.Contracts.Responses.Themes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemeArchive;
+namespace Nemera.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemeArchive;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetThemeArchiveEndpoint"/> API endpoint, for OpenAPI.
@@ -24,7 +24,7 @@ public class GetThemeArchiveEndpointSummary : Summary<GetThemeArchiveEndpoint, G
         Description = "Retrieves the downloadable ZIP archive of an installed theme.";
 
         ExampleRequest = new GetThemeArchiveRequest(
-            ThemeId: "lumina-default"
+            ThemeId: "nemera-default"
         );
 
         RequestParam(r => r.ThemeId, "The manifest id of the theme. Required.");
@@ -32,7 +32,7 @@ public class GetThemeArchiveEndpointSummary : Summary<GetThemeArchiveEndpoint, G
         Response(200, "The ZIP archive of the theme is returned.", "application/zip",
             example: new ThemeArchiveResponse(
                 Bytes: [],
-                FileName: "lumina-default.zip",
+                FileName: "nemera-default.zip",
                 ContentType: "application/zip"
             ));
 

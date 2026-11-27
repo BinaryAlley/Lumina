@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.MediaConsumption.Commands.StartConsumption;
-using Lumina.Contracts.Responses.MediaConsumption;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Common.Routes.MediaConsumption;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.MediaConsumption.Commands.StartConsumption;
+using Nemera.Contracts.Responses.MediaConsumption;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Common.Routes.MediaConsumption;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.MediaConsumption.StartConsumption;
+namespace Nemera.Presentation.Api.Core.Endpoints.MediaConsumption.StartConsumption;
 
 /// <summary>
 /// API endpoint for the <c>/libraries/{libraryId}/media-items/{mediaKind}/{mediaItemId}/consumption-records</c> route.

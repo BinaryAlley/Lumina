@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Responses.UsersManagement;
+namespace Nemera.Presentation.Web.Common.Responses.UsersManagement;
 
 /// <summary>
 /// Model for verifying the initialization status of the application.

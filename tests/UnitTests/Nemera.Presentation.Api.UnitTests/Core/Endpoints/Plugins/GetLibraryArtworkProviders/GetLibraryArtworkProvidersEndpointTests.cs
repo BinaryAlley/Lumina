@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Plugins.Queries.GetLibraryArtworkProviders;
-using Lumina.Contracts.Fixtures.Core.Requests.Plugins;
-using Lumina.Contracts.Fixtures.Core.Responses.Plugins;
-using Lumina.Contracts.Requests.Plugins;
-using Lumina.Contracts.Responses.Plugins;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Plugins.GetLibraryArtworkProviders;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Plugins.Queries.GetLibraryArtworkProviders;
+using Nemera.Contracts.Fixtures.Core.Requests.Plugins;
+using Nemera.Contracts.Fixtures.Core.Responses.Plugins;
+using Nemera.Contracts.Requests.Plugins;
+using Nemera.Contracts.Responses.Plugins;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Plugins.GetLibraryArtworkProviders;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Plugins.GetLibraryArtworkProviders;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Plugins.GetLibraryArtworkProviders;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetLibraryArtworkProvidersEndpoint"/> class.

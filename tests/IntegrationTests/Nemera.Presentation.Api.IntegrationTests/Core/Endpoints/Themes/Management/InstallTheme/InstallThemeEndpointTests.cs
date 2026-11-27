@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.Infrastructure.Themes;
-using Lumina.Contracts.Responses.Themes;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Themes;
-using Lumina.Presentation.Api.Core.Endpoints.Themes.Management.InstallTheme;
-using Lumina.Presentation.Api.Fixtures.Core.Endpoints.Themes;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.Infrastructure.Themes;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Themes;
+using Nemera.Presentation.Api.Core.Endpoints.Themes.Management.InstallTheme;
+using Nemera.Presentation.Api.Fixtures.Core.Endpoints.Themes;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,16 +26,16 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Management.InstallTheme;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Management.InstallTheme;
 
 /// <summary>
 /// Contains integration tests for the <see cref="InstallThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class InstallThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class InstallThemeEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly TestThemeArchiveFixture _testThemeArchiveFixture = new();
     private readonly List<string> _installedThemeIds = [];
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -48,7 +48,7 @@ public class InstallThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     /// Initializes a new instance of the <see cref="InstallThemeEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public InstallThemeEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public InstallThemeEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -94,7 +94,7 @@ public class InstallThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
 
         // The installed theme is persisted in the database.
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Assert.NotNull(await dbContext.Themes.FirstOrDefaultAsync(theme => theme.ThemeId == themeId));
 
         _installedThemeIds.Add(themeId);
@@ -209,7 +209,7 @@ public class InstallThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         foreach (string themeId in _installedThemeIds)
         {

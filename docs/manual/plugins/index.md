@@ -7,9 +7,9 @@
 1. [Introduction](../index.md)
 2. [Installation](../installation/index.md)
 
-**Using Lumina**
+**Using Nemera**
 
-3. [Using Lumina](../using-lumina/index.md)
+3. [Using Nemera](../using-nemera/index.md)
 
 **Administration**
 
@@ -17,7 +17,7 @@
 5. **Plugins**
 6. [Themes](../themes/index.md)
 
-Plugins are how Lumina learns to understand more than its core knows. They supply the metadata and the artwork of your library items, and they open book formats for reading. They are separate units you install, enable, rank and configure, so the core stays lean and the knowing arrives in pieces that you control.
+Plugins are how Nemera learns to understand more than its core knows. They supply the metadata and the artwork of your library items, and they open book formats for reading. They are separate units you install, enable, rank and configure, so the core stays lean and the knowing arrives in pieces that you control.
 
 ## What a plugin can do
 
@@ -27,7 +27,7 @@ A plugin can provide one or more of three capabilities:
 - **Artwork providers** supply the covers and other images of a library item.
 - **Book readers** open a book format and turn it into something the browser can render, with the original layout, styling and structure.
 
-Lumina ships with these plugins:
+Nemera ships with these plugins:
 
 | Plugin | Provides | For | Needs web | What it does |
 | --- | --- | --- | --- | --- |
@@ -54,10 +54,10 @@ Once installed and restarted, the plugin appears on the Plugins page with its na
 
 Each plugin is listed with one of two states:
 
-- **Loaded**, meaning Lumina found and initialized it.
+- **Loaded**, meaning Nemera found and initialized it.
 - **Failed to load**, meaning the assembly was found but could not be initialized, in which case the page also shows the error. A plugin that fails to load contributes nothing.
 
-Lumina reconciles the list at every startup. A plugin that is no longer present in the storage directory is forgotten, together with the per library settings that referenced it.
+Nemera reconciles the list at every startup. A plugin that is no longer present in the storage directory is forgotten, together with the per library settings that referenced it.
 
 ## Uninstalling a plugin
 
@@ -75,16 +75,16 @@ A plugin that supports a library type but is not wanted for a particular library
 
 ## Plugin settings
 
-A plugin can declare its own settings, which Lumina renders on the Plugins page next to it. Each setting is one of four kinds: a text field, a number, a true/false switch, or a choice from a fixed list. Values you save are stored by Lumina and handed to the plugin on the next run.
+A plugin can declare its own settings, which Nemera renders on the Plugins page next to it. Each setting is one of four kinds: a text field, a number, a true/false switch, or a choice from a fixed list. Values you save are stored by Nemera and handed to the plugin on the next run.
 
 The shipped plugins use these settings for practical things, such as the base address of a service, a contact email for a polite API client, lookup limits, and the minimum interval between requests. These settings are global to the plugin, not per library.
 
 ## Writing your own plugin
 
-Anyone can write a plugin, and it is the intended way to teach Lumina about a new source or a new format. A plugin is a .NET assembly targeting the same framework as the server, referencing the `Lumina.Plugins.Contracts` project. To be a plugin it implements `IPlugin`, which describes it and lists its settings, and `IPluginServiceRegistrator`, which wires its services up. To contribute a capability it also implements one or more of `IMetadataProvider`, `IArtworkProvider` and `IBookReader`. Package the built assembly, and any dependencies, into a ZIP and install it like any other plugin.
+Anyone can write a plugin, and it is the intended way to teach Nemera about a new source or a new format. A plugin is a .NET assembly targeting the same framework as the server, referencing the `Nemera.Plugins.Contracts` project. To be a plugin it implements `IPlugin`, which describes it and lists its settings, and `IPluginServiceRegistrator`, which wires its services up. To contribute a capability it also implements one or more of `IMetadataProvider`, `IArtworkProvider` and `IBookReader`. Package the built assembly, and any dependencies, into a ZIP and install it like any other plugin.
 
 ## Security
 
-Treat plugins with more caution than themes. A theme is HTML, CSS and JavaScript, but a plugin is a .NET assembly that Lumina loads into the API process itself. It runs with the full trust of the server: it can read and write files, open network connections and do anything else the API is allowed to do. There is no sandbox around a plugin once it is loaded.
+Treat plugins with more caution than themes. A theme is HTML, CSS and JavaScript, but a plugin is a .NET assembly that Nemera loads into the API process itself. It runs with the full trust of the server: it can read and write files, open network connections and do anything else the API is allowed to do. There is no sandbox around a plugin once it is loaded.
 
 That means a plugin from an untrusted source effectively owns your server. Only install plugins you trust, and if you cannot vouch for the code, read it first. The bundled plugins are written and reviewed by the project and are safe to use.

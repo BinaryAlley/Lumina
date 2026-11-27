@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Common.Enums.MediaConsumption;
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Core.Endpoints.MediaConsumption.GetResumePoint;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Common.Enums.MediaConsumption;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Core.Endpoints.MediaConsumption.GetResumePoint;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.MediaConsumption;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -18,18 +18,18 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.MediaConsumption.GetResumePoint;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.MediaConsumption.GetResumePoint;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetResumePointEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetResumePointEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetResumePointEndpointTests : IClassFixture<NemeraWebFactory>
 {
     private const string ZERO_GUID = "00000000-0000-0000-0000-000000000000";
     private const string RESUME_POINT_ENDPOINT_PREFIX = "users/me/media-resume-points/";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly ResumePointDtoFixture _resumePointDtoFixture = new();
     private readonly MediaPositionDtoFixture _mediaPositionDtoFixture = new();
     private readonly ProblemDetailsDtoFixture _problemDetailsDtoFixture = new();
@@ -38,7 +38,7 @@ public class GetResumePointEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="GetResumePointEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetResumePointEndpointTests(LuminaWebFactory apiFactory)
+    public GetResumePointEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

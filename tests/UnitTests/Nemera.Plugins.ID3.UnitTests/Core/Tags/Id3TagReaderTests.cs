@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.ID3.Common.Models.DTO.Tags;
-using Lumina.Plugins.ID3.Core.Tags;
+using Nemera.Plugins.ID3.Common.Models.DTO.Tags;
+using Nemera.Plugins.ID3.Core.Tags;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 #endregion
 
-namespace Lumina.Plugins.ID3.UnitTests.Core.Tags;
+namespace Nemera.Plugins.ID3.UnitTests.Core.Tags;
 
 /// <summary>
 /// Contains unit tests for the <see cref="Id3TagReader"/> class, covering the guard branches that do not reach the tagging library.
@@ -22,7 +22,7 @@ public class Id3TagReaderTests : IDisposable
     /// </summary>
     public Id3TagReaderTests()
     {
-        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"lumina-id3-reader-{Guid.NewGuid():N}");
+        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"nemera-id3-reader-{Guid.NewGuid():N}");
         Directory.CreateDirectory(_temporaryDirectory);
     }
 

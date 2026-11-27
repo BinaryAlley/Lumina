@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Plugins;
-using Lumina.Presentation.Web.Core.Endpoints.Library.Management.GetMetadataProviders;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Plugins;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Plugins;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Management.GetMetadataProviders;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Plugins;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -13,22 +13,22 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.GetMetadataProviders;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.GetMetadataProviders;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetMetadataProvidersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetMetadataProvidersEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetMetadataProvidersEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly LibraryMetadataProviderDtoFixture _libraryMetadataProviderDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetMetadataProvidersEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetMetadataProvidersEndpointTests(LuminaWebFactory apiFactory)
+    public GetMetadataProvidersEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

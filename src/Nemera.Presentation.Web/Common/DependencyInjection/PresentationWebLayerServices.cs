@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
 using FastEndpoints.Swagger;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.Authorization;
-using Lumina.Presentation.Web.Common.Enums.Authorization;
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Http;
-using Lumina.Presentation.Web.Common.Localization;
-using Lumina.Presentation.Web.Common.Security;
-using Lumina.Presentation.Web.Common.Services;
-using Lumina.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.Authorization;
+using Nemera.Presentation.Web.Common.Enums.Authorization;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Http;
+using Nemera.Presentation.Web.Common.Localization;
+using Nemera.Presentation.Web.Common.Security;
+using Nemera.Presentation.Web.Common.Services;
+using Nemera.Presentation.Web.Core.Themes;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -38,7 +38,7 @@ using System.Threading.RateLimiting;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DependencyInjection;
+namespace Nemera.Presentation.Web.Common.DependencyInjection;
 
 /// <summary>
 /// Utility class for registering the services of the Presentation Web layer into the Dependency Injection container.
@@ -98,7 +98,7 @@ public static class PresentationWebLayerServices
             documentOptions.DocumentSettings = aspNetCoreOpenApiDocumentGeneratorSettings =>
             {
                 aspNetCoreOpenApiDocumentGeneratorSettings.DocumentName = "v1";
-                aspNetCoreOpenApiDocumentGeneratorSettings.Title = "Lumina Web";
+                aspNetCoreOpenApiDocumentGeneratorSettings.Title = "Nemera Web";
                 aspNetCoreOpenApiDocumentGeneratorSettings.Version = "v1";
             };
             documentOptions.RemoveEmptyRequestSchema = true;
@@ -156,7 +156,7 @@ public static class PresentationWebLayerServices
                 // Cookie configuration.
                 cookieAuthenticationOptions.Cookie = new CookieBuilder
                 {
-                    Name = ".Lumina.Auth", // Unique name to avoid conflicts.
+                    Name = ".Nemera.Auth", // Unique name to avoid conflicts.
                     HttpOnly = true,       // Prevent JavaScript access.
                     SameSite = SameSiteMode.Strict,
                     SecurePolicy = CookieSecurePolicy.Always, // Require HTTPS.

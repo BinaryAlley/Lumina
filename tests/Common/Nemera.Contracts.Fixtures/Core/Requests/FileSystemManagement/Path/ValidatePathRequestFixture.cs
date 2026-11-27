@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Requests.FileSystemManagement.Path;
+using Nemera.Contracts.Requests.FileSystemManagement.Path;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
+namespace Nemera.Contracts.Fixtures.Core.Requests.FileSystemManagement.Path;
 
 /// <summary>
 /// Fixture class for the <see cref="ValidatePathRequest"/> record.

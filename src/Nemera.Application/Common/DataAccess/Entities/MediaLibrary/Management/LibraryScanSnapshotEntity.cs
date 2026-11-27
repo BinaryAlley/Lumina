@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.Common;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+namespace Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
 
 /// <summary>
 /// Repository entity for a media library item, representing the current state of a previously scanned media item, as a snapshot.

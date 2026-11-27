@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.Authentication;
-using Lumina.Contracts.Responses.Authentication;
+using Nemera.Contracts.Requests.Authentication;
+using Nemera.Contracts.Responses.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.Register;
+namespace Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Authentication.Register;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="RegisterEndpoint"/> API endpoint, for OpenAPI.

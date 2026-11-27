@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
+using Nemera.Application.Core.UsersManagement.Authorization.Queries.GetAuthorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetAuthorization;
+namespace Nemera.Application.Fixtures.Core.UsersManagement.Authorization.Queries.GetAuthorization;
 
 /// <summary>
 /// Fixture class for the <see cref="GetAuthorizationQuery"/> class.

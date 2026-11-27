@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Plugins.ID3.Core;
-using Lumina.Plugins.ID3.Core.Tags;
-using Lumina.Plugins.ID3.Fixtures.Core.Tags;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Plugins.ID3.Core;
+using Nemera.Plugins.ID3.Core.Tags;
+using Nemera.Plugins.ID3.Fixtures.Core.Tags;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.ID3.IntegrationTests.Core;
+namespace Nemera.Plugins.ID3.IntegrationTests.Core;
 
 /// <summary>
 /// Contains integration tests for the <see cref="Id3TrackMetadataProvider"/> class, reading real tagged audio containers.
@@ -30,7 +30,7 @@ public class Id3TrackMetadataProviderTests : IDisposable
     /// </summary>
     public Id3TrackMetadataProviderTests()
     {
-        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"lumina-id3-track-{Guid.NewGuid():N}");
+        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"nemera-id3-track-{Guid.NewGuid():N}");
         Directory.CreateDirectory(_temporaryDirectory);
     }
 

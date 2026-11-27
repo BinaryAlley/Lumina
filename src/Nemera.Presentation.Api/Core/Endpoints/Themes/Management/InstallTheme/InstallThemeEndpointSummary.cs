@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Responses.Themes;
-using Lumina.Domain.SharedKernel.Common.Enums.Themes;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.Domain.SharedKernel.Common.Enums.Themes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Themes.Management.InstallTheme;
+namespace Nemera.Presentation.Api.Core.Endpoints.Themes.Management.InstallTheme;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="InstallThemeEndpoint"/> API endpoint, for OpenAPI.
@@ -26,10 +26,10 @@ public class InstallThemeEndpointSummary : Summary<InstallThemeEndpoint, EmptyRe
         Response(200, "The theme was successfully installed.",
             example: new ThemeResponse(
                 Id: Guid.NewGuid(),
-                ThemeId: "lumina-default",
-                Name: "Lumina Default",
+                ThemeId: "nemera-default",
+                Name: "Nemera Default",
                 Description: "A clean, readable theme.",
-                Author: "Lumina Team",
+                Author: "Nemera Team",
                 Version: "1.2.0",
                 PreviewPath: "preview.png",
                 InstallSource: ThemeInstallSource.Uploaded,

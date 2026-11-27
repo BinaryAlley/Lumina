@@ -1,4 +1,4 @@
-namespace Lumina.Plugins.MusicBrainz.Core.Settings;
+namespace Nemera.Plugins.MusicBrainz.Core.Settings;
 
 /// <summary>
 /// Keys of the settings of the MusicBrainz metadata plugin, shared by the settings schema and the settings loader.

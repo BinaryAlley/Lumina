@@ -1,28 +1,28 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.Core.Endpoints.Maintenance;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Api.Core.Endpoints.Maintenance;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Maintenance;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Maintenance;
 
 /// <summary>
 /// Contains integration tests for the <see cref="CheckHealthEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class CheckHealthEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class CheckHealthEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CheckHealthEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public CheckHealthEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public CheckHealthEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.MediaConsumption.Commands.CompleteConsumption;
-using Lumina.Contracts.Fixtures.Core.Requests.MediaConsumption;
-using Lumina.Contracts.Fixtures.Core.Responses.MediaConsumption;
-using Lumina.Contracts.Requests.MediaConsumption;
-using Lumina.Contracts.Responses.MediaConsumption;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaConsumption;
-using Lumina.Presentation.Api.Core.Endpoints.MediaConsumption.CompleteConsumption;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.MediaConsumption.Commands.CompleteConsumption;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaConsumption;
+using Nemera.Contracts.Fixtures.Core.Responses.MediaConsumption;
+using Nemera.Contracts.Requests.MediaConsumption;
+using Nemera.Contracts.Responses.MediaConsumption;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaConsumption;
+using Nemera.Presentation.Api.Core.Endpoints.MediaConsumption.CompleteConsumption;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -16,11 +16,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.MediaConsumption.CompleteConsumption;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.MediaConsumption.CompleteConsumption;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CompleteConsumptionEndpoint"/> class.

@@ -1,20 +1,20 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.DataAccess.Repositories.Plugins;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Plugins;
-using Lumina.Application.Common.Infrastructure.Reading;
-using Lumina.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.Contracts.Core.Reading;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.DataAccess.Repositories.Plugins;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Plugins;
+using Nemera.Application.Common.Infrastructure.Reading;
+using Nemera.Application.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Contracts.Responses.MediaLibrary.WrittenContentLibrary.BookLibrary.Books.Reading;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Infrastructure.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.Contracts.Core.Reading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -27,7 +27,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Infrastructure.IntegrationTests.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+namespace Nemera.Infrastructure.IntegrationTests.Core.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
 
 /// <summary>
 /// Contains integration tests for the <see cref="BookReadingService"/> class.
@@ -80,7 +80,7 @@ public class BookReadingServiceTests : IDisposable
         _serviceProvider = services.BuildServiceProvider();
         IServiceScopeFactory serviceScopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
-        _bookPath = Path.Combine(Path.GetTempPath(), $"lumina-test-book-{Guid.NewGuid():N}.epub");
+        _bookPath = Path.Combine(Path.GetTempPath(), $"nemera-test-book-{Guid.NewGuid():N}.epub");
         File.WriteAllText(_bookPath, "test epub content");
 
         _sut = new BookReadingService(_serviceProvider, _mockPluginManager, _enablementCache, serviceScopeFactory, Substitute.For<ILogger<BookReadingService>>());
@@ -574,7 +574,7 @@ public class BookReadingServiceTests : IDisposable
     public async Task GetManifestAsync_WhenReaderMatchesExtensionCaseInsensitively_ShouldResolveIt()
     {
         // Arrange
-        string uppercaseExtensionPath = Path.Combine(Path.GetTempPath(), $"lumina-test-book-{Guid.NewGuid():N}.EPUB");
+        string uppercaseExtensionPath = Path.Combine(Path.GetTempPath(), $"nemera-test-book-{Guid.NewGuid():N}.EPUB");
         File.WriteAllText(uppercaseExtensionPath, "test epub content");
         try
         {
@@ -597,7 +597,7 @@ public class BookReadingServiceTests : IDisposable
     public async Task GetManifestAsync_WhenReaderSupportsTheLibraryTypeButNotTheExtension_ShouldReturnNoReaderAvailableError()
     {
         // Arrange
-        string unsupportedExtensionPath = Path.Combine(Path.GetTempPath(), $"lumina-test-book-{Guid.NewGuid():N}.txt");
+        string unsupportedExtensionPath = Path.Combine(Path.GetTempPath(), $"nemera-test-book-{Guid.NewGuid():N}.txt");
         File.WriteAllText(unsupportedExtensionPath, "test content");
         try
         {

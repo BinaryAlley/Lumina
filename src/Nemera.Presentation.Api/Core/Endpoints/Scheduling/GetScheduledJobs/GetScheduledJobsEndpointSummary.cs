@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Responses.Scheduling;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Contracts.Responses.Scheduling;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Scheduling.GetScheduledJobs;
+namespace Nemera.Presentation.Api.Core.Endpoints.Scheduling.GetScheduledJobs;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetScheduledJobsEndpoint"/> API endpoint, for OpenAPI.

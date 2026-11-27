@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.Playlists;
-using Lumina.Contracts.Responses.Playlists;
+using Nemera.Application.Common.DTO.Playlists;
+using Nemera.Contracts.Responses.Playlists;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Playlists;
+namespace Nemera.Application.Common.Mapping.Playlists;
 
 /// <summary>
 /// Extension methods for converting <see cref="PlaylistDetailsDto"/>.

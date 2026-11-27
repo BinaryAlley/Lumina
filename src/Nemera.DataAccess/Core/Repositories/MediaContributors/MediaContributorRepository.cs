@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Common.DataAccess.Repositories.MediaContributors;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Common.DataAccess.Repositories.MediaContributors;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,22 +12,22 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.MediaContributors;
+namespace Nemera.DataAccess.Core.Repositories.MediaContributors;
 
 /// <summary>
 /// Repository for media contributors.
 /// </summary>
 internal sealed class MediaContributorRepository : IMediaContributorRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaContributorRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public MediaContributorRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public MediaContributorRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -38,20 +38,20 @@ internal sealed class MediaContributorRepository : IMediaContributorRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(MediaContributorEntity contributor, CancellationToken cancellationToken)
     {
-        bool doesContributorExist = await _luminaDbContext.MediaContributors
+        bool doesContributorExist = await _nemeraDbContext.MediaContributors
             .AnyAsync(repositoryContributor => repositoryContributor.Id == contributor.Id, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
         if (doesContributorExist)
             return Errors.MediaContributor.MediaContributorAlreadyExists;
 
         // A contributor is unique by its display name, so the same person can never be registered twice under different spellings of the same name.
-        bool doesContributorNameExist = await _luminaDbContext.MediaContributors
+        bool doesContributorNameExist = await _nemeraDbContext.MediaContributors
             .AnyAsync(repositoryContributor => EF.Functions.Collate(repositoryContributor.DisplayName, "NOCASE") == contributor.DisplayName, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
         if (doesContributorNameExist)
             return Errors.MediaContributor.MediaContributorAlreadyExists;
 
-        _luminaDbContext.MediaContributors.Add(contributor);
+        _nemeraDbContext.MediaContributors.Add(contributor);
         return Result.Created;
     }
 
@@ -71,7 +71,7 @@ internal sealed class MediaContributorRepository : IMediaContributorRepository
         // Contributors added earlier in the same unit of work are not returned by a database query, so the change tracker is consulted
         // first; without this, the same contributor discovered for several items of the same save would be inserted more than once and
         // violate the unique index on the display name.
-        MediaContributorEntity? trackedContributor = _luminaDbContext.MediaContributors.Local
+        MediaContributorEntity? trackedContributor = _nemeraDbContext.MediaContributors.Local
             .FirstOrDefault(contributor => contributor.DisplayName.ToLowerInvariant() == normalizedDisplayName);
         if (trackedContributor is not null)
             return trackedContributor;
@@ -79,7 +79,7 @@ internal sealed class MediaContributorRepository : IMediaContributorRepository
         // The lookup must use the same case-insensitive collation as the unique index on the display name, so that a name whose case is
         // not folded by the storage medium (for example one that starts with a non-ASCII uppercase letter) is still matched, instead of
         // being inserted again and violating the unique index.
-        MediaContributorEntity? existingContributor = await _luminaDbContext.MediaContributors
+        MediaContributorEntity? existingContributor = await _nemeraDbContext.MediaContributors
             .FirstOrDefaultAsync(contributor => EF.Functions.Collate(contributor.DisplayName, "NOCASE") == displayName, cancellationToken)
             .ConfigureAwait(false);
         if (existingContributor is not null)
@@ -91,7 +91,7 @@ internal sealed class MediaContributorRepository : IMediaContributorRepository
             DisplayName = displayName,
             LegalName = legalName
         };
-        _luminaDbContext.MediaContributors.Add(contributor);
+        _nemeraDbContext.MediaContributors.Add(contributor);
         return contributor;
     }
 
@@ -108,7 +108,7 @@ internal sealed class MediaContributorRepository : IMediaContributorRepository
         const int LOOKUP_CHUNK_SIZE = 500;
         foreach (Guid[] chunk in ids.Chunk(LOOKUP_CHUNK_SIZE))
         {
-            contributors.AddRange(await _luminaDbContext.MediaContributors
+            contributors.AddRange(await _nemeraDbContext.MediaContributors
                 .Where(contributor => chunk.Contains(contributor.Id))
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false));

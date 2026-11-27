@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Telemetry;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.Telemetry;
+using Nemera.Domain.Common.Primitives;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Telemetry;
+namespace Nemera.Application.UnitTests.Common.Telemetry;
 
 /// <summary>
 /// Contains unit tests for the <see cref="HandlerOutcomeDetector"/> class.

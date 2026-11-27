@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
+using Nemera.Plugins.OpenLibrary.Common.Models.Contracts.Responses;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Plugins.OpenLibrary.Fixtures.Common.Models.Contracts.Responses;
+namespace Nemera.Plugins.OpenLibrary.Fixtures.Common.Models.Contracts.Responses;
 
 /// <summary>
 /// Fixture class for the <see cref="OpenLibraryEditionResponse"/> record.

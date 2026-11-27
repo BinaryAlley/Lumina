@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.DTO.MediaLibrary.Management;
+namespace Nemera.Contracts.DTO.MediaLibrary.Management;
 
 /// <summary>
 /// Data transfer object for a media library content location.

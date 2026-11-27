@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Plugins;
+using Nemera.Presentation.Web.Common.Enums.Plugins;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Plugins;
+namespace Nemera.Presentation.Web.Common.DTO.Plugins;
 
 /// <summary>
 /// Data transfer object for a single setting of a plugin.

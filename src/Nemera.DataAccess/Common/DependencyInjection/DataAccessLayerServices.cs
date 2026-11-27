@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Seed;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.DataAccess.Common.Dapper;
-using Lumina.DataAccess.Common.Interceptors;
-using Lumina.DataAccess.Core.Seed;
-using Lumina.DataAccess.Core.UoW;
+using Nemera.Application.Common.DataAccess.Seed;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.DataAccess.Common.Dapper;
+using Nemera.DataAccess.Common.Interceptors;
+using Nemera.DataAccess.Core.Seed;
+using Nemera.DataAccess.Core.UoW;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -12,7 +12,7 @@ using System.IO;
 using System.Reflection;
 #endregion
 
-namespace Lumina.DataAccess.Common.DependencyInjection;
+namespace Nemera.DataAccess.Common.DependencyInjection;
 
 /// <summary>
 /// Utility class for registering the services of the Data Access layer into the Dependency Injection container.
@@ -33,9 +33,9 @@ public static class DataAccessLayerServices
         string? basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         if (!Directory.Exists(basePath))
             throw new DirectoryNotFoundException($"The base path '{basePath}' does not exist.");
-        services.AddDbContext<LuminaDbContext>((serviceProvider, options) =>
+        services.AddDbContext<NemeraDbContext>((serviceProvider, options) =>
         {
-            options.UseSqlite($"Data Source={Path.Combine(basePath, "Lumina.db")}");
+            options.UseSqlite($"Data Source={Path.Combine(basePath, "Nemera.db")}");
             options.AddInterceptors(serviceProvider.GetRequiredService<UpdateAuditableEntitiesInterceptor>());
         });
         services.AddScoped<IUnitOfWork, UnitOfWork>();

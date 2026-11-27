@@ -2,8 +2,8 @@
 /library/written-content-library/books-library/books/{bookId}/read
 *@
 
-@using Lumina.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books.Reading
-@using Lumina.Presentation.Web.Common.Services
+@using Nemera.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books.Reading
+@using Nemera.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
 
 @{
@@ -899,8 +899,8 @@
 
         // Resolves the resource marker attributes of the rendered content, pointing them at the reading resource endpoint.
         function resolveResources() {
-            readerContent.querySelectorAll('[data-lumina-resource]').forEach(element => {
-                const key = element.getAttribute('data-lumina-resource');
+            readerContent.querySelectorAll('[data-nemera-resource]').forEach(element => {
+                const key = element.getAttribute('data-nemera-resource');
                 if (!key)
                     return;
                 if (element.tagName === 'IMG' || element.tagName === 'SOURCE' || element.tagName === 'VIDEO' || element.tagName === 'AUDIO')

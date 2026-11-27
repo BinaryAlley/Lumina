@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
-using Lumina.Domain.Common.Errors;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
+using Nemera.Domain.Common.Errors;
 #endregion
 
-namespace Lumina.Application.Core.Playlists.Commands.CreatePlaylist;
+namespace Nemera.Application.Core.Playlists.Commands.CreatePlaylist;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="CreatePlaylistCommand"/>.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.Common;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.Contracts.Core.Metadata;
+namespace Nemera.Plugins.Contracts.Core.Metadata;
 
 /// <summary>
 /// Contract for a plugin that provides artwork for media items, typed to the media item lookup type.

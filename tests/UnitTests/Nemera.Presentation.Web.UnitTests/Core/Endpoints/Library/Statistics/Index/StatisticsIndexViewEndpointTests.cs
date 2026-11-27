@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.Authorization;
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Http;
-using Lumina.Presentation.Web.Common.Primitives;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Common.Services;
-using Lumina.Presentation.Web.Core.Endpoints.Library.Statistics.Index;
-using Lumina.Presentation.Web.Core.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.Authorization;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Http;
+using Nemera.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Common.Services;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Statistics.Index;
+using Nemera.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using NSubstitute;
@@ -22,7 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Endpoints.Library.Statistics.Index;
+namespace Nemera.Presentation.Web.UnitTests.Core.Endpoints.Library.Statistics.Index;
 
 /// <summary>
 /// Contains unit tests for the <see cref="StatisticsIndexViewEndpoint"/> class.
@@ -215,17 +215,17 @@ public class StatisticsIndexViewEndpointTests
     {
         // Arrange
         _mockAuthorizationService.IsInRoleAsync("Admin", Arg.Any<CancellationToken>()).Returns(true);
-        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_STATISTICS).Returns("https://lumina.test/statistics");
-        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_ALL_USERS_STATISTICS).Returns("https://lumina.test/all-users-statistics");
-        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_RECENTLY_CONSUMED).Returns("https://lumina.test/recently-consumed");
-        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_MOST_CONSUMED).Returns("https://lumina.test/most-consumed");
-        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_TAG_CONSUMPTION).Returns("https://lumina.test/tag-consumption");
-        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_GENRE_CONSUMPTION).Returns("https://lumina.test/genre-consumption");
-        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_LIBRARIES).Returns("https://lumina.test/libraries");
-        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_USERS).Returns("https://lumina.test/users");
-        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.DELETE_CONSUMPTION_ITEM_HISTORY).Returns("https://lumina.test/delete-consumption-item-history");
-        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.CLEAR_CONSUMPTION_HISTORY).Returns("https://lumina.test/clear-consumption-history");
-        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.CLEAR_RESUME_POINTS).Returns("https://lumina.test/clear-resume-points");
+        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_STATISTICS).Returns("https://nemera.test/statistics");
+        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_ALL_USERS_STATISTICS).Returns("https://nemera.test/all-users-statistics");
+        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_RECENTLY_CONSUMED).Returns("https://nemera.test/recently-consumed");
+        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_MOST_CONSUMED).Returns("https://nemera.test/most-consumed");
+        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_TAG_CONSUMPTION).Returns("https://nemera.test/tag-consumption");
+        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_GENRE_CONSUMPTION).Returns("https://nemera.test/genre-consumption");
+        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_LIBRARIES).Returns("https://nemera.test/libraries");
+        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_USERS).Returns("https://nemera.test/users");
+        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.DELETE_CONSUMPTION_ITEM_HISTORY).Returns("https://nemera.test/delete-consumption-item-history");
+        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.CLEAR_CONSUMPTION_HISTORY).Returns("https://nemera.test/clear-consumption-history");
+        _mockUrlService.GetAbsoluteUrl(WebRoutes.LibraryStatistics.CLEAR_RESUME_POINTS).Returns("https://nemera.test/clear-resume-points");
         _mockThemePageRenderer.RenderAsync(Arg.Any<ThemePageDto>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns(Result.From(_themePageRenderResultDtoFixture.Create()));
 
@@ -235,17 +235,17 @@ public class StatisticsIndexViewEndpointTests
         // Assert
         await _mockThemePageRenderer.Received(1).RenderAsync(
             Arg.Is<ThemePageDto>(page =>
-                string.Equals(page.PageData["getStatisticsUrl"] as string, "https://lumina.test/statistics", StringComparison.Ordinal) &&
-                string.Equals(page.PageData["getAllUsersStatisticsUrl"] as string, "https://lumina.test/all-users-statistics", StringComparison.Ordinal) &&
-                string.Equals(page.PageData["getRecentlyConsumedUrl"] as string, "https://lumina.test/recently-consumed", StringComparison.Ordinal) &&
-                string.Equals(page.PageData["getMostConsumedUrl"] as string, "https://lumina.test/most-consumed", StringComparison.Ordinal) &&
-                string.Equals(page.PageData["getTagConsumptionUrl"] as string, "https://lumina.test/tag-consumption", StringComparison.Ordinal) &&
-                string.Equals(page.PageData["getGenreConsumptionUrl"] as string, "https://lumina.test/genre-consumption", StringComparison.Ordinal) &&
-                string.Equals(page.PageData["getLibrariesUrl"] as string, "https://lumina.test/libraries", StringComparison.Ordinal) &&
-                string.Equals(page.PageData["getUsersUrl"] as string, "https://lumina.test/users", StringComparison.Ordinal) &&
-                string.Equals(page.PageData["deleteConsumptionItemHistoryUrl"] as string, "https://lumina.test/delete-consumption-item-history", StringComparison.Ordinal) &&
-                string.Equals(page.PageData["clearConsumptionHistoryUrl"] as string, "https://lumina.test/clear-consumption-history", StringComparison.Ordinal) &&
-                string.Equals(page.PageData["clearResumePointsUrl"] as string, "https://lumina.test/clear-resume-points", StringComparison.Ordinal)),
+                string.Equals(page.PageData["getStatisticsUrl"] as string, "https://nemera.test/statistics", StringComparison.Ordinal) &&
+                string.Equals(page.PageData["getAllUsersStatisticsUrl"] as string, "https://nemera.test/all-users-statistics", StringComparison.Ordinal) &&
+                string.Equals(page.PageData["getRecentlyConsumedUrl"] as string, "https://nemera.test/recently-consumed", StringComparison.Ordinal) &&
+                string.Equals(page.PageData["getMostConsumedUrl"] as string, "https://nemera.test/most-consumed", StringComparison.Ordinal) &&
+                string.Equals(page.PageData["getTagConsumptionUrl"] as string, "https://nemera.test/tag-consumption", StringComparison.Ordinal) &&
+                string.Equals(page.PageData["getGenreConsumptionUrl"] as string, "https://nemera.test/genre-consumption", StringComparison.Ordinal) &&
+                string.Equals(page.PageData["getLibrariesUrl"] as string, "https://nemera.test/libraries", StringComparison.Ordinal) &&
+                string.Equals(page.PageData["getUsersUrl"] as string, "https://nemera.test/users", StringComparison.Ordinal) &&
+                string.Equals(page.PageData["deleteConsumptionItemHistoryUrl"] as string, "https://nemera.test/delete-consumption-item-history", StringComparison.Ordinal) &&
+                string.Equals(page.PageData["clearConsumptionHistoryUrl"] as string, "https://nemera.test/clear-consumption-history", StringComparison.Ordinal) &&
+                string.Equals(page.PageData["clearResumePointsUrl"] as string, "https://nemera.test/clear-resume-points", StringComparison.Ordinal)),
             Arg.Any<string?>(),
             Arg.Any<CancellationToken>());
         _mockUrlService.Received(1).GetAbsoluteUrl(WebRoutes.LibraryStatistics.GET_STATISTICS);

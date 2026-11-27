@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Models.Core;
+using Nemera.Domain.Common.Models.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Domain.UnitTests.Common.Models.Core;
+namespace Nemera.Domain.UnitTests.Common.Models.Core;
 
 /// <summary>
 /// Contains unit tests for the <see cref="EntityId{TId}"/> class.

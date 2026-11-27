@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Maintenance.ApplicationSetup;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Maintenance.ApplicationSetup;
 
 /// <summary>
 /// Contains security tests for the <see cref="CheckInitializationEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class CheckInitializationEndpointTests : IClassFixture<LuminaApiFactory>
+public class CheckInitializationEndpointTests : IClassFixture<NemeraApiFactory>
 {
     private readonly HttpClient _client;
 
@@ -18,7 +18,7 @@ public class CheckInitializationEndpointTests : IClassFixture<LuminaApiFactory>
     /// Initializes a new instance of the <see cref="CheckInitializationEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public CheckInitializationEndpointTests(LuminaApiFactory apiFactory)
+    public CheckInitializationEndpointTests(NemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
     }

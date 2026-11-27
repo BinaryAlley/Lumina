@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Primitives;
 #endregion
 
-namespace Lumina.Domain.Common.Primitives;
+namespace Nemera.Domain.Common.Primitives;
 
 /// <summary>
 /// Error representing that the operation could not be completed due to a conflict with the current state.

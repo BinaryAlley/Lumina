@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Core.Themes;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using NSubstitute;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Core.Themes;
+namespace Nemera.Presentation.Web.UnitTests.Core.Themes;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ThemeAudioPlayerBuilder"/> class.
@@ -43,7 +43,7 @@ public class ThemeAudioPlayerBuilderTests
         _ = new ThemeAudioPlayerBuilder(_mockStringLocalizerFactory, _mockHttpContextAccessor);
 
         // Assert
-        _mockStringLocalizerFactory.Received(1).Create("Lumina.Presentation.Web.Views.Shared._Layout", "Lumina.Presentation.Web");
+        _mockStringLocalizerFactory.Received(1).Create("Nemera.Presentation.Web.Views.Shared._Layout", "Nemera.Presentation.Web");
     }
 
     [Theory]
@@ -109,14 +109,14 @@ public class ThemeAudioPlayerBuilderTests
         DefaultHttpContext httpContext = TestHttpContextFactory.Create();
         httpContext.Request.Scheme = "https";
         httpContext.Request.Host = new HostString("localhost", 5001);
-        httpContext.Request.PathBase = new PathString("/lumina");
+        httpContext.Request.PathBase = new PathString("/nemera");
         _mockHttpContextAccessor.HttpContext.Returns(httpContext);
 
         // Act
         ThemeAudioPlayerDto model = _sut.Build("/theme-assets/editorial/assets", string.Empty, string.Empty);
 
         // Assert
-        Assert.Equal("https://localhost:5001/lumina/", model.AppBase);
+        Assert.Equal("https://localhost:5001/nemera/", model.AppBase);
     }
 
     [Fact]

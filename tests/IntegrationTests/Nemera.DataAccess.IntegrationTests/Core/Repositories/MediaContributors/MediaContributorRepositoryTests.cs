@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
-using Lumina.DataAccess.Core.Repositories.MediaContributors;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
+using Nemera.DataAccess.Core.Repositories.MediaContributors;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.Repositories.MediaContributors;
+namespace Nemera.DataAccess.IntegrationTests.Core.Repositories.MediaContributors;
 
 /// <summary>
 /// Contains integration tests for the <see cref="MediaContributorRepository"/> class, exercising it against a real SQLite database.
@@ -29,9 +29,9 @@ public class MediaContributorRepositoryTests
     public async Task InsertAsync_WhenContributorWithSameDisplayNameInDifferentCaseExists_ShouldReturnError()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediacontributorrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediacontributorrepo-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
+        using NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(anchorConnection.ConnectionString).Options);
         context.Database.EnsureCreated();
         MediaContributorRepository sut = new(context);
 
@@ -53,9 +53,9 @@ public class MediaContributorRepositoryTests
     public async Task GetByIdsAsync_WhenCalled_ShouldReturnOnlyTheRequestedContributorsAndIgnoreMissingIds()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediacontributorrepo-getbyids-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediacontributorrepo-getbyids-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         MediaContributorRepository sut = new(context);
         MediaContributorEntity firstContributor = _mediaContributorEntityFixture.Create(displayName: "Frank Herbert");
         MediaContributorEntity secondContributor = _mediaContributorEntityFixture.Create(displayName: "Stephen King");
@@ -80,9 +80,9 @@ public class MediaContributorRepositoryTests
     public async Task GetByIdsAsync_WhenIdsIsEmpty_ShouldReturnAnEmptyList()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediacontributorrepo-getbyids-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediacontributorrepo-getbyids-empty-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         MediaContributorRepository sut = new(context);
         context.MediaContributors.Add(_mediaContributorEntityFixture.Create());
         await context.SaveChangesAsync();
@@ -100,9 +100,9 @@ public class MediaContributorRepositoryTests
     public async Task GetByIdsAsync_WhenMoreThanFiveHundredIdsAreRequested_ShouldReturnEveryContributor()
     {
         // Arrange
-        using SqliteConnection anchorConnection = new($"Data Source=luminadataccess-mediacontributorrepo-getbyids-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
+        using SqliteConnection anchorConnection = new($"Data Source=nemeradataccess-mediacontributorrepo-getbyids-chunks-{Guid.NewGuid()};Mode=Memory;Cache=Shared");
         anchorConnection.Open();
-        using LuminaDbContext context = CreateContext(anchorConnection);
+        using NemeraDbContext context = CreateContext(anchorConnection);
         MediaContributorRepository sut = new(context);
         const int CONTRIBUTOR_COUNT = 501;
         List<MediaContributorEntity> contributors = [.. Enumerable.Range(0, CONTRIBUTOR_COUNT).Select(index =>
@@ -129,9 +129,9 @@ public class MediaContributorRepositoryTests
     /// </summary>
     /// <param name="anchorConnection">The open in-memory SQLite connection that keeps the database alive for the duration of the test.</param>
     /// <returns>The created context.</returns>
-    private static LuminaDbContext CreateContext(SqliteConnection anchorConnection)
+    private static NemeraDbContext CreateContext(SqliteConnection anchorConnection)
     {
-        LuminaDbContext context = new(new DbContextOptionsBuilder<LuminaDbContext>()
+        NemeraDbContext context = new(new DbContextOptionsBuilder<NemeraDbContext>()
             .UseSqlite(anchorConnection.ConnectionString)
             .Options);
         context.Database.EnsureCreated();

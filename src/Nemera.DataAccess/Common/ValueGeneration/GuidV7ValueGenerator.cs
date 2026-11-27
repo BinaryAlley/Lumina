@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 using System;
 #endregion
 
-namespace Lumina.DataAccess.Common.ValueGeneration;
+namespace Nemera.DataAccess.Common.ValueGeneration;
 
 /// <summary>
 /// Generates time ordered version 7 GUIDs for identifier properties whose values are assigned by the persistence layer.

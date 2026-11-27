@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.UnitTests.Common.Enums.Playback;
+namespace Nemera.Domain.SharedKernel.UnitTests.Common.Enums.Playback;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PlaybackDeliveryShapeExtensions"/> class.

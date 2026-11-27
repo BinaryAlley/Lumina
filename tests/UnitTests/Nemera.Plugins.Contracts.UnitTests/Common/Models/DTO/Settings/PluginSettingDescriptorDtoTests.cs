@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
-using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
-using Lumina.Plugins.Contracts.Fixtures.Common.Models.DTO.Settings;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Plugins.Contracts.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Fixtures.Common.Models.DTO.Settings;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.Contracts.UnitTests.Common.Models.DTO.Settings;
+namespace Nemera.Plugins.Contracts.UnitTests.Common.Models.DTO.Settings;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PluginSettingDescriptorDto"/> class.

@@ -39,9 +39,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Lumina.Presentation.Api\Lumina.Presentation.Api.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Application.Fixtures\Lumina.Application.Fixtures.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Contracts.Fixtures\Lumina.Contracts.Fixtures.csproj" />
-        <ProjectReference Include="..\..\Common\Lumina.Presentation.Api.Fixtures\Lumina.Presentation.Api.Fixtures.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Presentation.Api\Nemera.Presentation.Api.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Application.Fixtures\Nemera.Application.Fixtures.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Contracts.Fixtures\Nemera.Contracts.Fixtures.csproj" />
+        <ProjectReference Include="..\..\Common\Nemera.Presentation.Api.Fixtures\Nemera.Presentation.Api.Fixtures.csproj" />
     </ItemGroup>
 </Project>

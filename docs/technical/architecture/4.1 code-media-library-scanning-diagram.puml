@@ -576,7 +576,7 @@ LibraryScanProgressChangedDomainEventHandler --> IMediaLibraryScanProgressNotifi
 LibraryScanJobProgressChangedDomainEventHandler --> IMediaLibrariesScanProgressTracker : updates job progress
 LibraryScanJobProgressChangedDomainEventHandler --> IMediaLibraryScanProgressNotifier : notifies update
 
-caption [Code] Lumina - Media Library Scanning 3.2.1
+caption [Code] Nemera - Media Library Scanning 3.2.1
 
 footer The code diagram for the Media Library Scanning 3.2.1 - created with PlantUML
 @enduml

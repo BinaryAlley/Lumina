@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.Application.Core.Playlists.Queries.GetPlaylist;
-using Lumina.Contracts.Requests.Playlists;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.Application.Core.Playlists.Queries.GetPlaylist;
+using Nemera.Contracts.Requests.Playlists;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Playlists;
+namespace Nemera.Application.Common.Mapping.Playlists;
 
 /// <summary>
 /// Extension methods for converting <see cref="GetPlaylistRequest"/>.

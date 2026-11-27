@@ -1,19 +1,19 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Common.DataAccess.UoW;
-using Lumina.Application.Common.Infrastructure.Models.DTO.Themes;
-using Lumina.Application.Common.Infrastructure.Themes;
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Contracts.Responses.Themes;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Common.DataAccess.UoW;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Themes;
+using Nemera.Application.Common.Infrastructure.Themes;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.Domain.Common.Primitives;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.Core.Themes.Management.Queries.GetThemeArchive;
+namespace Nemera.Application.Core.Themes.Management.Queries.GetThemeArchive;
 
 /// <summary>
 /// Handler for the query to get the downloadable archive of a theme.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Core.Authentication;
-using Lumina.Infrastructure.Fixtures.Core.Authentication;
+using Nemera.Infrastructure.Core.Authentication;
+using Nemera.Infrastructure.Fixtures.Core.Authentication;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Authentication;
+namespace Nemera.Infrastructure.UnitTests.Core.Authentication;
 
 /// <summary>
 /// Contains unit tests for the <see cref="QRCodeGenerator"/> class.

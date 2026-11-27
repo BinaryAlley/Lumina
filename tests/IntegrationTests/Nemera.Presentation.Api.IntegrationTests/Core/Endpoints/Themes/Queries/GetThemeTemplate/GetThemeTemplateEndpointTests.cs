@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.Themes;
-using Lumina.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemeTemplate;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemeTemplate;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -13,15 +13,15 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Queries.GetThemeTemplate;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Queries.GetThemeTemplate;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetThemeTemplateEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetThemeTemplateEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetThemeTemplateEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -32,7 +32,7 @@ public class GetThemeTemplateEndpointTests : IClassFixture<AuthenticatedLuminaAp
     /// Initializes a new instance of the <see cref="GetThemeTemplateEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetThemeTemplateEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetThemeTemplateEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }
@@ -67,7 +67,7 @@ public class GetThemeTemplateEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Theory]
-    [InlineData("lumina-default")]
+    [InlineData("nemera-default")]
     [InlineData("editorial-paper")]
     public async Task GetThemeTemplate_WhenCalledForTheDeletedItemsPage_ShouldReturnTheBundledTemplate(string themeId)
     {
@@ -88,7 +88,7 @@ public class GetThemeTemplateEndpointTests : IClassFixture<AuthenticatedLuminaAp
     }
 
     [Theory]
-    [InlineData("lumina-default")]
+    [InlineData("nemera-default")]
     [InlineData("editorial-paper")]
     public async Task GetThemeTemplate_WhenCalledForTheMusicDeletedItemsPage_ShouldReturnTheBundledTemplateWithItsRestoreHooks(string themeId)
     {

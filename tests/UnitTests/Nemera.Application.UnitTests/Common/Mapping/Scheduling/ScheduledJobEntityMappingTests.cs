@@ -1,19 +1,19 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Common.Mapping.Scheduling;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
-using Lumina.Contracts.Responses.Scheduling;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
-using Lumina.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.Mapping.Scheduling;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Scheduling;
+using Nemera.Contracts.Responses.Scheduling;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate;
+using Nemera.Domain.Core.BoundedContexts.SchedulingBoundedContext.ScheduledJobAggregate.ValueObjects;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.Scheduling;
+namespace Nemera.Application.UnitTests.Common.Mapping.Scheduling;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ScheduledJobEntityMapping"/> class.
@@ -81,7 +81,7 @@ public class ScheduledJobEntityMappingTests
 
         // Assert
         Assert.True(result.IsFailure);
-        Assert.Equal(Lumina.Domain.Common.Errors.Errors.Scheduling.IntervalMinutesMustBePositive, result.FirstError);
+        Assert.Equal(Nemera.Domain.Common.Errors.Errors.Scheduling.IntervalMinutesMustBePositive, result.FirstError);
     }
 
     [Fact]

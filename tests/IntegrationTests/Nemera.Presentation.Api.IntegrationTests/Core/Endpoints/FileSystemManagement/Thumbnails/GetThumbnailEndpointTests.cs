@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.Fixtures.Core.Endpoints.FileSystemManagement;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Api.Fixtures.Core.Endpoints.FileSystemManagement;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -13,16 +13,16 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemManagement.Thumbnails;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemManagement.Thumbnails;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetThumbnailEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IClassFixture<TestImageFixture>, IAsyncLifetime
+public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IClassFixture<TestImageFixture>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -35,7 +35,7 @@ public class GetThumbnailEndpointTests : IClassFixture<AuthenticatedLuminaApiFac
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
     /// <param name="imageFixture">Fixture for creating and managing test images.</param>
-    public GetThumbnailEndpointTests(AuthenticatedLuminaApiFactory apiFactory, TestImageFixture imageFixture)
+    public GetThumbnailEndpointTests(AuthenticatedNemeraApiFactory apiFactory, TestImageFixture imageFixture)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;

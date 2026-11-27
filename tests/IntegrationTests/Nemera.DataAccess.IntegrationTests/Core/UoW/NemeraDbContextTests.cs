@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Authorization;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.DataAccess.Common.ValueGeneration;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.Authorization;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.DataAccess.Common.ValueGeneration;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -18,28 +18,28 @@ using System.Linq;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.IntegrationTests.Core.UoW;
+namespace Nemera.DataAccess.IntegrationTests.Core.UoW;
 
 /// <summary>
-/// Contains integration tests for the <see cref="LuminaDbContext"/> class.
+/// Contains integration tests for the <see cref="NemeraDbContext"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class LuminaDbContextTests : IDisposable
+public class NemeraDbContextTests : IDisposable
 {
     private readonly string _connectionString;
     private readonly SqliteConnection _anchorConnection;
-    private readonly LuminaDbContext _context;
+    private readonly NemeraDbContext _context;
     private readonly BookEntityFixture _bookEntityFixture = new();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="LuminaDbContextTests"/> class.
+    /// Initializes a new instance of the <see cref="NemeraDbContextTests"/> class.
     /// </summary>
-    public LuminaDbContextTests()
+    public NemeraDbContextTests()
     {
-        _connectionString = $"Data Source=luminadataccess-dbcontext-tests-{Guid.NewGuid()};Mode=Memory;Cache=Shared";
+        _connectionString = $"Data Source=nemeradataccess-dbcontext-tests-{Guid.NewGuid()};Mode=Memory;Cache=Shared";
         _anchorConnection = new SqliteConnection(_connectionString);
         _anchorConnection.Open();
-        _context = new LuminaDbContext(new DbContextOptionsBuilder<LuminaDbContext>().UseSqlite(_connectionString).Options);
+        _context = new NemeraDbContext(new DbContextOptionsBuilder<NemeraDbContext>().UseSqlite(_connectionString).Options);
     }
 
     [Fact]

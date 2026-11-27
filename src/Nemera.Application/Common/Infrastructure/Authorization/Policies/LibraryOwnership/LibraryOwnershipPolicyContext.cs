@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
+namespace Nemera.Application.Common.Infrastructure.Authorization.Policies.LibraryOwnership;
 
 /// <summary>
 /// Represents the context required to evaluate the library ownership authorization policy.

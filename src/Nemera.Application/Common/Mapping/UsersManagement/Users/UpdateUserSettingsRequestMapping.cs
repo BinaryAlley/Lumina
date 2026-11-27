@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
-using Lumina.Contracts.Requests.UsersManagement.Settings;
+using Nemera.Application.Core.UsersManagement.Settings.Commands.UpdateUserSettings;
+using Nemera.Contracts.Requests.UsersManagement.Settings;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.UsersManagement.Users;
+namespace Nemera.Application.Common.Mapping.UsersManagement.Users;
 
 /// <summary>
 /// Extension methods for converting <see cref="UpdateUserSettingsRequest"/>.

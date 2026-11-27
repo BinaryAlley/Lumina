@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.Contracts.Core.Reading;
-using Lumina.Plugins.Pdf.Core.Pdf;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.Contracts.Core.Reading;
+using Nemera.Plugins.Pdf.Core.Pdf;
 using System.Collections.Generic;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.Pdf.Core;
+namespace Nemera.Plugins.Pdf.Core;
 
 /// <summary>
 /// Book reader for the PDF format.
@@ -57,7 +57,7 @@ internal sealed class PdfReader : IBookReader
     /// <remarks>
     /// The PDFtoImage and SkiaSharp APIs used by <see cref="PdfDocumentParser.RenderResource"/> are annotated with the supported
     /// platforms of the rendering engine, so this method must repeat that restriction or the CA1416 analyzer, which is a build error
-    /// here, flags the call. The attributes must not be removed, even though Windows, Linux and macOS are the only platforms Lumina runs on.
+    /// here, flags the call. The attributes must not be removed, even though Windows, Linux and macOS are the only platforms Nemera runs on.
     /// </remarks>
     [SupportedOSPlatform("windows")]
     [SupportedOSPlatform("linux")]

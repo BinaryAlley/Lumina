@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Requests.UsersManagement.Settings;
+namespace Nemera.Contracts.Requests.UsersManagement.Settings;
 
 /// <summary>
 /// Represents a request to report the playback state of the current user. The player sends this automatically, and these values are not part of the settings the user edits.

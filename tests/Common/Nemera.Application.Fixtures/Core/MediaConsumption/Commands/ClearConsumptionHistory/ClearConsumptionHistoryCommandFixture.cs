@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.MediaConsumption.Commands.ClearConsumptionHistory;
+using Nemera.Application.Core.MediaConsumption.Commands.ClearConsumptionHistory;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.MediaConsumption.Commands.ClearConsumptionHistory;
+namespace Nemera.Application.Fixtures.Core.MediaConsumption.Commands.ClearConsumptionHistory;
 
 /// <summary>
 /// Fixture class for the <see cref="ClearConsumptionHistoryCommand"/> class.

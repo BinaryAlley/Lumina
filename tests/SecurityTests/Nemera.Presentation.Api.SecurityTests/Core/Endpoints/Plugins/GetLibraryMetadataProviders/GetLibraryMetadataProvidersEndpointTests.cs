@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -11,16 +11,16 @@ using System.Net;
 using System.Text.Json;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.GetLibraryMetadataProviders;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.Plugins.GetLibraryMetadataProviders;
 
 /// <summary>
 /// Contains security tests for the <see cref="GetLibraryMetadataProvidersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetLibraryMetadataProvidersEndpointTests : IClassFixture<LuminaApiFactory>
+public class GetLibraryMetadataProvidersEndpointTests : IClassFixture<NemeraApiFactory>
 {
     private readonly HttpClient _client;
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -32,7 +32,7 @@ public class GetLibraryMetadataProvidersEndpointTests : IClassFixture<LuminaApiF
     /// Initializes a new instance of the <see cref="GetLibraryMetadataProvidersEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetLibraryMetadataProvidersEndpointTests(LuminaApiFactory apiFactory)
+    public GetLibraryMetadataProvidersEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
@@ -97,7 +97,7 @@ public class GetLibraryMetadataProvidersEndpointTests : IClassFixture<LuminaApiF
     private async Task<Guid> SeedLibraryAsync(Guid userId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid libraryId = Guid.NewGuid();
         dbContext.Libraries.Add(_libraryEntityFixture.Create(id: libraryId, userId: userId, title: "Test Library", libraryType: LibraryType.EBook, contentLocations: []));
         await dbContext.SaveChangesAsync();
@@ -112,7 +112,7 @@ public class GetLibraryMetadataProvidersEndpointTests : IClassFixture<LuminaApiF
     private async Task SeedConfigurationAsync(Guid libraryId)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         dbContext.LibraryMetadataProviderConfigurations.Add(_libraryMetadataProviderConfigurationEntityFixture.Create(libraryId: libraryId, pluginId: Guid.NewGuid(), rank: 1));
         await dbContext.SaveChangesAsync();
     }

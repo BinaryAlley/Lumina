@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Fixtures.Core.Requests.UsersManagement.Settings;
-using Lumina.Contracts.Requests.UsersManagement.Settings;
-using Lumina.Contracts.Responses.UsersManagement.Settings;
-using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Settings.UpdatePlaybackState;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Contracts.Fixtures.Core.Requests.UsersManagement.Settings;
+using Nemera.Contracts.Requests.UsersManagement.Settings;
+using Nemera.Contracts.Responses.UsersManagement.Settings;
+using Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Settings.UpdatePlaybackState;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Settings.UpdatePlaybackState;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Settings.UpdatePlaybackState;
 
 /// <summary>
 /// Contains security tests for the <see cref="UpdatePlaybackStateEndpoint"/> class.
@@ -26,10 +26,10 @@ namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.S
 /// resistance are not applicable to it. It never issues a token, so token and claim correctness is not applicable either.
 /// </remarks>
 [ExcludeFromCodeCoverage]
-public class UpdatePlaybackStateEndpointTests : IClassFixture<LuminaApiFactory>, IDisposable
+public class UpdatePlaybackStateEndpointTests : IClassFixture<NemeraApiFactory>, IDisposable
 {
     private readonly HttpClient _client;
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -41,12 +41,12 @@ public class UpdatePlaybackStateEndpointTests : IClassFixture<LuminaApiFactory>,
     /// Initializes a new instance of the <see cref="UpdatePlaybackStateEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public UpdatePlaybackStateEndpointTests(LuminaApiFactory apiFactory)
+    public UpdatePlaybackStateEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
         // A unique X-Forwarded-For isolates rate limiting state per test.
-        _client.DefaultRequestHeaders.Add("X-Forwarded-For", LuminaApiFactory.GetUniqueTestIp());
+        _client.DefaultRequestHeaders.Add("X-Forwarded-For", NemeraApiFactory.GetUniqueTestIp());
     }
 
     [Fact]
@@ -135,7 +135,7 @@ public class UpdatePlaybackStateEndpointTests : IClassFixture<LuminaApiFactory>,
         Assert.DoesNotContain("hash", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("salt", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina.", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(" at Nemera.", content, StringComparison.OrdinalIgnoreCase);
     }
 
     [Theory(Skip = "Production bug: a JSON payload whose volume is a string makes the FastEndpoints binder throw a System.Text.Json.JsonException, which escapes because UpdatePlaybackStateEndpoint calls DontCatchExceptions(), so the API responds with 500 instead of 400 or 422. The body is the generic ProblemDetails and leaks no internals. The test stays skipped until the endpoint maps binding failures to a client error.")]
@@ -170,7 +170,7 @@ public class UpdatePlaybackStateEndpointTests : IClassFixture<LuminaApiFactory>,
     {
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina.", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(" at Nemera.", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Microsoft.Data.Sqlite", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Microsoft.EntityFrameworkCore", content, StringComparison.OrdinalIgnoreCase);
     }

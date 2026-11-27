@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Common.ValueObjects.Metadata;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Common.ValueObjects.Metadata;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 using System;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Common.Metadata;
+namespace Nemera.Application.Common.Mapping.Common.Metadata;
 
 /// <summary>
 /// Extension methods for converting <see cref="ReleaseInfoDto"/>.

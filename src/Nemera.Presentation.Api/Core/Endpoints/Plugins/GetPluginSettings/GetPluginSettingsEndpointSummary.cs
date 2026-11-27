@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.Plugins;
-using Lumina.Contracts.Responses.Plugins;
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Contracts.Requests.Plugins;
+using Nemera.Contracts.Responses.Plugins;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.Plugins.GetPluginSettings;
+namespace Nemera.Presentation.Api.Core.Endpoints.Plugins.GetPluginSettings;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetPluginSettingsEndpoint"/> API endpoint, for OpenAPI.

@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DTO.Common;
+namespace Nemera.Presentation.Web.Common.DTO.Common;
 
 /// <summary>
 /// Response data transfer object for the JSON responses of the web application that carry a payload.

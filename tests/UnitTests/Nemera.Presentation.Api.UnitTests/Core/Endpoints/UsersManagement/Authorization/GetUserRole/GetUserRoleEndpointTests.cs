@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.UsersManagement.Authorization.Queries.GetUserRole;
-using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
-using Lumina.Contracts.Fixtures.Core.Responses.Authorization;
-using Lumina.Contracts.Requests.Authorization;
-using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.GetUserRole;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.UsersManagement.Authorization.Queries.GetUserRole;
+using Nemera.Contracts.Fixtures.Core.Requests.Authorization;
+using Nemera.Contracts.Fixtures.Core.Responses.Authorization;
+using Nemera.Contracts.Requests.Authorization;
+using Nemera.Contracts.Responses.Authorization;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.UsersManagement.Authorization.GetUserRole;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authorization.GetUserRole;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.UsersManagement.Authorization.GetUserRole;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetUserRoleEndpoint"/> class.

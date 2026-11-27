@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DataAccess.Entities.Common;
+namespace Nemera.Application.Common.DataAccess.Entities.Common;
 
 /// <summary>
 /// Represents a tag.

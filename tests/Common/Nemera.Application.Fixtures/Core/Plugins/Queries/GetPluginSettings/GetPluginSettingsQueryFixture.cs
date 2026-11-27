@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Plugins.Queries.GetPluginSettings;
+using Nemera.Application.Core.Plugins.Queries.GetPluginSettings;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Plugins.Queries.GetPluginSettings;
+namespace Nemera.Application.Fixtures.Core.Plugins.Queries.GetPluginSettings;
 
 /// <summary>
 /// Fixture class for the <see cref="GetPluginSettingsQuery"/> class.

@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.Scheduling;
+namespace Nemera.Contracts.Responses.Scheduling;
 
 /// <summary>
 /// Represents an execution of the task of a scheduled job.

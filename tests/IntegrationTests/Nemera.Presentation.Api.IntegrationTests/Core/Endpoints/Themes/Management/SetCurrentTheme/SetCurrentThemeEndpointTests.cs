@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.Themes;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Common.Infrastructure.Themes;
-using Lumina.Contracts.Fixtures.Core.Requests.Themes;
-using Lumina.Contracts.Requests.Themes;
-using Lumina.Contracts.Responses.Themes;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Presentation.Api.Core.Endpoints.Themes.Management.SetCurrentTheme;
-using Lumina.Presentation.Api.Fixtures.Core.Endpoints.Themes;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.Themes;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Common.Infrastructure.Themes;
+using Nemera.Contracts.Fixtures.Core.Requests.Themes;
+using Nemera.Contracts.Requests.Themes;
+using Nemera.Contracts.Responses.Themes;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Presentation.Api.Core.Endpoints.Themes.Management.SetCurrentTheme;
+using Nemera.Presentation.Api.Fixtures.Core.Endpoints.Themes;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,16 +25,16 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Management.SetCurrentTheme;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Management.SetCurrentTheme;
 
 /// <summary>
 /// Contains integration tests for the <see cref="SetCurrentThemeEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly TestThemeArchiveFixture _testThemeArchiveFixture = new();
     private readonly SetCurrentThemeRequestFixture _setCurrentThemeRequestFixture = new();
     private readonly List<string> _installedThemeIds = [];
@@ -48,7 +48,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
     /// Initializes a new instance of the <see cref="SetCurrentThemeEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public SetCurrentThemeEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public SetCurrentThemeEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -210,7 +210,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
     public async Task DisposeAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         foreach (string themeId in _installedThemeIds)
         {
@@ -223,7 +223,7 @@ public class SetCurrentThemeEndpointTests : IClassFixture<AuthenticatedLuminaApi
         }
 
         // Restore the bundled default theme as the active one, so the following tests start from a clean state.
-        ThemeEntity? bundledTheme = await dbContext.Themes.FirstOrDefaultAsync(t => t.ThemeId == "lumina-default");
+        ThemeEntity? bundledTheme = await dbContext.Themes.FirstOrDefaultAsync(t => t.ThemeId == "nemera-default");
         if (bundledTheme is not null)
             bundledTheme.IsCurrent = true;
 

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Requests.Themes;
+using Nemera.Presentation.Web.Common.Requests.Themes;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Admin.Themes.DownloadTheme;
+namespace Nemera.Presentation.Web.Core.Endpoints.Admin.Themes.DownloadTheme;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="DownloadThemeEndpoint"/> endpoint, for OpenAPI.
@@ -24,7 +24,7 @@ public class DownloadThemeEndpointSummary : Summary<DownloadThemeEndpoint, GetTh
         RequestParam(r => r.ThemeId, "The manifest id of the theme to download. Required.");
 
         ExampleRequest = new GetThemeArchiveRequest(
-            ThemeId: "lumina-default"
+            ThemeId: "nemera-default"
         );
 
         Response(200, "The ZIP archive of the theme is returned.", "application/zip");

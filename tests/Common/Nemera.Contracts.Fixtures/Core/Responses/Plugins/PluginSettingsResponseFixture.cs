@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Responses.Plugins;
+using Nemera.Contracts.Responses.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Responses.Plugins;
+namespace Nemera.Contracts.Fixtures.Core.Responses.Plugins;
 
 /// <summary>
 /// Fixture class for the <see cref="PluginSettingsResponse"/> record.

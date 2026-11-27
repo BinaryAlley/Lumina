@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authentication;
 using OtpNet;
 #endregion
 
-namespace Lumina.Infrastructure.Core.Authentication;
+namespace Nemera.Infrastructure.Core.Authentication;
 
 /// <summary>
 /// Service for generating and validating TOTP tokens.

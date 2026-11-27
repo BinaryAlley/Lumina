@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Infrastructure.Core.Plugins;
-using Lumina.Plugins.Contracts.Core.Plugins;
+using Nemera.Infrastructure.Core.Plugins;
+using Nemera.Plugins.Contracts.Core.Plugins;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Plugins;
+namespace Nemera.Infrastructure.UnitTests.Core.Plugins;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PluginManager"/> class.

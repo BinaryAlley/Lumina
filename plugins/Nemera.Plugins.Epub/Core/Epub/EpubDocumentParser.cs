@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Plugins.Epub.Common.Models.DTO.Opf;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Plugins.Epub.Common.Models.DTO.Opf;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,7 +14,7 @@ using System.Xml;
 using System.Xml.Linq;
 #endregion
 
-namespace Lumina.Plugins.Epub.Core.Epub;
+namespace Nemera.Plugins.Epub.Core.Epub;
 
 /// <summary>
 /// Parses an EPUB into a normalized reading document, extracting its sections and resources into a working directory.
@@ -159,7 +159,7 @@ internal static class EpubDocumentParser
 
         // Build a lookup that maps every reachable archive file to the opaque value its references should be rewritten to.
         // A section's HTML references other files of the book by their archive path, for example, <img src="images/cover.png">, but the client could be remote, and cannot reach into the ZIP.
-        // So, before a section is served, every such reference must be replaced by a marker (data-lumina-resource) that the host turns into a resource endpoint URL.
+        // So, before a section is served, every such reference must be replaced by a marker (data-nemera-resource) that the host turns into a resource endpoint URL.
         // This lookup is what makes that rewrite possible: given the archive path a reference points to, it answers which marker to use.
         Dictionary<string, string> targetByResolvedPath = [];
         HashSet<string> spineItemIds = [.. opfDocument.SpineIds];
@@ -482,7 +482,7 @@ internal static class EpubDocumentParser
 
                 // The original attribute is removed and replaced by the resource marker, so that the browser does not attempt to load the internal archive path,
                 // which it cannot reach; the client resolves the marker to the resource endpoint instead.
-                element.SetAttributeValue("data-lumina-resource", target);
+                element.SetAttributeValue("data-nemera-resource", target);
                 attribute.Remove();
             }
         }

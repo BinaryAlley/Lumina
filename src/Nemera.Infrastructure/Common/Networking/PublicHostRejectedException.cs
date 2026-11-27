@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.Networking;
+using Nemera.Domain.SharedKernel.Common.Enums.Networking;
 using System.Net.Http;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Networking;
+namespace Nemera.Infrastructure.Common.Networking;
 
 /// <summary>
 /// The exception thrown when an outbound request is rejected by the host address policy.

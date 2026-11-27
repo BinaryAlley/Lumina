@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Plugins;
-using Lumina.Presentation.Web.Core.Endpoints.Library.Management.GetLibraryTypeArtworkProviders;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Plugins;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Plugins;
+using Nemera.Presentation.Web.Core.Endpoints.Library.Management.GetLibraryTypeArtworkProviders;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Plugins;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -13,22 +13,22 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.GetLibraryTypeArtworkProviders;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Library.Management.GetLibraryTypeArtworkProviders;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetLibraryTypeArtworkProvidersEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetLibraryTypeArtworkProvidersEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetLibraryTypeArtworkProvidersEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly LibraryArtworkProviderDtoFixture _libraryArtworkProviderDtoFixture = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GetLibraryTypeArtworkProvidersEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetLibraryTypeArtworkProvidersEndpointTests(LuminaWebFactory apiFactory)
+    public GetLibraryTypeArtworkProvidersEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

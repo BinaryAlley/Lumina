@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
-using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Files;
-using Lumina.Contracts.Fixtures.Core.Responses.FileSystemManagement.Files;
-using Lumina.Contracts.Requests.FileSystemManagement.Files;
-using Lumina.Contracts.Responses.FileSystemManagement.Files;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Files.GetFiles;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
+using Nemera.Contracts.Fixtures.Core.Requests.FileSystemManagement.Files;
+using Nemera.Contracts.Fixtures.Core.Responses.FileSystemManagement.Files;
+using Nemera.Contracts.Requests.FileSystemManagement.Files;
+using Nemera.Contracts.Responses.FileSystemManagement.Files;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.FileSystemManagement.Files.GetFiles;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -19,7 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Files;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.FileSystemManagement.Files;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetFilesEndpoint"/> class.

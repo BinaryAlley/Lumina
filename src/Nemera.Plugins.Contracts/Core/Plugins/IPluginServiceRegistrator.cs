@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 #endregion
 
-namespace Lumina.Plugins.Contracts.Core.Plugins;
+namespace Nemera.Plugins.Contracts.Core.Plugins;
 
 /// <summary>
 /// Contract for registering the services of a plugin into the host dependency injection container.

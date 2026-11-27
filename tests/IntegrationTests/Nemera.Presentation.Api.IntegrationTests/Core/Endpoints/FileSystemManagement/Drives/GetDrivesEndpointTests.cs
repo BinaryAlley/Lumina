@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -13,16 +13,16 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemManagement.Drives;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.FileSystemManagement.Drives;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetDrivesEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetDrivesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetDrivesEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -50,7 +50,7 @@ public class GetDrivesEndpointTests : IClassFixture<AuthenticatedLuminaApiFactor
     /// Initializes a new instance of the <see cref="GetDrivesEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetDrivesEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetDrivesEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;

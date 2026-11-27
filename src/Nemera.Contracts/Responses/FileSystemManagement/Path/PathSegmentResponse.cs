@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.FileSystemManagement.Path;
+namespace Nemera.Contracts.Responses.FileSystemManagement.Path;
 
 /// <summary>
 /// Represents a response containing a file system path.

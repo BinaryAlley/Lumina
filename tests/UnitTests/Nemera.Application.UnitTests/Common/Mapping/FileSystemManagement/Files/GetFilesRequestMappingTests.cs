@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.FileSystemManagement.Files;
-using Lumina.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
-using Lumina.Contracts.Fixtures.Core.Requests.FileSystemManagement.Files;
-using Lumina.Contracts.Requests.FileSystemManagement.Files;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Files;
+using Nemera.Application.Core.FileSystemManagement.Files.Queries.GetFiles;
+using Nemera.Contracts.Fixtures.Core.Requests.FileSystemManagement.Files;
+using Nemera.Contracts.Requests.FileSystemManagement.Files;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.FileSystemManagement.Files;
+namespace Nemera.Application.UnitTests.Common.Mapping.FileSystemManagement.Files;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetFilesRequestMapping"/> class.

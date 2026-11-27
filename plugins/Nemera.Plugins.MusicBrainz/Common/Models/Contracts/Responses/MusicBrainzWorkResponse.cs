@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 #endregion
 
-namespace Lumina.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
+namespace Nemera.Plugins.MusicBrainz.Common.Models.Contracts.Responses;
 
 /// <summary>
 /// Represents a response for a work from the MusicBrainz API.

@@ -1,17 +1,17 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.MediaConsumption.Queries.GetGenreConsumption;
-using Lumina.Application.Fixtures.Core.MediaConsumption.Queries.GetGenreConsumption;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Core.MediaConsumption.Queries.GetGenreConsumption;
+using Nemera.Application.Fixtures.Core.MediaConsumption.Queries.GetGenreConsumption;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.MediaConsumption.Queries.GetGenreConsumption;
+namespace Nemera.Application.UnitTests.Core.MediaConsumption.Queries.GetGenreConsumption;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetGenreConsumptionQueryValidator"/> class.

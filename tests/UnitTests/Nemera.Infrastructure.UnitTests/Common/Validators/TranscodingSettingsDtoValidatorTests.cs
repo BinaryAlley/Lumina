@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Models.DTO.Configuration;
-using Lumina.Application.Fixtures.Common.Infrastructure.Models.DTO.Configuration;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
-using Lumina.Infrastructure.Common.Errors;
-using Lumina.Infrastructure.Common.Models.DTO.Configuration;
-using Lumina.Infrastructure.Common.Validators;
-using Lumina.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
+using Nemera.Application.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Application.Fixtures.Common.Infrastructure.Models.DTO.Configuration;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Services;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Path;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Strategies.Platform;
+using Nemera.Infrastructure.Common.Errors;
+using Nemera.Infrastructure.Common.Models.DTO.Configuration;
+using Nemera.Infrastructure.Common.Validators;
+using Nemera.Infrastructure.Fixtures.Common.Models.DTO.Configuration;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using System;
@@ -18,7 +18,7 @@ using System.IO;
 using System.IO.Abstractions;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Common.Validators;
+namespace Nemera.Infrastructure.UnitTests.Common.Validators;
 
 /// <summary>
 /// Contains unit tests for the <see cref="TranscodingSettingsDtoValidator"/> class.
@@ -40,7 +40,7 @@ public class TranscodingSettingsDtoValidatorTests : IDisposable
     /// </summary>
     public TranscodingSettingsDtoValidatorTests()
     {
-        _sandboxRoot = Path.Combine(Path.GetTempPath(), "lumina-transcoding-validator-tests-" + Guid.NewGuid().ToString("N"));
+        _sandboxRoot = Path.Combine(Path.GetTempPath(), "nemera-transcoding-validator-tests-" + Guid.NewGuid().ToString("N"));
         _mediaRoot = Path.Combine(_sandboxRoot, "media");
         _validCacheDirectory = Path.Combine(_sandboxRoot, "cache");
         _pluginsDirectory = Path.Combine(_sandboxRoot, "plugins");

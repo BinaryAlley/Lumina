@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Api;
+namespace Nemera.Presentation.Web.Fixtures.Common.Api;
 
 /// <summary>
 /// <see cref="HttpContent"/> test double that exposes whether the client buffered the content before handing it to the caller,

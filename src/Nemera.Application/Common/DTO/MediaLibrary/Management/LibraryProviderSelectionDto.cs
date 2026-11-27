@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Common.DTO.MediaLibrary.Management;
+namespace Nemera.Application.Common.DTO.MediaLibrary.Management;
 
 /// <summary>
 /// Data transfer object for the choice made for one metadata provider, artwork provider or book reader of a media library, carried by the commands that create or update a media library.

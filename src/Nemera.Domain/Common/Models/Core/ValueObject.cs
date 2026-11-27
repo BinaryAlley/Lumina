@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace Lumina.Domain.Common.Models.Core;
+namespace Nemera.Domain.Common.Models.Core;
 
 /// <summary>
 /// Base class for all domain Value Objects.

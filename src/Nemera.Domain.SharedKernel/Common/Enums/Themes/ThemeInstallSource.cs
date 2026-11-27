@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.Themes;
+namespace Nemera.Domain.SharedKernel.Common.Enums.Themes;
 
 /// <summary>
 /// Enumeration for the source a theme was installed from.

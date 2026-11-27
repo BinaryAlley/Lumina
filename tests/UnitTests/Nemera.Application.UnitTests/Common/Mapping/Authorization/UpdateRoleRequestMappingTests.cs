@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.Authorization;
-using Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
-using Lumina.Contracts.Fixtures.Core.Requests.Authorization;
-using Lumina.Contracts.Requests.Authorization;
+using Nemera.Application.Common.Mapping.Authorization;
+using Nemera.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
+using Nemera.Contracts.Fixtures.Core.Requests.Authorization;
+using Nemera.Contracts.Requests.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.Authorization;
+namespace Nemera.Application.UnitTests.Common.Mapping.Authorization;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdateRoleRequestMapping"/> class.

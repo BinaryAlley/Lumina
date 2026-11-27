@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Models.DTO.Plugins;
+namespace Nemera.Infrastructure.Common.Models.DTO.Plugins;
 
 /// <summary>
 /// Data transfer object for the error that occurred while loading a plugin assembly.

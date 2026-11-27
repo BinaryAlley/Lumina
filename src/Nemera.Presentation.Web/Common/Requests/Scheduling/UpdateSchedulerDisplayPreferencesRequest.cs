@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Enums.Scheduling;
+using Nemera.Presentation.Web.Common.Enums.Scheduling;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Requests.Scheduling;
+namespace Nemera.Presentation.Web.Common.Requests.Scheduling;
 
 /// <summary>
 /// Request for updating the display preferences of the scheduler page of the current user.

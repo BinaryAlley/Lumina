@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.Models;
+namespace Nemera.Presentation.Web.Fixtures.Common.Models;
 
 /// <summary>
 /// Fixture class for the <see cref="SectionModel"/> class.

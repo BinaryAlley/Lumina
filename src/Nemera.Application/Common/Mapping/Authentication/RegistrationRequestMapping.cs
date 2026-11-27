@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
-using Lumina.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
-using Lumina.Contracts.Requests.Authentication;
+using Nemera.Application.Core.Maintenance.ApplicationSetup.Commands.SetupApplication;
+using Nemera.Application.Core.UsersManagement.Authentication.Commands.RegisterUser;
+using Nemera.Contracts.Requests.Authentication;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Authentication;
+namespace Nemera.Application.Common.Mapping.Authentication;
 
 /// <summary>
 /// Extension methods for converting <see cref="RegistrationRequest"/>.

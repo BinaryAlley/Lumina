@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.FileSystemManagement.Path;
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
+using Nemera.Contracts.Requests.FileSystemManagement.Path;
+using Nemera.Contracts.Responses.FileSystemManagement.Path;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.SplitPath;
+namespace Nemera.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.SplitPath;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="SplitPathEndpoint"/> API endpoint, for OpenAPI.

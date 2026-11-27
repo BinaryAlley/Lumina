@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Time;
-using Lumina.Infrastructure.Common.Models.DTO.Configuration;
-using Lumina.Infrastructure.Core.Authentication;
-using Lumina.Infrastructure.Fixtures.Core.Authentication;
+using Nemera.Application.Common.Infrastructure.Time;
+using Nemera.Infrastructure.Common.Models.DTO.Configuration;
+using Nemera.Infrastructure.Core.Authentication;
+using Nemera.Infrastructure.Fixtures.Core.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NSubstitute;
@@ -13,7 +13,7 @@ using System.Security.Claims;
 using System.Text;
 #endregion
 
-namespace Lumina.Infrastructure.UnitTests.Core.Authentication;
+namespace Nemera.Infrastructure.UnitTests.Core.Authentication;
 
 /// <summary>
 /// Contains unit tests for the <see cref="JwtTokenGenerator"/> class.

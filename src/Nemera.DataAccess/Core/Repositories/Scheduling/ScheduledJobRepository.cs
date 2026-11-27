@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.DataAccess.Common.Persistence;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.Scheduling;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.DataAccess.Repositories.Scheduling;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.DataAccess.Common.Persistence;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.Scheduling;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,22 +17,22 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Scheduling;
+namespace Nemera.DataAccess.Core.Repositories.Scheduling;
 
 /// <summary>
 /// Repository for scheduled jobs.
 /// </summary>
 internal sealed class ScheduledJobRepository : IScheduledJobRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScheduledJobRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public ScheduledJobRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public ScheduledJobRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ internal sealed class ScheduledJobRepository : IScheduledJobRepository
     {
         // The scheduled job is read with a query instead of FindAsync so that it can be retrieved without tracking when requested.
         // When the entity is tracked, the change tracker still returns the already loaded instance instead of a new one.
-        IQueryable<ScheduledJobEntity> query = _luminaDbContext.ScheduledJobs;
+        IQueryable<ScheduledJobEntity> query = _nemeraDbContext.ScheduledJobs;
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         return await query.FirstOrDefaultAsync(scheduledJob => scheduledJob.Id == id, cancellationToken).ConfigureAwait(false);
@@ -62,7 +62,7 @@ internal sealed class ScheduledJobRepository : IScheduledJobRepository
     public async Task<Result<ScheduledJobEntity?>> GetByIdWithoutTrackingAsync(Guid id, CancellationToken cancellationToken)
     {
         // The entity is read without tracking, so a concurrent update made by another unit of work is never hidden by an already tracked copy.
-        return await _luminaDbContext.ScheduledJobs
+        return await _nemeraDbContext.ScheduledJobs
             .AsNoTracking()
             .FirstOrDefaultAsync(scheduledJob => scheduledJob.Id == id, cancellationToken).ConfigureAwait(false);
     }
@@ -81,7 +81,7 @@ internal sealed class ScheduledJobRepository : IScheduledJobRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a paginated result of <see cref="ScheduledJobEntity"/>, or an error.</returns>
     public async Task<Result<PaginatedResultDto<ScheduledJobEntity>>> GetAllAsync<TFilter>(PaginationDataDto? paginationData = null, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
     {
-        IQueryable<ScheduledJobEntity> query = _luminaDbContext.ScheduledJobs;
+        IQueryable<ScheduledJobEntity> query = _nemeraDbContext.ScheduledJobs;
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
 
@@ -125,7 +125,7 @@ internal sealed class ScheduledJobRepository : IScheduledJobRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="ScheduledJobEntity"/>, or an error.</returns>
     public async Task<Result<IEnumerable<ScheduledJobEntity>>> GetActiveOrRunningAsync(CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.ScheduledJobs
+        return await _nemeraDbContext.ScheduledJobs
             .Where(scheduledJob => scheduledJob.Status == ScheduledJobStatus.Active || scheduledJob.Status == ScheduledJobStatus.Running)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
     }
@@ -138,12 +138,12 @@ internal sealed class ScheduledJobRepository : IScheduledJobRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(ScheduledJobEntity scheduledJob, CancellationToken cancellationToken)
     {
-        bool doesScheduledJobExist = await _luminaDbContext.ScheduledJobs.AnyAsync(
+        bool doesScheduledJobExist = await _nemeraDbContext.ScheduledJobs.AnyAsync(
             existingScheduledJob => existingScheduledJob.Id == scheduledJob.Id, cancellationToken).ConfigureAwait(false);
         if (doesScheduledJobExist)
             return Errors.Scheduling.ScheduledJobAlreadyExists;
 
-        _luminaDbContext.ScheduledJobs.Add(scheduledJob);
+        _nemeraDbContext.ScheduledJobs.Add(scheduledJob);
         return Result.Created;
     }
 
@@ -155,12 +155,12 @@ internal sealed class ScheduledJobRepository : IScheduledJobRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpdateAsync(ScheduledJobEntity data, CancellationToken cancellationToken)
     {
-        ScheduledJobEntity? foundScheduledJob = _luminaDbContext.ScheduledJobs.Local.FirstOrDefault(scheduledJob => scheduledJob.Id == data.Id)
-            ?? await _luminaDbContext.ScheduledJobs.FirstOrDefaultAsync(scheduledJob => scheduledJob.Id == data.Id, cancellationToken).ConfigureAwait(false);
+        ScheduledJobEntity? foundScheduledJob = _nemeraDbContext.ScheduledJobs.Local.FirstOrDefault(scheduledJob => scheduledJob.Id == data.Id)
+            ?? await _nemeraDbContext.ScheduledJobs.FirstOrDefaultAsync(scheduledJob => scheduledJob.Id == data.Id, cancellationToken).ConfigureAwait(false);
         if (foundScheduledJob is null)
             return Errors.Scheduling.ScheduledJobNotFound;
         // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
-        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundScheduledJob, data);
+        EditableValuesCopier.CopyEditableValues(_nemeraDbContext, foundScheduledJob, data);
         return Result.Updated;
     }
 
@@ -172,12 +172,12 @@ internal sealed class ScheduledJobRepository : IScheduledJobRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        ScheduledJobEntity? foundScheduledJob = await _luminaDbContext.ScheduledJobs
+        ScheduledJobEntity? foundScheduledJob = await _nemeraDbContext.ScheduledJobs
             .FirstOrDefaultAsync(scheduledJob => scheduledJob.Id == id, cancellationToken).ConfigureAwait(false);
         if (foundScheduledJob is null)
             return Errors.Scheduling.ScheduledJobNotFound;
 
-        _luminaDbContext.ScheduledJobs.Remove(foundScheduledJob);
+        _nemeraDbContext.ScheduledJobs.Remove(foundScheduledJob);
         return Result.Deleted;
     }
 }

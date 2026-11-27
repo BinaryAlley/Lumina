@@ -1,4 +1,4 @@
-namespace Lumina.Application.Common.CQRS;
+namespace Nemera.Application.Common.CQRS;
 
 /// <summary>
 /// Marker interface for command types handled by <see cref="ICommandHandler{TCommand, TResult}"/>. 

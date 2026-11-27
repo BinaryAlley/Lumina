@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.Fixtures.Core.Requests.Authentication;
-using Lumina.Contracts.Fixtures.Core.Requests.UsersManagement.Settings;
-using Lumina.Contracts.Requests.UsersManagement.Settings;
-using Lumina.Contracts.Responses.Authentication;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.SharedKernel.Common.Enums.Playback;
-using Lumina.Infrastructure.Core.Security;
-using Lumina.Presentation.Api.SecurityTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.Fixtures.Core.Requests.Authentication;
+using Nemera.Contracts.Fixtures.Core.Requests.UsersManagement.Settings;
+using Nemera.Contracts.Requests.UsersManagement.Settings;
+using Nemera.Contracts.Responses.Authentication;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.SharedKernel.Common.Enums.Playback;
+using Nemera.Infrastructure.Core.Security;
+using Nemera.Presentation.Api.SecurityTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -20,16 +20,16 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 #endregion
 
-namespace Lumina.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Settings.UpdateUserSettings;
+namespace Nemera.Presentation.Api.SecurityTests.Core.Endpoints.UsersManagement.Settings.UpdateUserSettings;
 
 /// <summary>
 /// Contains security tests for the <see cref="UpdateUserSettingsEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
+public class UpdateUserSettingsEndpointTests : IClassFixture<NemeraApiFactory>
 {
     private readonly HttpClient _client;
-    private readonly LuminaApiFactory _apiFactory;
+    private readonly NemeraApiFactory _apiFactory;
     private readonly PasswordHashService _hashService = new();
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -43,7 +43,7 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     /// Initializes a new instance of the <see cref="UpdateUserSettingsEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public UpdateUserSettingsEndpointTests(LuminaApiFactory apiFactory)
+    public UpdateUserSettingsEndpointTests(NemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _client = apiFactory.CreateClient();
@@ -337,7 +337,7 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
     {
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stack trace", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina.", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(" at Nemera.", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Microsoft.Data.Sqlite", content, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("Microsoft.EntityFrameworkCore", content, StringComparison.OrdinalIgnoreCase);
     }
@@ -353,7 +353,7 @@ public class UpdateUserSettingsEndpointTests : IClassFixture<LuminaApiFactory>
         client.DefaultRequestHeaders.Add("X-Forwarded-For", $"192.168.1.{Random.Shared.Next(1, 255)}");
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         string username = $"testuser_{Guid.NewGuid()}";
         UserEntity user = _userEntityFixture.Create(id: userId, username: username, password: _hashService.HashString("TestPass123!"));

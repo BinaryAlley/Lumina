@@ -1,30 +1,30 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Scheduling;
-using Lumina.Application.Common.DataAccess.Repositories.Scheduling;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Scheduling;
+using Nemera.Application.Common.DataAccess.Repositories.Scheduling;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Scheduling;
+namespace Nemera.DataAccess.Core.Repositories.Scheduling;
 
 /// <summary>
 /// Repository for the display preferences of the scheduler page.
 /// </summary>
 internal sealed class SchedulerDisplayPreferencesRepository : ISchedulerDisplayPreferencesRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SchedulerDisplayPreferencesRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public SchedulerDisplayPreferencesRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public SchedulerDisplayPreferencesRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ internal sealed class SchedulerDisplayPreferencesRepository : ISchedulerDisplayP
     /// <returns>An <see cref="Result{TValue}"/> containing either the display preferences of the user, or an error.</returns>
     public async Task<Result<SchedulerDisplayPreferencesEntity?>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.SchedulerDisplayPreferences
+        return await _nemeraDbContext.SchedulerDisplayPreferences
             .FirstOrDefaultAsync(preferences => preferences.UserId == userId, cancellationToken).ConfigureAwait(false);
     }
 
@@ -47,10 +47,10 @@ internal sealed class SchedulerDisplayPreferencesRepository : ISchedulerDisplayP
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpsertAsync(SchedulerDisplayPreferencesEntity preferences, CancellationToken cancellationToken)
     {
-        SchedulerDisplayPreferencesEntity? existingPreferences = await _luminaDbContext.SchedulerDisplayPreferences
+        SchedulerDisplayPreferencesEntity? existingPreferences = await _nemeraDbContext.SchedulerDisplayPreferences
             .FirstOrDefaultAsync(repositoryPreferences => repositoryPreferences.UserId == preferences.UserId, cancellationToken).ConfigureAwait(false);
         if (existingPreferences is null)
-            _luminaDbContext.SchedulerDisplayPreferences.Add(preferences);
+            _nemeraDbContext.SchedulerDisplayPreferences.Add(preferences);
         else
         {
             // Update only the mutable fields, preserving the Id and the ownership of the existing preferences.

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Application.Common.Utilities;
-using Lumina.Application.Core.Themes.Management.Queries.GetThemeTemplate;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Application.Common.Utilities;
+using Nemera.Application.Core.Themes.Management.Queries.GetThemeTemplate;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Application.Core.Themes.Management.Queries.GetThemeTemplate;
+namespace Nemera.Application.Core.Themes.Management.Queries.GetThemeTemplate;
 
 /// <summary>
 /// Validates the needed validation rules for <see cref="GetThemeTemplateQuery"/>.

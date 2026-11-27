@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.Libraries;
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
-using Lumina.Presentation.Web.Common.Primitives;
-using Lumina.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
-using Lumina.Presentation.Web.Common.Routes;
-using Lumina.Presentation.Web.Common.Services;
-using Lumina.Presentation.Web.Core.Endpoints.Common;
-using Lumina.Presentation.Web.Core.Themes;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.Libraries;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.DTO.WrittenContentLibrary.BookLibrary;
+using Nemera.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
+using Nemera.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Common.Services;
+using Nemera.Presentation.Web.Core.Endpoints.Common;
+using Nemera.Presentation.Web.Core.Themes;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
@@ -22,7 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.DeletedBooks;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.BookLibrary.Books.DeletedBooks;
 
 /// <summary>
 /// API endpoint for the <c>/{culture}/library/written-content-library/books-library/books/deleted-items</c> route.
@@ -30,8 +30,8 @@ namespace Lumina.Presentation.Web.Core.Endpoints.Library.WrittenContentLibrary.B
 public class DeletedBooksViewEndpoint : BaseEndpoint<GetBooksViewRequest, IResult>
 {
     // The resource base name deliberately excludes the "Core.Resources" segment: the localization factory re-roots it with the configured ResourcesPath.
-    private const string VIEW_RESOURCE_BASE_NAME = "Lumina.Presentation.Web.Views.Library.WrittenContentLibrary.BookLibrary.Books.DeletedItems";
-    private const string VIEW_RESOURCE_LOCATION = "Lumina.Presentation.Web";
+    private const string VIEW_RESOURCE_BASE_NAME = "Nemera.Presentation.Web.Views.Library.WrittenContentLibrary.BookLibrary.Books.DeletedItems";
+    private const string VIEW_RESOURCE_LOCATION = "Nemera.Presentation.Web";
     // The page key mirrors the path of the Razor view under Core/Views, so that theme templates can override it at the page, section or default scope.
     private const string VIEW_PAGE_KEY = "library/written-content-library/book-library/books/deleted-items";
 

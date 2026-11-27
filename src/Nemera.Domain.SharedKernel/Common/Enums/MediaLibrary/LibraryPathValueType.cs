@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+namespace Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 
 /// <summary>
 /// Enumeration for the value types captured by the typed parts of a media library path template.

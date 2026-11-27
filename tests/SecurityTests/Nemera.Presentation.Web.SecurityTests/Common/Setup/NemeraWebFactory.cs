@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Fixtures.Common.Api;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Fixtures.Common.Api;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -8,13 +8,13 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Common.Setup;
+namespace Nemera.Presentation.Web.SecurityTests.Common.Setup;
 
 /// <summary>
 /// Factory for creating the Web application for security tests, with the remote API client replaced by a configurable stub.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class LuminaWebFactory : WebApplicationFactory<Program>, IDisposable
+public class NemeraWebFactory : WebApplicationFactory<Program>, IDisposable
 {
     private const string TEST_ENCRYPTION_KEY = "FLYO0QRo6u2VzoFOgNkkEwYNGtqhJ3QGZd7iAHNEJeM=";
 
@@ -29,9 +29,9 @@ public class LuminaWebFactory : WebApplicationFactory<Program>, IDisposable
     public StubStreamingApiHttpClient StreamingApiClientStub { get; } = new();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="LuminaWebFactory"/> class.
+    /// Initializes a new instance of the <see cref="NemeraWebFactory"/> class.
     /// </summary>
-    public LuminaWebFactory()
+    public NemeraWebFactory()
     {
     }
 

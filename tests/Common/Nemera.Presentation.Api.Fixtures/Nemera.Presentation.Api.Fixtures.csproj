@@ -18,6 +18,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Lumina.Presentation.Api\Lumina.Presentation.Api.csproj" />
+        <ProjectReference Include="..\..\..\src\Nemera.Presentation.Api\Nemera.Presentation.Api.csproj" />
     </ItemGroup>
 </Project>

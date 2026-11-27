@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Plugins.LocalMusicArtwork.Core;
-using Lumina.Plugins.LocalMusicArtwork.Fixtures.Core;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Plugins.LocalMusicArtwork.Core;
+using Nemera.Plugins.LocalMusicArtwork.Fixtures.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 #endregion
 
-namespace Lumina.Plugins.LocalMusicArtwork.IntegrationTests.Core;
+namespace Nemera.Plugins.LocalMusicArtwork.IntegrationTests.Core;
 
 /// <summary>
 /// Contains integration tests for the <see cref="LocalMusicArtworkScanner"/> class, scanning real image files on the file system.
@@ -24,7 +24,7 @@ public class LocalMusicArtworkScannerTests : IDisposable
     /// </summary>
     public LocalMusicArtworkScannerTests()
     {
-        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"lumina-local-music-artwork-scanner-{Guid.NewGuid():N}");
+        _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"nemera-local-music-artwork-scanner-{Guid.NewGuid():N}");
         Directory.CreateDirectory(_temporaryDirectory);
     }
 

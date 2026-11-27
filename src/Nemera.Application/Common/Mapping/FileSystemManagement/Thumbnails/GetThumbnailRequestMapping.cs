@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
-using Lumina.Contracts.Requests.FileSystemManagement.Thumbnails;
+using Nemera.Application.Core.FileSystemManagement.Thumbnails.Queries.GetThumbnail;
+using Nemera.Contracts.Requests.FileSystemManagement.Thumbnails;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.FileSystemManagement.Thumbnails;
+namespace Nemera.Application.Common.Mapping.FileSystemManagement.Thumbnails;
 
 /// <summary>
 /// Extension methods for converting <see cref="GetThumbnailRequest"/>.

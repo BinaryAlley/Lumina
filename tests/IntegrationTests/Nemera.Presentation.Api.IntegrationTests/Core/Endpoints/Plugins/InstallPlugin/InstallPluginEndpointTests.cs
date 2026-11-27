@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Presentation.Api.Core.Endpoints.Plugins.InstallPlugin;
-using Lumina.Presentation.Api.Fixtures.Core.Endpoints.Plugins;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Presentation.Api.Core.Endpoints.Plugins.InstallPlugin;
+using Nemera.Presentation.Api.Fixtures.Core.Endpoints.Plugins;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,16 +20,16 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Plugins.InstallPlugin;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Plugins.InstallPlugin;
 
 /// <summary>
 /// Contains integration tests for the <see cref="InstallPluginEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class InstallPluginEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class InstallPluginEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly TestPluginArchiveFixture _testPluginArchiveFixture = new();
     private readonly List<string> _installedPluginFileNames = [];
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -42,7 +42,7 @@ public class InstallPluginEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     /// Initializes a new instance of the <see cref="InstallPluginEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public InstallPluginEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public InstallPluginEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -273,7 +273,7 @@ public class InstallPluginEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         }
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
 
         // The admin seeding performed by the factory is not idempotent, so the seed data must be cleared between tests.
         await dbContext.Set<RolePermissionEntity>().ExecuteDeleteAsync();

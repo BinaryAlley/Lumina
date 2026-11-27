@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Api;
-using Lumina.Presentation.Web.Common.DTO.FileSystemManagement;
-using Lumina.Presentation.Web.Common.DTO.Themes;
-using Lumina.Presentation.Web.Common.Enums.Themes;
-using Lumina.Presentation.Web.Common.Requests.Themes;
-using Lumina.Presentation.Web.Common.Routes;
+using Nemera.Presentation.Web.Common.Api;
+using Nemera.Presentation.Web.Common.DTO.FileSystemManagement;
+using Nemera.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.Enums.Themes;
+using Nemera.Presentation.Web.Common.Requests.Themes;
+using Nemera.Presentation.Web.Common.Routes;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Themes;
+namespace Nemera.Presentation.Web.Core.Themes;
 
 /// <summary>
 /// Facade over the theme endpoints of the remote API, which stores and serves the theme packs, while the rendering logic stays in this project.

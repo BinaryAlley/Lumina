@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.FileSystem;
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.FileSystem;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.FileSystemManagement.Common;
+namespace Nemera.Application.Common.Mapping.FileSystemManagement.Common;
 
 /// <summary>
 /// Extension methods for converting <see cref="FileSystemTreeNodeResponse"/>.

@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DomainEvents;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate.Events;
+using Nemera.Application.Common.DomainEvents;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Core.BoundedContexts.FavoriteBoundedContext.FavoriteAggregate.Events;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,13 +10,13 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+namespace Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 
 /// <summary>
 /// Authenticated API factory whose database transactions and domain events are observable through probes.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public sealed class EventualConsistencyApiFactory : AuthenticatedLuminaApiFactory
+public sealed class EventualConsistencyApiFactory : AuthenticatedNemeraApiFactory
 {
     /// <summary>
     /// Gets the probe that controls and observes the domain events queue.

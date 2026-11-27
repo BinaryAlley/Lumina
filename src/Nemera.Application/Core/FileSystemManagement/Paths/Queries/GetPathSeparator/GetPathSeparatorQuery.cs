@@ -1,8 +1,8 @@
 ﻿#region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 #endregion
 
-namespace Lumina.Application.Core.FileSystemManagement.Paths.Queries.GetPathSeparator;
+namespace Nemera.Application.Core.FileSystemManagement.Paths.Queries.GetPathSeparator;
 
 /// <summary>
 /// Query for retrieving the file system path separator.

@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Contracts.Responses.MediaLibrary.Management;
+namespace Nemera.Contracts.Responses.MediaLibrary.Management;
 
 /// <summary>
 /// Represents a media library scan progress response.

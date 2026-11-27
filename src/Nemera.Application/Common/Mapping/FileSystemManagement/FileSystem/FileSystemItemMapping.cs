@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.FileSystemManagement.Directories;
-using Lumina.Application.Common.Mapping.FileSystemManagement.Files;
-using Lumina.Contracts.Responses.FileSystemManagement.Common;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
-using Lumina.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Directories;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Files;
+using Nemera.Contracts.Responses.FileSystemManagement.Common;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate;
+using Nemera.Domain.Core.BoundedContexts.FileSystemManagementBoundedContext.FileSystemManagementAggregate.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Lumina.Contracts.DTO.FileSystemManagement;
+using Nemera.Contracts.DTO.FileSystemManagement;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.FileSystemManagement.FileSystem;
+namespace Nemera.Application.Common.Mapping.FileSystemManagement.FileSystem;
 
 /// <summary>
 /// Extension methods for converting <see cref="FileSystemItem"/>.

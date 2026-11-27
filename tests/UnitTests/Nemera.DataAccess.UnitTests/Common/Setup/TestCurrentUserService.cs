@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authentication;
+using Nemera.Application.Common.Infrastructure.Authentication;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.DataAccess.UnitTests.Common.Setup;
+namespace Nemera.DataAccess.UnitTests.Common.Setup;
 
 /// <summary>
 /// Fake service for retrieving the current user's information during tests.

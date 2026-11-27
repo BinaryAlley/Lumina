@@ -1,7 +1,7 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
-using Lumina.Plugins.Pdf.Core.Pdf;
-using Lumina.Plugins.Pdf.Fixtures.Core.Pdf;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary.Reading;
+using Nemera.Plugins.Pdf.Core.Pdf;
+using Nemera.Plugins.Pdf.Fixtures.Core.Pdf;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -10,7 +10,7 @@ using System.Runtime.Versioning;
 using System.Threading;
 #endregion
 
-namespace Lumina.Plugins.Pdf.IntegrationTests.Core.Pdf;
+namespace Nemera.Plugins.Pdf.IntegrationTests.Core.Pdf;
 
 /// <summary>
 /// Contains integration tests for the <see cref="PdfDocumentParser"/> class.
@@ -18,7 +18,7 @@ namespace Lumina.Plugins.Pdf.IntegrationTests.Core.Pdf;
 [ExcludeFromCodeCoverage]
 public class PdfDocumentParserTests : IDisposable
 {
-    private readonly string _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"lumina-pdf-tests-{Guid.NewGuid():N}");
+    private readonly string _temporaryDirectory = Path.Combine(Path.GetTempPath(), $"nemera-pdf-tests-{Guid.NewGuid():N}");
     private readonly string _pdfPath;
 
     /// <summary>
@@ -68,7 +68,7 @@ public class PdfDocumentParserTests : IDisposable
         Assert.Equal("page:1", resource.Key);
         Assert.Equal("image/png", resource.Value.MimeType);
         string sectionContent = File.ReadAllText(Path.Combine(workingDirectory, spineItem.RelativeSectionFilePath));
-        Assert.Contains("data-lumina-resource=\"page:1\"", sectionContent, StringComparison.Ordinal);
+        Assert.Contains("data-nemera-resource=\"page:1\"", sectionContent, StringComparison.Ordinal);
     }
 
     [Fact]

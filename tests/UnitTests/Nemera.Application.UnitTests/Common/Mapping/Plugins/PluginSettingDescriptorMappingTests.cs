@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Mapping.Plugins;
-using Lumina.Contracts.Responses.Plugins;
-using Lumina.Domain.SharedKernel.Common.Enums.Plugins;
-using Lumina.Plugins.Contracts.Common.Models.DTO.Settings;
-using Lumina.Plugins.Contracts.Fixtures.Common.Models.DTO.Settings;
+using Nemera.Application.Common.Mapping.Plugins;
+using Nemera.Contracts.Responses.Plugins;
+using Nemera.Domain.SharedKernel.Common.Enums.Plugins;
+using Nemera.Plugins.Contracts.Common.Models.DTO.Settings;
+using Nemera.Plugins.Contracts.Fixtures.Common.Models.DTO.Settings;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.Plugins;
+namespace Nemera.Application.UnitTests.Common.Mapping.Plugins;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PluginSettingDescriptorMapping"/> class.

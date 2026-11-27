@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Themes;
+using Nemera.Presentation.Web.Common.DTO.Themes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Themes;
+namespace Nemera.Presentation.Web.Core.Themes;
 
 /// <summary>
 /// Builds the file system browser model for the themed component template, resolving the localized strings and theme asset URLs server side.
@@ -13,8 +13,8 @@ namespace Lumina.Presentation.Web.Core.Themes;
 public sealed class ThemeFileSystemBrowserBuilder
 {
     // The resource base name deliberately excludes the "Core.Resources" segment: the localization factory re-roots it with the configured ResourcesPath.
-    private const string VIEW_RESOURCE_BASE_NAME = "Lumina.Presentation.Web.Views.Shared.Components.FileSystemBrowser.Default";
-    private const string VIEW_RESOURCE_LOCATION = "Lumina.Presentation.Web";
+    private const string VIEW_RESOURCE_BASE_NAME = "Nemera.Presentation.Web.Views.Shared.Components.FileSystemBrowser.Default";
+    private const string VIEW_RESOURCE_LOCATION = "Nemera.Presentation.Web";
 
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IStringLocalizer _localizer;

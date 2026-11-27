@@ -1,12 +1,12 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Calibre.Common.Models.DTO.Opf;
+using Nemera.Plugins.Calibre.Common.Models.DTO.Opf;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Plugins.Calibre.Fixtures.Common.Models.DTO.Opf;
+namespace Nemera.Plugins.Calibre.Fixtures.Common.Models.DTO.Opf;
 
 /// <summary>
 /// Fixture class for the <see cref="OpfDocumentDto"/> class.

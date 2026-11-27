@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Scheduling.Commands.StartScheduledJob;
+namespace Nemera.Application.Core.Scheduling.Commands.StartScheduledJob;
 
 /// <summary>
 /// Command for starting the execution cycle of a scheduled job.

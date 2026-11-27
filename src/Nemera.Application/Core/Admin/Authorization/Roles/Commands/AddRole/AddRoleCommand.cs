@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
+namespace Nemera.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
 
 /// <summary>
 /// Command for adding an authorization role.

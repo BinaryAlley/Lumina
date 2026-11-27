@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
+using Nemera.Application.Common.CQRS;
 using System;
 using System.Diagnostics;
 using System.IO;
 #endregion
 
-namespace Lumina.Application.Core.Themes.Management.Commands.InstallTheme;
+namespace Nemera.Application.Core.Themes.Management.Commands.InstallTheme;
 
 /// <summary>
 /// Command for installing a theme pack, replacing the files of an existing theme with the same manifest id.

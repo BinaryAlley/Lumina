@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Plugins.Commands.UpdatePluginSettings;
-using Lumina.Contracts.Fixtures.Core.Requests.Plugins;
-using Lumina.Contracts.Requests.Plugins;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Plugins.UpdatePluginSettings;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Plugins.Commands.UpdatePluginSettings;
+using Nemera.Contracts.Fixtures.Core.Requests.Plugins;
+using Nemera.Contracts.Requests.Plugins;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Plugins.UpdatePluginSettings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Plugins.UpdatePluginSettings;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Plugins.UpdatePluginSettings;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdatePluginSettingsEndpoint"/> class.

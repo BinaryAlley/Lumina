@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Pdf.Core.Pdf;
+using Nemera.Plugins.Pdf.Core.Pdf;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -7,7 +7,7 @@ using System.Runtime.Versioning;
 using System.Threading;
 #endregion
 
-namespace Lumina.Plugins.Pdf.UnitTests.Core.Pdf;
+namespace Nemera.Plugins.Pdf.UnitTests.Core.Pdf;
 
 /// <summary>
 /// Contains unit tests for the <see cref="PdfDocumentParser"/> class.

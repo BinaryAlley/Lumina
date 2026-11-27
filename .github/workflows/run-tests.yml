@@ -26,15 +26,15 @@ jobs:
         run: sudo sysctl -w fs.inotify.max_user_instances=1024 fs.inotify.max_user_watches=524288
       - name: Restore Six Labors license
         shell: bash
-        run: printf '%s\n' "${{ secrets.SIXLABORS_LICENSE_KEY }}" > src/Lumina.Domain/sixlabors.lic
+        run: printf '%s\n' "${{ secrets.SIXLABORS_LICENSE_KEY }}" > src/Nemera.Domain/sixlabors.lic
       - name: Restore dependencies
-        run: dotnet restore src/Lumina.slnx
+        run: dotnet restore src/Nemera.slnx
       - name: Build
-        run: dotnet build src/Lumina.slnx --no-restore -p:SixLaborsLicenseEnforceBuild=true
+        run: dotnet build src/Nemera.slnx --no-restore -p:SixLaborsLicenseEnforceBuild=true
       - name: Run tests
         # Blame-hang terminates a test that blocks for 10 minutes and dumps the hang stack,
         # turning the recurring 'stuck job' into a failing job that names the culprit test.
-        run: dotnet test src/Lumina.slnx --no-build --verbosity normal --blame-hang --blame-hang-timeout 10m
+        run: dotnet test src/Nemera.slnx --no-build --verbosity normal --blame-hang --blame-hang-timeout 10m
       - name: Upload hang diagnostics
         if: failure()
         uses: actions/upload-artifact@v4

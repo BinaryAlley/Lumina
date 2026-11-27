@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Errors;
-using Lumina.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
-using Lumina.Application.Fixtures.Core.Admin.Authorization.Roles.Commands.UpdateRole;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Common.Errors;
+using Nemera.Application.Core.Admin.Authorization.Roles.Commands.UpdateRole;
+using Nemera.Application.Fixtures.Core.Admin.Authorization.Roles.Commands.UpdateRole;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.UpdateRole;
+namespace Nemera.Application.UnitTests.Core.Admin.Authorization.Roles.Commands.UpdateRole;
 
 /// <summary>
 /// Contains unit tests for the <see cref="UpdateRoleCommandValidator"/> class.

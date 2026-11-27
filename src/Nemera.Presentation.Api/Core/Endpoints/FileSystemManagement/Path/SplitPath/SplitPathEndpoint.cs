@@ -1,19 +1,19 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Mapping.FileSystemManagement.Paths;
-using Lumina.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
-using Lumina.Contracts.Requests.FileSystemManagement.Path;
-using Lumina.Contracts.Responses.FileSystemManagement.Path;
-using Lumina.Presentation.Api.Common.Routes.FileSystemManagement;
-using Lumina.Presentation.Api.Core.Endpoints.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Mapping.FileSystemManagement.Paths;
+using Nemera.Application.Core.FileSystemManagement.Paths.Commands.SplitPath;
+using Nemera.Contracts.Requests.FileSystemManagement.Path;
+using Nemera.Contracts.Responses.FileSystemManagement.Path;
+using Nemera.Presentation.Api.Common.Routes.FileSystemManagement;
+using Nemera.Presentation.Api.Core.Endpoints.Common;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.SplitPath;
+namespace Nemera.Presentation.Api.Core.Endpoints.FileSystemManagement.Path.SplitPath;
 
 /// <summary>
 /// API endpoint for the <c>/path/split</c> route.

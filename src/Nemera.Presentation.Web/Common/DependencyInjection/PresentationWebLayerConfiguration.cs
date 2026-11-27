@@ -1,21 +1,21 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Configuration;
-using Lumina.Presentation.Web.Common.Utilities;
+using Nemera.Presentation.Web.Common.DTO.Configuration;
+using Nemera.Presentation.Web.Common.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.DependencyInjection;
+namespace Nemera.Presentation.Web.Common.DependencyInjection;
 
 /// <summary>
-/// Class containing the configuration bindings of the Lumina.Presentation.Web project.
+/// Class containing the configuration bindings of the Nemera.Presentation.Web project.
 /// </summary>
 [ExcludeFromCodeCoverage]
 internal static class PresentationWebLayerConfiguration
 {
     /// <summary>
-    /// Extension method for registering the configuration options of the Lumina.Presentation.Web project into the Dependency Injection container.
+    /// Extension method for registering the configuration options of the Nemera.Presentation.Web project into the Dependency Injection container.
     /// </summary>
     /// <param name="serviceCollection">The <see cref="IServiceCollection"/> to bind the configuration options to.</param>
     /// <param name="configuration">The configuration to be bound.</param>

@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Common.Http;
-using Lumina.Plugins.CoverArtArchive.Common.Models.Contracts.Responses;
-using Lumina.Plugins.CoverArtArchive.Core;
-using Lumina.Plugins.CoverArtArchive.Core.Api;
-using Lumina.Plugins.CoverArtArchive.Core.Settings;
-using Lumina.Plugins.CoverArtArchive.Fixtures.Common.Models.DTO.Settings;
-using Lumina.Plugins.CoverArtArchive.UnitTests.Common.TestHelpers;
+using Nemera.Plugins.Contracts.Common.Http;
+using Nemera.Plugins.CoverArtArchive.Common.Models.Contracts.Responses;
+using Nemera.Plugins.CoverArtArchive.Core;
+using Nemera.Plugins.CoverArtArchive.Core.Api;
+using Nemera.Plugins.CoverArtArchive.Core.Settings;
+using Nemera.Plugins.CoverArtArchive.Fixtures.Common.Models.DTO.Settings;
+using Nemera.Plugins.CoverArtArchive.UnitTests.Common.TestHelpers;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.UnitTests.Core.Api;
+namespace Nemera.Plugins.CoverArtArchive.UnitTests.Core.Api;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CoverArtArchiveHttpClient"/> class.
@@ -403,7 +403,7 @@ public class CoverArtArchiveHttpClientTests
 
         // Assert
         string userAgent = handler.Requests[0].Headers.UserAgent.ToString();
-        Assert.Contains("Lumina-Test/1.0", userAgent);
+        Assert.Contains("Nemera-Test/1.0", userAgent);
         Assert.Contains("contact@example.com", userAgent);
     }
 
@@ -418,7 +418,7 @@ public class CoverArtArchiveHttpClientTests
 
         // Assert
         string userAgent = handler.Requests[0].Headers.UserAgent.ToString();
-        Assert.Equal("Lumina-Test/1.0", userAgent);
+        Assert.Equal("Nemera-Test/1.0", userAgent);
     }
 
     [Fact]
@@ -575,7 +575,7 @@ public class CoverArtArchiveHttpClientTests
     private CoverArtArchiveSettingsProvider CreateSettingsProvider(string? contactEmail)
     {
         return new CoverArtArchiveSettingsProvider(null, CoverArtArchivePlugin.s_pluginId, _coverArtArchiveSettingsDtoFixture.Create(
-            userAgent: "Lumina-Test/1.0",
+            userAgent: "Nemera-Test/1.0",
             contactEmail: contactEmail,
             includeContactEmail: contactEmail is not null,
             minimumRequestInterval: TimeSpan.Zero));

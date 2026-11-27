@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Core.Scheduling.Queries.GetScheduledJobs;
-using Lumina.Contracts.Fixtures.Core.Responses.Scheduling;
-using Lumina.Contracts.Responses.Scheduling;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Presentation.Api.Core.Endpoints.Scheduling.GetScheduledJobs;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Core.Scheduling.Queries.GetScheduledJobs;
+using Nemera.Contracts.Fixtures.Core.Responses.Scheduling;
+using Nemera.Contracts.Responses.Scheduling;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Presentation.Api.Core.Endpoints.Scheduling.GetScheduledJobs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
@@ -14,10 +14,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ApplicationErrors = Lumina.Application.Common.Errors.Errors;
+using ApplicationErrors = Nemera.Application.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.Presentation.Api.UnitTests.Core.Endpoints.Scheduling.GetScheduledJobs;
+namespace Nemera.Presentation.Api.UnitTests.Core.Endpoints.Scheduling.GetScheduledJobs;
 
 /// <summary>
 /// Contains unit tests for the <see cref="GetScheduledJobsEndpoint"/> class.

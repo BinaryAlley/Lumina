@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Contracts.Responses.UsersManagement.Users;
+using Nemera.Contracts.Responses.UsersManagement.Users;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Contracts.Fixtures.Core.Responses.UsersManagement.Users;
+namespace Nemera.Contracts.Fixtures.Core.Responses.UsersManagement.Users;
 
 /// <summary>
 /// Fixture class for the <see cref="UserResponse"/> record.

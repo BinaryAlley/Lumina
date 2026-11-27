@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DTO.MediaLibrary.Management;
-using Lumina.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DTO.MediaLibrary.Management;
+using Nemera.Application.Core.MediaLibrary.Management.Commands.UpdateLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.MediaLibrary.Management.Commands.UpdateLibrary;
+namespace Nemera.Application.Fixtures.Core.MediaLibrary.Management.Commands.UpdateLibrary;
 
 /// <summary>
 /// Fixture class for the <see cref="UpdateLibraryCommand"/> class.

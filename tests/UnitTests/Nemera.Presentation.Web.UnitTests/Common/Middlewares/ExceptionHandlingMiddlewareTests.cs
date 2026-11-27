@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Common;
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Common.Middlewares;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.DTO.Common;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Middlewares;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
@@ -20,7 +20,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.UnitTests.Common.Middlewares;
+namespace Nemera.Presentation.Web.UnitTests.Common.Middlewares;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ExceptionHandlingMiddleware"/> class.

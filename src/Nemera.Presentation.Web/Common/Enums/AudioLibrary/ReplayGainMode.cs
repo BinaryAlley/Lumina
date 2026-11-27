@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Enums.AudioLibrary;
+namespace Nemera.Presentation.Web.Common.Enums.AudioLibrary;
 
 /// <summary>
 /// Enumeration for the ways ReplayGain normalization is applied to the tracks a user plays.

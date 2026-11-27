@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Repositories.MediaLibrary;
-using Lumina.Application.Common.DTO.Filtering;
-using Lumina.Application.Common.DTO.Pagination;
-using Lumina.DataAccess.Common.Persistence;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Repositories.MediaLibrary;
+using Nemera.Application.Common.DTO.Filtering;
+using Nemera.Application.Common.DTO.Pagination;
+using Nemera.DataAccess.Common.Persistence;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,22 +16,22 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Libraries;
+namespace Nemera.DataAccess.Core.Repositories.Libraries;
 
 /// <summary>
 /// Repository for media libraries.
 /// </summary>
 internal sealed class LibraryRepository : ILibraryRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LibraryRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public LibraryRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public LibraryRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -42,11 +42,11 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Created>> InsertAsync(LibraryEntity library, CancellationToken cancellationToken)
     {
-        bool doesLibraryExist = await _luminaDbContext.Libraries.AnyAsync(repositoryLibrary => repositoryLibrary.Id == library.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
+        bool doesLibraryExist = await _nemeraDbContext.Libraries.AnyAsync(repositoryLibrary => repositoryLibrary.Id == library.Id, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (doesLibraryExist)
             return Errors.Library.LibraryAlreadyExists;
 
-        _luminaDbContext.Libraries.Add(library);
+        _nemeraDbContext.Libraries.Add(library);
         return Result.Created;
     }
 
@@ -60,7 +60,7 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a <see cref="LibraryEntity"/> identified by <paramref name="id"/>, or an error.</returns>
     public async Task<Result<LibraryEntity?>> GetByIdAsync(Guid id, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
-        IQueryable<LibraryEntity> query = _luminaDbContext.Libraries;
+        IQueryable<LibraryEntity> query = _nemeraDbContext.Libraries;
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         if (shouldIncludeNavigationProperties)
@@ -78,7 +78,7 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryEntity"/>, or an error.</returns>
     public async Task<Result<IEnumerable<LibraryEntity>>> GetAllEnabledAsync(CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Libraries
+        return await _nemeraDbContext.Libraries
             .Include(library => library.ContentLocations)
             .Include(library => library.PathTemplateParts)
             .AsSplitQuery()
@@ -93,7 +93,7 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a collection of <see cref="LibraryEntity"/>, or an error.</returns>
     public async Task<Result<IEnumerable<LibraryEntity>>> GetAllEnabledAndUnlockedAsync(CancellationToken cancellationToken)
     {
-        return await _luminaDbContext.Libraries
+        return await _nemeraDbContext.Libraries
             .Include(library => library.ContentLocations)
             .Include(library => library.PathTemplateParts)
             .AsSplitQuery()
@@ -118,7 +118,7 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// <returns>An <see cref="Result{TValue}"/> containing either a paginated result of <see cref="LibraryEntity"/>, or an error.</returns>
     public async Task<Result<PaginatedResultDto<LibraryEntity>>> GetAllAsync<TFilter>(PaginationDataDto? paginationData = null, string? sortBy = null, SortOrder? sortOrder = null, TFilter? filterModel = null, bool shouldIncludeNavigationProperties = true, bool shouldTrackEntities = true, CancellationToken cancellationToken = default) where TFilter : BaseFilterDto
     {
-        IQueryable<LibraryEntity> query = _luminaDbContext.Libraries;
+        IQueryable<LibraryEntity> query = _nemeraDbContext.Libraries;
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
         if (shouldIncludeNavigationProperties)
@@ -168,7 +168,7 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Updated>> UpdateAsync(LibraryEntity data, CancellationToken cancellationToken)
     {
-        LibraryEntity? foundLibrary = await _luminaDbContext.Libraries
+        LibraryEntity? foundLibrary = await _nemeraDbContext.Libraries
             .Include(library => library.ContentLocations)
             .Include(library => library.PathTemplateParts)
             .AsSplitQuery()
@@ -177,7 +177,7 @@ internal sealed class LibraryRepository : ILibraryRepository
             return Errors.Library.LibraryNotFound;
 
         // The stored identity is never overwritten by an edit, and the audit columns are only ever written by the auditing interceptor.
-        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundLibrary, data);
+        EditableValuesCopier.CopyEditableValues(_nemeraDbContext, foundLibrary, data);
 
         // A content location is matched by its path. Matched locations keep their identity and the locations that did not change are left exactly as they are stored,
         // so that editing a library never deletes and re-inserts all of its content locations.
@@ -211,7 +211,7 @@ internal sealed class LibraryRepository : ILibraryRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public async Task<Result<Deleted>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        LibraryEntity? library = await _luminaDbContext.Libraries
+        LibraryEntity? library = await _nemeraDbContext.Libraries
             .Include(library => library.ContentLocations)
             .Include(library => library.PathTemplateParts)
             .AsSplitQuery()
@@ -221,7 +221,7 @@ internal sealed class LibraryRepository : ILibraryRepository
         if (library is null)
             return Errors.Library.LibraryNotFound;
 
-        _luminaDbContext.Libraries.Remove(library);
+        _nemeraDbContext.Libraries.Remove(library);
         return Result.Deleted;
     }
 }

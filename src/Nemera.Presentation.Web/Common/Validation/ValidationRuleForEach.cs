@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Primitives;
+using Nemera.Presentation.Web.Common.Primitives;
 using System;
 using System.Collections.Generic;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Validation;
+namespace Nemera.Presentation.Web.Common.Validation;
 
 /// <summary>
 /// Defines a validation rule that evaluates each item within a collection property of an instance.

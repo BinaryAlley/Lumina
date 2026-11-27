@@ -1,4 +1,4 @@
-namespace Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
+namespace Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
 
 /// <summary>
 /// Enumeration for the various sources of audio ratings.
@@ -6,7 +6,7 @@ namespace Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
 public enum AudioRatingSource
 {
     /// <summary>
-    /// Ratings provided by users of the Lumina media library.
+    /// Ratings provided by users of the Nemera media library.
     /// </summary>
     User,
 

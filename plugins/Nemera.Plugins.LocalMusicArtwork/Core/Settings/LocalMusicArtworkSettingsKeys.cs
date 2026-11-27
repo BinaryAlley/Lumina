@@ -1,4 +1,4 @@
-namespace Lumina.Plugins.LocalMusicArtwork.Core.Settings;
+namespace Nemera.Plugins.LocalMusicArtwork.Core.Settings;
 
 /// <summary>
 /// Keys of the settings of the local music artwork plugin, shared by the settings schema and the settings provider.

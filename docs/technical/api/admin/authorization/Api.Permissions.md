@@ -1,6 +1,6 @@
-# Lumina API
+# Nemera API
 
-- [Lumina API](#lumina-api)
+- [Nemera API](#nemera-api)
   - [Permissions](#permissions)
     - [Get Permissions](#get-permissions)
       - [Get Permissions Request](#get-permissions-request)

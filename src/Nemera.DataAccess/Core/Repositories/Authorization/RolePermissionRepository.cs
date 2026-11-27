@@ -1,28 +1,28 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.Common.Primitives;
-using Lumina.Application.Common.DataAccess.Entities.Authorization;
-using Lumina.Application.Common.DataAccess.Repositories.Authorization;
-using Lumina.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Application.Common.DataAccess.Entities.Authorization;
+using Nemera.Application.Common.DataAccess.Repositories.Authorization;
+using Nemera.DataAccess.Core.UoW;
 using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.Authorization;
+namespace Nemera.DataAccess.Core.Repositories.Authorization;
 
 /// <summary>
 /// Repository for authorization role permissions.
 /// </summary>
 internal sealed class RolePermissionRepository : IRolePermissionRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RolePermissionRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public RolePermissionRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public RolePermissionRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -33,7 +33,7 @@ internal sealed class RolePermissionRepository : IRolePermissionRepository
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
     public Task<Result<Created>> InsertAsync(RolePermissionEntity rolePermission, CancellationToken cancellationToken)
     {
-        _luminaDbContext.RolePermissions.Add(rolePermission);
+        _nemeraDbContext.RolePermissions.Add(rolePermission);
         return Task.FromResult(Result.From(Result.Created));
     }
 }

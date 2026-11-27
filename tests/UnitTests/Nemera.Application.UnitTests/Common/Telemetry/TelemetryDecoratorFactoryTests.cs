@@ -1,18 +1,18 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.CQRS;
-using Lumina.Application.Common.Telemetry;
-using Lumina.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
-using Lumina.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
-using Lumina.Contracts.Responses.Authorization;
-using Lumina.Domain.Common.Events;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
+using Nemera.Application.Common.CQRS;
+using Nemera.Application.Common.Telemetry;
+using Nemera.Application.Core.Admin.Authorization.Roles.Commands.AddRole;
+using Nemera.Application.Core.Admin.Authorization.Roles.Queries.GetRolePermissions;
+using Nemera.Contracts.Responses.Authorization;
+using Nemera.Domain.Common.Events;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.Core.BoundedContexts.LibraryManagementBoundedContext.LibraryAggregate.Events;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Telemetry;
+namespace Nemera.Application.UnitTests.Common.Telemetry;
 
 /// <summary>
 /// Contains unit tests for the <see cref="TelemetryDecoratorFactory"/> class.

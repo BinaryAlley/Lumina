@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Validation;
-using Lumina.Infrastructure.Common.Validation;
+using Nemera.Application.Common.Infrastructure.Validation;
+using Nemera.Infrastructure.Common.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Utilities;
+namespace Nemera.Infrastructure.Common.Utilities;
 
 /// <summary>
 /// Extension methods for adding configuration related options services to the DI container via <see cref="OptionsBuilder{TOptions}"/>.

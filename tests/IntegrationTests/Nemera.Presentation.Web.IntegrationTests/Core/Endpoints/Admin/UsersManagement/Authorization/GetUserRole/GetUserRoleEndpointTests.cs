@@ -1,10 +1,10 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Authorization;
-using Lumina.Presentation.Web.Core.Endpoints.Admin.UsersManagement.Authorization.GetUserRole;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.Responses.Authorization;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Web.Common.DTO.Authorization;
+using Nemera.Presentation.Web.Core.Endpoints.Admin.UsersManagement.Authorization.GetUserRole;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.Responses.Authorization;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.IntegrationTests.Common.Setup;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -14,15 +14,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.UsersManagement.Authorization.GetUserRole;
+namespace Nemera.Presentation.Web.IntegrationTests.Core.Endpoints.Admin.UsersManagement.Authorization.GetUserRole;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetUserRoleEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetUserRoleEndpointTests : IClassFixture<LuminaWebFactory>
+public class GetUserRoleEndpointTests : IClassFixture<NemeraWebFactory>
 {
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly GetAuthorizationResponseFixture _getAuthorizationResponseFixture = new();
     private readonly RoleDtoFixture _roleDtoFixture = new();
 
@@ -30,7 +30,7 @@ public class GetUserRoleEndpointTests : IClassFixture<LuminaWebFactory>
     /// Initializes a new instance of the <see cref="GetUserRoleEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public GetUserRoleEndpointTests(LuminaWebFactory apiFactory)
+    public GetUserRoleEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

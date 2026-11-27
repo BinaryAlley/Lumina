@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
-using Lumina.Plugins.Calibre.Common.Models.DTO.Opf;
-using Lumina.Plugins.Calibre.Core.Mapping;
-using Lumina.Plugins.Calibre.Fixtures.Common.Models.DTO.Opf;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Contracts.DTO.MediaLibrary.WrittenContentLibrary.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Plugins.Calibre.Common.Models.DTO.Opf;
+using Nemera.Plugins.Calibre.Core.Mapping;
+using Nemera.Plugins.Calibre.Fixtures.Common.Models.DTO.Opf;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Plugins.Calibre.UnitTests.Core.Mapping;
+namespace Nemera.Plugins.Calibre.UnitTests.Core.Mapping;
 
 /// <summary>
 /// Contains unit tests for the <see cref="CalibreMapper"/> class.

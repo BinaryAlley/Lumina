@@ -1,32 +1,32 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Common.DataAccess.Entities.Common;
-using Lumina.Application.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
-using Lumina.Contracts.DTO.Common;
-using Lumina.Contracts.DTO.MediaContributors;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary;
-using Lumina.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.Common;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaContributors;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary;
-using Lumina.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
-using Lumina.Contracts.Fixtures.Core.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
-using Lumina.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
-using Lumina.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.SharedKernel.Common.Enums.AudioLibrary;
-using Lumina.Domain.SharedKernel.Common.Enums.Common;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaContributors;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Application.Common.DataAccess.Entities.Common;
+using Nemera.Application.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaContributors;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.MediaLibrary.Management;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.UsersManagement;
+using Nemera.Contracts.DTO.Common;
+using Nemera.Contracts.DTO.MediaContributors;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary;
+using Nemera.Contracts.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.Common;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaContributors;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary;
+using Nemera.Contracts.Fixtures.Core.DTO.MediaLibrary.AudioLibrary.MusicLibrary;
+using Nemera.Contracts.Fixtures.Core.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Contracts.Requests.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.Contracts.Responses.MediaLibrary.AudioLibrary.MusicLibrary.Tracks;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.SharedKernel.Common.Enums.AudioLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.Common;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaContributors;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,16 +44,16 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.AddTrack;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Tracks.AddTrack;
 
 /// <summary>
 /// Contains integration tests for the <see cref="AddTrackEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class AddTrackEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
     private HttpClient _client;
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -82,7 +82,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     /// Initializes a new instance of the <see cref="AddTrackEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public AddTrackEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public AddTrackEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _client = apiFactory.CreateClient();
         _apiFactory = apiFactory;
@@ -97,7 +97,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
 
         _libraryId = Guid.NewGuid();
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = dbContext.Users.Single(user => user.Username == _apiFactory.TestUsername).Id;
         dbContext.Libraries.Add(_libraryEntityFixture.Create(id: _libraryId, userId: userId, title: "Queen Library", libraryType: LibraryType.Music, contentLocations: [_libraryContentLocation]));
         await dbContext.SaveChangesAsync();
@@ -276,7 +276,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Assert.Equal(new[] { genreName }, firstTrack.Metadata.Genres!.Select(genre => genre.Name));
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         // Both spellings must collapse into a single row each, keyed by the normalized name.
         Assert.Equal(1, await dbContext.Set<TagEntity>().CountAsync(tag => tag.Name == tagName));
         Assert.Equal(1, await dbContext.Set<GenreEntity>().CountAsync(genre => genre.Name == genreName));
@@ -1009,7 +1009,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     {
         // Arrange
         (Guid artistId, Guid albumId) = await SeedArtistAndAlbumAsync();
-        string pathOutsideTheLibrary = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "..", "lumina-tracks-outside", $"{Guid.NewGuid():N}.flac"));
+        string pathOutsideTheLibrary = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "..", "nemera-tracks-outside", $"{Guid.NewGuid():N}.flac"));
         AddTrackRequest request = _addTrackRequestFixture.Create(path: pathOutsideTheLibrary);
 
         // Act
@@ -1075,7 +1075,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Guid albumId = Guid.NewGuid();
         using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             seedDbContext.Artists.Add(_artistEntityFixture.Create(id: artistId, libraryId: missingLibraryId, name: "Queen", includeAlbums: false, includeContributors: false));
             seedDbContext.Albums.Add(_albumEntityFixture.Create(id: albumId, artistId: artistId, libraryId: missingLibraryId, title: "A Night at the Opera", includeTracks: false, includeMetadata: false));
             await seedDbContext.SaveChangesAsync();
@@ -1114,7 +1114,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
         Guid albumId = Guid.NewGuid();
         using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
         {
-            LuminaDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            NemeraDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<NemeraDbContext>();
             seedDbContext.Libraries.Add(_libraryEntityFixture.Create(id: otherLibraryId, userId: ownerId, title: "Queen Reissues", libraryType: LibraryType.Music, contentLocations: [_libraryContentLocation]));
             seedDbContext.Artists.Add(_artistEntityFixture.Create(id: artistId, libraryId: otherLibraryId, name: "Queen", includeAlbums: false, includeContributors: false));
             seedDbContext.Albums.Add(_albumEntityFixture.Create(id: albumId, artistId: artistId, libraryId: otherLibraryId, title: "News of the World", includeTracks: false, includeMetadata: false));
@@ -1238,7 +1238,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     private async Task<(Guid artistId, Guid albumId)> SeedArtistAndAlbumAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid artistId = Guid.NewGuid();
         Guid albumId = Guid.NewGuid();
         dbContext.Artists.Add(_artistEntityFixture.Create(id: artistId, libraryId: _libraryId, name: "Queen", includeAlbums: false, includeContributors: false));
@@ -1257,7 +1257,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
             return;
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         foreach (Guid contributorId in contributors.Select(contributor => contributor.ContributorId).Distinct())
         {
             if (contributorId == Guid.Empty || await dbContext.MediaContributors.AnyAsync(contributor => contributor.Id == contributorId))
@@ -1274,7 +1274,7 @@ public class AddTrackEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory
     private async Task<(Guid userId, string username)> SeedOtherUserAsync()
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
-        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        NemeraDbContext dbContext = scope.ServiceProvider.GetRequiredService<NemeraDbContext>();
         Guid userId = Guid.NewGuid();
         string username = $"otheruser_{Guid.NewGuid()}";
         dbContext.Users.Add(_userEntityFixture.Create(id: userId, username: username, password: "TestPass123!"));

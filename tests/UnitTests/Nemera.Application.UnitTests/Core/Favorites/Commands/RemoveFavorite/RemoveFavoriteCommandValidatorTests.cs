@@ -1,15 +1,15 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Favorites.Commands.RemoveFavorite;
-using Lumina.Application.Fixtures.Core.Favorites.Commands.RemoveFavorite;
-using Lumina.Application.UnitTests.Common.Setup;
-using Lumina.Domain.Common.Errors;
-using Lumina.Domain.Common.Primitives;
+using Nemera.Application.Core.Favorites.Commands.RemoveFavorite;
+using Nemera.Application.Fixtures.Core.Favorites.Commands.RemoveFavorite;
+using Nemera.Application.UnitTests.Common.Setup;
+using Nemera.Domain.Common.Errors;
+using Nemera.Domain.Common.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Core.Favorites.Commands.RemoveFavorite;
+namespace Nemera.Application.UnitTests.Core.Favorites.Commands.RemoveFavorite;
 
 /// <summary>
 /// Contains unit tests for the <see cref="RemoveFavoriteCommandValidator"/> class.

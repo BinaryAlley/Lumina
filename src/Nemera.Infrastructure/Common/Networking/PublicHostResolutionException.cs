@@ -3,7 +3,7 @@ using System;
 using System.Net.Http;
 #endregion
 
-namespace Lumina.Infrastructure.Common.Networking;
+namespace Nemera.Infrastructure.Common.Networking;
 
 /// <summary>
 /// The exception thrown when the host of an outbound request cannot be resolved.

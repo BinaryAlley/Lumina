@@ -1,8 +1,8 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
+using Nemera.Application.Common.Infrastructure.Authorization.Policies.Common.Base;
 #endregion
 
-namespace Lumina.Application.Common.Infrastructure.Authorization.Policies.ConsumptionActivity;
+namespace Nemera.Application.Common.Infrastructure.Authorization.Policies.ConsumptionActivity;
 
 /// <summary>
 /// Interface for the consumption activity authorization policy.

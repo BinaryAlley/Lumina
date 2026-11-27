@@ -1,16 +1,16 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Plugins.Contracts.Core.Metadata;
-using Lumina.Plugins.Contracts.Core.Plugins;
-using Lumina.Plugins.CoverArtArchive.Common.Models.DTO.Settings;
-using Lumina.Plugins.CoverArtArchive.Core;
-using Lumina.Plugins.CoverArtArchive.Core.Api;
-using Lumina.Plugins.CoverArtArchive.Core.Settings;
+using Nemera.Plugins.Contracts.Core.Metadata;
+using Nemera.Plugins.Contracts.Core.Plugins;
+using Nemera.Plugins.CoverArtArchive.Common.Models.DTO.Settings;
+using Nemera.Plugins.CoverArtArchive.Core;
+using Nemera.Plugins.CoverArtArchive.Core.Api;
+using Nemera.Plugins.CoverArtArchive.Core.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 #endregion
 
-namespace Lumina.Plugins.CoverArtArchive.Common.DependencyInjection;
+namespace Nemera.Plugins.CoverArtArchive.Common.DependencyInjection;
 
 /// <summary>
 /// Utility class for registering the services of the Cover Art Archive artwork provider into the Dependency Injection container.

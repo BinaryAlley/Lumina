@@ -1,5 +1,5 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.DTO.Configuration;
+using Nemera.Presentation.Web.Common.DTO.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using System;
@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.HealthChecks;
+namespace Nemera.Presentation.Web.Common.HealthChecks;
 
 /// <summary>
 /// Health check that verifies the remote API is reachable.

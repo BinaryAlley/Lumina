@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace Lumina.Domain.Common.Events;
+namespace Nemera.Domain.Common.Events;
 
 /// <summary>
 /// Interface defining a domain event.

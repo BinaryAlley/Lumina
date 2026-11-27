@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.PhotoLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.PhotoLibrary;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.UnitTests.Common.Enums.PhotoLibrary;
+namespace Nemera.Domain.SharedKernel.UnitTests.Common.Enums.PhotoLibrary;
 
 /// <summary>
 /// Contains unit tests for the <see cref="ImageType"/> enumeration.

@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using FastEndpoints;
-using Lumina.Contracts.Requests.FileSystemManagement.Directories;
-using Lumina.Contracts.Responses.FileSystemManagement.Directories;
+using Nemera.Contracts.Requests.FileSystemManagement.Directories;
+using Nemera.Contracts.Responses.FileSystemManagement.Directories;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Api.Core.Endpoints.FileSystemManagement.Directories.GetDirectories;
+namespace Nemera.Presentation.Api.Core.Endpoints.FileSystemManagement.Directories.GetDirectories;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="GetDirectoriesEndpoint"/> API endpoint, for OpenAPI.

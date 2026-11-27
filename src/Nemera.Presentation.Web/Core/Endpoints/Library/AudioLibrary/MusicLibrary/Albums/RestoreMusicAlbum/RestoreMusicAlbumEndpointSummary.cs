@@ -3,7 +3,7 @@ using FastEndpoints;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.RestoreMusicAlbum;
+namespace Nemera.Presentation.Web.Core.Endpoints.Library.AudioLibrary.MusicLibrary.Albums.RestoreMusicAlbum;
 
 /// <summary>
 /// Class used for providing a textual description for the <see cref="RestoreMusicAlbumEndpoint"/> endpoint, for OpenAPI.

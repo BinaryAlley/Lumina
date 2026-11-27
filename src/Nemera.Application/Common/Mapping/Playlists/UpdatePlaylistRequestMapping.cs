@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Core.Playlists.Commands.UpdatePlaylist;
-using Lumina.Contracts.Requests.Playlists;
+using Nemera.Application.Core.Playlists.Commands.UpdatePlaylist;
+using Nemera.Contracts.Requests.Playlists;
 #endregion
 
-namespace Lumina.Application.Common.Mapping.Playlists;
+namespace Nemera.Application.Common.Mapping.Playlists;
 
 /// <summary>
 /// Extension methods for converting <see cref="UpdatePlaylistRequest"/>.

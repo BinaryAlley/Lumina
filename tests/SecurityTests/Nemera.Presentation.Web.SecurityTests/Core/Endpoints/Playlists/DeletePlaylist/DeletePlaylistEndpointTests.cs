@@ -1,9 +1,9 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Web.Common.Exceptions;
-using Lumina.Presentation.Web.Core.Endpoints.Playlists.DeletePlaylist;
-using Lumina.Presentation.Web.Fixtures.Common.DTO.Common;
-using Lumina.Presentation.Web.Fixtures.Common.TestHelpers;
-using Lumina.Presentation.Web.SecurityTests.Common.Setup;
+using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Core.Endpoints.Playlists.DeletePlaylist;
+using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
+using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
+using Nemera.Presentation.Web.SecurityTests.Common.Setup;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -16,7 +16,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Playlists.DeletePlaylist;
+namespace Nemera.Presentation.Web.SecurityTests.Core.Endpoints.Playlists.DeletePlaylist;
 
 /// <summary>
 /// Contains security tests for the <see cref="DeletePlaylistEndpoint"/> class.
@@ -26,11 +26,11 @@ namespace Lumina.Presentation.Web.SecurityTests.Core.Endpoints.Playlists.DeleteP
 /// performs no credential comparison, and token or claim correctness does not apply because the Web layer issues no token for this route.
 /// </remarks>
 [ExcludeFromCodeCoverage]
-public class DeletePlaylistEndpointTests : IClassFixture<LuminaWebFactory>, IDisposable
+public class DeletePlaylistEndpointTests : IClassFixture<NemeraWebFactory>, IDisposable
 {
     private const string ZERO_GUID = "00000000-0000-0000-0000-000000000000";
 
-    private readonly LuminaWebFactory _apiFactory;
+    private readonly NemeraWebFactory _apiFactory;
     private readonly ProblemDetailsDtoFixture _problemDetailsDtoFixture = new();
     private readonly string _clientIp;
 
@@ -38,7 +38,7 @@ public class DeletePlaylistEndpointTests : IClassFixture<LuminaWebFactory>, IDis
     /// Initializes a new instance of the <see cref="DeletePlaylistEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected Web application factory.</param>
-    public DeletePlaylistEndpointTests(LuminaWebFactory apiFactory)
+    public DeletePlaylistEndpointTests(NemeraWebFactory apiFactory)
     {
         _apiFactory = apiFactory;
         _clientIp = $"10.{Random.Shared.Next(0, 256)}.{Random.Shared.Next(0, 256)}.{Random.Shared.Next(1, 254)}";
@@ -123,7 +123,7 @@ public class DeletePlaylistEndpointTests : IClassFixture<LuminaWebFactory>, IDis
         Assert.DoesNotContain(payload, string.Join(",", endpointCalls), StringComparison.Ordinal);
         Assert.DoesNotContain(payload, content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -154,7 +154,7 @@ public class DeletePlaylistEndpointTests : IClassFixture<LuminaWebFactory>, IDis
         Assert.All(endpointCalls, endpoint => Assert.StartsWith("users/me/", endpoint, StringComparison.Ordinal));
         Assert.DoesNotContain("test_jwt_token", content, StringComparison.Ordinal);
         Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(" at Lumina", content, StringComparison.Ordinal);
+        Assert.DoesNotContain(" at Nemera", content, StringComparison.Ordinal);
     }
 
     /// <summary>

@@ -2,7 +2,7 @@
 using System.Diagnostics;
 #endregion
 
-namespace Lumina.Presentation.Web.Common.Enums.Playlists;
+namespace Nemera.Presentation.Web.Common.Enums.Playlists;
 
 /// <summary>
 /// Enumeration for the kinds of media a playlist can hold.

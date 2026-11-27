@@ -14,7 +14,7 @@ The media library scan jobs perform bulk data operations that the Entity Framewo
 Bulk inserts through the EF Core change tracker are slow for hundreds of thousands of rows, because every entity is individually tracked and saved. At the target scale (millions of files), the scan pipeline needs a data access path that is not only fast, but also bounded in memory.
 
 ## Decision
-Add the Dapper library to the DataAccess layer, and perform the bulk data operations of the scan jobs with parameterized raw SQL on a dedicated `Microsoft.Data.Sqlite` connection, derived from the connection string of the injected `LuminaDbContext`.
+Add the Dapper library to the DataAccess layer, and perform the bulk data operations of the scan jobs with parameterized raw SQL on a dedicated `Microsoft.Data.Sqlite` connection, derived from the connection string of the injected `NemeraDbContext`.
 
 These operations never touch the Entity Framework change tracker. Reads that are not bulk (for example loading the media library entity) keep using EF Core, and bulk reads use unbuffered, key-set paginated queries to keep the peak memory bounded.
 

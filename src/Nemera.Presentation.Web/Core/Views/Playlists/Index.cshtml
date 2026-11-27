@@ -13,7 +13,7 @@
     /playlists
 *@
 
-@using Lumina.Presentation.Web.Common.Services
+@using Nemera.Presentation.Web.Common.Services
 @using Microsoft.AspNetCore.Mvc.Localization
 @using System
 @using System.Collections.Generic
@@ -182,7 +182,7 @@
                 notificationService.show(strings.deleteFailed, NotificationType.ERROR);
         }
 
-        document.addEventListener('lumina:playlist-updated', handlePlaylistUpdated);
+        document.addEventListener('nemera:playlist-updated', handlePlaylistUpdated);
         if (createPlaylistButton)
             createPlaylistButton.addEventListener('click', openCreatePlaylistAsync);
 
@@ -197,7 +197,7 @@
 
         window.viewCleanups = window.viewCleanups || {};
         window.viewCleanups['@scriptId'] = () => {
-            document.removeEventListener('lumina:playlist-updated', handlePlaylistUpdated);
+            document.removeEventListener('nemera:playlist-updated', handlePlaylistUpdated);
             if (createPlaylistButton)
                 createPlaylistButton.removeEventListener('click', openCreatePlaylistAsync);
             console.log(`Unloaded @scriptId`);

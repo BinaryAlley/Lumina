@@ -1,13 +1,13 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.Plugins;
-using Lumina.Application.Common.Mapping.Plugins;
-using Lumina.Application.Fixtures.Common.DataAccess.Entities.Plugins;
-using Lumina.Contracts.Responses.Plugins;
+using Nemera.Application.Common.DataAccess.Entities.Plugins;
+using Nemera.Application.Common.Mapping.Plugins;
+using Nemera.Application.Fixtures.Common.DataAccess.Entities.Plugins;
+using Nemera.Contracts.Responses.Plugins;
 using System;
 using System.Diagnostics.CodeAnalysis;
 #endregion
 
-namespace Lumina.Application.UnitTests.Common.Mapping.Plugins;
+namespace Nemera.Application.UnitTests.Common.Mapping.Plugins;
 
 /// <summary>
 /// Contains unit tests for the <see cref="LibraryMetadataProviderConfigurationEntityMapping"/> class.

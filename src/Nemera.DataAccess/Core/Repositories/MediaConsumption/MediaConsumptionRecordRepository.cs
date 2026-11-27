@@ -1,20 +1,20 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Application.Common.DataAccess.Entities.MediaConsumption;
-using Lumina.Application.Common.DataAccess.Repositories.MediaConsumption;
-using Lumina.DataAccess.Common.Persistence;
-using Lumina.DataAccess.Core.UoW;
-using Lumina.Domain.Common.Primitives;
-using Lumina.Domain.SharedKernel.Common.Enums.MediaLibrary;
+using Nemera.Application.Common.DataAccess.Entities.MediaConsumption;
+using Nemera.Application.Common.DataAccess.Repositories.MediaConsumption;
+using Nemera.DataAccess.Common.Persistence;
+using Nemera.DataAccess.Core.UoW;
+using Nemera.Domain.Common.Primitives;
+using Nemera.Domain.SharedKernel.Common.Enums.MediaLibrary;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DomainErrors = Lumina.Domain.Common.Errors.Errors;
+using DomainErrors = Nemera.Domain.Common.Errors.Errors;
 #endregion
 
-namespace Lumina.DataAccess.Core.Repositories.MediaConsumption;
+namespace Nemera.DataAccess.Core.Repositories.MediaConsumption;
 
 /// <summary>
 /// Repository for media consumption records.
@@ -24,15 +24,15 @@ namespace Lumina.DataAccess.Core.Repositories.MediaConsumption;
 /// </remarks>
 internal sealed class MediaConsumptionRecordRepository : IMediaConsumptionRecordRepository
 {
-    private readonly LuminaDbContext _luminaDbContext;
+    private readonly NemeraDbContext _nemeraDbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaConsumptionRecordRepository"/> class.
     /// </summary>
-    /// <param name="luminaDbContext">Injected Entity Framework DbContext.</param>
-    public MediaConsumptionRecordRepository(LuminaDbContext luminaDbContext)
+    /// <param name="nemeraDbContext">Injected Entity Framework DbContext.</param>
+    public MediaConsumptionRecordRepository(NemeraDbContext nemeraDbContext)
     {
-        _luminaDbContext = luminaDbContext;
+        _nemeraDbContext = nemeraDbContext;
     }
 
     /// <summary>
@@ -44,7 +44,7 @@ internal sealed class MediaConsumptionRecordRepository : IMediaConsumptionRecord
     public Task<Result<Created>> InsertAsync(MediaConsumptionRecordEntity data, CancellationToken cancellationToken)
     {
         // The handler creates a new session with a newly generated Id, so this always adds a row.
-        _luminaDbContext.MediaConsumptionRecords.Add(data);
+        _nemeraDbContext.MediaConsumptionRecords.Add(data);
         return Task.FromResult<Result<Created>>(Result.Created);
     }
 
@@ -62,7 +62,7 @@ internal sealed class MediaConsumptionRecordRepository : IMediaConsumptionRecord
     public async Task<Result<MediaConsumptionRecordEntity?>> GetByIdForUserAsync(Guid id, Guid userId, bool shouldTrackEntities = true, CancellationToken cancellationToken = default)
     {
         // The user is part of the filter rather than a check performed after the read, so the storage medium never returns a record that belongs to another user in the first place.
-        IQueryable<MediaConsumptionRecordEntity> query = _luminaDbContext.MediaConsumptionRecords
+        IQueryable<MediaConsumptionRecordEntity> query = _nemeraDbContext.MediaConsumptionRecords
             .Where(record => record.Id == id && record.UserId == userId);
         if (!shouldTrackEntities)
             query = query.AsNoTracking();
@@ -79,9 +79,9 @@ internal sealed class MediaConsumptionRecordRepository : IMediaConsumptionRecord
     public async Task<Result<Updated>> UpdateForUserAsync(MediaConsumptionRecordEntity data, Guid userId, CancellationToken cancellationToken)
     {
         // The user is part of both the tracked and the stored lookup, so a caller can never update a record that belongs to another user merely by knowing its Id.
-        MediaConsumptionRecordEntity? foundRecord = _luminaDbContext.MediaConsumptionRecords.Local
+        MediaConsumptionRecordEntity? foundRecord = _nemeraDbContext.MediaConsumptionRecords.Local
             .FirstOrDefault(record => record.Id == data.Id && record.UserId == userId)
-            ?? await _luminaDbContext.MediaConsumptionRecords
+            ?? await _nemeraDbContext.MediaConsumptionRecords
                 .FirstOrDefaultAsync(record => record.Id == data.Id && record.UserId == userId, cancellationToken).ConfigureAwait(false);
         if (foundRecord is null)
             return DomainErrors.MediaConsumption.ConsumptionRecordNotFound;
@@ -99,7 +99,7 @@ internal sealed class MediaConsumptionRecordRepository : IMediaConsumptionRecord
         MediaKind mediaKind = foundRecord.MediaKind;
         DateTime startedOnUtc = foundRecord.StartedOnUtc;
         long version = foundRecord.Version;
-        EditableValuesCopier.CopyEditableValues(_luminaDbContext, foundRecord, data);
+        EditableValuesCopier.CopyEditableValues(_nemeraDbContext, foundRecord, data);
         foundRecord.UserId = storedUserId;
         foundRecord.LibraryId = libraryId;
         foundRecord.MediaItemId = mediaItemId;
@@ -119,14 +119,14 @@ internal sealed class MediaConsumptionRecordRepository : IMediaConsumptionRecord
     public async Task<Result<Deleted>> DeleteForUserAsync(Guid id, Guid userId, CancellationToken cancellationToken)
     {
         // A handler may already have loaded the same record in this unit of work, so the tracked instance is preferred over materializing a second copy.
-        MediaConsumptionRecordEntity? record = _luminaDbContext.MediaConsumptionRecords.Local
+        MediaConsumptionRecordEntity? record = _nemeraDbContext.MediaConsumptionRecords.Local
             .FirstOrDefault(trackedRecord => trackedRecord.Id == id && trackedRecord.UserId == userId)
-            ?? await _luminaDbContext.MediaConsumptionRecords
+            ?? await _nemeraDbContext.MediaConsumptionRecords
                 .FirstOrDefaultAsync(foundRecord => foundRecord.Id == id && foundRecord.UserId == userId, cancellationToken).ConfigureAwait(false);
         if (record is null)
             return Result.Deleted;
 
-        _luminaDbContext.MediaConsumptionRecords.Remove(record);
+        _nemeraDbContext.MediaConsumptionRecords.Remove(record);
         return Result.Deleted;
     }
 
@@ -141,14 +141,14 @@ internal sealed class MediaConsumptionRecordRepository : IMediaConsumptionRecord
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful deletion, or an error.</returns>
     public async Task<Result<Deleted>> DeleteAllByMediaItemIdForUserAsync(Guid userId, MediaKind mediaKind, Guid mediaItemId, Guid libraryId, CancellationToken cancellationToken)
     {
-        List<MediaConsumptionRecordEntity> records = await _luminaDbContext.MediaConsumptionRecords
+        List<MediaConsumptionRecordEntity> records = await _nemeraDbContext.MediaConsumptionRecords
             .Where(record => record.UserId == userId &&
                              record.MediaKind == mediaKind &&
                              record.MediaItemId == mediaItemId &&
                              record.LibraryId == libraryId)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
         if (records.Count > 0)
-            _luminaDbContext.MediaConsumptionRecords.RemoveRange(records);
+            _nemeraDbContext.MediaConsumptionRecords.RemoveRange(records);
         return Result.Deleted;
     }
 
@@ -160,11 +160,11 @@ internal sealed class MediaConsumptionRecordRepository : IMediaConsumptionRecord
     /// <returns>An <see cref="Result{TValue}"/> representing either a successful deletion, or an error.</returns>
     public async Task<Result<Deleted>> DeleteAllForUserAsync(Guid userId, CancellationToken cancellationToken)
     {
-        List<MediaConsumptionRecordEntity> records = await _luminaDbContext.MediaConsumptionRecords
+        List<MediaConsumptionRecordEntity> records = await _nemeraDbContext.MediaConsumptionRecords
             .Where(record => record.UserId == userId)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
         if (records.Count > 0)
-            _luminaDbContext.MediaConsumptionRecords.RemoveRange(records);
+            _nemeraDbContext.MediaConsumptionRecords.RemoveRange(records);
         return Result.Deleted;
     }
 

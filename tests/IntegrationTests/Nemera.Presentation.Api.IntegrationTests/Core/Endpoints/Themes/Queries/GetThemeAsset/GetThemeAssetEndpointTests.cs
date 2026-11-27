@@ -1,6 +1,6 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemeAsset;
-using Lumina.Presentation.Api.IntegrationTests.Common.Setup;
+using Nemera.Presentation.Api.Core.Endpoints.Themes.Queries.GetThemeAsset;
+using Nemera.Presentation.Api.IntegrationTests.Common.Setup;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -11,15 +11,15 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 #endregion
 
-namespace Lumina.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Queries.GetThemeAsset;
+namespace Nemera.Presentation.Api.IntegrationTests.Core.Endpoints.Themes.Queries.GetThemeAsset;
 
 /// <summary>
 /// Contains integration tests for the <see cref="GetThemeAssetEndpoint"/> class.
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class GetThemeAssetEndpointTests : IClassFixture<AuthenticatedLuminaApiFactory>, IAsyncLifetime
+public class GetThemeAssetEndpointTests : IClassFixture<AuthenticatedNemeraApiFactory>, IAsyncLifetime
 {
-    private readonly AuthenticatedLuminaApiFactory _apiFactory;
+    private readonly AuthenticatedNemeraApiFactory _apiFactory;
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -30,7 +30,7 @@ public class GetThemeAssetEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
     /// Initializes a new instance of the <see cref="GetThemeAssetEndpointTests"/> class.
     /// </summary>
     /// <param name="apiFactory">Injected in-memory API factory.</param>
-    public GetThemeAssetEndpointTests(AuthenticatedLuminaApiFactory apiFactory)
+    public GetThemeAssetEndpointTests(AuthenticatedNemeraApiFactory apiFactory)
     {
         _apiFactory = apiFactory;
     }

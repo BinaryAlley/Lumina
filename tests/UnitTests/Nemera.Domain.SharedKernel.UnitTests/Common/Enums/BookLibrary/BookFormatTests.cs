@@ -1,11 +1,11 @@
 #region ========================================================================= USING =====================================================================================
-using Lumina.Domain.SharedKernel.Common.Enums.BookLibrary;
+using Nemera.Domain.SharedKernel.Common.Enums.BookLibrary;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Domain.SharedKernel.UnitTests.Common.Enums.BookLibrary;
+namespace Nemera.Domain.SharedKernel.UnitTests.Common.Enums.BookLibrary;
 
 /// <summary>
 /// Contains unit tests for the <see cref="BookFormat"/> enumeration.

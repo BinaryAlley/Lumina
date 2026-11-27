@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Presentation.Web.Common.DTO.UsersManagement;
-using Lumina.Presentation.Web.Common.Enums.AudioLibrary;
+using Nemera.Presentation.Web.Common.DTO.UsersManagement;
+using Nemera.Presentation.Web.Common.Enums.AudioLibrary;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Presentation.Web.Fixtures.Common.DTO.UsersManagement;
+namespace Nemera.Presentation.Web.Fixtures.Common.DTO.UsersManagement;
 
 /// <summary>
 /// Fixture class for the <see cref="UserSettingsDto"/> class.

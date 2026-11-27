@@ -1,4 +1,4 @@
-﻿namespace Lumina.Presentation.Web.Common.Enums.VideoLibrary;
+﻿namespace Nemera.Presentation.Web.Common.Enums.VideoLibrary;
 
 /// <summary>
 /// Enumeration for the types of video content libraries.

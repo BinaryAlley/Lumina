@@ -1,5 +1,5 @@
-@using Lumina.Presentation.Web.Common.DTO.Common
-@using Lumina.Presentation.Web.Common.Services
+@using Nemera.Presentation.Web.Common.DTO.Common
+@using Nemera.Presentation.Web.Common.Services
 @using Microsoft.Extensions.Localization
 
 @model ErrorViewDto
@@ -8,7 +8,7 @@
 @{
     ViewData["Title"] = "Error";
     var scriptId = ScriptIdentifierHelper.GenerateScriptId();
-    var localizer = _stringLocalizerFactory.Create("Lumina.Presentation.Web.Views.Shared._Layout", "Lumina.Presentation.Web");
+    var localizer = _stringLocalizerFactory.Create("Nemera.Presentation.Web.Views.Shared._Layout", "Nemera.Presentation.Web");
 }
 
 <div style="display: grid; grid-template-rows: auto 1fr;">

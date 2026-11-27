@@ -1,14 +1,14 @@
 #region ========================================================================= USING =====================================================================================
 using Bogus;
-using Lumina.Application.Core.Favorites.Commands.RemoveFavorite;
-using Lumina.Domain.SharedKernel.Common.Enums.Favorites;
+using Nemera.Application.Core.Favorites.Commands.RemoveFavorite;
+using Nemera.Domain.SharedKernel.Common.Enums.Favorites;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 #endregion
 
-namespace Lumina.Application.Fixtures.Core.Favorites.Commands.RemoveFavorite;
+namespace Nemera.Application.Fixtures.Core.Favorites.Commands.RemoveFavorite;
 
 /// <summary>
 /// Fixture class for the <see cref="RemoveFavoriteCommand"/> record.
