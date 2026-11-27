@@ -14,6 +14,7 @@ Content-Type: application/json
   "canDownloadMetadataFromWeb": true,
   "shouldSaveMetadataInMediaDirectories": true,
   "shouldSkipUnchangedDirectoriesDuringScan": true,
+  "shouldSkipHiddenFilesAndDirectoriesDuringScan": false,
   "isContentOnSsd": false,
   "shouldTrackConsumptionProgress": true,
   "completionThresholdPercentage": 100,

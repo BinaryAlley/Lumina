@@ -33,6 +33,7 @@ public class GetEnabledLibrariesEndpointSummary : Summary<GetEnabledLibrariesEnd
         ResponseParam<LibraryResponse>(r => r.CanDownloadMetadataFromWeb, "Whether this media library should update the metadata of its elements from the web, or not.");
         ResponseParam<LibraryResponse>(r => r.ShouldSaveMetadataInMediaDirectories, "Whether this media library should copy the downloaded metadata into the media library content locations, or not.");
         ResponseParam<LibraryResponse>(r => r.ShouldSkipUnchangedDirectoriesDuringScan, "Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.");
+        ResponseParam<LibraryResponse>(r => r.ShouldSkipHiddenFilesAndDirectoriesDuringScan, "Whether this media library should skip hidden files and directories during the scan, or not.");
         ResponseParam<LibraryResponse>(r => r.IsContentOnSsd, "Whether the content of this media library is stored on a solid state drive, in which case the file discovery and content hashing stages read the files in parallel.");
         ResponseParam<LibraryResponse>(r => r.ShouldTrackConsumptionProgress, "Whether the consumption progress of the media library items is tracked.");
         ResponseParam<LibraryResponse>(r => r.CompletionThresholdPercentage, "The percentage of a media library item that must be consumed for its session to be considered completed, when progress tracking is enabled.");
@@ -54,6 +55,7 @@ public class GetEnabledLibrariesEndpointSummary : Summary<GetEnabledLibrariesEnd
                 CanDownloadMetadataFromWeb: true,
                 ShouldSaveMetadataInMediaDirectories: false,
                 ShouldSkipUnchangedDirectoriesDuringScan: false,
+                ShouldSkipHiddenFilesAndDirectoriesDuringScan: false,
                 IsContentOnSsd: false,
                 ShouldTrackConsumptionProgress: true,
                 CompletionThresholdPercentage: 90,
@@ -73,6 +75,7 @@ public class GetEnabledLibrariesEndpointSummary : Summary<GetEnabledLibrariesEnd
                 CanDownloadMetadataFromWeb: true,
                 ShouldSaveMetadataInMediaDirectories: true,
                 ShouldSkipUnchangedDirectoriesDuringScan: false,
+                ShouldSkipHiddenFilesAndDirectoriesDuringScan: false,
                 IsContentOnSsd: false,
                 ShouldTrackConsumptionProgress: true,
                 CompletionThresholdPercentage: 90,

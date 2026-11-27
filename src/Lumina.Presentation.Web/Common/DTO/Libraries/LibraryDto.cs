@@ -64,6 +64,11 @@ public class LibraryDto
     public bool ShouldSkipUnchangedDirectoriesDuringScan { get; set; } = false;
 
     /// <summary>
+    /// Gets or sets whether this media library should skip hidden files and directories during the scan, or not. When absent, the default is off on create, and the stored value is kept on update.
+    /// </summary>
+    public bool? ShouldSkipHiddenFilesAndDirectoriesDuringScan { get; set; }
+
+    /// <summary>
     /// Gets or sets whether the content of this media library is stored on a solid state drive, in which case the file discovery and content hashing stages read the files in parallel.
     /// </summary>
     public bool IsContentOnSsd { get; set; } = false;

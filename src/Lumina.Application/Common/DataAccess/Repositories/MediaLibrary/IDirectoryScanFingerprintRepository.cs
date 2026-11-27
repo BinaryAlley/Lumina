@@ -24,6 +24,14 @@ public interface IDirectoryScanFingerprintRepository : IRepository<DirectoryScan
     Task<Result<Dictionary<string, DirectoryScanFingerprintEntity>>> GetMappedByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Deletes all the directory scan fingerprints of the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The unique identifier of the library whose directory scan fingerprints are deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Inserts or updates the provided directory scan fingerprints in the storage medium.
     /// </summary>
     /// <param name="entities">The directory scan fingerprints to insert or update.</param>

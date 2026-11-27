@@ -189,6 +189,9 @@
   <data name="DescriptionShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Si guardar o no una copia de los metadatos descargados en los directorios de contenido de la biblioteca multimedia. Esto solo tiene efecto si la descarga de metadatos desde la web está activa.</value>
   </data>
+  <data name="DescriptionShouldSkipHiddenFilesAndDirectoriesDuringScan" xml:space="preserve">
+    <value>Cuando está habilitada, los archivos y carpetas ocultos se excluyen de los análisis de esta biblioteca multimedia.</value>
+  </data>
   <data name="DescriptionShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
     <value>Cuando esta opción está habilitada, utiliza los metadatos de los directorios para omitir los directorios que no han cambiado desde el último escaneo. Esto puede acelerar _significativamente_ los escaneos, pero tenga en cuenta que los metadatos de los directorios _no_ cambian/actualizan al editar archivos existentes, solo lo hacen al agregar archivos nuevos o eliminar archivos existentes. Habilite esta opción solo si no modifica archivos existentes.</value>
   </data>
@@ -284,6 +287,9 @@
   </data>
   <data name="ShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Guardar Metadatos En Los Directorios Multimedia</value>
+  </data>
+  <data name="ShouldSkipHiddenFilesAndDirectoriesDuringScan" xml:space="preserve">
+    <value>Omitir Archivos y Carpetas Ocultos Durante el Análisis</value>
   </data>
   <data name="ShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
     <value>Omitir Carpetas Sin Cambios Durante El Escaneo</value>

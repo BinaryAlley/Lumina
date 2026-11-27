@@ -189,6 +189,9 @@
   <data name="DescriptionShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Чи зберігати копію завантажених метаданих у каталогах вмісту медіатеки чи ні. Це діє лише якщо активне завантаження метаданих з інтернету.</value>
   </data>
+  <data name="DescriptionShouldSkipHiddenFilesAndDirectoriesDuringScan" xml:space="preserve">
+    <value>Коли ввімкнено, приховані файли та папки не включаються до сканування цієї медіатеки.</value>
+  </data>
   <data name="DescriptionShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
     <value>Під час увімкнення цієї опції використовуються метадані каталогів, щоб пропускати каталоги, які не змінювалися з моменту останнього сканування. Це може _значно_ прискорити сканування, але врахуйте, що метадані каталогів _не_ змінюються/оновлюються під час редагування наявних файлів, а лише під час додавання нових або видалення наявних. Вмикайте цю опцію лише в тому випадку, якщо ви не змінюєте наявні файли.</value>
   </data>
@@ -284,6 +287,9 @@
   </data>
   <data name="ShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Зберігати метадані в каталогах медіафайлів</value>
+  </data>
+  <data name="ShouldSkipHiddenFilesAndDirectoriesDuringScan" xml:space="preserve">
+    <value>Пропускати Приховані Файли та Папки Під Час Сканування</value>
   </data>
   <data name="ShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
     <value>Пропускати незмінені папки під час сканування</value>

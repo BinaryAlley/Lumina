@@ -96,8 +96,13 @@ public class BooksFileSystemDiscoveryJobTests
         using TemporaryLibraryDirectory temporaryLibraryDirectory = new();
         temporaryLibraryDirectory.CreateFile("book1.pdf", "book content");
         temporaryLibraryDirectory.CreateFile("notes.log", "not a book");
+        temporaryLibraryDirectory.CreateFile(".hidden.pdf", "hidden book content");
+        SetHiddenAttribute(Path.Combine(temporaryLibraryDirectory.Path, ".hidden.pdf"));
         string subdirectoryPath = temporaryLibraryDirectory.CreateSubdirectory("sub");
         File.WriteAllText(Path.Combine(subdirectoryPath, "book2.epub"), "another book content");
+        string hiddenSubdirectoryPath = temporaryLibraryDirectory.CreateSubdirectory(".hidden");
+        SetHiddenAttribute(hiddenSubdirectoryPath);
+        File.WriteAllText(Path.Combine(hiddenSubdirectoryPath, "hidden.epub"), "hidden book content");
 
         LibraryEntity libraryEntity = _libraryEntityFixture.Create(
             id: _libraryId.Value,
@@ -125,10 +130,51 @@ public class BooksFileSystemDiscoveryJobTests
             .FirstOrDefault();
         Assert.True(actualEntities is not null, $"InsertRangeAsync was not called. Received: {string.Join(", ", _mockStagingResultsRepository.ReceivedCalls().Select(call => call.GetMethodInfo().Name))}");
         Assert.Equal(
-            ["book1.pdf", "book2.epub"],
+            [".hidden.pdf", "book1.pdf", "book2.epub", "hidden.epub"],
             actualEntities!.Select(entity => Path.GetFileName(entity.Path)).OrderBy(name => name, StringComparer.Ordinal));
         await _mockDirectoryScanFingerprintRepository.DidNotReceive().UpsertRangeAsync(Arg.Any<IReadOnlyCollection<DirectoryScanFingerprintEntity>>(), Arg.Any<CancellationToken>());
         await _mockDomainEventPublisher.Received(1).PublishAsync(Arg.Is<LibraryScanProgressChangedDomainEvent>(domainEvent => domainEvent.LibraryId == _libraryId), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenHiddenFilesAndDirectoriesAreSkipped_ShouldNotDiscoverThem()
+    {
+        // Arrange
+        using TemporaryLibraryDirectory temporaryLibraryDirectory = new();
+        temporaryLibraryDirectory.CreateFile("visible.pdf", "visible book content");
+        temporaryLibraryDirectory.CreateFile(".hidden.pdf", "hidden book content");
+        string hiddenFileName = Path.Combine(temporaryLibraryDirectory.Path, ".hidden.pdf");
+        SetHiddenAttribute(hiddenFileName);
+
+        string visibleSubdirectoryPath = temporaryLibraryDirectory.CreateSubdirectory("visible");
+        File.WriteAllText(Path.Combine(visibleSubdirectoryPath, "nested.epub"), "nested book content");
+
+        string hiddenSubdirectoryPath = temporaryLibraryDirectory.CreateSubdirectory(".hidden");
+        SetHiddenAttribute(hiddenSubdirectoryPath);
+        File.WriteAllText(Path.Combine(hiddenSubdirectoryPath, "secret.epub"), "secret book content");
+
+        LibraryEntity libraryEntity = _libraryEntityFixture.Create(
+            id: _libraryId.Value,
+            userId: _userId.Value,
+            title: "Test Library",
+            libraryType: LibraryType.Book,
+            contentLocations: [temporaryLibraryDirectory.Path],
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: true);
+        _mockLibraryRepository.GetByIdAsync(_libraryId.Value, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(libraryEntity));
+        _mockStagingResultsRepository.InsertRangeAsync(Arg.Any<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(), Arg.Any<CancellationToken>())
+            .Returns(Result.From(Result.Created));
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+        await _mockStagingResultsRepository.Received(1).InsertRangeAsync(
+            Arg.Is<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(entities =>
+                entities.Count == 2
+                && entities.Select(entity => Path.GetFileName(entity.Path)).OrderBy(name => name, StringComparer.Ordinal).SequenceEqual(new[] { "nested.epub", "visible.pdf" })),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -308,6 +354,16 @@ public class BooksFileSystemDiscoveryJobTests
         // Assert
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
         await mockChild.Received(1).ExecuteAsync(Arg.Any<Guid>(), Arg.Is<object>(executedInput => executedInput == input), Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>
+    /// Marks the file system entry at <paramref name="path"/> as hidden on Windows, where the dot prefix alone is not enough.
+    /// </summary>
+    /// <param name="path">The path of the file or directory to mark as hidden.</param>
+    private static void SetHiddenAttribute(string path)
+    {
+        if (OperatingSystem.IsWindows())
+            File.SetAttributes(path, File.GetAttributes(path) | FileAttributes.Hidden);
     }
 
     /// <summary>

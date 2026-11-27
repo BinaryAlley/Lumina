@@ -114,6 +114,13 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
             !await _authorizationService.HasPermissionAsync(userId, AuthorizationPermission.CanCreateLibraries, cancellationToken).ConfigureAwait(false))
             return ApplicationErrors.Authorization.NotAuthorized;
         bool hasProviderChoices = command.MetadataProviders is not null || command.ArtworkProviders is not null || command.BookReaders is not null;
+        // A missing hidden files setting keeps the stored one, so that a partial update never silently turns it off.
+        bool shouldSkipHiddenFilesAndDirectoriesDuringScan = command.ShouldSkipHiddenFilesAndDirectoriesDuringScan ?? getLibraryResult.Value.ShouldSkipHiddenFilesAndDirectoriesDuringScan;
+        // The directory scan fingerprints are only valid for the scan scope that produced them, so changing either scan scope setting
+        // discards them, forcing the next scan to read the whole library instead of skipping directories that are no longer in scope.
+        bool areScanScopeSettingsChanged =
+            getLibraryResult.Value.ShouldSkipUnchangedDirectoriesDuringScan != command.ShouldSkipUnchangedDirectoriesDuringScan ||
+            getLibraryResult.Value.ShouldSkipHiddenFilesAndDirectoriesDuringScan != shouldSkipHiddenFilesAndDirectoriesDuringScan;
 
         // Make sure the file is an actual supported image, but only when a new cover image was chosen; the stored cover image is
         // relative to the application base directory and is already validated, so it must not block saving unrelated changes.
@@ -173,6 +180,7 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
             command.CanDownloadMetadataFromWeb,
             command.ShouldSaveMetadataInMediaDirectories,
             command.ShouldSkipUnchangedDirectoriesDuringScan,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan,
             command.IsContentOnSsd,
             consumptionSettings,
             pathTemplateResult.Value,
@@ -189,6 +197,12 @@ public class UpdateLibraryCommandHandler : ICommandHandler<UpdateLibraryCommand,
         Result<Updated> updateLibraryResult = await _unitOfWork.LibraryRepository.UpdateAsync(persistenceLibrary, cancellationToken).ConfigureAwait(false);
         if (updateLibraryResult.IsFailure)
             return updateLibraryResult.Errors;
+        if (areScanScopeSettingsChanged)
+        {
+            Result<Deleted> deleteDirectoryScanFingerprintsResult = await _unitOfWork.DirectoryScanFingerprintRepository.DeleteByLibraryIdAsync(command.Id, cancellationToken).ConfigureAwait(false);
+            if (deleteDirectoryScanFingerprintsResult.IsFailure)
+                return deleteDirectoryScanFingerprintsResult.Errors;
+        }
         bool isLibraryTypeChanged = getLibraryResult.Value.LibraryType != newLibraryType;
         if (isLibraryTypeChanged || hasProviderChoices)
         {

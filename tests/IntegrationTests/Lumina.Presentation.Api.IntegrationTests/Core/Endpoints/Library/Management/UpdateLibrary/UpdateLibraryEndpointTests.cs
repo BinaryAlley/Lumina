@@ -41,6 +41,7 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
     };
     private readonly LibraryEntityFixture _libraryEntityFixture = new();
+    private readonly DirectoryScanFingerprintEntityFixture _directoryScanFingerprintEntityFixture = new();
     private readonly UpdateLibraryRequestFixture _updateLibraryRequestFixture = new();
     private readonly LibraryProviderSelectionRequestFixture _libraryProviderSelectionRequestFixture = new();
 
@@ -69,6 +70,12 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         Guid userId = GetCurrentUserId();
         Guid libraryId = Guid.NewGuid();
         await SeedLibraryAsync(libraryId, userId, "Original Title");
+        using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
+        {
+            LuminaDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            seedDbContext.DirectoryScanFingerprints.Add(_directoryScanFingerprintEntityFixture.Create(libraryId: libraryId, path: "/fingerprint"));
+            await seedDbContext.SaveChangesAsync();
+        }
         UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
             id: libraryId,
             title: "Updated Title",
@@ -79,7 +86,8 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
             isLocked: false,
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
-            shouldSkipUnchangedDirectoriesDuringScan: true
+            shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: true
         );
 
         // Act
@@ -91,12 +99,66 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         LibraryResponse? library = await response.Content.ReadFromJsonAsync<LibraryResponse>(_jsonOptions);
         Assert.NotNull(library);
         Assert.Equal("Updated Title", library!.Title);
+        Assert.True(library.ShouldSkipHiddenFilesAndDirectoriesDuringScan);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(lib => lib.Id == libraryId);
         Assert.NotNull(storedLibrary);
         Assert.Equal("Updated Title", storedLibrary!.Title);
+        Assert.True(storedLibrary.ShouldSkipHiddenFilesAndDirectoriesDuringScan);
+        Assert.False(await dbContext.DirectoryScanFingerprints.AnyAsync(fingerprint => fingerprint.LibraryId == libraryId));
+    }
+
+    [Fact]
+    public async Task UpdateLibrary_WhenHiddenFilesSettingIsAbsent_ShouldKeepTheStoredValue()
+    {
+        // Arrange
+        Guid userId = GetCurrentUserId();
+        Guid libraryId = Guid.NewGuid();
+        await SeedLibraryAsync(libraryId, userId, "Original Title", shouldSkipHiddenFilesAndDirectoriesDuringScan: true);
+        using (IServiceScope seedScope = _apiFactory.Services.CreateScope())
+        {
+            LuminaDbContext seedDbContext = seedScope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+            seedDbContext.DirectoryScanFingerprints.Add(_directoryScanFingerprintEntityFixture.Create(libraryId: libraryId, path: "/fingerprint"));
+            await seedDbContext.SaveChangesAsync();
+        }
+        Dictionary<string, object?> request = new()
+        {
+            ["id"] = libraryId,
+            ["title"] = "Updated Title",
+            ["libraryType"] = "EBook",
+            ["contentLocations"] = new[] { "C:/Media" },
+            ["coverImage"] = null,
+            ["isEnabled"] = true,
+            ["isLocked"] = false,
+            ["canDownloadMetadataFromWeb"] = true,
+            ["shouldSaveMetadataInMediaDirectories"] = false,
+            ["shouldSkipUnchangedDirectoriesDuringScan"] = false,
+            ["isContentOnSsd"] = false,
+            ["shouldTrackConsumptionProgress"] = null,
+            ["completionThresholdPercentage"] = null,
+            ["pathTemplateParts"] = null,
+            ["metadataProviders"] = null,
+            ["artworkProviders"] = null,
+            ["bookReaders"] = null
+        };
+
+        // Act
+        HttpResponseMessage response = await _client.PutAsJsonAsync($"/api/v1/libraries/{libraryId}", request);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        LibraryResponse? library = await response.Content.ReadFromJsonAsync<LibraryResponse>(_jsonOptions);
+        Assert.NotNull(library);
+        Assert.True(library!.ShouldSkipHiddenFilesAndDirectoriesDuringScan);
+
+        using IServiceScope scope = _apiFactory.Services.CreateScope();
+        LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
+        LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(lib => lib.Id == libraryId);
+        Assert.NotNull(storedLibrary);
+        Assert.True(storedLibrary!.ShouldSkipHiddenFilesAndDirectoriesDuringScan);
+        Assert.True(await dbContext.DirectoryScanFingerprints.AnyAsync(fingerprint => fingerprint.LibraryId == libraryId));
     }
 
     [Fact]
@@ -473,7 +535,8 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
         Guid userId,
         string title,
         bool shouldTrackConsumptionProgress = false,
-        int? completionThresholdPercentage = null)
+        int? completionThresholdPercentage = null,
+        bool shouldSkipHiddenFilesAndDirectoriesDuringScan = false)
     {
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
@@ -483,6 +546,7 @@ public class UpdateLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFa
             title: title,
             libraryType: LibraryType.EBook,
             contentLocations: [],
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: shouldSkipHiddenFilesAndDirectoriesDuringScan,
             shouldTrackConsumptionProgress: shouldTrackConsumptionProgress,
             completionThresholdPercentage: completionThresholdPercentage));
         await dbContext.SaveChangesAsync();

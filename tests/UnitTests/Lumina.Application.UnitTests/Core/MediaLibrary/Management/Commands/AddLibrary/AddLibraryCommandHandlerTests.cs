@@ -115,6 +115,25 @@ public class AddLibraryCommandHandlerTests
     }
 
     [Fact]
+    public async Task HandleAsync_WhenHiddenFilesSettingIsAbsent_ShouldDefaultToNotSkippingHiddenFiles()
+    {
+        // Arrange
+        AddLibraryCommand command = _addLibraryCommandFixture.Create(shouldSkipHiddenFilesAndDirectoriesDuringScan: null);
+        LibraryEntity persistedLibrary = _libraryEntityFixture.Create(userId: _userId);
+        _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(persistedLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).InsertAsync(
+            Arg.Is<LibraryEntity>(library => !library.ShouldSkipHiddenFilesAndDirectoriesDuringScan),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task HandleAsync_WhenThresholdIsSuppliedWhileEffectiveTrackingIsOff_ShouldReturnThresholdMustBeNullError()
     {
         // Arrange

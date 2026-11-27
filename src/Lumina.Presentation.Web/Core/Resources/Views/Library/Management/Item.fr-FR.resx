@@ -189,6 +189,9 @@
   <data name="DescriptionShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Si une copie des métadonnées téléchargées doit être sauvegardée dans les répertoires de contenu de la médiathèque ou non. Ceci n'a d'effet que si le téléchargement des métadonnées depuis le web est actif.</value>
   </data>
+  <data name="DescriptionShouldSkipHiddenFilesAndDirectoriesDuringScan" xml:space="preserve">
+    <value>Lorsque cette option est activée, les fichiers et dossiers cachés sont exclus des analyses de cette bibliothèque multimédia.</value>
+  </data>
   <data name="DescriptionShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
     <value>Lorsque cette option est activée, elle utilise les métadonnées des dossiers pour ignorer les dossiers qui n'ont pas changé depuis la dernière analyse. Cela peut accélérer _considérablement_ les analyses, mais sachez que les métadonnées des dossiers _ne_ changent/mettent _pas_ à jour lors de la modification de fichiers existants, seulement lors de l'ajout de nouveaux fichiers ou de la suppression de fichiers existants. N'activez cette option que si vous ne modifiez pas les fichiers existants.</value>
   </data>
@@ -284,6 +287,9 @@
   </data>
   <data name="ShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Sauvegarder Les Métadonnées Dans Les Répertoires Média</value>
+  </data>
+  <data name="ShouldSkipHiddenFilesAndDirectoriesDuringScan" xml:space="preserve">
+    <value>Ignorer Les Fichiers Et Dossiers Cachés Lors De L'Analyse</value>
   </data>
   <data name="ShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
     <value>Ignorer Les Dossiers Inchangés Lors De L'Analyse</value>

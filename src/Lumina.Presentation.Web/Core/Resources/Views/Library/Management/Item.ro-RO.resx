@@ -189,6 +189,9 @@
   <data name="DescriptionShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Dacă se salvează sau nu o copie a metadatelor descărcate în directoarele cu conținut ale bibliotecii media. Acest lucru are efect doar dacă descărcarea metadatelor de pe web este activă.</value>
   </data>
+  <data name="DescriptionShouldSkipHiddenFilesAndDirectoriesDuringScan" xml:space="preserve">
+    <value>Când este activată, fișierele și dosarele ascunse sunt excluse din scanările acestei biblioteci media.</value>
+  </data>
   <data name="DescriptionShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
     <value>Când această opțiune este activată, folosește metadatele directorului pentru a sări peste directoarele care nu s-au schimbat de la ultima scanare. Acest lucru poate accelera _semnificativ_ scanările, dar rețineți că metadatele directoarelor _nu_ se schimbă/actualizează atunci când editați fișiere existente, se schimbă doar atunci când adăugați fișiere noi sau ștergeți fișiere existente. Activați această opțiune numai dacă nu modificați fișierele existente.</value>
   </data>
@@ -284,6 +287,9 @@
   </data>
   <data name="ShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Salvează Metadatele În Directoarele Media</value>
+  </data>
+  <data name="ShouldSkipHiddenFilesAndDirectoriesDuringScan" xml:space="preserve">
+    <value>Omite Fișierele și Dosarele Ascunse În Timpul Scanării</value>
   </data>
   <data name="ShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
     <value>Sari Peste Directorarele Neschimbate În Timpul Scanării</value>

@@ -25,8 +25,15 @@ public class LibraryDtoFixture
     /// <param name="libraryType">Optional type of the library.</param>
     /// <param name="isEnabled">Whether the media library is enabled or not.</param>
     /// <param name="contentLocations">Optional collection of directories that contain the library files.</param>
+    /// <param name="shouldSkipHiddenFilesAndDirectoriesDuringScan">Optional. Whether hidden files and directories should be skipped during the scan, or not.</param>
     /// <returns>A configured <see cref="LibraryDto"/> instance.</returns>
-    public LibraryDto Create(Guid? id = null, string? title = null, string? libraryType = null, bool? isEnabled = null, List<string>? contentLocations = null)
+    public LibraryDto Create(
+        Guid? id = null,
+        string? title = null,
+        string? libraryType = null,
+        bool? isEnabled = null,
+        List<string>? contentLocations = null,
+        bool? shouldSkipHiddenFilesAndDirectoriesDuringScan = null)
     {
         return new LibraryDto
         {
@@ -35,7 +42,8 @@ public class LibraryDtoFixture
             LibraryType = libraryType ?? _faker.PickRandom("Book", "Video", "Photo"),
             CoverImage = _faker.Image.PicsumUrl(),
             ContentLocations = contentLocations ?? [_faker.System.DirectoryPath()],
-            IsEnabled = isEnabled ?? _faker.Random.Bool()
+            IsEnabled = isEnabled ?? _faker.Random.Bool(),
+            ShouldSkipHiddenFilesAndDirectoriesDuringScan = shouldSkipHiddenFilesAndDirectoriesDuringScan ?? _faker.Random.Bool()
         };
     }
 

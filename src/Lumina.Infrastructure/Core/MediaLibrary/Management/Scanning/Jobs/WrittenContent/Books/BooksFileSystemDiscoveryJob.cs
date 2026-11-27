@@ -41,9 +41,15 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
         ],
         StringComparer.OrdinalIgnoreCase
     );
-    private static readonly EnumerationOptions s_enumerationOptions = new()
+    private static readonly EnumerationOptions s_includingHiddenEnumerationOptions = new()
     {
         AttributesToSkip = FileAttributes.None, // Hidden files and directories are included in the discovery.
+        IgnoreInaccessible = true,
+        RecurseSubdirectories = false
+    };
+    private static readonly EnumerationOptions s_skippingHiddenEnumerationOptions = new()
+    {
+        AttributesToSkip = FileAttributes.Hidden,
         IgnoreInaccessible = true,
         RecurseSubdirectories = false
     };
@@ -134,6 +140,7 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
 
                     await DiscoverContentLocationAsync(
                         contentLocation.Path,
+                        domainLibraryResult.Value.ShouldSkipHiddenFilesAndDirectoriesDuringScan,
                         fingerprintsByPath is not null,
                         shouldParallelizeReads,
                         fingerprintsByPath,
@@ -195,6 +202,7 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
     /// Discovers the book files of a content location of the media library, using a breadth-first traversal, and writes them in batches to the staging results.
     /// </summary>
     /// <param name="rootDirectoryPath">The path of the root directory from which to start collecting files.</param>
+    /// <param name="shouldSkipHiddenFilesAndDirectories">Whether to skip hidden files and directories, or not.</param>
     /// <param name="shouldSkipUnchangedDirectories">Whether to skip the directories whose last write time has not changed since the last scan, or not.</param>
     /// <param name="shouldParallelizeReads">Whether the file system reads should run in parallel, which benefits solid state drives.</param>
     /// <param name="fingerprintsByPath">The directory scan fingerprints of the library, mapped by the directory path. Can be <see langword="null"/> when the fast skip is disabled.</param>
@@ -209,6 +217,7 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private async Task DiscoverContentLocationAsync(
         string rootDirectoryPath,
+        bool shouldSkipHiddenFilesAndDirectories,
         bool shouldSkipUnchangedDirectories,
         bool shouldParallelizeReads,
         Dictionary<string, DirectoryScanFingerprintEntity>? fingerprintsByPath,
@@ -218,6 +227,9 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
         IDirectoryScanFingerprintRepository directoryScanFingerprintRepository,
         CancellationToken cancellationToken)
     {
+        EnumerationOptions enumerationOptions = shouldSkipHiddenFilesAndDirectories
+            ? s_skippingHiddenEnumerationOptions
+            : s_includingHiddenEnumerationOptions;
         Queue<DirectoryInfo> directoryQueue = new();
         directoryQueue.Enqueue(new DirectoryInfo(rootDirectoryPath));
 
@@ -257,7 +269,7 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
             IEnumerable<FileInfo>? files = null;
             try
             {
-                files = currentDirectory.EnumerateFiles("*", s_enumerationOptions)
+                files = currentDirectory.EnumerateFiles("*", enumerationOptions)
                     .Where(file => s_bookExtensions.Contains(file.Extension));
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -300,7 +312,7 @@ internal sealed class BooksFileSystemDiscoveryJob : MediaLibraryScanJob, IBooksF
             IEnumerable<DirectoryInfo>? subdirectories = null;
             try
             {
-                subdirectories = currentDirectory.EnumerateDirectories("*", s_enumerationOptions);
+                subdirectories = currentDirectory.EnumerateDirectories("*", enumerationOptions);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {

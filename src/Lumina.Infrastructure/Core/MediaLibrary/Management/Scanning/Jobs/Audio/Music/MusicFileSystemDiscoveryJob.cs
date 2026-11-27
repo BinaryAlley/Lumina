@@ -133,6 +133,7 @@ internal sealed class MusicFileSystemDiscoveryJob : MediaLibraryScanJob, IMusicF
                         contentLocation.Path,
                         fileProviderService,
                         directoryProviderService,
+                        domainLibraryResult.Value.ShouldSkipHiddenFilesAndDirectoriesDuringScan,
                         fingerprintsByPath is not null,
                         shouldParallelizeReads,
                         fingerprintsByPath,
@@ -196,6 +197,7 @@ internal sealed class MusicFileSystemDiscoveryJob : MediaLibraryScanJob, IMusicF
     /// <param name="rootDirectoryPath">The path of the root directory from which to start collecting files.</param>
     /// <param name="fileProviderService">The service used to enumerate the files of a directory.</param>
     /// <param name="directoryProviderService">The service used to enumerate the subdirectories of a directory.</param>
+    /// <param name="shouldSkipHiddenFilesAndDirectories">Whether to skip hidden files and directories, or not.</param>
     /// <param name="shouldSkipUnchangedDirectories">Whether to skip the directories whose last write time has not changed since the last scan, or not.</param>
     /// <param name="shouldParallelizeReads">Whether the file system reads should run in parallel, which benefits solid state drives.</param>
     /// <param name="fingerprintsByPath">The directory scan fingerprints of the library, mapped by the directory path. Can be <see langword="null"/> when the fast skip is disabled.</param>
@@ -212,6 +214,7 @@ internal sealed class MusicFileSystemDiscoveryJob : MediaLibraryScanJob, IMusicF
         string rootDirectoryPath,
         IFileProviderService fileProviderService,
         IDirectoryProviderService directoryProviderService,
+        bool shouldSkipHiddenFilesAndDirectories,
         bool shouldSkipUnchangedDirectories,
         bool shouldParallelizeReads,
         Dictionary<string, DirectoryScanFingerprintEntity>? fingerprintsByPath,
@@ -265,7 +268,7 @@ internal sealed class MusicFileSystemDiscoveryJob : MediaLibraryScanJob, IMusicF
             }
 
             // Process the files of the current directory.
-            Result<IEnumerable<FileSystemPathId>> getFilesResult = fileProviderService.GetFilePaths(currentDirectory, true);
+            Result<IEnumerable<FileSystemPathId>> getFilesResult = fileProviderService.GetFilePaths(currentDirectory, !shouldSkipHiddenFilesAndDirectories);
             if (getFilesResult.IsSuccess)
             {
                 if (shouldParallelizeReads)
@@ -291,7 +294,7 @@ internal sealed class MusicFileSystemDiscoveryJob : MediaLibraryScanJob, IMusicF
             }
 
             // Process the subdirectories - each new subdirectory is added to the same queue, for later processing.
-            Result<IEnumerable<FileSystemPathId>> getSubdirectoriesResult = directoryProviderService.GetSubdirectoryPaths(currentDirectory, true);
+            Result<IEnumerable<FileSystemPathId>> getSubdirectoriesResult = directoryProviderService.GetSubdirectoryPaths(currentDirectory, !shouldSkipHiddenFilesAndDirectories);
             if (getSubdirectoriesResult.IsSuccess)
             {
                 foreach (FileSystemPathId subdirectory in getSubdirectoriesResult.Value)

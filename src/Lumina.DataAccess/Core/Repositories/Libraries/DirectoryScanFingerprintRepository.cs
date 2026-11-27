@@ -56,6 +56,20 @@ internal sealed class DirectoryScanFingerprintRepository : IDirectoryScanFingerp
     }
 
     /// <summary>
+    /// Deletes all the directory scan fingerprints of the media library identified by <paramref name="libraryId"/>.
+    /// </summary>
+    /// <param name="libraryId">The unique identifier of the library whose directory scan fingerprints are deleted.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    /// <returns>An <see cref="Result{TValue}"/> representing either a successful operation, or an error.</returns>
+    public async Task<Result<Deleted>> DeleteByLibraryIdAsync(Guid libraryId, CancellationToken cancellationToken)
+    {
+        await _luminaDbContext.DirectoryScanFingerprints
+            .Where(fingerprint => fingerprint.LibraryId == libraryId)
+            .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
+        return Result.Deleted;
+    }
+
+    /// <summary>
     /// Inserts or updates the provided directory scan fingerprints in the storage medium.
     /// </summary>
     /// <param name="entities">The directory scan fingerprints to insert or update.</param>

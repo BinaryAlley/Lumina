@@ -71,7 +71,8 @@ public class AddLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
             isLocked: false,
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
-            shouldSkipUnchangedDirectoriesDuringScan: true
+            shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: true
         );
 
         // Act
@@ -83,12 +84,14 @@ public class AddLibraryEndpointTests : IClassFixture<AuthenticatedLuminaApiFacto
         Assert.NotNull(library);
         Assert.Equal("New Library", library!.Title);
         Assert.Equal(LibraryType.EBook, library.LibraryType);
+        Assert.True(library.ShouldSkipHiddenFilesAndDirectoriesDuringScan);
 
         using IServiceScope scope = _apiFactory.Services.CreateScope();
         LuminaDbContext dbContext = scope.ServiceProvider.GetRequiredService<LuminaDbContext>();
         LibraryEntity? storedLibrary = await dbContext.Libraries.FirstOrDefaultAsync(lib => lib.Id == library.Id);
         Assert.NotNull(storedLibrary);
         Assert.Equal("New Library", storedLibrary!.Title);
+        Assert.True(storedLibrary.ShouldSkipHiddenFilesAndDirectoriesDuringScan);
     }
 
     [Fact]

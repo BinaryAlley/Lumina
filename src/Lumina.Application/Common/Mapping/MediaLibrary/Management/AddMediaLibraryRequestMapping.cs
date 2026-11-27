@@ -34,6 +34,7 @@ public static class AddMediaLibraryRequestMapping
             request.CanDownloadMetadataFromWeb,
             request.ShouldSaveMetadataInMediaDirectories,
             request.ShouldSkipUnchangedDirectoriesDuringScan,
+            request.ShouldSkipHiddenFilesAndDirectoriesDuringScan,
             request.IsContentOnSsd,
             request.ShouldTrackConsumptionProgress,
             request.CompletionThresholdPercentage,

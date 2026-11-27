@@ -189,6 +189,9 @@
   <data name="DescriptionShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Ob eine Kopie der heruntergeladenen Metadaten in den Verzeichnissen der Medienbibliothek gespeichert werden soll oder nicht. Dies hat nur eine Auswirkung, wenn das Herunterladen von Metadaten aus dem Web aktiv ist.</value>
   </data>
+  <data name="DescriptionShouldSkipHiddenFilesAndDirectoriesDuringScan" xml:space="preserve">
+    <value>Wenn diese Option aktiviert ist, werden versteckte Dateien und Ordner bei den Scans dieser Medienbibliothek ausgelassen.</value>
+  </data>
   <data name="DescriptionShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
     <value>Wenn diese Option aktiviert ist, verwendet sie Verzeichnismetadaten, um Verzeichnisse zu überspringen, die sich seit dem letzten Scan nicht geändert haben. Dies kann die Scans _erheblich_ beschleunigen, aber beachten Sie, dass sich die Metadaten von Verzeichnissen _nicht_ ändern/aktualisieren, wenn vorhandene Dateien bearbeitet werden, sondern nur, wenn neue Dateien hinzugefügt oder vorhandene gelöscht werden. Aktivieren Sie diese Option nur, wenn Sie keine vorhandenen Dateien ändern.</value>
   </data>
@@ -284,6 +287,9 @@
   </data>
   <data name="ShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>Metadaten In Medienverzeichnissen Speichern</value>
+  </data>
+  <data name="ShouldSkipHiddenFilesAndDirectoriesDuringScan" xml:space="preserve">
+    <value>Versteckte Dateien und Ordner Beim Scannen Überspringen</value>
   </data>
   <data name="ShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
     <value>Unveränderte Ordner Beim Scannen Überspringen</value>

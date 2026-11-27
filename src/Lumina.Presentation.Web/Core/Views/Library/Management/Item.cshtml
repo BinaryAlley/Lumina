@@ -208,6 +208,18 @@
                 </div>
                 <div class="form-row">
                     <div class="form-label">
+                        <label asp-for="ShouldSkipHiddenFilesAndDirectoriesDuringScan">@_localizer["ShouldSkipHiddenFilesAndDirectoriesDuringScan"]:</label>
+                    </div>
+                    <div class="form-field">
+                        <label class="enlightenment-checkbox-label">
+                            <input type="checkbox" id="ShouldSkipHiddenFilesAndDirectoriesDuringScan" name="ShouldSkipHiddenFilesAndDirectoriesDuringScan" value="true" checked="@(Model.ShouldSkipHiddenFilesAndDirectoriesDuringScan == true)" class="enlightenment-checkbox-hidden" />
+                            <span class="enlightenment-checkbox"></span>
+                        </label>
+                    </div>
+                    <small class="form-label text-disabled form-description">@_localizer["DescriptionShouldSkipHiddenFilesAndDirectoriesDuringScan"]</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">
                         <label asp-for="IsContentOnSsd">@_localizer["IsContentOnSsd"]:</label>
                     </div>
                     <div class="form-field">
@@ -377,6 +389,7 @@
         const chkCanDownloadMetadataFromWeb = form.querySelector('[name="CanDownloadMetadataFromWeb"]');
         const chkShouldSaveMetadataInMediaDirectories = form.querySelector('[name="ShouldSaveMetadataInMediaDirectories"]');
         const chkShouldSkipUnchangedDirectoriesDuringScan = form.querySelector('[name="ShouldSkipUnchangedDirectoriesDuringScan"]');
+        const chkShouldSkipHiddenFilesAndDirectoriesDuringScan = form.querySelector('[name="ShouldSkipHiddenFilesAndDirectoriesDuringScan"]');
         const chkIsContentOnSsd = form.querySelector('[name="IsContentOnSsd"]');
         const chkShouldTrackConsumptionProgress = form.querySelector('[name="ShouldTrackConsumptionProgress"]');
         const inputCompletionThresholdPercentage = form.querySelector('[name="CompletionThresholdPercentage"]');
@@ -410,6 +423,7 @@
                 CanDownloadMetadataFromWeb: chkCanDownloadMetadataFromWeb.checked,
                 ShouldSaveMetadataInMediaDirectories: chkShouldSaveMetadataInMediaDirectories.checked,
                 ShouldSkipUnchangedDirectoriesDuringScan: chkShouldSkipUnchangedDirectoriesDuringScan.checked,
+                ShouldSkipHiddenFilesAndDirectoriesDuringScan: chkShouldSkipHiddenFilesAndDirectoriesDuringScan.checked,
                 IsContentOnSsd: chkIsContentOnSsd.checked,
                 ShouldTrackConsumptionProgress: shouldTrackConsumptionProgress,
                 // An empty threshold is sent as null: creating a library or enabling progress tracking uses the type default,

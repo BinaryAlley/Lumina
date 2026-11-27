@@ -77,6 +77,11 @@ public class Library : AggregateRoot<LibraryId>
     public bool ShouldSkipUnchangedDirectoriesDuringScan { get; private set; }
 
     /// <summary>
+    /// Gets whether this media library should skip hidden files and directories during the scan, or not.
+    /// </summary>
+    public bool ShouldSkipHiddenFilesAndDirectoriesDuringScan { get; private set; }
+
+    /// <summary>
     /// Gets whether the content of this media library is stored on a solid state drive. When it is, the file discovery and content hashing stages read the files in parallel,
     /// which takes advantage of the low latency of solid state drives. Mechanical hard drives keep those reads sequential, because parallel reads can reduce their throughput.
     /// </summary>
@@ -117,6 +122,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="canDownloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
+    /// <param name="shouldSkipHiddenFilesAndDirectoriesDuringScan">Whether this media library should skip hidden files and directories during the scan, or not.</param>
     /// <param name="isContentOnSsd">Whether the content of this media library is stored on a solid state drive.</param>
     /// <param name="consumptionSettings">The consumption settings of the media library.</param>
     /// <param name="pathTemplate">The template describing the structure of the media library on disk.</param>
@@ -133,6 +139,7 @@ public class Library : AggregateRoot<LibraryId>
         bool canDownloadMetadataFromWeb,
         bool shouldSaveMetadataInMediaDirectories,
         bool shouldSkipUnchangedDirectoriesDuringScan,
+        bool shouldSkipHiddenFilesAndDirectoriesDuringScan,
         bool isContentOnSsd,
         LibraryConsumptionSettings consumptionSettings,
         LibraryPathTemplate pathTemplate,
@@ -148,6 +155,7 @@ public class Library : AggregateRoot<LibraryId>
         CanDownloadMetadataFromWeb = canDownloadMetadataFromWeb;
         ShouldSaveMetadataInMediaDirectories = shouldSaveMetadataInMediaDirectories;
         ShouldSkipUnchangedDirectoriesDuringScan = shouldSkipUnchangedDirectoriesDuringScan;
+        ShouldSkipHiddenFilesAndDirectoriesDuringScan = shouldSkipHiddenFilesAndDirectoriesDuringScan;
         IsContentOnSsd = isContentOnSsd;
         ConsumptionSettings = consumptionSettings;
         PathTemplate = pathTemplate;
@@ -167,6 +175,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="canDownloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
+    /// <param name="shouldSkipHiddenFilesAndDirectoriesDuringScan">Whether this media library should skip hidden files and directories during the scan, or not.</param>
     /// <param name="isContentOnSsd">Whether the content of this media library is stored on a solid state drive.</param>
     /// <param name="consumptionSettings">The consumption settings of the media library.</param>
     /// <param name="pathTemplate">The template describing the structure of the media library on disk.</param>
@@ -185,6 +194,7 @@ public class Library : AggregateRoot<LibraryId>
         bool canDownloadMetadataFromWeb,
         bool shouldSaveMetadataInMediaDirectories,
         bool shouldSkipUnchangedDirectoriesDuringScan,
+        bool shouldSkipHiddenFilesAndDirectoriesDuringScan,
         bool isContentOnSsd,
         LibraryConsumptionSettings consumptionSettings,
         LibraryPathTemplate pathTemplate,
@@ -211,6 +221,7 @@ public class Library : AggregateRoot<LibraryId>
             canDownloadMetadataFromWeb,
             shouldSaveMetadataInMediaDirectories,
             shouldSkipUnchangedDirectoriesDuringScan,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan,
             isContentOnSsd,
             consumptionSettings,
             pathTemplate,
@@ -232,6 +243,7 @@ public class Library : AggregateRoot<LibraryId>
     /// <param name="canDownloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
+    /// <param name="shouldSkipHiddenFilesAndDirectoriesDuringScan">Whether this media library should skip hidden files and directories during the scan, or not.</param>
     /// <param name="isContentOnSsd">Whether the content of this media library is stored on a solid state drive.</param>
     /// <param name="consumptionSettings">The consumption settings of the media library.</param>
     /// <param name="pathTemplate">The template describing the structure of the media library on disk.</param>
@@ -251,6 +263,7 @@ public class Library : AggregateRoot<LibraryId>
         bool canDownloadMetadataFromWeb,
         bool shouldSaveMetadataInMediaDirectories,
         bool shouldSkipUnchangedDirectoriesDuringScan,
+        bool shouldSkipHiddenFilesAndDirectoriesDuringScan,
         bool isContentOnSsd,
         LibraryConsumptionSettings consumptionSettings,
         LibraryPathTemplate pathTemplate,
@@ -277,6 +290,7 @@ public class Library : AggregateRoot<LibraryId>
             canDownloadMetadataFromWeb,
             shouldSaveMetadataInMediaDirectories,
             shouldSkipUnchangedDirectoriesDuringScan,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan,
             isContentOnSsd,
             consumptionSettings,
             pathTemplate,
