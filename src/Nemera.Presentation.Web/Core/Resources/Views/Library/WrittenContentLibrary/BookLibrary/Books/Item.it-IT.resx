@@ -51,9 +51,6 @@
   <data name="ChangeCover" xml:space="preserve">
     <value>Cambia copertina</value>
   </data>
-  <data name="ContributorName" xml:space="preserve">
-    <value>Nome</value>
-  </data>
   <data name="ContributorsDescription" xml:space="preserve">
     <value>Le persone che hanno contribuito al libro, come i suoi autori.</value>
   </data>

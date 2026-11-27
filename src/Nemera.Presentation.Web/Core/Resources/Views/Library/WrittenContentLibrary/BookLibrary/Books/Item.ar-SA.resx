@@ -51,9 +51,6 @@
   <data name="ChangeCover" xml:space="preserve">
     <value>تغيير الغلاف</value>
   </data>
-  <data name="ContributorName" xml:space="preserve">
-    <value>الاسم</value>
-  </data>
   <data name="ContributorsDescription" xml:space="preserve">
     <value>الأشخاص الذين ساهموا في الكتاب، مثل مؤلفيه.</value>
   </data>

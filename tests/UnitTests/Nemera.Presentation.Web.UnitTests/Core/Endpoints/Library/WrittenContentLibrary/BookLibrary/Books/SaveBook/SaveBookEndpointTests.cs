@@ -63,6 +63,31 @@ public class SaveBookEndpointTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_WhenContributorsAreProvided_ShouldForwardContributorReferencesToApi()
+    {
+        // Arrange
+        string routeId = Guid.NewGuid().ToString();
+        UpdateBookRequest request = _updateBookRequestFixture.Create();
+        BookDetailsDto expectedBook = _bookDetailsDtoFixture.Create();
+        _mockApiHttpClient.PutAsync<BookDetailsDto, UpdateBookRequest>(Arg.Any<string>(), Arg.Any<UpdateBookRequest>(), Arg.Any<CancellationToken>())
+            .Returns(expectedBook);
+        ConfigureRequest(routeId);
+
+        // Act
+        await _sut.ExecuteAsync(request, CancellationToken.None);
+
+        // Assert
+        await _mockApiHttpClient.Received(1).PutAsync<BookDetailsDto, UpdateBookRequest>(
+            Arg.Any<string>(),
+            Arg.Is<UpdateBookRequest>(forwardedRequest =>
+                forwardedRequest.Contributors != null &&
+                forwardedRequest.Contributors.Count == request.Contributors!.Count &&
+                forwardedRequest.Contributors[0].ContributorId == request.Contributors[0].ContributorId &&
+                forwardedRequest.Contributors[0].Role == request.Contributors[0].Role),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task ExecuteAsync_WhenRouteIdDiffersFromBodyId_ShouldForwardTheRouteIdToApi()
     {
         // Arrange

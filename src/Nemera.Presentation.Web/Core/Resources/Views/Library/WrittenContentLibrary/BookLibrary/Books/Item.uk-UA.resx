@@ -51,9 +51,6 @@
   <data name="ChangeCover" xml:space="preserve">
     <value>Змінити обкладинку</value>
   </data>
-  <data name="ContributorName" xml:space="preserve">
-    <value>Ім'я</value>
-  </data>
   <data name="ContributorsDescription" xml:space="preserve">
     <value>Люди, які долучилися до створення книги, як-от її автори.</value>
   </data>

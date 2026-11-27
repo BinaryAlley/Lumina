@@ -51,9 +51,6 @@
   <data name="ChangeCover" xml:space="preserve">
     <value>Titelbild ändern</value>
   </data>
-  <data name="ContributorName" xml:space="preserve">
-    <value>Name</value>
-  </data>
   <data name="ContributorsDescription" xml:space="preserve">
     <value>Die Personen, die zum Buch beigetragen haben, wie seine Autoren.</value>
   </data>

@@ -24,7 +24,7 @@ public class UpdateBookRequestFixture
     private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
     private readonly BookSeriesDtoFixture _bookSeriesDtoFixture = new();
     private readonly IsbnDtoFixture _isbnDtoFixture = new();
-    private readonly MediaContributorDtoFixture _mediaContributorDtoFixture = new();
+    private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
     private readonly BookRatingDtoFixture _bookRatingDtoFixture = new();
 
     /// <summary>
@@ -91,7 +91,7 @@ public class UpdateBookRequestFixture
             BarnesAndNobleId: includeBarnesAndNobleId ? _faker.Random.String2(10, "0123456789") : null,
             AppleBooksId: includeAppleBooksId ? $"id{_faker.Random.Number(1, 999999)}" : null,
             ISBNs: includeIsbns ? [.. _isbnDtoFixture.CreateMany(_faker.Random.Number(1, 3))] : null,
-            Contributors: includeContributors ? [.. _mediaContributorDtoFixture.CreateMany(_faker.Random.Number(1, 3))] : null,
+            Contributors: includeContributors ? [.. _mediaContributorReferenceDtoFixture.CreateMany(_faker.Random.Number(1, 3))] : null,
             Ratings: includeRatings ? [.. _bookRatingDtoFixture.CreateMany(_faker.Random.Number(1, 3))] : null
         );
     }

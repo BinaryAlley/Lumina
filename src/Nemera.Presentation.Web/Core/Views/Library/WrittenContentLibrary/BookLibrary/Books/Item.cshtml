@@ -34,7 +34,7 @@
     var genres = metadata?.Genres ?? [];
     var tags = metadata?.Tags ?? [];
     var isbns = Model.ISBNs ?? [];
-            var contributors = Model.Contributors ?? [];
+    var contributors = Model.Contributors ?? [];
     var ratings = Model.Ratings ?? [];
     // The full set of canonical media contributor roles, mirroring the MediaContributorRole enum members, offered by the role combobox.
     var contributorRoles = new[]
@@ -42,7 +42,7 @@
         "Other", "Author", "Translator", "Illustrator", "Publisher", "Narrator", "Actor", "Director", "Screenwriter",
         "Composer", "Lyricist", "Arranger", "Conductor", "Producer", "ExecutiveProducer", "Engineer", "Mixer", "Remixer",
         "RecordLabel", "Vocals", "BackingVocals", "Guitar", "BassGuitar", "Drums", "Percussion", "Keyboards", "Piano",
-        "Synthesizer", "Strings", "Woodwinds", "Brass", "Choir", "Orchestrator"
+        "Synthesizer", "Strings", "Woodwinds", "Brass", "Choir", "Orchestrator", "Performer"
     };
     // Resolves the localized label of a contributor role, keyed by its canonical value.
     Func<string?, string> roleLabel = role => role switch
@@ -441,7 +441,7 @@
                     <table class="w-100 form-table book-list-table">
                         <thead>
                             <tr>
-                                <th>@_localizer["ContributorName"]</th>
+                                <th>@_localizer["ContributorId"]</th>
                                 <th>@_localizer["Role"]</th>
                                 <th class="w-40px"></th>
                             </tr>
@@ -451,7 +451,7 @@
                             @foreach (var contributor in contributors)
                             {
                                 <tr class="contributor-row">
-                                    <td><input type="text" class="enlightenment-input contributor-name w-100" value="@(contributor.Name?.DisplayName ?? string.Empty)" /></td>
+                                    <td><input type="text" class="enlightenment-input contributor-id w-100" value="@(contributor.ContributorId.ToString())" /></td>
                                     <td>
                                         <div class="enlightenment-combobox inline-block w-100 contributor-role-combobox">
                                             <div class="shine-effect" style="top: 1px;"></div>
@@ -637,7 +637,7 @@
                     Format: readRowComboboxValue(row, '.isbn-format-combobox') || null
                 })),
                 Contributors: Array.from(contributorsBody.querySelectorAll('.contributor-row')).map(row => ({
-                    Name: { DisplayName: row.querySelector('.contributor-name').value.trim() || null },
+                    ContributorId: row.querySelector('.contributor-id').value.trim() || '00000000-0000-0000-0000-000000000000',
                     Role: readRowComboboxValue(row, '.contributor-role-combobox') || null
                 })),
                 Ratings: Array.from(ratingsBody.querySelectorAll('.rating-row')).map(row => ({
@@ -787,15 +787,13 @@
             await updateContentAsync(`${libraryIndexUrl}?libraryId=${encodeURIComponent(libraryId)}`, true);
         }
 
-        // Builds the HTML of an enlightenment combobox of a row, with the provided option values.
-        function buildRowCombobox(optionValues, selectedValue) {
+        // Builds the HTML of an enlightenment combobox of a row, with the provided option values and an optional wrapper class.
+        function buildRowCombobox(optionValues, selectedValue, wrapperClass) {
             const id = `row-combobox-${generatedId++}`;
-            const options = optionValues.map(option => {
-                const selected = option.value === selectedValue ? ' selected' : '';
-                return `<div class="enlightenment-option" data-value="${option.value}">${option.label}</div>`;
-            }).join('');
+            const options = optionValues.map(option =>
+                `<div class="enlightenment-option" data-value="${option.value}">${option.label}</div>`).join('');
             return `
-                <div class="enlightenment-combobox inline-block w-100">
+                <div class="enlightenment-combobox inline-block w-100 ${wrapperClass || ''}">
                     <div class="shine-effect" style="top: 1px;"></div>
                     <input type="checkbox" class="enlightenment-toggle-checkbox" id="${id}" />
                     <label class="enlightenment-toggle" for="${id}">
@@ -845,7 +843,7 @@
             isbnsBody.insertAdjacentHTML('beforeend', `
                 <tr class="isbn-row">
                     <td><input type="text" class="enlightenment-input isbn-value" /></td>
-                    <td>${buildRowCombobox(isbnOptions, '')}</td>
+                    <td>${buildRowCombobox(isbnOptions, '', 'isbn-format-combobox')}</td>
                     <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
                 </tr>`);
         }
@@ -854,8 +852,8 @@
         function addContributorRow() {
             contributorsBody.insertAdjacentHTML('beforeend', `
                 <tr class="contributor-row">
-                    <td><input type="text" class="enlightenment-input contributor-name w-100" /></td>
-                    <td>${buildRowCombobox(contributorRoleOptions, 'Author')}</td>
+                    <td><input type="text" class="enlightenment-input contributor-id w-100" /></td>
+                    <td>${buildRowCombobox(contributorRoleOptions, 'Author', 'contributor-role-combobox')}</td>
                     <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
                 </tr>`);
         }
@@ -866,7 +864,7 @@
                 <tr class="rating-row">
                     <td><input type="number" step="any" min="0" class="enlightenment-input rating-value" /></td>
                     <td><input type="number" step="any" min="0" class="enlightenment-input rating-max-value" /></td>
-                    <td>${buildRowCombobox(ratingSourceOptions, '')}</td>
+                    <td>${buildRowCombobox(ratingSourceOptions, '', 'rating-source-combobox')}</td>
                     <td><input type="number" min="0" class="enlightenment-input rating-vote-count" /></td>
                     <td><img src="/images/ui/delete.svg" alt="${jsLocalizedStrings.remove}" title="${jsLocalizedStrings.remove}" class="remove-form-table-row-icon" /></td>
                 </tr>`);

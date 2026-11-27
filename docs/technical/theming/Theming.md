@@ -179,6 +179,7 @@ Known page keys:
 | `shared/audio-player/queue-item` | The queue item of the audio player bar. |
 | `shared/audio-player/playlist-item` | The playlist item of the audio player bar. |
 | `library/written-content-library/book-library/books/index` | The books browsing page. |
+| `library/written-content-library/book-library/books/item` | The details and editing page of a book. |
 | `library/written-content-library/book-library/books/deleted-items` | The deleted items page of a book library, which restores deleted books. |
 | `library/audio-library/music-library/deleted-items` | The deleted items page of a music library, which restores deleted artists, albums and tracks. |
 | `playlists/index` | The page that lists and deletes the playlists of the current user. |
@@ -589,6 +590,27 @@ The page script renders the cards into `books-container` and drives these hooks:
 | `no-items` and `no-items-matching` | Show the empty states without and with active filters. |
 | `.media-card`, `.card-actions-trigger` and `.card-actions-menu` | Render a book card and its actions menu. |
 | `.card-action-delete` | Deletes the book of the card. |
+
+#### The Book Details and Editing Page
+
+`library/written-content-library/book-library/books/item` renders the details and editing page of a book. Its fallback is `Core/Views/Library/WrittenContentLibrary/BookLibrary/Books/Item.cshtml`. Both bundled themes ship `templates/library/written-content-library/book-library/books/item.html`.
+
+Page data:
+
+| Field | Content |
+| --- | --- |
+| `bookId` | The Id of the book shown. |
+| `libraryId` | The Id of the library the book belongs to. |
+| `antiforgeryToken` | The anti-forgery request token for the save, delete and cover upload requests. |
+| `saveUrl` | The route that saves the book. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the book. |
+| `deleteUrl` | The route that deletes the book. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the book, and `libraryId` is appended as a query parameter. |
+| `coverUrl` | The route that uploads the cover of the book. The trailing `00000000-0000-0000-0000-000000000000` is replaced by the Id of the book. |
+| `backUrl` | The route of the books page of the library. |
+| `bookJson` | The full details of the book, serialized as JSON. It carries the same fields as the book details response, including `metadata`, identifiers, ISBNs, `contributors`, `ratings` and `coverPath`. |
+| `strings` | The localized strings of the page, keyed by their resource names. |
+| `stringsJson` | The same localized strings serialized as JSON, with camel case keys, for the page script. |
+
+The `contributors` of `bookJson` are references to the contributors table, each with the shape `{ contributorId, role }`, where `contributorId` is the Id of the contributor. A theme that needs a contributor's name resolves it from the contributors table using that Id.
 
 #### The Deleted Items Page
 

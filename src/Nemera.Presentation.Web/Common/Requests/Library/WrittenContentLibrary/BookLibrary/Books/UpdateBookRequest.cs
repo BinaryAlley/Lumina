@@ -30,7 +30,7 @@ namespace Nemera.Presentation.Web.Common.Requests.Library.WrittenContentLibrary.
 /// <param name="BarnesAndNobleId">The Barnes &amp; Noble Id of the book. Optional.</param>
 /// <param name="AppleBooksId">The Apple Books Id of the book. Optional.</param>
 /// <param name="ISBNs">The list of ISBN (International Standard Book Number) of the book. Required.</param>
-/// <param name="Contributors">The list of media contributors of the book. Required.</param>
+/// <param name="Contributors">The list of references to the media contributors of the book, each with the role they played. Required.</param>
 /// <param name="Ratings">The list of ratings of the book. Required.</param>
 [DebuggerDisplay("Title: {Metadata?.Title}")]
 public record UpdateBookRequest(
@@ -51,6 +51,6 @@ public record UpdateBookRequest(
     string? BarnesAndNobleId,
     string? AppleBooksId,
     List<IsbnDto>? ISBNs,
-    List<MediaContributorDto>? Contributors,
+    List<MediaContributorReferenceDto>? Contributors,
     List<BookRatingDto>? Ratings
 );

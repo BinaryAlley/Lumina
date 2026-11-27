@@ -51,9 +51,6 @@
   <data name="ChangeCover" xml:space="preserve">
     <value>表紙を変更</value>
   </data>
-  <data name="ContributorName" xml:space="preserve">
-    <value>名前</value>
-  </data>
   <data name="ContributorsDescription" xml:space="preserve">
     <value>著者など、本に貢献した人々。</value>
   </data>
