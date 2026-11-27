@@ -96,6 +96,48 @@ public class DirectoryScanFingerprintRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task DeleteByLibraryIdAsync_WhenCalled_ShouldDeleteOnlyTheFingerprintsOfThatLibrary()
+    {
+        // Arrange
+        (Guid libraryId, _) = await SeedLibraryGraphAsync();
+        UserEntity otherUser = _userEntityFixture.Create();
+        _context.Users.Add(otherUser);
+        Guid otherLibraryId = Guid.NewGuid();
+        LibraryEntity otherLibrary = _libraryEntityFixture.Create(id: otherLibraryId, userId: otherUser.Id);
+        _context.Libraries.Add(otherLibrary);
+
+        DirectoryScanFingerprintEntity firstFingerprint = _directoryScanFingerprintEntityFixture.Create(libraryId: libraryId, path: "/dir1");
+        DirectoryScanFingerprintEntity secondFingerprint = _directoryScanFingerprintEntityFixture.Create(libraryId: libraryId, path: "/dir2");
+        DirectoryScanFingerprintEntity fingerprintOfOtherLibrary = _directoryScanFingerprintEntityFixture.Create(libraryId: otherLibraryId, path: "/dir3");
+        _context.DirectoryScanFingerprints.AddRange(firstFingerprint, secondFingerprint, fingerprintOfOtherLibrary);
+        await _context.SaveChangesAsync();
+
+        // Act
+        Result<Deleted> result = await _sut.DeleteByLibraryIdAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Deleted, result.Value);
+        DirectoryScanFingerprintEntity remainingFingerprint = await _context.DirectoryScanFingerprints.AsNoTracking().SingleAsync();
+        Assert.Equal(fingerprintOfOtherLibrary.Id, remainingFingerprint.Id);
+    }
+
+    [Fact]
+    public async Task DeleteByLibraryIdAsync_WhenNoFingerprintsExist_ShouldReturnDeleted()
+    {
+        // Arrange
+        (Guid libraryId, _) = await SeedLibraryGraphAsync();
+
+        // Act
+        Result<Deleted> result = await _sut.DeleteByLibraryIdAsync(libraryId, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        Assert.Equal(Result.Deleted, result.Value);
+        Assert.False(await _context.DirectoryScanFingerprints.AnyAsync());
+    }
+
+    [Fact]
     public async Task UpsertRangeAsync_WhenCalledWithNewFingerprints_ShouldInsertThemAndReturnUpdated()
     {
         // Arrange

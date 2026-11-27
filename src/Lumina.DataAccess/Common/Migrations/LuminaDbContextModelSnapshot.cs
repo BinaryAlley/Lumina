@@ -1596,6 +1596,12 @@ namespace Lumina.DataAccess.Common.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(7);
 
+                    b.Property<bool>("ShouldSkipHiddenFilesAndDirectoriesDuringScan")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false)
+                        .HasColumnOrder(19);
+
                     b.Property<bool>("ShouldSkipUnchangedDirectoriesDuringScan")
                         .HasColumnType("INTEGER")
                         .HasColumnOrder(8);

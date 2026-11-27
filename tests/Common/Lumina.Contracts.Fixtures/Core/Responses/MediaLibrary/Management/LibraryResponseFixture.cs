@@ -32,6 +32,7 @@ public class LibraryResponseFixture
     /// <param name="canDownloadMetadataFromWeb">Optional. Whether metadata should be downloaded from the web.</param>
     /// <param name="shouldSaveMetadataInMediaDirectories">Optional. Whether metadata should be saved in the media directories.</param>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Optional. Whether unchanged directories should be skipped during scan.</param>
+    /// <param name="shouldSkipHiddenFilesAndDirectoriesDuringScan">Optional. Whether hidden files and directories should be skipped during scan.</param>
     /// <param name="isContentOnSsd">Optional. Whether the content of the media library is stored on a solid state drive.</param>
     /// <param name="shouldTrackConsumptionProgress">Optional. Whether the consumption progress of the media library items is tracked.</param>
     /// <param name="completionThresholdPercentage">Optional. The percentage of a media library item that must be consumed for its session to be considered completed.</param>
@@ -51,6 +52,7 @@ public class LibraryResponseFixture
         bool? canDownloadMetadataFromWeb = null,
         bool? shouldSaveMetadataInMediaDirectories = null,
         bool? shouldSkipUnchangedDirectoriesDuringScan = null,
+        bool? shouldSkipHiddenFilesAndDirectoriesDuringScan = null,
         bool? isContentOnSsd = null,
         bool? shouldTrackConsumptionProgress = null,
         int? completionThresholdPercentage = null,
@@ -72,6 +74,7 @@ public class LibraryResponseFixture
             canDownloadMetadataFromWeb ?? _faker.Random.Bool(),
             shouldSaveMetadataInMediaDirectories ?? _faker.Random.Bool(),
             shouldSkipUnchangedDirectoriesDuringScan ?? _faker.Random.Bool(),
+            shouldSkipHiddenFilesAndDirectoriesDuringScan ?? _faker.Random.Bool(),
             isContentOnSsd ?? false,
             resolvedShouldTrackConsumptionProgress,
             resolvedCompletionThresholdPercentage,

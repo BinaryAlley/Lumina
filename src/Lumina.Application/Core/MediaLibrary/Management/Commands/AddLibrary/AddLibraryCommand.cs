@@ -18,6 +18,7 @@ namespace Lumina.Application.Core.MediaLibrary.Management.Commands.AddLibrary;
 /// <param name="CanDownloadMetadataFromWeb">Whether this media library should update the metadata of its elements from the web, or not.</param>
 /// <param name="ShouldSaveMetadataInMediaDirectories">Whether this media library should copy the downloaded metadata into the media library content locations, or not.</param>
 /// <param name="ShouldSkipUnchangedDirectoriesDuringScan">Whether this media library should skip the directories whose contents have not changed since the last scan, during the scan, or not.</param>
+/// <param name="ShouldSkipHiddenFilesAndDirectoriesDuringScan">Whether this media library should skip hidden files and directories during the scan, or not. When absent, the default is off.</param>
 /// <param name="IsContentOnSsd">Whether the content of this media library is stored on a solid state drive, in which case the file discovery and content hashing stages read the files in parallel.</param>
 /// <param name="ShouldTrackConsumptionProgress">Whether the consumption progress of the media library items should be tracked, or not. When absent, the default of the library type is used.</param>
 /// <param name="CompletionThresholdPercentage">The percentage of a media library item that must be consumed for its session to be considered completed. When absent, the default of the library type is used on creation.</param>
@@ -36,6 +37,7 @@ public record AddLibraryCommand(
     bool CanDownloadMetadataFromWeb,
     bool ShouldSaveMetadataInMediaDirectories,
     bool ShouldSkipUnchangedDirectoriesDuringScan,
+    bool? ShouldSkipHiddenFilesAndDirectoriesDuringScan,
     bool IsContentOnSsd,
     bool? ShouldTrackConsumptionProgress,
     int? CompletionThresholdPercentage,

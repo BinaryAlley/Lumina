@@ -189,6 +189,9 @@
   <data name="DescriptionShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>ما إذا كان يجب حفظ نسخة من البيانات الوصفية التي تم تنزيلها في المجلدات التي تحتوي على محتوى مكتبة الوسائط أم لا. هذا يؤثر فقط إذا كان تنزيل البيانات الوصفية من الويب مفعّلًا.</value>
   </data>
+  <data name="DescriptionShouldSkipHiddenFilesAndDirectoriesDuringScan" xml:space="preserve">
+    <value>عند التمكين، يتم استبعاد الملفات والمجلدات المخفية من عمليات فحص مكتبة الوسائط هذه.</value>
+  </data>
   <data name="DescriptionShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
     <value>عند التفعيل، يستخدم هذا الخيار البيانات الوصفية للمجلدات لتخطي المجلدات التي لم تتغير منذ آخر فحص. يمكن أن يؤدي ذلك إلى تسريع عمليات الفحص _بشكل ملحوظ_، لكن انتبه إلى أن البيانات الوصفية للمجلدات _لا تتغير ولا تُحدَّث_ عند تعديل الملفات الموجودة، بل تتغير فقط عند إضافة ملفات جديدة أو حذف ملفات موجودة. فعّل هذا الخيار فقط إذا كنت لا تعدّل الملفات الموجودة.</value>
   </data>
@@ -284,6 +287,9 @@
   </data>
   <data name="ShouldSaveMetadataInMediaDirectories" xml:space="preserve">
     <value>حفظ البيانات الوصفية في مجلدات الوسائط</value>
+  </data>
+  <data name="ShouldSkipHiddenFilesAndDirectoriesDuringScan" xml:space="preserve">
+    <value>تخطي الملفات والمجلدات المخفية أثناء الفحص</value>
   </data>
   <data name="ShouldSkipUnchangedDirectoriesDuringScan" xml:space="preserve">
     <value>تخطي المجلدات غير المتغيرة أثناء الفحص</value>

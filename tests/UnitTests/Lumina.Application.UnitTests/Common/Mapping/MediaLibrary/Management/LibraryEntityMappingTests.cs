@@ -33,6 +33,7 @@ public class LibraryEntityMappingTests
             libraryType: LibraryType.Book,
             contentLocations: ["C:/Books", "D:/Media/Books"],
             coverImage: "D:/myPoster.jpg",
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: true,
             isContentOnSsd: true);
 
         // Act
@@ -46,6 +47,7 @@ public class LibraryEntityMappingTests
         Assert.Equal(entity.LibraryType, result.LibraryType);
         Assert.Equal(entity.ContentLocations.Select(l => l.Path), result.ContentLocations);
         Assert.Equal(entity.CoverImage, result.CoverImage);
+        Assert.Equal(entity.ShouldSkipHiddenFilesAndDirectoriesDuringScan, result.ShouldSkipHiddenFilesAndDirectoriesDuringScan);
         Assert.Equal(entity.IsContentOnSsd, result.IsContentOnSsd);
         Assert.Equal(entity.ShouldTrackConsumptionProgress, result.ShouldTrackConsumptionProgress);
         Assert.Equal(entity.CompletionThresholdPercentage, result.CompletionThresholdPercentage);
@@ -190,6 +192,7 @@ public class LibraryEntityMappingTests
             libraryType: LibraryType.Book,
             contentLocations: ["C:/Books"],
             coverImage: "D:/cover.jpg",
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: true,
             isContentOnSsd: true,
             pathTemplateParts: [firstPart, secondPart]);
 
@@ -203,6 +206,7 @@ public class LibraryEntityMappingTests
         Assert.Equal(entity.Title, result.Value.Title);
         Assert.Equal(entity.LibraryType, result.Value.LibraryType);
         Assert.Equal("D:/cover.jpg", result.Value.CoverImage.Value);
+        Assert.Equal(entity.ShouldSkipHiddenFilesAndDirectoriesDuringScan, result.Value.ShouldSkipHiddenFilesAndDirectoriesDuringScan);
         Assert.Equal(entity.IsContentOnSsd, result.Value.IsContentOnSsd);
         Assert.Equal(entity.ShouldTrackConsumptionProgress, result.Value.ConsumptionSettings.ShouldTrackConsumptionProgress);
         Assert.Equal(entity.CompletionThresholdPercentage, result.Value.ConsumptionSettings.CompletionThresholdPercentage.HasValue ? result.Value.ConsumptionSettings.CompletionThresholdPercentage.Value : null);

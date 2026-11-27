@@ -56,6 +56,7 @@ public class LibraryTests
             canDownloadMetadataFromWeb: false,
             shouldSaveMetadataInMediaDirectories: true,
             shouldSkipUnchangedDirectoriesDuringScan: true,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: true,
             isContentOnSsd: true,
             consumptionSettings,
             LibraryPathTemplate.Empty(),
@@ -74,6 +75,7 @@ public class LibraryTests
         Assert.False(result.Value.CanDownloadMetadataFromWeb);
         Assert.True(result.Value.ShouldSaveMetadataInMediaDirectories);
         Assert.True(result.Value.ShouldSkipUnchangedDirectoriesDuringScan);
+        Assert.True(result.Value.ShouldSkipHiddenFilesAndDirectoriesDuringScan);
         Assert.True(result.Value.IsContentOnSsd);
         Assert.Equal(consumptionSettings, result.Value.ConsumptionSettings);
         Assert.Equal(scanIds, result.Value.ScanIds);
@@ -99,6 +101,7 @@ public class LibraryTests
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: false,
             isContentOnSsd: false,
             _libraryConsumptionSettingsFixture.Create(),
             LibraryPathTemplate.Empty(),
@@ -128,6 +131,7 @@ public class LibraryTests
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: false,
             isContentOnSsd: false,
             _libraryConsumptionSettingsFixture.Create(),
             LibraryPathTemplate.Empty(),
@@ -166,6 +170,7 @@ public class LibraryTests
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: false,
             isContentOnSsd: false,
             _libraryConsumptionSettingsFixture.Create(),
             LibraryPathTemplate.Empty(),
@@ -196,6 +201,7 @@ public class LibraryTests
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: false,
             isContentOnSsd: false,
             _libraryConsumptionSettingsFixture.Create(),
             LibraryPathTemplate.Empty(),

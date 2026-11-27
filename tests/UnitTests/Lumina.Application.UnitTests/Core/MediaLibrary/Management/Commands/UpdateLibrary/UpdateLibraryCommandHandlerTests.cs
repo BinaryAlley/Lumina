@@ -45,6 +45,7 @@ public class UpdateLibraryCommandHandlerTests
 {
     private readonly IUnitOfWork _mockUnitOfWork;
     private readonly ILibraryRepository _mockLibraryRepository;
+    private readonly IDirectoryScanFingerprintRepository _mockDirectoryScanFingerprintRepository;
     private readonly IAuthorizationService _mockAuthorizationService;
     private readonly ICurrentUserService _mockCurrentUserService;
     private readonly IDomainEventsQueue _mockDomainEventsQueue;
@@ -70,6 +71,10 @@ public class UpdateLibraryCommandHandlerTests
         _mockUnitOfWork.SaveChangesAsync(Arg.Any<CancellationToken>()).Returns(Result.Success);
         _mockLibraryRepository = Substitute.For<ILibraryRepository>();
         _mockUnitOfWork.LibraryRepository.Returns(_mockLibraryRepository);
+        _mockDirectoryScanFingerprintRepository = Substitute.For<IDirectoryScanFingerprintRepository>();
+        _mockDirectoryScanFingerprintRepository.DeleteByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Result.Deleted);
+        _mockUnitOfWork.DirectoryScanFingerprintRepository.Returns(_mockDirectoryScanFingerprintRepository);
         _mockAuthorizationService = Substitute.For<IAuthorizationService>();
         _mockCurrentUserService = Substitute.For<ICurrentUserService>();
         _mockDomainEventsQueue = Substitute.For<IDomainEventsQueue>();
@@ -119,6 +124,101 @@ public class UpdateLibraryCommandHandlerTests
             command.Id, Arg.Is<LibraryType>(libraryType => libraryType == commandLibraryType), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Any<IReadOnlyList<LibraryProviderSelectionDto>?>(), Arg.Is(true), Arg.Any<CancellationToken>());
         await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         _mockDomainEventsQueue.Received(1).Enqueue(Arg.Any<LibrarySavedDomainEvent>());
+    }
+
+    [Theory]
+    [InlineData(true, false, false, false)] // Only the skip unchanged directories setting changes.
+    [InlineData(false, true, false, false)] // Only the skip hidden files and directories setting changes.
+    public async Task HandleAsync_WhenAScanScopeSettingChanges_ShouldDeleteTheDirectoryScanFingerprints(
+        bool commandShouldSkipUnchangedDirectories,
+        bool commandShouldSkipHiddenFilesAndDirectories,
+        bool existingShouldSkipUnchangedDirectories,
+        bool existingShouldSkipHiddenFilesAndDirectories)
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create(
+            shouldSkipUnchangedDirectoriesDuringScan: commandShouldSkipUnchangedDirectories,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: commandShouldSkipHiddenFilesAndDirectories);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(
+            id: command.Id,
+            userId: _userId,
+            shouldSkipUnchangedDirectoriesDuringScan: existingShouldSkipUnchangedDirectories,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: existingShouldSkipHiddenFilesAndDirectories);
+        existingLibrary.LibraryType = Enum.Parse<LibraryType>(command.LibraryType!);
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockDirectoryScanFingerprintRepository.Received(1).DeleteByLibraryIdAsync(command.Id, Arg.Any<CancellationToken>());
+        await _mockUnitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenHiddenFilesSettingIsAbsent_ShouldKeepTheStoredValue()
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create(shouldSkipHiddenFilesAndDirectoriesDuringScan: null);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(
+            id: command.Id,
+            userId: _userId,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: true);
+        existingLibrary.LibraryType = Enum.Parse<LibraryType>(command.LibraryType!);
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockLibraryRepository.Received(1).UpdateAsync(
+            Arg.Is<LibraryEntity>(library => library.ShouldSkipHiddenFilesAndDirectoriesDuringScan),
+            Arg.Any<CancellationToken>());
+        await _mockDirectoryScanFingerprintRepository.DidNotReceive().DeleteByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenScanScopeSettingsAreUnchanged_ShouldNotDeleteTheDirectoryScanFingerprints()
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create();
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
+        existingLibrary.LibraryType = Enum.Parse<LibraryType>(command.LibraryType!);
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.False(result.IsFailure);
+        await _mockDirectoryScanFingerprintRepository.DidNotReceive().DeleteByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_WhenDeletingTheDirectoryScanFingerprintsFails_ShouldReturnTheErrorAndNotSave()
+    {
+        // Arrange
+        UpdateLibraryCommand command = _updateLibraryCommandFixture.Create(shouldSkipHiddenFilesAndDirectoriesDuringScan: true);
+        LibraryEntity existingLibrary = _libraryEntityFixture.Create(id: command.Id, userId: _userId);
+        existingLibrary.LibraryType = Enum.Parse<LibraryType>(command.LibraryType!);
+        _mockLibraryRepository.GetByIdAsync(command.Id, cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(Result.From<LibraryEntity?>(existingLibrary));
+        Error deleteError = Error.Failure("Database.Error", "Failed to delete the directory scan fingerprints");
+        _mockDirectoryScanFingerprintRepository.DeleteByLibraryIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(deleteError);
+
+        // Act
+        Result<LibraryResponse> result = await _sut.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(deleteError, result.FirstError);
+        await _mockUnitOfWork.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]

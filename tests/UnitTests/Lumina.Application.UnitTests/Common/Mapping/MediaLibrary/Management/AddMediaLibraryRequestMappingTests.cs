@@ -36,6 +36,7 @@ public class AddMediaLibraryRequestMappingTests
             canDownloadMetadataFromWeb: true,
             shouldSaveMetadataInMediaDirectories: false,
             shouldSkipUnchangedDirectoriesDuringScan: false,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: true,
             isContentOnSsd: true,
             shouldTrackConsumptionProgress: true,
             completionThresholdPercentage: 90
@@ -54,6 +55,7 @@ public class AddMediaLibraryRequestMappingTests
         Assert.Equal(request.IsLocked, result.IsLocked);
         Assert.Equal(request.CanDownloadMetadataFromWeb, result.CanDownloadMetadataFromWeb);
         Assert.Equal(request.ShouldSaveMetadataInMediaDirectories, result.ShouldSaveMetadataInMediaDirectories);
+        Assert.Equal(request.ShouldSkipHiddenFilesAndDirectoriesDuringScan, result.ShouldSkipHiddenFilesAndDirectoriesDuringScan);
         Assert.Equal(request.IsContentOnSsd, result.IsContentOnSsd);
         Assert.Equal(request.ShouldTrackConsumptionProgress, result.ShouldTrackConsumptionProgress);
         Assert.Equal(request.CompletionThresholdPercentage, result.CompletionThresholdPercentage);

@@ -34,7 +34,7 @@ Lumina can scan two kinds of libraries today:
 
 The other types in Lumina's model, such as movies, TV shows, comics, manga, photos, podcasts and audiobooks, are designed but not implemented yet. There is no scanner for them, so they cannot be scanned.
 
-A scan includes hidden files and folders.
+A scan includes hidden files and folders, unless the library is set to skip them.
 
 ## Creating a library
 
@@ -51,6 +51,7 @@ Open the Libraries management page, choose to add a library, and fill in the for
 | Download metadata from the web | on | Whether Lumina may look up the metadata of the items online. This only has an effect when a metadata provider is enabled for the library (see [Plugins](../plugins/index.md)). |
 | Save metadata in media directories | off | Whether the metadata Lumina fetches is also written next to your media files, so other tools can read it. This is the one option that writes into your media folders. |
 | Skip unchanged directories during scan | off | An opt-in speedup that skips folders whose own last-modified time has not changed since the last scan. Editing the contents of an existing file in place, without adding, removing or renaming anything in that folder, leaves the folder's time untouched, so that edit can be missed while it is on. |
+| Skip hidden files and directories during scan | off | Whether hidden files and hidden folders are left out of the scan. Off indexes them like any other item. |
 | Content is on SSD | off | Whether the folders of this library are stored on a solid state drive. When on, the file discovery and content hashing stages read several files at the same time, which is faster on solid state drives. Leave it off for mechanical hard drives, where reading files in parallel can slow the scan down. |
 | Track consumption progress | the type default | Whether the latest playback or reading position of the library's items is remembered, so a user can resume where they left off. |
 | Completion threshold | the type default | The percentage of an item that must be consumed for a stopped session to be recorded as completed. Empty means completion is recorded only when it is reported explicitly. |
@@ -195,7 +196,8 @@ These are per user settings, each user changes their own from the settings page 
 ## Things to watch out for
 
 - **`Save metadata in media directories` writes into your media folders.** It is off by default; turn it on only if you want metadata files to accompany your media.
-- **`Skip unchanged directories during scan` can miss in-place edits.** It trusts each folder's own last-modified time, so editing the contents of an existing file without adding, removing or renaming anything in its folder leaves the folder unchanged and it gets skipped. Adding, removing or renaming a file does change the folder, and is still seen.
+- **`Skip unchanged directories during scan` can miss in-place edits.** It trusts each folder's own last-modified time, so editing the contents of an existing file without adding, removing or renaming anything in its folder leaves the folder unchanged and it gets skipped. Adding, removing or renaming a file does change the folder, and is still seen. Changing either scan scope setting discards the stored directory fingerprints, so the next scan reads the whole library.
+- **`Skip hidden files and directories during scan` leaves hidden items out of the catalogue.** Files and folders marked as hidden by the operating system, and dot-prefixed names on Unix-like systems, are not indexed while it is on. Turning it back off picks them up on the next scan, and changing either scan scope setting discards the stored directory fingerprints, so the next scan reads the whole library.
 - **`Content is on SSD` changes how file discovery and content hashing read files.** Turn it on only when the folders of the library really are on a solid state drive. On a mechanical hard drive, parallel reads can make those stages slower than sequential ones.
 - **`Locked` blocks everything.** A locked library is not scanned and not updated, including by the scheduler.
 - **`Disabled` hides the library.** A disabled library is neither shown on the dashboard nor touched.

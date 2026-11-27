@@ -87,6 +87,7 @@ public class UpdateLibraryEndpointTests
     {
         // Arrange
         UpdateLibraryRequest request = _updateLibraryRequestFixture.Create(
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: true,
             isContentOnSsd: true,
             shouldTrackConsumptionProgress: true,
             completionThresholdPercentage: 65);
@@ -110,6 +111,7 @@ public class UpdateLibraryEndpointTests
                 command.CanDownloadMetadataFromWeb == request.CanDownloadMetadataFromWeb &&
                 command.ShouldSaveMetadataInMediaDirectories == request.ShouldSaveMetadataInMediaDirectories &&
                 command.ShouldSkipUnchangedDirectoriesDuringScan == request.ShouldSkipUnchangedDirectoriesDuringScan &&
+                command.ShouldSkipHiddenFilesAndDirectoriesDuringScan == request.ShouldSkipHiddenFilesAndDirectoriesDuringScan &&
                 command.IsContentOnSsd == request.IsContentOnSsd &&
                 command.ShouldTrackConsumptionProgress == request.ShouldTrackConsumptionProgress &&
                 command.CompletionThresholdPercentage == request.CompletionThresholdPercentage),

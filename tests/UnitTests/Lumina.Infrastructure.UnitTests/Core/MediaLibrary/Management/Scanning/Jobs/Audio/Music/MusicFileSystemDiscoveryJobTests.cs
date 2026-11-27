@@ -179,6 +179,8 @@ public class MusicFileSystemDiscoveryJobTests
 
         // Assert
         Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+        _mockFileProviderService.Received(1).GetFilePaths(Arg.Any<FileSystemPathId>(), true);
+        _mockDirectoryProviderService.Received(1).GetSubdirectoryPaths(Arg.Any<FileSystemPathId>(), true);
         await _mockStagingResultsRepository.Received(1).InsertRangeAsync(
             Arg.Is<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(entities => entities.Count == 1
                 && entities.First().Path == AUDIO_FILE_PATH
@@ -225,6 +227,25 @@ public class MusicFileSystemDiscoveryJobTests
             Arg.Is<object>(state => state.ToString()!.Contains(AUDIO_FILE_PATH, StringComparison.Ordinal)),
             Arg.Any<IOException>(),
             Arg.Any<Func<object, Exception?, string>>());
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenHiddenFilesAndDirectoriesAreSkipped_ShouldAskTheProvidersToExcludeThem()
+    {
+        // Arrange
+        SetupLibrary(shouldSkipHiddenFilesAndDirectoriesDuringScan: true);
+        SetupDirectory(ROOT_PATH, files: [AUDIO_FILE_PATH], subdirectories: [], shouldIncludeHiddenElements: false);
+
+        // Act
+        await _sut.ExecuteAsync(Guid.NewGuid(), new { }, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(LibraryScanJobStatus.Completed, _sut.Status);
+        _mockFileProviderService.Received(1).GetFilePaths(Arg.Any<FileSystemPathId>(), false);
+        _mockDirectoryProviderService.Received(1).GetSubdirectoryPaths(Arg.Any<FileSystemPathId>(), false);
+        await _mockStagingResultsRepository.Received(1).InsertRangeAsync(
+            Arg.Is<IReadOnlyCollection<LibraryScanStagingResultsEntity>>(entities => entities.Count == 1 && entities.First().Path == AUDIO_FILE_PATH),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -403,14 +424,16 @@ public class MusicFileSystemDiscoveryJobTests
     /// Stubs the media library reader with a library whose single content location is the test root path.
     /// </summary>
     /// <param name="shouldSkipUnchangedDirectoriesDuringScan">Whether the library skips the directories that have not changed since the last scan.</param>
+    /// <param name="shouldSkipHiddenFilesAndDirectoriesDuringScan">Whether the library skips hidden files and directories.</param>
     /// <param name="isContentOnSsd">Whether the content of the library is stored on a solid state drive.</param>
-    private void SetupLibrary(bool shouldSkipUnchangedDirectoriesDuringScan = false, bool isContentOnSsd = false)
+    private void SetupLibrary(bool shouldSkipUnchangedDirectoriesDuringScan = false, bool shouldSkipHiddenFilesAndDirectoriesDuringScan = false, bool isContentOnSsd = false)
     {
         LibraryEntity library = _libraryEntityFixture.Create(
             id: _libraryId.Value,
             libraryType: LibraryType.Music,
             contentLocations: [ROOT_PATH],
             shouldSkipUnchangedDirectoriesDuringScan: shouldSkipUnchangedDirectoriesDuringScan,
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: shouldSkipHiddenFilesAndDirectoriesDuringScan,
             isContentOnSsd: isContentOnSsd);
         _mockLibraryRepository.GetByIdAsync(Arg.Any<Guid>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(Result.From<LibraryEntity?>(library));
@@ -422,11 +445,12 @@ public class MusicFileSystemDiscoveryJobTests
     /// <param name="directory">The file system path of the directory.</param>
     /// <param name="files">The file system paths of the files of the directory.</param>
     /// <param name="subdirectories">The file system paths of the subdirectories of the directory.</param>
-    private void SetupDirectory(string directory, string[] files, string[] subdirectories)
+    /// <param name="shouldIncludeHiddenElements">Whether the providers are expected to include hidden elements.</param>
+    private void SetupDirectory(string directory, string[] files, string[] subdirectories, bool shouldIncludeHiddenElements = true)
     {
-        _mockFileProviderService.GetFilePaths(Arg.Is<FileSystemPathId>(path => path.Path == directory), true)
+        _mockFileProviderService.GetFilePaths(Arg.Is<FileSystemPathId>(path => path.Path == directory), shouldIncludeHiddenElements)
             .Returns(Result.From<IEnumerable<FileSystemPathId>>([.. files.Select(file => PathId(file))]));
-        _mockDirectoryProviderService.GetSubdirectoryPaths(Arg.Is<FileSystemPathId>(path => path.Path == directory), true)
+        _mockDirectoryProviderService.GetSubdirectoryPaths(Arg.Is<FileSystemPathId>(path => path.Path == directory), shouldIncludeHiddenElements)
             .Returns(Result.From<IEnumerable<FileSystemPathId>>([.. subdirectories.Select(subdirectoryPath => PathId(subdirectoryPath))]));
     }
 

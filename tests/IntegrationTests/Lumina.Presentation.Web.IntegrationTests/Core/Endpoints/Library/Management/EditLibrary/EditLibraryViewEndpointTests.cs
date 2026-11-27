@@ -11,6 +11,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 #endregion
 
@@ -54,6 +55,36 @@ public class EditLibraryViewEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("text/html", response.Content.Headers.ContentType!.MediaType);
         Assert.Contains($"libraries/{libraryId}", _apiFactory.ApiClientStub.GetEndpointsCalled);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task EditLibraryView_WhenLibraryHasHiddenFilesSetting_ShouldRenderTheCheckboxWithItsStoredState(bool shouldSkipHiddenFilesAndDirectoriesDuringScan)
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        Guid libraryId = Guid.NewGuid();
+        LibraryDto expectedLibrary = _libraryDtoFixture.Create(
+            id: libraryId,
+            title: "Books",
+            libraryType: "Book",
+            shouldSkipHiddenFilesAndDirectoriesDuringScan: shouldSkipHiddenFilesAndDirectoriesDuringScan);
+        _apiFactory.ApiClientStub.RegisterGetResponse($"libraries/{libraryId}", expectedLibrary);
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.GetAsync($"/en-us/libraries/manage/item/{libraryId}");
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        string? checkboxTag = GetCheckboxTag(content, "ShouldSkipHiddenFilesAndDirectoriesDuringScan");
+        Assert.NotNull(checkboxTag);
+        if (shouldSkipHiddenFilesAndDirectoriesDuringScan)
+            Assert.Contains("checked", checkboxTag, StringComparison.OrdinalIgnoreCase);
+        else
+            Assert.DoesNotContain("checked", checkboxTag, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -102,6 +133,18 @@ public class EditLibraryViewEndpointTests : IClassFixture<LuminaWebFactory>
         Assert.Contains("id=\"file-system-browser-dialog\"", content);
         Assert.DoesNotContain("fsb-template-tree-node", content);
         Assert.Contains("initFileSystemBrowser(", content);
+    }
+
+    /// <summary>
+    /// Gets the rendered checkbox input tag with the provided name, or <see langword="null"/> when it is not present.
+    /// </summary>
+    /// <param name="content">The rendered HTML content.</param>
+    /// <param name="name">The name of the checkbox input.</param>
+    /// <returns>The rendered checkbox input tag, or <see langword="null"/>.</returns>
+    private static string? GetCheckboxTag(string content, string name)
+    {
+        Match match = Regex.Match(content, $@"<input[^>]*name=""{Regex.Escape(name)}""[^>]*>");
+        return match.Success ? match.Value : null;
     }
 
     /// <summary>

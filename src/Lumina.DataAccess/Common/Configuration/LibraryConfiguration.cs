@@ -83,6 +83,10 @@ public class LibraryConfiguration : IEntityTypeConfiguration<LibraryEntity>
             .HasDefaultValue(false)
             .HasColumnOrder(18);
 
+        builder.Property(library => library.ShouldSkipHiddenFilesAndDirectoriesDuringScan)
+            .HasDefaultValue(false)
+            .HasColumnOrder(19);
+
         // One user with many libraries.
         builder.HasOne(library => library.User)
             .WithMany(user => user.Libraries)
