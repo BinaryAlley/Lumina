@@ -1,11 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Nemera.Presentation.Web.Common.DTO.Common;
 using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Http;
 using Nemera.Presentation.Web.Common.Middlewares;
 using Nemera.Presentation.Web.Fixtures.Common.DTO.Common;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -17,6 +19,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 #endregion
 
@@ -170,6 +173,170 @@ public class ExceptionHandlingMiddlewareTests
         // Assert
         Assert.Equal(StatusCodes.Status500InternalServerError, httpContext.Response.StatusCode);
         Assert.Equal(0, httpContext.Response.Body.Length);
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenRequestBindingThrowsJsonExceptionAndApiRequest_ShouldWriteBadRequestProblemDetails()
+    {
+        // Arrange
+        DefaultHttpContext httpContext = CreateHttpContext(isApiRequest: true);
+        httpContext.Request.Path = "/books/1";
+        ConfigureJsonBindingFailureEndpoint(httpContext);
+        _nextDelegate = _ => throw new JsonException("The JSON value could not be converted to System.Guid.", "$.contributors[0].contributorId", 0, 10);
+
+        // Act
+        await _sut.InvokeAsync(httpContext);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, httpContext.Response.StatusCode);
+        Assert.Equal("application/problem+json", httpContext.Response.ContentType);
+        string body = await ReadResponseBodyAsync(httpContext);
+        using JsonDocument jsonDocument = JsonDocument.Parse(body);
+        JsonElement problemDetails = jsonDocument.RootElement;
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.1", problemDetails.GetProperty("type").GetString());
+        Assert.Equal("General.Validation", problemDetails.GetProperty("title").GetString());
+        Assert.Equal(StatusCodes.Status400BadRequest, problemDetails.GetProperty("status").GetInt32());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails.GetProperty("detail").GetString());
+        Assert.Equal("/books/1", problemDetails.GetProperty("instance").GetString());
+        Assert.Equal("localized:OneOrMoreValidationErrorsOccurred", problemDetails.GetProperty("errorMessage").GetString());
+        Assert.True(problemDetails.GetProperty("errors").TryGetProperty("contributors[0].contributorId", out JsonElement fieldErrors));
+        Assert.Equal("localized:OneOrMoreValidationErrorsOccurred", fieldErrors[0].GetString());
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData("$")]
+    public async Task InvokeAsync_WhenJsonExceptionHasNoFieldPath_ShouldReportTheRequestAsTheErrorField(string? path)
+    {
+        // Arrange
+        DefaultHttpContext httpContext = CreateHttpContext(isApiRequest: true);
+        ConfigureJsonBindingFailureEndpoint(httpContext);
+        _nextDelegate = _ => throw new JsonException("The JSON body is malformed.", path, 0, 10);
+
+        // Act
+        await _sut.InvokeAsync(httpContext);
+
+        // Assert
+        string body = await ReadResponseBodyAsync(httpContext);
+        using JsonDocument jsonDocument = JsonDocument.Parse(body);
+        Assert.True(jsonDocument.RootElement.GetProperty("errors").TryGetProperty("request", out JsonElement fieldErrors));
+        Assert.Equal("localized:OneOrMoreValidationErrorsOccurred", fieldErrors[0].GetString());
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenJsonBindExceptionOccursOnAnOptedInEndpoint_ShouldKeepTheJsonErrorEnvelope()
+    {
+        // Arrange
+        DefaultHttpContext httpContext = CreateHttpContext(isApiRequest: true);
+        ConfigureJsonBindingFailureEndpoint(httpContext);
+        _nextDelegate = _ => throw new FastEndpoints.JsonBindException(
+            "value",
+            "Value is not valid.",
+            new JsonException("The JSON value could not be converted.", "$.value", 0, 10));
+
+        // Act
+        await _sut.InvokeAsync(httpContext);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, httpContext.Response.StatusCode);
+        string body = await ReadResponseBodyAsync(httpContext);
+        using JsonDocument jsonDocument = JsonDocument.Parse(body);
+        Assert.False(jsonDocument.RootElement.GetProperty("success").GetBoolean());
+        Assert.Equal("localized:InternalServerError", jsonDocument.RootElement.GetProperty("errorMessage").GetString());
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenJsonBindingExceptionOccursAfterResponseStarted_ShouldAbortWithoutWritingProblemDetails()
+    {
+        // Arrange
+        DefaultHttpContext httpContext = CreateHttpContext(isApiRequest: true);
+        ConfigureJsonBindingFailureEndpoint(httpContext);
+        RecordingRequestLifetimeFeature lifetimeFeature = new();
+        httpContext.Features.Set<IHttpRequestLifetimeFeature>(lifetimeFeature);
+        httpContext.Features.Set<IHttpResponseFeature>(new StartedHttpResponseFeature());
+        _nextDelegate = _ => throw new JsonException("The JSON body is malformed.", "$.contributors", 0, 10);
+
+        // Act
+        await _sut.InvokeAsync(httpContext);
+
+        // Assert
+        Assert.True(httpContext.Response.HasStarted);
+        Assert.True(lifetimeFeature.WasAborted);
+        Assert.Equal(0, httpContext.Response.Body.Length);
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenRequestBindingThrowsJsonExceptionAndRawRequest_ShouldWriteBadRequestWithoutBody()
+    {
+        // Arrange
+        DefaultHttpContext httpContext = CreateHttpContext();
+        httpContext.Request.Headers.Accept = "audio/mpeg";
+        ConfigureJsonBindingFailureEndpoint(httpContext);
+        _nextDelegate = _ => throw new JsonException("The JSON body is malformed.", "$.id", 0, 10);
+
+        // Act
+        await _sut.InvokeAsync(httpContext);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, httpContext.Response.StatusCode);
+        Assert.Equal(0, httpContext.Response.Body.Length);
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenRequestBindingThrowsJsonExceptionAndPageRequest_ShouldWriteBadRequestHtmlPage()
+    {
+        // Arrange
+        DefaultHttpContext httpContext = CreateHttpContext();
+        httpContext.Request.Headers.Accept = "text/html";
+        ConfigureJsonBindingFailureEndpoint(httpContext);
+        _nextDelegate = _ => throw new JsonException("The JSON value could not be converted to System.Guid.", "$.contributors[0].contributorId", 0, 10);
+
+        // Act
+        await _sut.InvokeAsync(httpContext);
+
+        // Assert
+        Assert.Equal(StatusCodes.Status400BadRequest, httpContext.Response.StatusCode);
+        Assert.Contains("text/html", httpContext.Response.ContentType);
+        Assert.Contains("localized:OneOrMoreValidationErrorsOccurred", await ReadResponseBodyAsync(httpContext));
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenJsonExceptionOccursAfterEndpointStarted_ShouldTreatItAsAnUnexpectedError()
+    {
+        // Arrange
+        DefaultHttpContext httpContext = CreateHttpContext(isApiRequest: true);
+        ConfigureJsonBindingFailureEndpoint(httpContext);
+        httpContext.Items[HttpContextItemKeys.ENDPOINT_STARTED] = true;
+        _nextDelegate = _ => throw new JsonException("Malformed API response.", "$.id", 0, 10);
+
+        // Act
+        await _sut.InvokeAsync(httpContext);
+
+        // Assert
+        string body = await ReadResponseBodyAsync(httpContext);
+        using JsonDocument jsonDocument = JsonDocument.Parse(body);
+        Assert.False(jsonDocument.RootElement.GetProperty("success").GetBoolean());
+        Assert.Equal("localized:InternalServerError", jsonDocument.RootElement.GetProperty("errorMessage").GetString());
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WhenJsonExceptionOccursOnAnEndpointThatDidNotOptIn_ShouldKeepTheJsonErrorEnvelope()
+    {
+        // Arrange
+        DefaultHttpContext httpContext = CreateHttpContext(isApiRequest: true);
+        httpContext.SetEndpoint(new Endpoint(requestDelegate: null, new EndpointMetadataCollection(), displayName: "TestEndpoint"));
+        _nextDelegate = _ => throw new JsonException("The JSON value could not be converted to System.Guid.", "$.contributors[0].contributorId", 0, 10);
+
+        // Act
+        await _sut.InvokeAsync(httpContext);
+
+        // Assert
+        string body = await ReadResponseBodyAsync(httpContext);
+        using JsonDocument jsonDocument = JsonDocument.Parse(body);
+        Assert.False(jsonDocument.RootElement.GetProperty("success").GetBoolean());
+        Assert.Equal("localized:InternalServerError", jsonDocument.RootElement.GetProperty("errorMessage").GetString());
     }
 
     [Fact]
@@ -465,6 +632,18 @@ public class ExceptionHandlingMiddlewareTests
     }
 
     /// <summary>
+    /// Marks the endpoint of the provided HTTP context as one that reports JSON binding failures as client errors.
+    /// </summary>
+    /// <param name="httpContext">The HTTP context whose endpoint is marked.</param>
+    private static void ConfigureJsonBindingFailureEndpoint(DefaultHttpContext httpContext)
+    {
+        httpContext.SetEndpoint(new Endpoint(
+            requestDelegate: null,
+            new EndpointMetadataCollection(new JsonBindingFailureClientErrorMetadata()),
+            displayName: "TestEndpoint"));
+    }
+
+    /// <summary>
     /// Creates a service provider that resolves the mocked <see cref="IAuthenticationService"/>.
     /// </summary>
     /// <returns>The configured <see cref="IServiceProvider"/> instance.</returns>
@@ -526,5 +705,80 @@ public class ExceptionHandlingMiddlewareTests
         }
         """;
         return JsonSerializer.Deserialize<ProblemDetailsDto>(problemDetailsJson)!;
+    }
+
+    /// <summary>
+    /// Response feature that reports the response as already started, so tests can exercise the abort branch of the middleware.
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    private sealed class StartedHttpResponseFeature : IHttpResponseFeature
+    {
+        /// <summary>
+        /// Gets or sets the status code of the response.
+        /// </summary>
+        public int StatusCode { get; set; } = StatusCodes.Status200OK;
+
+        /// <summary>
+        /// Gets or sets the reason phrase of the response.
+        /// </summary>
+        public string? ReasonPhrase { get; set; }
+
+        /// <summary>
+        /// Gets or sets the response headers.
+        /// </summary>
+        public IHeaderDictionary Headers { get; set; } = new HeaderDictionary();
+
+        /// <summary>
+        /// Gets or sets the response body.
+        /// </summary>
+        public Stream Body { get; set; } = new MemoryStream();
+
+        /// <summary>
+        /// Gets a value indicating whether the response has started.
+        /// </summary>
+        public bool HasStarted => true;
+
+        /// <summary>
+        /// Registers a callback invoked before the response starts.
+        /// </summary>
+        /// <param name="callback">The callback to invoke.</param>
+        /// <param name="state">The state passed to the callback.</param>
+        public void OnStarting(Func<object, Task> callback, object state)
+        {
+        }
+
+        /// <summary>
+        /// Registers a callback invoked when the response completes.
+        /// </summary>
+        /// <param name="callback">The callback to invoke.</param>
+        /// <param name="state">The state passed to the callback.</param>
+        public void OnCompleted(Func<object, Task> callback, object state)
+        {
+        }
+    }
+
+    /// <summary>
+    /// Records whether the lifetime of a test request was aborted, so tests can assert the abort branch of the middleware.
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    private sealed class RecordingRequestLifetimeFeature : IHttpRequestLifetimeFeature
+    {
+        /// <summary>
+        /// Gets or sets the token that is signaled when the request is aborted.
+        /// </summary>
+        public CancellationToken RequestAborted { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the request was aborted.
+        /// </summary>
+        public bool WasAborted { get; private set; }
+
+        /// <summary>
+        /// Marks the request as aborted.
+        /// </summary>
+        public void Abort()
+        {
+            WasAborted = true;
+        }
     }
 }

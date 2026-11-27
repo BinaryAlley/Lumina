@@ -1,11 +1,13 @@
 #region ========================================================================= USING =====================================================================================
 using Nemera.Presentation.Web.Common.Exceptions;
+using Nemera.Presentation.Web.Common.Http;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -61,6 +63,11 @@ public class ExceptionHandlingMiddleware
         {
             await HandleApiExceptionAsync(context, apiException);
         }
+        catch (JsonException jsonException) when (IsOptedInJsonBindingFailure(context, jsonException))
+        {
+            // The JSON request body failed to bind before the endpoint ran, so the caller sent a body that does not match the request contract.
+            await HandleJsonBindingExceptionAsync(context, jsonException);
+        }
         catch (Exception ex) // Other cases.
         {
             if (_logger.IsEnabled(LogLevel.Error))
@@ -98,6 +105,63 @@ public class ExceptionHandlingMiddleware
             else
                 await WriteStatusOnlyResponseAsync(context, (int)HttpStatusCode.InternalServerError).ConfigureAwait(false);
         }
+    }
+
+    /// <summary>
+    /// Determines whether a JSON exception is a request body binding failure of an endpoint that opted into client error responses.
+    /// </summary>
+    /// <param name="context">The <see cref="HttpContext"/> for the current request.</param>
+    /// <param name="jsonException">The JSON exception thrown while processing the request.</param>
+    /// <returns><see langword="true"/> when the exception is a JSON body binding failure that should be reported as a client error.</returns>
+    private static bool IsOptedInJsonBindingFailure(HttpContext context, JsonException jsonException)
+    {
+        return jsonException is not FastEndpoints.JsonBindException
+            && !context.Items.ContainsKey(HttpContextItemKeys.ENDPOINT_STARTED)
+            && context.GetEndpoint()?.Metadata.GetMetadata<JsonBindingFailureClientErrorMetadata>() is not null;
+    }
+
+    /// <summary>
+    /// Handles a JSON request body that could not be deserialized into the request contract.
+    /// </summary>
+    /// <param name="context">The <see cref="HttpContext"/> for the current request.</param>
+    /// <param name="jsonException">The exception thrown while binding the request body.</param>
+    private async Task HandleJsonBindingExceptionAsync(HttpContext context, JsonException jsonException)
+    {
+        if (_logger.IsEnabled(LogLevel.Warning))
+            _logger.LogWarning(jsonException, "The JSON request body could not be deserialized: {Message}", jsonException.Message);
+
+        // Once the response has started, its status and headers are already on the wire, so they can no longer be replaced.
+        if (context.Response.HasStarted)
+        {
+            context.Abort();
+            return;
+        }
+
+        string errorMessage = _stringLocalizer["OneOrMoreValidationErrorsOccurred"].Value;
+        string? trimmedPath = jsonException.Path?.TrimStart('$', '.');
+        string fieldName = string.IsNullOrWhiteSpace(trimmedPath) ? "request" : trimmedPath;
+        if (IsJsonRequest(context))
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsJsonAsync(
+                new
+                {
+                    type = "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+                    title = "General.Validation",
+                    status = StatusCodes.Status400BadRequest,
+                    detail = "OneOrMoreValidationErrorsOccurred",
+                    instance = context.Request.Path.ToString(),
+                    errors = new Dictionary<string, string[]> { [fieldName] = [errorMessage] },
+                    errorMessage
+                },
+                options: null,
+                contentType: "application/problem+json",
+                cancellationToken: context.RequestAborted).ConfigureAwait(false);
+        }
+        else if (IsNavigationRequest(context))
+            await WriteHtmlErrorResponseAsync(context, StatusCodes.Status400BadRequest, errorMessage).ConfigureAwait(false);
+        else
+            await WriteStatusOnlyResponseAsync(context, StatusCodes.Status400BadRequest).ConfigureAwait(false);
     }
 
     /// <summary>

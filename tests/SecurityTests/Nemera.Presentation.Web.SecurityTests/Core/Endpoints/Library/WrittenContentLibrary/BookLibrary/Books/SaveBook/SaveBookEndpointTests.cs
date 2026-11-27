@@ -6,12 +6,14 @@ using Nemera.Presentation.Web.Fixtures.Common.DTO.WrittenContentLibrary.BookLibr
 using Nemera.Presentation.Web.Fixtures.Common.Requests.Library.WrittenContentLibrary.BookLibrary.Books;
 using Nemera.Presentation.Web.Fixtures.Common.TestHelpers;
 using Nemera.Presentation.Web.SecurityTests.Common.Setup;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 #endregion
@@ -98,6 +100,79 @@ public class SaveBookEndpointTests : IClassFixture<NemeraWebFactory>
     }
 
     [Fact]
+    public async Task SaveBook_WhenLibraryIdIsNotAGuid_ShouldReturnClientErrorWithoutLeakingInternals()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        Guid bookId = Guid.NewGuid();
+        Guid libraryId = Guid.NewGuid();
+        UpdateBookRequest request = _updateBookRequestFixture.Create(id: bookId, libraryId: libraryId);
+        string maliciousLibraryId = "'; DROP TABLE Libraries--";
+        string payload = JsonSerializer.Serialize(request, JsonSerializerOptions.Web);
+        payload = payload.Replace(libraryId.ToString(), maliciousLibraryId);
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        HttpRequestMessage saveRequest = CreateRawSaveRequest(bookId.ToString(), payload);
+        saveRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(saveRequest);
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType!.MediaType);
+        using JsonDocument json = JsonDocument.Parse(content);
+        JsonElement problemDetails = json.RootElement;
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.1", problemDetails.GetProperty("type").GetString());
+        Assert.Equal("General.Validation", problemDetails.GetProperty("title").GetString());
+        Assert.Equal(StatusCodes.Status400BadRequest, problemDetails.GetProperty("status").GetInt32());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails.GetProperty("detail").GetString());
+        Assert.Equal($"/en-us/library/written-content-library/books-library/books/{bookId}/api-save-book", problemDetails.GetProperty("instance").GetString());
+        Assert.Equal("One or more validation errors occurred", problemDetails.GetProperty("errorMessage").GetString());
+        Assert.True(problemDetails.GetProperty("errors").TryGetProperty("libraryId", out JsonElement fieldErrors));
+        Assert.Equal("One or more validation errors occurred", fieldErrors[0].GetString());
+        Assert.Empty(_apiFactory.ApiClientStub.PutRequests);
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("at Nemera", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(maliciousLibraryId, content, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task SaveBook_WhenBodyIsMalformedJson_ShouldReturnClientErrorWithoutLeakingInternals()
+    {
+        // Arrange
+        _apiFactory.ApiClientStub.Reset();
+        Guid bookId = Guid.NewGuid();
+        const string PAYLOAD = "{\"contributors\": [";
+        AuthenticatedWebClient webClient = await WebTestHelpers.CreateAuthenticatedClientAsync(_apiFactory);
+        HttpRequestMessage saveRequest = CreateRawSaveRequest(bookId.ToString(), PAYLOAD);
+        saveRequest.Headers.Add("RequestVerificationToken", webClient.AntiforgeryToken);
+
+        // Act
+        HttpResponseMessage response = await webClient.Client.SendAsync(saveRequest);
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType!.MediaType);
+        using JsonDocument json = JsonDocument.Parse(content);
+        JsonElement problemDetails = json.RootElement;
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.1", problemDetails.GetProperty("type").GetString());
+        Assert.Equal("General.Validation", problemDetails.GetProperty("title").GetString());
+        Assert.Equal(StatusCodes.Status400BadRequest, problemDetails.GetProperty("status").GetInt32());
+        Assert.Equal("OneOrMoreValidationErrorsOccurred", problemDetails.GetProperty("detail").GetString());
+        Assert.Equal($"/en-us/library/written-content-library/books-library/books/{bookId}/api-save-book", problemDetails.GetProperty("instance").GetString());
+        Assert.Equal("One or more validation errors occurred", problemDetails.GetProperty("errorMessage").GetString());
+        Assert.NotEmpty(problemDetails.GetProperty("errors").EnumerateObject());
+        Assert.Empty(_apiFactory.ApiClientStub.PutRequests);
+        Assert.DoesNotContain(PAYLOAD, content, StringComparison.Ordinal);
+        Assert.DoesNotContain("Exception", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("SqliteException", content, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("at Nemera", content, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public async Task SaveBook_WhenCalledWithoutAuthentication_ShouldRedirectToLogin()
     {
         // Arrange
@@ -126,6 +201,22 @@ public class SaveBookEndpointTests : IClassFixture<NemeraWebFactory>
             Content = JsonContent.Create(request)
         };
         saveRequest.Content!.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        saveRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        return saveRequest;
+    }
+
+    /// <summary>
+    /// Builds a save request that sends the given raw JSON body to the book identified by <paramref name="bookId"/>.
+    /// </summary>
+    /// <param name="bookId">The route Id of the book to save.</param>
+    /// <param name="jsonBody">The raw JSON body to send.</param>
+    /// <returns>The configured save request.</returns>
+    private static HttpRequestMessage CreateRawSaveRequest(string bookId, string jsonBody)
+    {
+        HttpRequestMessage saveRequest = new(HttpMethod.Put, $"/en-us/library/written-content-library/books-library/books/{Uri.EscapeDataString(bookId)}/api-save-book")
+        {
+            Content = new StringContent(jsonBody, Encoding.UTF8, "application/json")
+        };
         saveRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         return saveRequest;
     }

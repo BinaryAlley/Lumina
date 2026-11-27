@@ -3,6 +3,8 @@ using FastEndpoints;
 using Nemera.Presentation.Web.Common.Http;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 #endregion
 
 namespace Nemera.Presentation.Web.Core.Endpoints.Common;
@@ -29,6 +31,25 @@ public abstract class BaseEndpoint<TRequest, TResponse> : Endpoint<TRequest, TRe
     public override void Configure()
     {
         DontCatchExceptions();
+    }
+
+    /// <summary>
+    /// Marks the endpoint so that malformed JSON request bodies are answered with a client error ProblemDetails instead of the default JSON error envelope.
+    /// </summary>
+    protected void ReportJsonBindingFailuresAsClientErrors()
+    {
+        Metadata(new JsonBindingFailureClientErrorMetadata());
+    }
+
+    /// <summary>
+    /// Marks the request as past request binding, so that JSON binding failures can be told apart from JSON failures thrown while the endpoint runs.
+    /// </summary>
+    /// <param name="request">The request bound from the incoming request.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to stop the execution.</param>
+    public override Task OnBeforeHandleAsync(TRequest request, CancellationToken cancellationToken)
+    {
+        HttpContext.Items[HttpContextItemKeys.ENDPOINT_STARTED] = true;
+        return Task.CompletedTask;
     }
 
     /// <summary>
