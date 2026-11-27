@@ -102,9 +102,9 @@ public class BookDetailsDto
     public List<IsbnDto>? ISBNs { get; set; }
 
     /// <summary>
-    /// Gets or sets the list of media contributors of the book.
+    /// Gets or sets the list of references to the media contributors of the book, each with the role they played.
     /// </summary>
-    public List<MediaContributorDto>? Contributors { get; set; }
+    public List<MediaContributorReferenceDto>? Contributors { get; set; }
 
     /// <summary>
     /// Gets or sets the list of ratings of the book.

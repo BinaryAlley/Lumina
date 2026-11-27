@@ -69,7 +69,7 @@ public class SaveBookEndpointSummary : Summary<SaveBookEndpoint, UpdateBookReque
         RequestParam(r => r.BarnesAndNobleId, "The Barnes & Noble Id of the book. Optional.");
         RequestParam(r => r.AppleBooksId, "The Apple Books Id of the book. Optional.");
         RequestParam(r => r.ISBNs, "The list of ISBN (International Standard Book Number) of the book. Required.");
-        RequestParam(r => r.Contributors, "The list of media contributors of the book. Required.");
+        RequestParam(r => r.Contributors, "The list of references to the media contributors of the book, each with the role they played. Required.");
         RequestParam(r => r.Ratings, "The list of ratings of the book. Required.");
 
         ExampleRequest = new UpdateBookRequest(
@@ -139,14 +139,14 @@ public class SaveBookEndpointSummary : Summary<SaveBookEndpoint, UpdateBookReque
             ],
             Contributors:
             [
-                new MediaContributorDto
+                new MediaContributorReferenceDto
                 {
-                    Name = new MediaContributorNameDto { DisplayName = "J.R.R. Tolkien", LegalName = "John Ronald Reuel Tolkien" },
+                    ContributorId = Guid.NewGuid(),
                     Role = MediaContributorRole.Author
                 },
-                new MediaContributorDto
+                new MediaContributorReferenceDto
                 {
-                    Name = new MediaContributorNameDto { DisplayName = "Alan Lee", LegalName = "Alan Lee" },
+                    ContributorId = Guid.NewGuid(),
                     Role = MediaContributorRole.Illustrator
                 }
             ],

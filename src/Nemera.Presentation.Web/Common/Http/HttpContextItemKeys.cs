@@ -29,4 +29,9 @@ public static class HttpContextItemKeys
     /// The <c>Cache-Control</c> value chosen by the endpoint, restored when the response starts.
     /// </summary>
     public const string CACHE_CONTROL = "CacheControl";
+
+    /// <summary>
+    /// The key under which the flag indicating that the endpoint bound its request and started executing is stored.
+    /// </summary>
+    public const string ENDPOINT_STARTED = "EndpointStarted";
 }

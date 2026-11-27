@@ -23,7 +23,7 @@ public class BookDetailsDtoFixture
     private readonly Faker _faker = new();
     private readonly WrittenContentMetadataDtoFixture _writtenContentMetadataDtoFixture = new();
     private readonly IsbnDtoFixture _isbnDtoFixture = new();
-    private readonly MediaContributorDtoFixture _mediaContributorDtoFixture = new();
+    private readonly MediaContributorReferenceDtoFixture _mediaContributorReferenceDtoFixture = new();
     private readonly BookRatingDtoFixture _bookRatingDtoFixture = new();
 
     /// <summary>
@@ -61,7 +61,7 @@ public class BookDetailsDtoFixture
             BarnesAndNobleId = _faker.Random.String2(10, "0123456789"),
             AppleBooksId = $"id{_faker.Random.Number(1, 999999)}",
             ISBNs = [.. _isbnDtoFixture.CreateMany(_faker.Random.Number(1, 3))],
-            Contributors = [.. _mediaContributorDtoFixture.CreateMany(_faker.Random.Number(1, 3))],
+            Contributors = [.. _mediaContributorReferenceDtoFixture.CreateMany(_faker.Random.Number(1, 3))],
             Ratings = [.. _bookRatingDtoFixture.CreateMany(_faker.Random.Number(1, 3))],
             MetadataStatus = _faker.Random.String2(_faker.Random.Number(1, 20)),
             LastMetadataUpdateUtc = _faker.Date.Recent(),

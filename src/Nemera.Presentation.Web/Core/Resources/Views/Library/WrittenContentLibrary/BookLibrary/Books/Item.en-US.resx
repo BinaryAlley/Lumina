@@ -150,9 +150,6 @@
   <data name="Contributors" xml:space="preserve">
     <value>Contributors</value>
   </data>
-  <data name="ContributorName" xml:space="preserve">
-    <value>Name</value>
-  </data>
   <data name="RoleName" xml:space="preserve">
     <value>Role</value>
   </data>

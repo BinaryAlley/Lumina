@@ -50,5 +50,8 @@ public class EditBookViewEndpointTests : IClassFixture<NemeraWebFactory>
         Assert.Equal("text/html", response.Content.Headers.ContentType!.MediaType);
         Assert.Contains("A book", content);
         Assert.Contains("btn-delete-book", content);
+        Assert.Contains("contributor-id", content);
+        Assert.DoesNotContain("contributor-name", content);
+        Assert.Contains(expectedBook.Contributors![0].ContributorId.ToString(), content);
     }
 }

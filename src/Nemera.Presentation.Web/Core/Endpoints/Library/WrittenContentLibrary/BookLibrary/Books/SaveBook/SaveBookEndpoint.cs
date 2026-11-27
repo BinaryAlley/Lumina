@@ -41,6 +41,7 @@ public class SaveBookEndpoint : BaseEndpoint<UpdateBookRequest, IResult>
         DontAutoTag();
         Options(options => options.WithTags("Books"));
         EnableAntiforgery();
+        ReportJsonBindingFailuresAsClientErrors();
     }
 
     /// <summary>
